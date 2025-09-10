@@ -14,12 +14,19 @@ import {
   EyeIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { useAdmin } from '@/contexts/AdminContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
 export default function AdminDashboard() {
   const { t } = useLanguage()
+  const { logout } = useAdmin()
   const [activeTab, setActiveTab] = useState('overview')
+
+  const handleLogout = () => {
+    logout()
+    window.location.href = '/'
+  }
 
   const stats = [
     {
@@ -182,13 +189,21 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {t('admin.title', 'Admin Dashboard', 'நிர்வாக டாஷ்போர்டு')}
-            </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-300">
-              {t('admin.subtitle', 'Manage your Hello Madurai content and settings', 'உங்கள் ஹலோ மதுரை உள்ளடக்கம் மற்றும் அமைப்புகளை நிர்வகிக்கவும்')}
-            </p>
+          <div className="py-6 flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                {t('admin.title', 'Admin Dashboard', 'நிர்வாக டாஷ்போர்டு')}
+              </h1>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">
+                {t('admin.subtitle', 'Manage your Hello Madurai content and settings', 'உங்கள் ஹலோ மதுரை உள்ளடக்கம் மற்றும் அமைப்புகளை நிர்வகிக்கவும்')}
+              </p>
+            </div>
+            <Button
+              onClick={handleLogout}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {t('admin.logout', 'Logout', 'வெளியேறு')}
+            </Button>
           </div>
         </div>
       </div>

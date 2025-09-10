@@ -163,7 +163,7 @@ export default function MagazinePage() {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                         <EyeIcon className="h-4 w-4 mr-1" />
-                        {magazine.downloadCount.toLocaleString()} {t('magazine.downloads', 'downloads', 'பதிவிறக்கங்கள்')}
+                        {(magazine.downloadCount || 0).toLocaleString()} {t('magazine.downloads', 'downloads', 'பதிவிறக்கங்கள்')}
                       </div>
                     </div>
                     <div className="flex space-x-3">

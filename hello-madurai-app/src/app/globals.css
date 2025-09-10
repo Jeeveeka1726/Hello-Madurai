@@ -14,36 +14,36 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #fefefe;
+  background-color: #ffffff;
   color: #374151;
 }
 
-/* Light theme improvements */
+/* Light theme improvements - White/Purple theme */
 .light {
-  --background: #fefefe;
+  --background: #ffffff;
   --foreground: #374151;
   --card: #ffffff;
   --card-foreground: #374151;
-  --primary: #f59e0b;
+  --primary: #a855f7;
   --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
+  --secondary: #f8fafc;
   --secondary-foreground: #374151;
-  --muted: #f9fafb;
+  --muted: #f1f5f9;
   --muted-foreground: #6b7280;
-  --accent: #f3f4f6;
+  --accent: #f3e8ff;
   --accent-foreground: #374151;
-  --border: #e5e7eb;
+  --border: #e2e8f0;
   --input: #ffffff;
-  --ring: #f59e0b;
+  --ring: #a855f7;
 }
 
-/* Dark theme improvements */
+/* Dark theme improvements - True dark theme */
 .dark {
   --background: #0f172a;
   --foreground: #f1f5f9;
   --card: #1e293b;
   --card-foreground: #f1f5f9;
-  --primary: #fbbf24;
+  --primary: #c084fc;
   --primary-foreground: #0f172a;
   --secondary: #334155;
   --secondary-foreground: #f1f5f9;
@@ -53,7 +53,7 @@ body {
   --accent-foreground: #f1f5f9;
   --border: #334155;
   --input: #1e293b;
-  --ring: #fbbf24;
+  --ring: #c084fc;
 }
 
 /* Tamil font support */
@@ -61,9 +61,18 @@ body {
   font-family: 'Noto Sans Tamil', 'Latha', 'Vijaya', sans-serif;
 }
 
-/* Dark mode transitions */
+/* Dark mode transitions - Faster for better performance */
 * {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+}
+
+/* Optimize for performance */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
 }
 
 /* Custom scrollbar */
@@ -133,6 +142,33 @@ body {
 
 .focus-visible\:outline-offset-2 {
   outline-offset: 2px;
+}
+
+/* Performance optimizations */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Faster transitions */
+.transition-fast {
+  transition: all 0.15s ease-in-out;
+}
+
+/* Image optimization */
+img {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Print styles */

@@ -52,13 +52,7 @@ export default function VideosPage() {
     fetchVideos()
   }, [])
 
-  // Filter videos based on selected category
-  const filteredVideos = selectedCategory === 'all'
-    ? videos
-    : videos.filter(video => video.category === selectedCategory)
-
-  // Get featured videos
-  const featuredVideos = videos.filter(video => video.featured)
+  // Variables will be defined later after categories
 
   // Hardcoded videos removed - now using database data
   const fallbackVideos = [
@@ -177,6 +171,13 @@ export default function VideosPage() {
     window.open(`https://www.youtube.com/watch?v=${youtubeId}`, '_blank')
   }
 
+  const getYouTubeThumbnail = (youtubeId?: string) => {
+    if (youtubeId) {
+      return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
+    }
+    return '/placeholder-video.jpg'
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -233,8 +234,16 @@ export default function VideosPage() {
               {featuredVideos.map((video) => (
                 <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                   <div className="relative aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 cursor-pointer" onClick={() => playVideo(video.youtubeId)}>
-                    <div className="flex items-center justify-center">
-                      <div className="bg-black bg-opacity-50 rounded-full p-4 hover:bg-opacity-70 transition-all">
+                    <img
+                      src={getYouTubeThumbnail(video.youtubeId)}
+                      alt={video.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder-video.jpg'
+                      }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-all">
+                      <div className="bg-red-600 rounded-full p-4 hover:bg-red-700 transition-all">
                         <PlayIcon className="h-12 w-12 text-white" />
                       </div>
                     </div>

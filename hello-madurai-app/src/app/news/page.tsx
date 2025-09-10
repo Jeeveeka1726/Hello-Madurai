@@ -6,6 +6,7 @@ import { CalendarIcon, EyeIcon, UserIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import { BannerAd, ResponsiveAd } from '@/components/ads/GoogleAdsense'
 
 interface NewsArticle {
   id: string
@@ -124,6 +125,9 @@ export default function NewsPage() {
               </div>
             </div>
 
+            {/* Top Banner Ad */}
+            <BannerAd className="mb-8" />
+
             {/* Featured News */}
         {featuredNews.length > 0 && (
           <div className="mb-12">
@@ -182,6 +186,9 @@ export default function NewsPage() {
             </div>
           </div>
         )}
+
+        {/* Middle Banner Ad */}
+        <ResponsiveAd className="mb-8" />
 
         {/* Regular News */}
         <div>

@@ -46,10 +46,6 @@ export default function NewHeader() {
       name: t('nav.directory', 'Directory', 'முகவரி நூல்'),
       href: '/directory'
     },
-    {
-      name: t('nav.admin', 'Admin', 'நிர்வாகம்'),
-      href: '/admin'
-    },
   ]
 
   const toggleLanguage = () => {

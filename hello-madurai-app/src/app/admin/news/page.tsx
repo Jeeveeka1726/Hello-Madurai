@@ -38,7 +38,9 @@ export default function AdminNewsPage() {
     excerpt_ta: '',
     category: 'general',
     author: 'Admin',
-    featured: false
+    featured: false,
+    imageUrl: '',
+    tags: ''
   })
 
   const categories = [
@@ -97,7 +99,9 @@ export default function AdminNewsPage() {
           excerpt_ta: '',
           category: 'general',
           author: 'Admin',
-          featured: false
+          featured: false,
+          imageUrl: '',
+          tags: ''
         })
         alert(editingNews ? 'News updated successfully!' : 'News created successfully!')
       } else {
@@ -320,6 +324,30 @@ export default function AdminNewsPage() {
                         required
                         value={formData.author}
                         onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Featured Image URL
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.imageUrl}
+                        onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                        placeholder="https://example.com/image.jpg"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Tags (comma separated)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.tags}
+                        onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                        placeholder="madurai, news, local"
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
                       />
                     </div>

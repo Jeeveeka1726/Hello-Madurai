@@ -9,19 +9,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Custom colors for Hello Madurai theme - Lighter and more pleasant
+        // Custom colors for Hello Madurai theme - Purple for light mode
         primary: {
-          50: '#fef9f5',
-          100: '#fef2e8',
-          200: '#fde4cc',
-          300: '#fbd0a5',
-          400: '#f8b572',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
-          950: '#451a03',
+          50: '#faf5ff',
+          100: '#f3e8ff',
+          200: '#e9d5ff',
+          300: '#d8b4fe',
+          400: '#c084fc',
+          500: '#a855f7',
+          600: '#9333ea',
+          700: '#7c3aed',
+          800: '#6b21a8',
+          900: '#581c87',
+          950: '#3b0764',
         },
         secondary: {
           50: '#f0f9ff',
