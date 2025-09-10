@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model News {
+  id          String   @id @default(cuid())
+  title       String
+  title_ta    String?
+  content     String
+  content_ta  String?
+  excerpt     String
+  excerpt_ta  String?
+  category    String
+  author      String
+  publishedAt DateTime @default(now())
+  views       Int      @default(0)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("news")
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  title_ta    String?
+  description String
+  description_ta String?
+  location    String
+  location_ta String?
+  startDate   DateTime
+  endDate     DateTime?
+  category    String
+  status      String   @default("upcoming") // upcoming, ongoing, completed
+  featured    Boolean  @default(false)
+  registrations Int    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("events")
+}
+
+model Podcast {
+  id          String   @id @default(cuid())
+  title       String
+  title_ta    String?
+  description String
+  description_ta String?
+  host        String
+  duration    String
+  audioUrl    String
+  featured    Boolean  @default(false)
+  plays       Int      @default(0)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("podcasts")
+}
+
+model Business {
+  id          String   @id @default(cuid())
+  name        String
+  name_ta     String?
+  description String
+  description_ta String?
+  category    String
+  phone       String?
+  email       String?
+  website     String?
+  address     String
+  address_ta  String?
+  featured    Boolean  @default(false)
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("businesses")
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  title       String
+  title_ta    String?
+  description String
+  description_ta String?
+  videoUrl    String   // YouTube URL or video file URL
+  youtubeId   String?  // YouTube video ID for embedding
+  thumbnail   String?
+  category    String
+  duration    String?
+  views       Int      @default(0)
+  featured    Boolean  @default(false)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("videos")
+}
+
+model Magazine {
+  id          String   @id @default(cuid())
+  title       String
+  title_ta    String?
+  description String
+  description_ta String?
+  pdfUrl      String
+  coverImage  String?
+  issueNumber String
+  publishedAt DateTime @default(now())
+  downloads   Int      @default(0)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("magazines")
+}
