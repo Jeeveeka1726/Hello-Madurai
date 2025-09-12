@@ -59,9 +59,9 @@ const navigation = [
     icon: DocumentIcon
   },
   {
-    name: 'Podcasts',
-    name_ta: 'பாட்காஸ்ட்கள்',
-    href: '/admin/podcasts',
+    name: 'Radio',
+    name_ta: 'வானொலி',
+    href: '/admin/radio',
     icon: ChartBarIcon
   }
 ]

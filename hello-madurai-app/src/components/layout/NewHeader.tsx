@@ -2,21 +2,17 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { 
-  Bars3Icon, 
-  XMarkIcon, 
-  LanguageIcon,
-  SunIcon,
-  MoonIcon
+import {
+  Bars3Icon,
+  XMarkIcon,
+  LanguageIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { useTheme } from '@/contexts/ThemeContext'
 import TranslatedText from '@/components/TranslatedText'
 
 export default function NewHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { language, setLanguage, t } = useLanguage()
-  const { theme, toggleTheme, mounted } = useTheme()
 
   const navigation = [
     { 
@@ -32,7 +28,7 @@ export default function NewHeader() {
       href: '/events' 
     },
     {
-      name: t('nav.podcast', 'Podcast', 'பாட்காஸ்ட்'),
+      name: t('nav.radio', 'Radio', 'வானொலி'),
       href: '/radio'
     },
     { 
@@ -46,6 +42,10 @@ export default function NewHeader() {
     {
       name: t('nav.directory', 'Directory', 'முகவரி நூல்'),
       href: '/directory'
+    },
+    {
+      name: t('nav.contact', 'Contact', 'தொடர்பு'),
+      href: '/contact'
     },
   ]
 
@@ -98,20 +98,7 @@ export default function NewHeader() {
               </span>
             </button>
 
-            {/* Theme Toggle */}
-            {mounted && (
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-md text-neutral-700 dark:text-white hover:text-primary-600 dark:hover:text-primary-300 hover:bg-white-600 dark:hover:bg-primary-800 transition-colors duration-200"
-                title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-              >
-                {theme === 'light' ? (
-                  <MoonIcon className="h-5 w-5" />
-                ) : (
-                  <SunIcon className="h-5 w-5" />
-                )}
-              </button>
-            )}
+
 
             {/* Mobile menu button */}
             <button

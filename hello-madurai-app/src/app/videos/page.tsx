@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { PlayIcon, EyeIcon, CalendarIcon, ClockIcon } from '@heroicons/react/24/outline'
-import AppWrapper from '@/components/AppWrapper'
 import { useLanguage } from '@/contexts/LanguageContext'
+import NewHeader from '@/components/layout/NewHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
@@ -282,8 +282,9 @@ function VideosPageContent() {
 
 export default function VideosPage() {
   return (
-    <AppWrapper>
+    <div>
+      <NewHeader />
       <VideosPageContent />
-    </AppWrapper>
+    </div>
   )
 }

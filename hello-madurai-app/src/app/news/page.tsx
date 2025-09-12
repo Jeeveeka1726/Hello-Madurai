@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { CalendarIcon, EyeIcon, UserIcon } from '@heroicons/react/24/outline'
-import AppWrapper from '@/components/AppWrapper'
 import { useLanguage } from '@/contexts/LanguageContext'
+import NewHeader from '@/components/layout/NewHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import { BannerAd, ResponsiveAd } from '@/components/ads/GoogleAdsense'
@@ -273,8 +273,9 @@ function NewsPageContent() {
 
 export default function NewsPage() {
   return (
-    <AppWrapper>
+    <div>
+      <NewHeader />
       <NewsPageContent />
-    </AppWrapper>
+    </div>
   )
 }

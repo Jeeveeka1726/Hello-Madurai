@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { CalendarIcon, MapPinIcon, ClockIcon, UserGroupIcon } from '@heroicons/react/24/outline'
-import AppWrapper from '@/components/AppWrapper'
 import { useLanguage } from '@/contexts/LanguageContext'
+import NewHeader from '@/components/layout/NewHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
@@ -295,8 +295,9 @@ function EventsPageContent() {
 
 export default function EventsPage() {
   return (
-    <AppWrapper>
+    <div>
+      <NewHeader />
       <EventsPageContent />
-    </AppWrapper>
+    </div>
   )
 }

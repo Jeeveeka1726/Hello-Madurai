@@ -13,7 +13,8 @@ import {
   PencilIcon,
   TrashIcon,
   EyeIcon,
-  BellIcon
+  BellIcon,
+  MicrophoneIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAdmin } from '@/contexts/AdminContext'
@@ -332,6 +333,16 @@ export default function AdminDashboard() {
                 <CalendarIcon className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
                 <p className="font-medium text-green-900 dark:text-green-100">
                   {t('admin.addEvent', 'Add Event', 'நிகழ்வு சேர்க்க')}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/admin/radio">
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 border-purple-200 dark:border-purple-700 hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <MicrophoneIcon className="h-8 w-8 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                <p className="font-medium text-purple-900 dark:text-purple-100">
+                  {t('admin.addRadio', 'Manage Radio', 'வானொலி நிர்வகிக்க')}
                 </p>
               </CardContent>
             </Card>

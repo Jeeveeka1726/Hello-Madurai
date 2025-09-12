@@ -51,7 +51,26 @@ model Event {
   @@map("events")
 }
 
-model Podcast {
+// Radio Show Folders (e.g., "Hello Madurai", "Music Shows", etc.)
+model RadioFolder {
+  id          String   @id @default(cuid())
+  name        String
+  name_ta     String?
+  description String?
+  description_ta String?
+  coverImage  String?
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationship to radio shows
+  radioShows  RadioShow[]
+
+  @@map("radio_folders")
+}
+
+// Individual Radio Shows within folders
+model RadioShow {
   id          String   @id @default(cuid())
   title       String
   title_ta    String?
@@ -66,7 +85,11 @@ model Podcast {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@map("podcasts")
+  // Relationship to folder
+  folderId    String
+  folder      RadioFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+
+  @@map("radio_shows")
 }
 
 model Business {
@@ -109,6 +132,25 @@ model Video {
   @@map("videos")
 }
 
+// Magazine Collections (e.g., "Monthly Issues", "Special Editions", etc.)
+model MagazineCollection {
+  id          String   @id @default(cuid())
+  name        String
+  name_ta     String?
+  description String?
+  description_ta String?
+  coverImage  String?
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationship to magazines
+  magazines   Magazine[]
+
+  @@map("magazine_collections")
+}
+
+// Individual Magazines within collections
 model Magazine {
   id            String   @id @default(cuid())
   title         String
@@ -124,6 +166,10 @@ model Magazine {
   featured      Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  // Relationship to collection
+  collectionId  String
+  collection    MagazineCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
   @@map("magazines")
 }

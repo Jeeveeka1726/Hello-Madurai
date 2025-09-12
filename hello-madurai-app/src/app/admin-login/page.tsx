@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import AppWrapper from '@/components/AppWrapper'
 import { useAdmin } from '@/contexts/AdminContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
@@ -131,9 +130,5 @@ function AdminLoginPageContent() {
 }
 
 export default function AdminLoginPage() {
-  return (
-    <AppWrapper>
-      <AdminLoginPageContent />
-    </AppWrapper>
-  )
+  return <AdminLoginPageContent />
 }

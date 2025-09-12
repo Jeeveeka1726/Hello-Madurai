@@ -1,13 +1,34 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { PlayIcon, PauseIcon, SpeakerWaveIcon, ClockIcon, CalendarIcon } from '@heroicons/react/24/outline'
-import AppWrapper from '@/components/AppWrapper'
+import {
+  PlayIcon,
+  PauseIcon,
+  SpeakerWaveIcon,
+  ClockIcon,
+  CalendarIcon,
+  FolderIcon,
+  ChevronRightIcon,
+  MicrophoneIcon,
+  StarIcon
+} from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
+import NewHeader from '@/components/layout/NewHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
-interface Podcast {
+interface RadioFolder {
+  id: string
+  name: string
+  name_ta?: string
+  description?: string
+  description_ta?: string
+  coverImage?: string
+  featured: boolean
+  radioShows: RadioShow[]
+}
+
+interface RadioShow {
   id: string
   title: string
   title_ta?: string
@@ -19,36 +40,38 @@ interface Podcast {
   featured: boolean
   plays: number
   publishedAt: string
+  folderId: string
 }
 
-function PodcastPageContent() {
+function RadioPageContent() {
   const { t } = useLanguage()
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [podcasts, setPodcasts] = useState<Podcast[]>([])
+  const [radioFolders, setRadioFolders] = useState<RadioFolder[]>([])
+  const [selectedFolder, setSelectedFolder] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const audioRef = useRef<HTMLAudioElement>(null)
 
-  // Fetch podcasts from database
+  // Fetch radio folders and shows from database
   useEffect(() => {
-    const fetchPodcasts = async () => {
+    const fetchRadioData = async () => {
       try {
-        const response = await fetch('/api/admin/podcasts')
+        const response = await fetch('/api/radio/folders')
         if (response.ok) {
           const data = await response.json()
-          setPodcasts(data)
+          setRadioFolders(data)
         } else {
-          console.error('Failed to fetch podcasts')
+          console.error('Failed to fetch radio data')
         }
       } catch (error) {
-        console.error('Error fetching podcasts:', error)
+        console.error('Error fetching radio data:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchPodcasts()
+    fetchRadioData()
   }, [])
 
 
@@ -69,19 +92,19 @@ function PodcastPageContent() {
     })
   }
 
-  const playPodcast = (podcastId: string, audioUrl: string) => {
-    if (currentlyPlaying === podcastId) {
-      // Pause current podcast
+  const playRadioShow = (showId: string, audioUrl: string) => {
+    if (currentlyPlaying === showId) {
+      // Pause current show
       if (audioRef.current) {
         audioRef.current.pause()
       }
       setCurrentlyPlaying(null)
     } else {
-      // Play new podcast
+      // Play new show
       if (audioRef.current) {
         audioRef.current.src = audioUrl
         audioRef.current.play()
-        setCurrentlyPlaying(podcastId)
+        setCurrentlyPlaying(showId)
       }
     }
   }
@@ -103,28 +126,31 @@ function PodcastPageContent() {
     setCurrentTime(0)
   }
 
-  const featuredPodcasts = podcasts.filter(podcast => podcast.featured)
-  const regularPodcasts = podcasts.filter(podcast => !podcast.featured)
+  // Get all shows from all folders
+  const allShows = radioFolders.flatMap(folder => folder.radioShows)
+  const featuredShows = allShows.filter(show => show.featured)
+  const regularShows = allShows.filter(show => !show.featured)
+  const selectedFolderData = selectedFolder ? radioFolders.find(f => f.id === selectedFolder) : null
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <img
               src="/fm-logo.jpg"
-              alt="Hello Madurai FM"
+              alt="Hello Madurai Radio"
               className="h-16 w-16 rounded-full object-cover mr-4"
             />
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-                {t('podcast.title', 'Hello Madurai Podcasts', 'ஹலோ மதுரை பாட்காஸ்ட்கள்')}
+                {t('radio.title', 'Hello Madurai Radio', 'ஹலோ மதுரை வானொலி')}
               </h1>
             </div>
           </div>
           <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
-            {t('podcast.subtitle', 'Listen to local stories, interviews, and discussions', 'உள்ளூர் கதைகள், நேர்காணல்கள் மற்றும் விவாதங்களைக் கேளுங்கள்')}
+            {t('radio.subtitle', 'Listen to local stories, interviews, and discussions', 'உள்ளூர் கதைகள், நேர்காணல்கள் மற்றும் விவாதங்களைக் கேளுங்கள்')}
           </p>
         </div>
 
@@ -147,21 +173,143 @@ function PodcastPageContent() {
           </div>
         )}
 
-        {/* Featured Podcasts */}
-        {!loading && featuredPodcasts.length > 0 && (
+        {/* Radio Folders */}
+        {!loading && radioFolders.length > 0 && (
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              {t('podcast.featured', 'Featured Podcasts', 'சிறப்பு பாட்காஸ்ட்கள்')}
+              {t('radio.folders', 'Radio Shows by Category', 'வகை வாரியாக வானொலி நிகழ்ச்சிகள்')}
+            </h2>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {radioFolders.map((folder) => (
+                <Card key={folder.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <FolderIcon className="h-8 w-8 text-purple-600 dark:text-purple-400 mr-3" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          {folder.name}
+                        </h3>
+                        {folder.name_ta && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {folder.name_ta}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {folder.description && (
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                        {folder.description}
+                      </p>
+                    )}
+
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {folder.radioShows.length} {t('radio.shows', 'shows', 'நிகழ்ச்சிகள்')}
+                      </span>
+                      {folder.featured && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                          <StarIcon className="h-3 w-3 mr-1" />
+                          {t('radio.featured', 'Featured', 'சிறப்பு')}
+                        </span>
+                      )}
+                    </div>
+
+                    <Button
+                      onClick={() => setSelectedFolder(selectedFolder === folder.id ? null : folder.id)}
+                      className="w-full bg-purple-600 text-white hover:bg-purple-700"
+                    >
+                      {selectedFolder === folder.id ? (
+                        t('radio.hide', 'Hide Shows', 'நிகழ்ச்சிகளை மறைக்கவும்')
+                      ) : (
+                        t('radio.viewShows', 'View Shows', 'நிகழ்ச்சிகளைப் பார்க்கவும்')
+                      )}
+                      <ChevronRightIcon className={`h-4 w-4 ml-2 transition-transform ${selectedFolder === folder.id ? 'rotate-90' : ''}`} />
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Selected Folder Shows */}
+        {!loading && selectedFolderData && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              {selectedFolderData.name} - {t('radio.shows', 'Shows', 'நிகழ்ச்சிகள்')}
+            </h2>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {selectedFolderData.radioShows.map((show) => (
+                <Card key={show.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
+                  <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
+                    <div className="flex items-center justify-center">
+                      <div className="text-center">
+                        <MicrophoneIcon className="h-12 w-12 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {show.duration}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <CardContent className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      {show.title}
+                    </h3>
+                    {show.title_ta && (
+                      <h4 className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        {show.title_ta}
+                      </h4>
+                    )}
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+                      {show.description}
+                    </p>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {t('radio.host', 'Host', 'தொகுப்பாளர்')}: {show.host}
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {show.plays} {t('radio.plays', 'plays', 'இயக்கங்கள்')}
+                      </span>
+                    </div>
+                    <Button
+                      onClick={() => handlePlay(show.audioUrl, show.id)}
+                      className="w-full bg-green-600 text-white hover:bg-green-700"
+                    >
+                      {currentlyPlaying === show.id ? (
+                        <>
+                          <PauseIcon className="h-4 w-4 mr-2" />
+                          {t('radio.pause', 'Pause', 'இடைநிறுத்தம்')}
+                        </>
+                      ) : (
+                        <>
+                          <PlayIcon className="h-4 w-4 mr-2" />
+                          {t('radio.play', 'Play', 'இயக்கு')}
+                        </>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Featured Radio Shows */}
+        {!loading && featuredShows.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              {t('radio.featured', 'Featured Radio Shows', 'சிறப்பு வானொலி நிகழ்ச்சிகள்')}
             </h2>
             <div className="grid gap-8 lg:grid-cols-2">
-              {featuredPodcasts.map((podcast) => (
-                <Card key={podcast.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
+              {featuredShows.map((show) => (
+                <Card key={show.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
                   <div className="aspect-w-16 aspect-h-9 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900 dark:to-secondary-900">
                     <div className="flex items-center justify-center">
                       <div className="text-center">
                         <SpeakerWaveIcon className="h-16 w-16 text-primary-600 dark:text-primary-400 mx-auto mb-2" />
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {podcast.duration}
+                          {show.duration}
                         </p>
                       </div>
                     </div>
@@ -169,46 +317,46 @@ function PodcastPageContent() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-2">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
-                        {t('podcast.featured', 'Featured', 'சிறப்பு')}
+                        {t('radio.featured', 'Featured', 'சிறப்பு')}
                       </span>
                       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                         <CalendarIcon className="h-4 w-4 mr-1" />
-                        {formatDate(podcast.publishedAt)}
+                        {formatDate(show.publishedAt)}
                       </div>
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                      {t(`podcast.${podcast.id}.title`, podcast.title, podcast.title_ta || '')}
+                      {t(`radio.${show.id}.title`, show.title, show.title_ta || '')}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300 mb-4">
-                      {t(`podcast.${podcast.id}.description`, podcast.description, podcast.description_ta || '')}
+                      {t(`radio.${show.id}.description`, show.description, show.description_ta || '')}
                     </p>
                     <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
                       <div className="flex items-center space-x-4">
-                        <span>{t('podcast.host', 'Host:', 'தொகுப்பாளர்:')} {podcast.host}</span>
+                        <span>{t('radio.host', 'Host:', 'தொகுப்பாளர்:')} {show.host}</span>
                         <div className="flex items-center">
                           <ClockIcon className="h-4 w-4 mr-1" />
-                          {podcast.duration}
+                          {show.duration}
                         </div>
-                        <span>{podcast.plays.toLocaleString()} {t('podcast.plays', 'plays', 'ஒலிப்பு')}</span>
+                        <span>{show.plays.toLocaleString()} {t('radio.plays', 'plays', 'ஒலிப்பு')}</span>
                       </div>
                     </div>
                     <Button
-                      onClick={() => playPodcast(podcast.id, podcast.audioUrl)}
+                      onClick={() => playPodcast(show.id, show.audioUrl)}
                       className="w-full"
                     >
-                      {currentlyPlaying === podcast.id ? (
+                      {currentlyPlaying === show.id ? (
                         <>
                           <PauseIcon className="h-4 w-4 mr-2" />
-                          {t('podcast.pause', 'Pause', 'இடைநிறுத்து')}
+                          {t('radio.pause', 'Pause', 'இடைநிறுத்து')}
                         </>
                       ) : (
                         <>
                           <PlayIcon className="h-4 w-4 mr-2" />
-                          {t('podcast.play', 'Play', 'ஒலிக்க')}
+                          {t('radio.play', 'Play', 'ஒலிக்க')}
                         </>
                       )}
                     </Button>
-                    {currentlyPlaying === podcast.id && (
+                    {currentlyPlaying === show.id && (
                       <div className="mt-4 bg-gray-50 dark:bg-purple-800 rounded-lg p-3">
                         <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
                           <span>{formatTime(currentTime)}</span>
@@ -233,17 +381,17 @@ function PodcastPageContent() {
         {!loading && (
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            {t('podcast.allPodcasts', 'All Podcasts', 'அனைத்து பாட்காஸ்ட்கள்')}
+            {t('radio.allShows', 'All Radio Shows', 'அனைத்து வானொலி நிகழ்ச்சிகள்')}
           </h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {regularPodcasts.map((podcast) => (
-              <Card key={podcast.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
+            {regularShows.map((show) => (
+              <Card key={show.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
                 <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
                   <div className="flex items-center justify-center">
                     <div className="text-center">
                       <SpeakerWaveIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-1" />
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {podcast.duration}
+                        {show.duration}
                       </p>
                     </div>
                   </div>
@@ -251,43 +399,43 @@ function PodcastPageContent() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatDate(podcast.publishedAt)}
+                      {formatDate(show.publishedAt)}
                     </span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {podcast.plays.toLocaleString()} {t('podcast.plays', 'plays', 'ஒலிப்பு')}
+                      {show.plays.toLocaleString()} {t('radio.plays', 'plays', 'ஒலிப்பு')}
                     </span>
                   </div>
                   <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                    {t(`podcast.${podcast.id}.title`, podcast.title, podcast.title_ta || '')}
+                    {t(`radio.${show.id}.title`, show.title, show.title_ta || '')}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
-                    {t(`podcast.${podcast.id}.description`, podcast.description, podcast.description_ta || '')}
+                    {t(`radio.${show.id}.description`, show.description, show.description_ta || '')}
                   </p>
                   <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
-                    <span>{t('podcast.host', 'Host:', 'தொகுப்பாளர்:')} {podcast.host}</span>
+                    <span>{t('radio.host', 'Host:', 'தொகுப்பாளர்:')} {show.host}</span>
                     <div className="flex items-center">
                       <ClockIcon className="h-3 w-3 mr-1" />
-                      {podcast.duration}
+                      {show.duration}
                     </div>
                   </div>
                   <Button
                     size="sm"
-                    onClick={() => playPodcast(podcast.id, podcast.audioUrl)}
+                    onClick={() => playPodcast(show.id, show.audioUrl)}
                     className="w-full"
                   >
-                    {currentlyPlaying === podcast.id ? (
+                    {currentlyPlaying === show.id ? (
                       <>
                         <PauseIcon className="h-3 w-3 mr-1" />
-                        {t('podcast.pause', 'Pause', 'இடைநிறுத்து')}
+                        {t('radio.pause', 'Pause', 'இடைநிறுத்து')}
                       </>
                     ) : (
                       <>
                         <PlayIcon className="h-3 w-3 mr-1" />
-                        {t('podcast.play', 'Play', 'ஒலிக்க')}
+                        {t('radio.play', 'Play', 'ஒலிக்க')}
                       </>
                     )}
                   </Button>
-                  {currentlyPlaying === podcast.id && (
+                  {currentlyPlaying === show.id && (
                     <div className="mt-3 bg-gray-50 dark:bg-purple-800 rounded-lg p-2">
                       <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mb-1">
                         <span>{formatTime(currentTime)}</span>
@@ -309,46 +457,17 @@ function PodcastPageContent() {
         )}
 
         {/* Contact Info */}
-        {!loading && (
-        <div className="mt-12 text-center">
-          <Card className="bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                {t('podcast.contact', 'Contact Hello Madurai Podcasts', 'ஹலோ மதுரை பாட்காஸ்ட்கள் தொடர்பு')}
-              </h3>
-              <div className="grid gap-4 md:grid-cols-3">
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {t('podcast.phone', 'Phone', 'தொலைபேசி')}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300">+91 452 123 4567</p>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {t('podcast.email', 'Email', 'மின்னஞ்சல்')}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300">podcasts@hellomadurai.com</p>
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {t('podcast.submit', 'Submit Your Podcast', 'உங்கள் பாட்காஸ்ட்டை சமர்ப்பிக்கவும்')}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300">{t('podcast.submitDesc', 'Share your stories', 'உங்கள் கதைகளைப் பகிருங்கள்')}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        )}
+
       </div>
     </div>
   )
 }
 
-export default function PodcastPage() {
+export default function RadioPage() {
   return (
-    <AppWrapper>
-      <PodcastPageContent />
-    </AppWrapper>
+    <div>
+      <NewHeader />
+      <RadioPageContent />
+    </div>
   )
 }
