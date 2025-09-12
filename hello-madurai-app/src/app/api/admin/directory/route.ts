@@ -31,8 +31,7 @@ export async function POST(request: NextRequest) {
         phone: data.phone,
         email: data.email || null,
         website: data.website || null,
-        featured: data.featured || false,
-        image: data.image || null
+        featured: data.featured || false
       }
     })
     

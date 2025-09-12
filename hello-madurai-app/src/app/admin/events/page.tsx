@@ -17,18 +17,22 @@ import {
 } from '@heroicons/react/24/outline'
 
 interface Event {
-  id: number
+  id: string
   title: string
   title_ta: string
   description: string
   description_ta: string
-  date: string
+  startDate: string
+  endDate?: string
   location: string
   location_ta: string
   category: string
   featured: boolean
   featuredImage?: string
+  status: string
+  registrations: number
   createdAt: string
+  updatedAt: string
 }
 
 const eventCategories = [
@@ -51,7 +55,8 @@ export default function AdminEventsPage() {
     title_ta: '',
     description: '',
     description_ta: '',
-    date: '',
+    startDate: '',
+    endDate: '',
     location: '',
     location_ta: '',
     category: 'festival',
@@ -102,7 +107,8 @@ export default function AdminEventsPage() {
           title_ta: '',
           description: '',
           description_ta: '',
-          date: '',
+          startDate: '',
+          endDate: '',
           location: '',
           location_ta: '',
           category: 'festival',
@@ -124,7 +130,8 @@ export default function AdminEventsPage() {
       title_ta: event.title_ta,
       description: event.description,
       description_ta: event.description_ta,
-      date: event.date,
+      startDate: event.startDate,
+      endDate: event.endDate || '',
       location: event.location,
       location_ta: event.location_ta,
       category: event.category,
@@ -134,7 +141,7 @@ export default function AdminEventsPage() {
     setShowForm(true)
   }
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this event?')) return
 
     try {
@@ -237,7 +244,7 @@ export default function AdminEventsPage() {
                     <TranslatedText>Upcoming Events</TranslatedText>
                   </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {events.filter(e => new Date(e.date) > new Date()).length}
+                    {events.filter(e => new Date(e.startDate) > new Date()).length}
                   </p>
                 </div>
               </div>
@@ -305,13 +312,13 @@ export default function AdminEventsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        <TranslatedText>Event Date</TranslatedText>
+                        <TranslatedText>Start Date & Time</TranslatedText> *
                       </label>
                       <input
                         type="datetime-local"
                         required
-                        value={formData.date}
-                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                        value={formData.startDate}
+                        onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
                       />
                     </div>
@@ -451,7 +458,7 @@ export default function AdminEventsPage() {
                         {eventCategories.find(cat => cat.id === event.category)?.name || event.category}
                       </span>
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {formatDate(event.date)}
+                        {formatDate(event.startDate)}
                       </span>
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">

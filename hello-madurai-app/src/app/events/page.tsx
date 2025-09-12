@@ -1,32 +1,71 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CalendarIcon, MapPinIcon, ClockIcon, UserGroupIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
+interface Event {
+  id: string
+  title: string
+  title_ta?: string
+  description: string
+  description_ta?: string
+  startDate: string
+  endDate?: string
+  location: string
+  location_ta?: string
+  category: string
+  featured: boolean
+  featuredImage?: string
+  status: string
+  registrations: number
+  createdAt: string
+  updatedAt: string
+}
+
 function EventsPageContent() {
   const { t } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [events, setEvents] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
 
-  // Fetch events from database - no hardcoded data
-  const events = [
-  ]
+  // Fetch events from database
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/api/admin/events')
+        if (response.ok) {
+          const data = await response.json()
+          setEvents(data)
+        } else {
+          console.error('Failed to fetch events')
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEvents()
+  }, [])
 
   const categories = [
     { id: 'all', name: t('events.categories.all', 'All Events', 'அனைத்து நிகழ்வுகள்') },
     { id: 'festival', name: t('events.categories.festival', 'Festivals', 'திருவிழாக்கள்') },
     { id: 'exhibition', name: t('events.categories.exhibition', 'Exhibitions', 'கண்காட்சிகள்') },
     { id: 'cultural', name: t('events.categories.cultural', 'Cultural', 'கலாச்சாரம்') },
-    { id: 'government', name: t('events.categories.government', 'Government', 'அரசு') },
+    { id: 'education', name: t('events.categories.education', 'Education', 'கல்வி') },
+    { id: 'sports', name: t('events.categories.sports', 'Sports', 'விளையாட்டு') },
     { id: 'business', name: t('events.categories.business', 'Business', 'வணிகம்') }
   ]
 
   const filteredEvents = selectedCategory === 'all' 
     ? events 
-    : events.filter(event => event.eventType === selectedCategory)
+    : events.filter(event => event.category === selectedCategory)
 
   const featuredEvents = filteredEvents.filter(event => event.featured)
   const regularEvents = filteredEvents.filter(event => !event.featured)
@@ -52,22 +91,22 @@ function EventsPageContent() {
     return new Date(dateString) > new Date()
   }
 
-  const getEventStatus = (startDate: string, endDate: string) => {
+  const getEventStatus = (startDate: string, endDate?: string) => {
     const now = new Date()
     const start = new Date(startDate)
-    const end = new Date(endDate)
+    const end = endDate ? new Date(endDate) : new Date(startDate)
     
     if (now < start) return 'upcoming'
     if (now >= start && now <= end) return 'ongoing'
     return 'completed'
   }
 
-  const handleRegister = (eventId: number) => {
+  const handleRegister = (eventId: string) => {
     // In a real app, this would handle event registration
     alert(t('events.registerSuccess', 'Registration successful! You will receive confirmation details.', 'பதிவு வெற்றிகரமாக முடிந்தது! உறுதிப்படுத்தல் விவரங்களைப் பெறுவீர்கள்.'))
   }
 
-  const handleReminder = (eventId: number) => {
+  const handleReminder = (eventId: string) => {
     // In a real app, this would set up a reminder
     alert(t('events.reminderSet', 'Reminder set! You will be notified before the event.', 'நினைவூட்டல் அமைக்கப்பட்டது! நிகழ்வுக்கு முன் உங்களுக்கு அறிவிப்பு வரும்.'))
   }
@@ -85,27 +124,39 @@ function EventsPageContent() {
           </p>
         </div>
 
-        {/* Category Filter */}
-        <div className="mb-8">
-          <div className="flex flex-wrap gap-2 justify-center">
-            {categories.map((category) => (
-              <Button
-                key={category.id}
-                variant={selectedCategory === category.id ? "primary" : "outline"}
-                onClick={() => setSelectedCategory(category.id)}
-                className={selectedCategory === category.id 
-                  ? "bg-primary-600 text-white" 
-                  : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                }
-              >
-                {category.name}
-              </Button>
-            ))}
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">
+              {t('events.loading', 'Loading events...', 'நிகழ்வுகள் ஏற்றப்படுகின்றன...')}
+            </p>
           </div>
-        </div>
+        )}
+
+        {/* Category Filter */}
+        {!loading && (
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-2 justify-center">
+              {categories.map((category) => (
+                <Button
+                  key={category.id}
+                  variant={selectedCategory === category.id ? "primary" : "outline"}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={selectedCategory === category.id 
+                    ? "bg-primary-600 text-white" 
+                    : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }
+                >
+                  {category.name}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Featured Events */}
-        {featuredEvents.length > 0 && (
+        {!loading && featuredEvents.length > 0 && (
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
               {t('events.featured', 'Featured Events', 'சிறப்பு நிகழ்வுகள்')}
@@ -120,7 +171,7 @@ function EventsPageContent() {
                         <div className="text-center">
                           <CalendarIcon className="h-16 w-16 text-primary-600 dark:text-primary-400 mx-auto mb-2" />
                           <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
-                            {t(`events.categories.${event.eventType}`, event.eventType, event.eventType)}
+                            {t(`events.categories.${event.category}`, event.category, event.category)}
                           </p>
                         </div>
                       </div>
@@ -147,11 +198,11 @@ function EventsPageContent() {
                       <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
                         <div className="flex items-center">
                           <CalendarIcon className="h-4 w-4 mr-2 text-gray-400" />
-                          {formatDate(event.startDate)} - {formatDate(event.endDate)}
+                          {formatDate(event.startDate)}{event.endDate && ` - ${formatDate(event.endDate)}`}
                         </div>
                         <div className="flex items-center">
                           <ClockIcon className="h-4 w-4 mr-2 text-gray-400" />
-                          {formatTime(event.startDate)} - {formatTime(event.endDate)}
+                          {formatTime(event.startDate)}{event.endDate && ` - ${formatTime(event.endDate)}`}
                         </div>
                         <div className="flex items-center">
                           <MapPinIcon className="h-4 w-4 mr-2 text-gray-400" />
@@ -159,7 +210,7 @@ function EventsPageContent() {
                         </div>
                         <div className="flex items-center">
                           <UserGroupIcon className="h-4 w-4 mr-2 text-gray-400" />
-                          {event.organizer} • {event.capacity.toLocaleString()} {t('events.capacity', 'capacity', 'திறன்')}
+                          {event.registrations.toLocaleString()} {t('events.registrations', 'registered', 'பதிவு செய்யப்பட்டவர்கள்')}
                         </div>
                       </div>
                       <div className="flex space-x-3">
@@ -197,6 +248,7 @@ function EventsPageContent() {
         )}
 
         {/* All Events */}
+        {!loading && (
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
             {selectedCategory === 'all' 
@@ -214,7 +266,7 @@ function EventsPageContent() {
                       <div className="text-center">
                         <CalendarIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-1" />
                         <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                          {t(`events.categories.${event.eventType}`, event.eventType, event.eventType)}
+                          {t(`events.categories.${event.category}`, event.category, event.category)}
                         </p>
                       </div>
                     </div>
@@ -279,9 +331,10 @@ function EventsPageContent() {
             })}
           </div>
         </div>
+        )}
 
         {/* No events message */}
-        {filteredEvents.length === 0 && (
+        {!loading && filteredEvents.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400">
               {t('events.noEvents', 'No events found in this category', 'இந்த வகையில் நிகழ்வுகள் எதுவும் கிடைக்கவில்லை')}

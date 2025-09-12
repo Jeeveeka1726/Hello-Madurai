@@ -23,6 +23,7 @@ interface RichTextEditorProps {
   label?: string
   showTranslate?: boolean
   targetLanguage?: 'en' | 'ta'
+  onTranslate?: (translatedText: string, targetLang: 'en' | 'ta') => void
 }
 
 export default function RichTextEditor({
@@ -32,7 +33,8 @@ export default function RichTextEditor({
   className = '',
   label,
   showTranslate = false,
-  targetLanguage = 'ta'
+  targetLanguage = 'ta',
+  onTranslate
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
   const [uploading, setUploading] = useState(false)
@@ -49,8 +51,11 @@ export default function RichTextEditor({
   }, [value, isInitialized])
 
   const executeCommand = (command: string, value?: string) => {
-    document.execCommand(command, false, value)
-    updateContent()
+    if (editorRef.current) {
+      editorRef.current.focus()
+      document.execCommand(command, false, value)
+      updateContent()
+    }
   }
 
   const updateContent = () => {
@@ -88,7 +93,7 @@ export default function RichTextEditor({
   }
 
   const insertImage = (url: string) => {
-    const img = `<img src="${url}" alt="Uploaded image" style="max-width: 100%; height: auto; margin: 10px 0;" />`
+    const img = `<img src="${url}" alt="Uploaded image" style="max-width: 800px; width: 100%; height: auto; margin: 16px 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />`
     executeCommand('insertHTML', img)
   }
 
@@ -130,17 +135,37 @@ export default function RichTextEditor({
         return
       }
 
+      const sourceLanguage = targetLanguage === 'ta' ? 'en' : 'ta'
+      
+      console.log('Translation Debug:', {
+        textContent: textContent.substring(0, 100) + '...',
+        targetLanguage,
+        sourceLanguage
+      })
+
       const translated = await translate({
         text: textContent,
         targetLanguage: targetLanguage,
-        sourceLanguage: targetLanguage === 'ta' ? 'en' : 'ta'
+        sourceLanguage: sourceLanguage
       })
 
-      // Replace the content with translated text (keeping basic HTML structure)
-      if (editorRef.current) {
-        editorRef.current.innerHTML = `<p>${translated}</p>`
-        onChange(editorRef.current.innerHTML)
-        toast.success(`Translated to ${targetLanguage === 'ta' ? 'Tamil' : 'English'}!`)
+      console.log('Translation Result:', {
+        original: textContent.substring(0, 100) + '...',
+        translated: translated.substring(0, 100) + '...',
+        targetLanguage
+      })
+
+      // Use callback to populate target field, or fallback to current field
+      if (onTranslate) {
+        onTranslate(translated, targetLanguage)
+        toast.success(`Translated to ${targetLanguage === 'ta' ? 'Tamil' : 'English'}! Check the ${targetLanguage === 'ta' ? 'Tamil' : 'English'} field.`)
+      } else {
+        // Fallback: replace current field content
+        if (editorRef.current) {
+          editorRef.current.innerHTML = `<p>${translated}</p>`
+          onChange(editorRef.current.innerHTML)
+          toast.success(`Translated to ${targetLanguage === 'ta' ? 'Tamil' : 'English'}!`)
+        }
       }
     } catch (error) {
       console.error('Translation error:', error)
@@ -230,7 +255,13 @@ export default function RichTextEditor({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => executeCommand('insertUnorderedList')}
+          onClick={() => {
+            if (editorRef.current) {
+              editorRef.current.focus()
+              document.execCommand('insertUnorderedList', false)
+              updateContent()
+            }
+          }}
           className="p-2"
           title="Bullet List"
         >
@@ -241,7 +272,13 @@ export default function RichTextEditor({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => executeCommand('insertOrderedList')}
+          onClick={() => {
+            if (editorRef.current) {
+              editorRef.current.focus()
+              document.execCommand('insertOrderedList', false)
+              updateContent()
+            }
+          }}
           className="p-2"
           title="Numbered List"
         >
@@ -268,9 +305,10 @@ export default function RichTextEditor({
           onClick={handleImageButtonClick}
           disabled={uploading}
           className="p-2"
-          title="Insert Image"
+          title="Insert Image (Recommended: 800×450px, under 150KB, WebP/JPEG)"
         >
           <PhotoIcon className="h-4 w-4" />
+          {uploading && <span className="ml-1 text-xs">...</span>}
         </Button>
 
         {showTranslate && (
@@ -282,10 +320,11 @@ export default function RichTextEditor({
               size="sm"
               onClick={handleTranslate}
               disabled={isTranslating || !value || !value.trim()}
-              className="p-2"
+              className="p-2 text-xs"
               title={`Translate to ${targetLanguage === 'ta' ? 'Tamil' : 'English'}`}
             >
               <LanguageIcon className="h-4 w-4" />
+              {isTranslating ? '...' : `→${targetLanguage === 'ta' ? 'த' : 'EN'}`}
             </Button>
           </>
         )}
@@ -328,10 +367,13 @@ export default function RichTextEditor({
           font-style: italic;
         }
         [contenteditable] img {
-          max-width: 100%;
+          max-width: 800px;
+          width: 100%;
           height: auto;
-          margin: 10px 0;
-          border-radius: 4px;
+          margin: 16px 0;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          display: block;
         }
         [contenteditable] h1 {
           font-size: 1.875rem;

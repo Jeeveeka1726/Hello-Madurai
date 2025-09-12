@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   PlayIcon,
   PauseIcon,
@@ -45,11 +46,11 @@ interface RadioShow {
 
 function RadioPageContent() {
   const { t } = useLanguage()
+  const router = useRouter()
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [radioFolders, setRadioFolders] = useState<RadioFolder[]>([])
-  const [selectedFolder, setSelectedFolder] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const audioRef = useRef<HTMLAudioElement>(null)
 
@@ -130,10 +131,9 @@ function RadioPageContent() {
   const allShows = radioFolders.flatMap(folder => folder.radioShows)
   const featuredShows = allShows.filter(show => show.featured)
   const regularShows = allShows.filter(show => !show.featured)
-  const selectedFolderData = selectedFolder ? radioFolders.find(f => f.id === selectedFolder) : null
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -166,7 +166,7 @@ function RadioPageContent() {
         {/* Loading State */}
         {loading && (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-300">
               {t('podcast.loading', 'Loading podcasts...', 'பாட்காஸ்ட்கள் ஏற்றப்படுகின்றன...')}
             </p>
@@ -216,15 +216,11 @@ function RadioPageContent() {
                     </div>
 
                     <Button
-                      onClick={() => setSelectedFolder(selectedFolder === folder.id ? null : folder.id)}
+                      onClick={() => router.push(`/radio/${folder.id}`)}
                       className="w-full bg-purple-600 text-white hover:bg-purple-700"
                     >
-                      {selectedFolder === folder.id ? (
-                        t('radio.hide', 'Hide Shows', 'நிகழ்ச்சிகளை மறைக்கவும்')
-                      ) : (
-                        t('radio.viewShows', 'View Shows', 'நிகழ்ச்சிகளைப் பார்க்கவும்')
-                      )}
-                      <ChevronRightIcon className={`h-4 w-4 ml-2 transition-transform ${selectedFolder === folder.id ? 'rotate-90' : ''}`} />
+                      {t('radio.viewShows', 'View Shows', 'நிகழ்ச்சிகளைப் பார்க்கவும்')}
+                      <ChevronRightIcon className="h-4 w-4 ml-2" />
                     </Button>
                   </CardContent>
                 </Card>
@@ -233,67 +229,6 @@ function RadioPageContent() {
           </div>
         )}
 
-        {/* Selected Folder Shows */}
-        {!loading && selectedFolderData && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              {selectedFolderData.name} - {t('radio.shows', 'Shows', 'நிகழ்ச்சிகள்')}
-            </h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {selectedFolderData.radioShows.map((show) => (
-                <Card key={show.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
-                  <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
-                    <div className="flex items-center justify-center">
-                      <div className="text-center">
-                        <MicrophoneIcon className="h-12 w-12 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {show.duration}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                      {show.title}
-                    </h3>
-                    {show.title_ta && (
-                      <h4 className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                        {show.title_ta}
-                      </h4>
-                    )}
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
-                      {show.description}
-                    </p>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t('radio.host', 'Host', 'தொகுப்பாளர்')}: {show.host}
-                      </span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {show.plays} {t('radio.plays', 'plays', 'இயக்கங்கள்')}
-                      </span>
-                    </div>
-                    <Button
-                      onClick={() => handlePlay(show.audioUrl, show.id)}
-                      className="w-full bg-green-600 text-white hover:bg-green-700"
-                    >
-                      {currentlyPlaying === show.id ? (
-                        <>
-                          <PauseIcon className="h-4 w-4 mr-2" />
-                          {t('radio.pause', 'Pause', 'இடைநிறுத்தம்')}
-                        </>
-                      ) : (
-                        <>
-                          <PlayIcon className="h-4 w-4 mr-2" />
-                          {t('radio.play', 'Play', 'இயக்கு')}
-                        </>
-                      )}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Featured Radio Shows */}
         {!loading && featuredShows.length > 0 && (
@@ -341,7 +276,7 @@ function RadioPageContent() {
                       </div>
                     </div>
                     <Button
-                      onClick={() => playPodcast(show.id, show.audioUrl)}
+                      onClick={() => playRadioShow(show.id, show.audioUrl)}
                       className="w-full"
                     >
                       {currentlyPlaying === show.id ? (
@@ -420,7 +355,7 @@ function RadioPageContent() {
                   </div>
                   <Button
                     size="sm"
-                    onClick={() => playPodcast(show.id, show.audioUrl)}
+                    onClick={() => playRadioShow(show.id, show.audioUrl)}
                     className="w-full"
                   >
                     {currentlyPlaying === show.id ? (

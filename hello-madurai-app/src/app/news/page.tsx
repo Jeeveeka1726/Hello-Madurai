@@ -22,6 +22,7 @@ interface NewsArticle {
   publishedAt: string
   views: number
   featured: boolean
+  featuredImage?: string
 }
 
 function NewsPageContent() {
@@ -202,13 +203,23 @@ function NewsPageContent() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {(selectedCategory === 'all' ? regularNews : filteredArticles.filter(a => !a.featured)).map((article) => (
               <Card key={article.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
-                  <div className="flex items-center justify-center text-gray-400 dark:text-gray-500">
-                    <span className="text-sm">
-                      {t('news.imageComingSoon', 'Image Coming Soon', 'படம் விரைவில்')}
-                    </span>
+                {article.featuredImage ? (
+                  <div className="aspect-w-16 aspect-h-9 overflow-hidden">
+                    <img
+                      src={article.featuredImage}
+                      alt={t(`news.${article.id}.title`, article.title, article.title_ta)}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                </div>
+                ) : (
+                  <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
+                    <div className="flex items-center justify-center text-gray-400 dark:text-gray-500">
+                      <span className="text-sm">
+                        {t('news.imageComingSoon', 'Image Coming Soon', 'படம் விரைவில்')}
+                      </span>
+                    </div>
+                  </div>
+                )}
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">

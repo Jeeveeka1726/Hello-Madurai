@@ -45,7 +45,7 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   return (
-    <AppWrapper>
+    <AppWrapper showFooter={false}>
       <AdminLayoutContent>
         {children}
       </AdminLayoutContent>

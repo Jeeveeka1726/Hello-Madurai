@@ -22,6 +22,7 @@ interface NewsArticle {
   publishedAt: string
   views: number
   featured: boolean
+  featuredImage?: string
 }
 
 function NewsDetailPageContent() {
@@ -146,14 +147,25 @@ function NewsDetailPageContent() {
 
         {/* Article */}
         <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-          {/* Featured Image Placeholder */}
-          <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
-            <div className="flex items-center justify-center">
-              <span className="text-gray-400 dark:text-gray-500">
-                {t('news.imageComingSoon', 'Featured Image Coming Soon', 'சிறப்பு படம் விரைவில்')}
-              </span>
+          {/* Featured Image */}
+          {article.featuredImage ? (
+            <div className="aspect-w-16 aspect-h-9 overflow-hidden">
+              <img
+                src={article.featuredImage}
+                alt={t(`news.${article.id}.title`, article.title, article.title_ta)}
+                className="w-full h-full object-cover"
+                style={{ maxHeight: '400px' }}
+              />
             </div>
-          </div>
+          ) : (
+            <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
+              <div className="flex items-center justify-center">
+                <span className="text-gray-400 dark:text-gray-500">
+                  {t('news.imageComingSoon', 'Featured Image Coming Soon', 'சிறப்பு படம் விரைவில்')}
+                </span>
+              </div>
+            </div>
+          )}
 
           <CardContent className="p-8">
             {/* Article Header */}
@@ -223,13 +235,23 @@ function NewsDetailPageContent() {
             {relatedArticles.map((relatedArticle) => (
                 <Link key={relatedArticle.id} href={`/news/${relatedArticle.id}`}>
                   <Card className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                    <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
-                      <div className="flex items-center justify-center">
-                        <span className="text-sm text-gray-400 dark:text-gray-500">
-                          {t('news.imageComingSoon', 'Image Coming Soon', 'படம் விரைவில்')}
-                        </span>
+                    {relatedArticle.featuredImage ? (
+                      <div className="aspect-w-16 aspect-h-9 overflow-hidden">
+                        <img
+                          src={relatedArticle.featuredImage}
+                          alt={t(`news.${relatedArticle.id}.title`, relatedArticle.title, relatedArticle.title_ta)}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                    </div>
+                    ) : (
+                      <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
+                        <div className="flex items-center justify-center">
+                          <span className="text-sm text-gray-400 dark:text-gray-500">
+                            {t('news.imageComingSoon', 'Image Coming Soon', 'படம் விரைவில்')}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                     <CardContent className="p-4">
                       <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
                         {t(`news.${relatedArticle.id}.title`, relatedArticle.title, relatedArticle.title_ta)}

@@ -269,6 +269,7 @@ export default function AdminNewsPage() {
                         className="mb-4"
                         showTranslate={true}
                         targetLanguage="ta"
+                        onTranslate={(translatedText) => setFormData({ ...formData, content_ta: translatedText })}
                       />
                     </div>
                     
@@ -283,19 +284,35 @@ export default function AdminNewsPage() {
                         className="font-tamil"
                         showTranslate={true}
                         targetLanguage="en"
+                        onTranslate={(translatedText) => setFormData({ ...formData, content: translatedText })}
                       />
                     </div>
                   </div>
 
                   {/* Featured Image Upload */}
-                  <FileUpload
-                    label="Featured Image"
-                    fileType="image"
-                    currentFile={formData.featuredImage}
-                    onFileUpload={(url) => setFormData({ ...formData, featuredImage: url })}
-                    onUrlChange={(url) => setFormData({ ...formData, featuredImage: url })}
-                    className="mb-6"
-                  />
+                  <div className="mb-6">
+                    <div className="mb-3">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Featured Image
+                      </label>
+                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-3">
+                        <p className="text-sm text-blue-800 dark:text-blue-200 font-medium mb-1">📐 Recommended Image Sizes:</p>
+                        <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                          <li>• <strong>Featured Image:</strong> 1200×675 pixels (16:9 ratio)</li>
+                          <li>• <strong>File Size:</strong> Under 200KB for fast loading</li>
+                          <li>• <strong>Format:</strong> WebP or JPEG preferred</li>
+                          <li>• <strong>Note:</strong> Images will be automatically cropped to fit 16:9 aspect ratio</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <FileUpload
+                      label=""
+                      fileType="image"
+                      currentFile={formData.featuredImage}
+                      onFileUpload={(url) => setFormData({ ...formData, featuredImage: url })}
+                      onUrlChange={(url) => setFormData({ ...formData, featuredImage: url })}
+                    />
+                  </div>
 
                   <div className="grid gap-6 md:grid-cols-3">
                     <div>
