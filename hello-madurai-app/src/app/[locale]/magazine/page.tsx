@@ -7,44 +7,8 @@ interface MagazinePageProps {
   params: Promise<{ locale: string }>
 }
 
-const magazines = [
-  {
-    id: 1,
-    title: 'Hello Madurai - February 2019',
-    title_ta: 'ஹலோ மதுரை - பிப்ரவரி 2019',
-    date: '2019-02-01',
-    description: 'Monthly magazine featuring local news, culture, and business updates',
-    description_ta: 'உள்ளூர் செய்திகள், கலாசாரம் மற்றும் வணிக புதுப்பிப்புகளை உள்ளடக்கிய மாத இதழ்',
-    pdfUrl: '/01.02.19-hello-madurai.pdf',
-    coverImage: '/magazine-covers/feb-2019.jpg',
-    pages: 24,
-    featured: true
-  },
-  {
-    id: 2,
-    title: 'Hello Madurai - September 2019',
-    title_ta: 'ஹலோ மதுரை - செப்டம்பர் 2019',
-    date: '2019-09-01',
-    description: 'Special festival edition with Navarathri celebrations coverage',
-    description_ta: 'நவராத்திரி கொண்டாட்டங்களின் சிறப்பு திருவிழா பதிப்பு',
-    pdfUrl: '/01.09.19-hello-madurai.pdf',
-    coverImage: '/magazine-covers/sep-2019.jpg',
-    pages: 28,
-    featured: false
-  },
-  {
-    id: 3,
-    title: 'Hello Madurai - October 2019',
-    title_ta: 'ஹலோ மதுரை - அக்டோபர் 2019',
-    date: '2019-10-01',
-    description: 'Diwali special edition with local business spotlight',
-    description_ta: 'உள்ளூர் வணிக விளக்குகளுடன் தீபாவளி சிறப்பு பதிப்பு',
-    pdfUrl: '/01.10.19-hello-madurai.pdf',
-    coverImage: '/magazine-covers/oct-2019.jpg',
-    pages: 32,
-    featured: true
-  }
-]
+// Fetch magazines from database - no hardcoded data
+const magazines = []
 
 export default async function MagazinePage({ params }: MagazinePageProps) {
   const { locale } = await params;
@@ -103,7 +67,7 @@ export default async function MagazinePage({ params }: MagazinePageProps) {
                       <span className="text-sm text-gray-500">
                         {formatDate(magazine.date)}
                       </span>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                         {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                       </span>
                     </div>
@@ -165,7 +129,7 @@ export default async function MagazinePage({ params }: MagazinePageProps) {
                       {formatDate(magazine.date)}
                     </span>
                     {magazine.featured && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                         {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                       </span>
                     )}

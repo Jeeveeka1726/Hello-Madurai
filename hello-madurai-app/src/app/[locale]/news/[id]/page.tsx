@@ -132,7 +132,7 @@ export default function NewsArticlePage() {
           {/* Article Header */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <span className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+              <span className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-3 py-1 rounded-full text-sm font-medium">
                 {locale === 'ta' ? 'மாநகராட்சி' : 'Corporation'}
               </span>
               <Button variant="ghost" size="sm" onClick={handleShare}>

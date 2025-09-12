@@ -30,12 +30,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           setTheme(savedTheme)
           applyTheme(savedTheme)
         } else {
-          // Check system preference
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-          const systemTheme = prefersDark ? 'dark' : 'light'
-          setTheme(systemTheme)
-          applyTheme(systemTheme)
-          localStorage.setItem('hello-madurai-theme', systemTheme)
+          // Default to light mode (ignore system preference for now)
+          setTheme('light')
+          applyTheme('light')
+          localStorage.setItem('hello-madurai-theme', 'light')
         }
       } catch (error) {
         console.log('Theme initialization error:', error)

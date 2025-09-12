@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from 'react-hot-toast';
-import { LanguageProvider } from '@/contexts/LanguageContext';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import { AdminProvider } from '@/contexts/AdminContext';
-import NewHeader from '@/components/layout/NewHeader';
-import Footer from '@/components/layout/Footer';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,29 +25,7 @@ export default function RootLayout({
         ></script>
       </head>
       <body className={inter.className}>
-        <ThemeProvider>
-          <LanguageProvider>
-            <AdminProvider>
-              <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-                <NewHeader />
-                <main>
-                  {children}
-                </main>
-                <Footer />
-              </div>
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: '#363636',
-                    color: '#fff',
-                  },
-                }}
-              />
-            </AdminProvider>
-          </LanguageProvider>
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );

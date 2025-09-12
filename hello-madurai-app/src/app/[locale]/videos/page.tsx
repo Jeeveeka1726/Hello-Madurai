@@ -223,7 +223,7 @@ export default async function VideosPage({ params }: VideosPageProps) {
         </div>
 
         {/* Subscribe Section */}
-        <div className="mt-12 bg-white rounded-lg shadow-md p-6 text-center">
+        <div className="mt-12 bg-white dark:bg-purple-900 rounded-lg shadow-md p-6 text-center">
           <h3 className="text-xl font-bold text-gray-900 mb-4">
             {locale === 'ta' ? 'எங்கள் சேனலை சந்தா செய்யுங்கள்' : 'Subscribe to Our Channel'}
           </h3>

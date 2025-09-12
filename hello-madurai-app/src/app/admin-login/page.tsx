@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import AppWrapper from '@/components/AppWrapper'
 import { useAdmin } from '@/contexts/AdminContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 
-export default function AdminLoginPage() {
+function AdminLoginPageContent() {
   const { t } = useLanguage()
   const { login } = useAdmin()
   const router = useRouter()
@@ -126,5 +127,13 @@ export default function AdminLoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AdminLoginPage() {
+  return (
+    <AppWrapper>
+      <AdminLoginPageContent />
+    </AppWrapper>
   )
 }

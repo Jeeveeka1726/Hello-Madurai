@@ -15,45 +15,50 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #ffffff;
-  color: #374151;
+  color: #1f2937; 
 }
 
-/* Light theme improvements - White/Purple theme */
+/* Beautiful Purple and White theme - Light mode */
+:root,
 .light {
   --background: #ffffff;
-  --foreground: #374151;
+  --foreground: #1f2937;
   --card: #ffffff;
-  --card-foreground: #374151;
-  --primary: #a855f7;
+  --card-foreground: #1f2937;
+  --primary: #8b5cf6;
   --primary-foreground: #ffffff;
   --secondary: #f8fafc;
   --secondary-foreground: #374151;
   --muted: #f1f5f9;
-  --muted-foreground: #6b7280;
+  --muted-foreground: #64748b;
   --accent: #f3e8ff;
-  --accent-foreground: #374151;
+  --accent-foreground: #7c3aed;
   --border: #e2e8f0;
   --input: #ffffff;
-  --ring: #a855f7;
+  --ring: #8b5cf6;
+  --gradient-from: #8b5cf6;
+  --gradient-to: #a855f7;
 }
 
-/* Dark theme improvements - True dark theme */
+/* Dark Purple theme */
 .dark {
-  --background: #0f172a;
-  --foreground: #f1f5f9;
-  --card: #1e293b;
-  --card-foreground: #f1f5f9;
-  --primary: #c084fc;
-  --primary-foreground: #0f172a;
-  --secondary: #334155;
-  --secondary-foreground: #f1f5f9;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #334155;
-  --accent-foreground: #f1f5f9;
-  --border: #334155;
-  --input: #1e293b;
-  --ring: #c084fc;
+  --background: #1a0b2e;
+  --foreground: #f8fafc;
+  --card: #2d1b4e;
+  --card-foreground: #f8fafc;
+  --primary: #a78bfa;
+  --primary-foreground: #2d1b4e;
+  --secondary: #4c1d95;
+  --secondary-foreground: #e0e7ff;
+  --muted: #2d1b4e;
+  --muted-foreground: #a5b4fc;
+  --accent: #8b5cf6;
+  --accent-foreground: #e0e7ff;
+  --border: #4c1d95;
+  --input: #2d1b4e;
+  --ring: #a78bfa;
+  --gradient-from: #a78bfa;
+  --gradient-to: #c084fc;
 }
 
 /* Tamil font support */
@@ -61,9 +66,47 @@ body {
   font-family: 'Noto Sans Tamil', 'Latha', 'Vijaya', sans-serif;
 }
 
-/* Dark mode transitions - Faster for better performance */
+/* Smooth transitions and animations */
 * {
-  transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+/* Beautiful gradients */
+.gradient-bg {
+  background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+  background: rgba(30, 27, 75, 0.3);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 10px 25px rgba(167, 139, 250, 0.25);
 }
 
 /* Optimize for performance */

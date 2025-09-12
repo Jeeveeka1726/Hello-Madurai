@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { CalendarIcon, EyeIcon, UserIcon, ArrowLeftIcon, ShareIcon } from '@heroicons/react/24/outline'
+import AppWrapper from '@/components/AppWrapper'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -23,7 +24,7 @@ interface NewsArticle {
   featured: boolean
 }
 
-export default function NewsDetailPage() {
+function NewsDetailPageContent() {
   const params = useParams()
   const { t } = useLanguage()
   const newsId = params.id as string
@@ -69,7 +70,7 @@ export default function NewsDetailPage() {
   // Show loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
@@ -84,7 +85,7 @@ export default function NewsDetailPage() {
 
   if (!article) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <Card className="text-center py-12 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <CardContent>
@@ -131,7 +132,7 @@ export default function NewsDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
         <div className="mb-6">
@@ -248,5 +249,13 @@ export default function NewsDetailPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function NewsDetailPage() {
+  return (
+    <AppWrapper>
+      <NewsDetailPageContent />
+    </AppWrapper>
   )
 }

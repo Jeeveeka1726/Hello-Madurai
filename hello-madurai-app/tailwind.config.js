@@ -9,45 +9,68 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Custom colors for Hello Madurai theme - Purple for light mode
+        // CSS Variable-based colors that respond to theme
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        card: {
+          DEFAULT: 'var(--card)',
+          foreground: 'var(--card-foreground)',
+        },
         primary: {
-          50: '#faf5ff',
-          100: '#f3e8ff',
-          200: '#e9d5ff',
-          300: '#d8b4fe',
-          400: '#c084fc',
-          500: '#a855f7',
-          600: '#9333ea',
-          700: '#7c3aed',
-          800: '#6b21a8',
-          900: '#581c87',
-          950: '#3b0764',
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)',
+          50: '#faf5ff',   // Very light purple
+          100: '#f3e8ff',  // Light purple
+          200: '#e9d5ff',  // Lighter purple
+          300: '#d8b4fe',  // Medium light purple
+          400: '#c084fc',  // Medium purple
+          500: '#a855f7',  // Base purple
+          600: '#9333ea',  // Darker purple
+          700: '#7c3aed',  // Dark purple
+          800: '#6b21a8',  // Very dark purple
+          900: '#581c87',  // Deep purple
+          950: '#3b0764',  // Deepest purple
         },
         secondary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)',
         },
-        // Additional lighter colors for better theme support
+        muted: {
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)',
+        },
         accent: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
+        },
+        border: 'var(--border)',
+        input: 'var(--input)',
+        ring: 'var(--ring)',
+        // Pure white variants
+        white: {
+          50: '#ffffff',   // Pure white
+          100: '#fefefe',  // Almost white
+          200: '#fdfdfd',  // Very light gray
+          300: '#fcfcfc',  // Light gray
+          400: '#fafafa',  // Lighter gray
+          500: '#f8f8f8',  // Light background
+          600: '#f5f5f5',  // Background
+          700: '#f0f0f0',  // Darker background
+          800: '#e8e8e8',  // Border color
+          900: '#e0e0e0',  // Darker border
+        },
+        // Neutral grays for text and subtle elements
+        neutral: {
+          50: '#fafafa',
+          100: '#f5f5f5',
+          200: '#e5e5e5',
+          300: '#d4d4d4',
+          400: '#a3a3a3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717',
         },
       },
       fontFamily: {

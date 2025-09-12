@@ -1,8 +1,13 @@
 'use client'
 
+import AppWrapper from '@/components/AppWrapper'
 import HomePage from './home/page'
 
 export default function RootPage() {
-  return <HomePage />
+  return (
+    <AppWrapper>
+      <HomePage />
+    </AppWrapper>
+  )
 }
 

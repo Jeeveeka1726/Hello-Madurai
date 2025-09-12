@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import {
   NewspaperIcon,
   CalendarIcon,
@@ -11,7 +12,8 @@ import {
   PlusIcon,
   PencilIcon,
   TrashIcon,
-  EyeIcon
+  EyeIcon,
+  BellIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAdmin } from '@/contexts/AdminContext'
@@ -21,55 +23,107 @@ import Button from '@/components/ui/Button'
 export default function AdminDashboard() {
   const { t } = useLanguage()
   const { logout } = useAdmin()
-  const [activeTab, setActiveTab] = useState('overview')
+  const [stats, setStats] = useState({
+    totalNews: 0,
+    totalEvents: 0,
+    totalVideos: 0,
+    totalBusinesses: 0,
+    totalUsers: 0,
+    monthlyViews: 0
+  })
+  const [recentContent, setRecentContent] = useState<{
+    news: any[]
+    events: any[]
+    videos: any[]
+  }>({
+    news: [],
+    events: [],
+    videos: []
+  })
+  const [loading, setLoading] = useState(true)
 
-  const handleLogout = () => {
-    logout()
-    window.location.href = '/'
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
+
+  const fetchDashboardData = async () => {
+    try {
+      // Fetch real stats from APIs
+      const [newsRes, eventsRes, videosRes] = await Promise.all([
+        fetch('/api/admin/news').then(r => r.json()).catch(() => []),
+        fetch('/api/admin/events').then(r => r.json()).catch(() => []),
+        fetch('/api/admin/videos').then(r => r.json()).catch(() => [])
+      ])
+
+      setStats({
+        totalNews: Array.isArray(newsRes) ? newsRes.length : 0,
+        totalEvents: Array.isArray(eventsRes) ? eventsRes.length : 0,
+        totalVideos: Array.isArray(videosRes) ? videosRes.length : 0,
+        totalBusinesses: 0, // Will be fetched from database when businesses feature is implemented
+        totalUsers: 0, // Will be fetched from database when user management is implemented
+        monthlyViews: 0 // Will be fetched from analytics when implemented
+      })
+
+      setRecentContent({
+        news: Array.isArray(newsRes) ? newsRes.slice(0, 5) : [],
+        events: Array.isArray(eventsRes) ? eventsRes.slice(0, 5) : [],
+        videos: Array.isArray(videosRes) ? videosRes.slice(0, 5) : []
+      })
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const stats = [
+  const statsData = [
     {
       name: t('admin.stats.totalNews', 'Total News', 'மொத்த செய்திகள்'),
-      value: '156',
+      value: stats.totalNews.toString(),
       icon: NewspaperIcon,
-      change: '+12%',
-      changeType: 'positive'
+      change: '',
+      changeType: 'neutral',
+      href: '/admin/news'
     },
     {
       name: t('admin.stats.totalEvents', 'Total Events', 'மொத்த நிகழ்வுகள்'),
-      value: '43',
+      value: stats.totalEvents.toString(),
       icon: CalendarIcon,
-      change: '+8%',
-      changeType: 'positive'
+      change: '',
+      changeType: 'neutral',
+      href: '/admin/events'
     },
     {
       name: t('admin.stats.totalVideos', 'Total Videos', 'மொத்த வீடியோக்கள்'),
-      value: '89',
+      value: stats.totalVideos.toString(),
       icon: VideoCameraIcon,
-      change: '+15%',
-      changeType: 'positive'
+      change: '',
+      changeType: 'neutral',
+      href: '/admin/videos'
     },
     {
       name: t('admin.stats.totalBusinesses', 'Total Businesses', 'மொத்த வணிகங்கள்'),
-      value: '234',
+      value: stats.totalBusinesses.toString(),
       icon: BuildingOfficeIcon,
-      change: '+5%',
-      changeType: 'positive'
+      change: '',
+      changeType: 'neutral',
+      href: '/admin/directory'
     },
     {
       name: t('admin.stats.totalUsers', 'Total Users', 'மொத்த பயனர்கள்'),
-      value: '1,247',
+      value: stats.totalUsers.toLocaleString(),
       icon: UserGroupIcon,
-      change: '+23%',
-      changeType: 'positive'
+      change: '',
+      changeType: 'neutral',
+      href: '/admin/users'
     },
     {
       name: t('admin.stats.monthlyViews', 'Monthly Views', 'மாதாந்திர பார்வைகள்'),
-      value: '45,678',
+      value: stats.monthlyViews.toLocaleString(),
       icon: ChartBarIcon,
-      change: '+18%',
-      changeType: 'positive'
+      change: '',
+      changeType: 'neutral',
+      href: '/admin'
     }
   ]
 
@@ -184,212 +238,144 @@ export default function AdminDashboard() {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 shadow">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="py-6 flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                {t('admin.title', 'Admin Dashboard', 'நிர்வாக டாஷ்போர்டு')}
-              </h1>
-              <p className="mt-2 text-gray-600 dark:text-gray-300">
-                {t('admin.subtitle', 'Manage your Hello Madurai content and settings', 'உங்கள் ஹலோ மதுரை உள்ளடக்கம் மற்றும் அமைப்புகளை நிர்வகிக்கவும்')}
-              </p>
-            </div>
-            <Button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              {t('admin.logout', 'Logout', 'வெளியேறு')}
-            </Button>
+  if (loading) {
+    return (
+      <div className="p-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 dark:bg-purple-800 rounded w-1/4"></div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {Array(6).fill(0).map((_, i) => (
+              <div key={i} className="h-32 bg-gray-200 dark:bg-purple-800 rounded"></div>
+            ))}
           </div>
         </div>
       </div>
+    )
+  }
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tabs */}
-        <div className="mb-8">
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="-mb-px flex space-x-8 overflow-x-auto">
-              {tabs.map((tab) => {
-                const Icon = tab.icon
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
-                      activeTab === tab.id
-                        ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                    }`}
-                  >
-                    <Icon className="h-5 w-5 mr-2" />
-                    {tab.name}
-                  </button>
-                )
-              })}
-            </nav>
-          </div>
-        </div>
+  return (
+    <div className="p-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          {t('admin.dashboard', 'Dashboard', 'டாஷ்போர்டு')}
+        </h1>
+        <p className="mt-2 text-gray-600 dark:text-gray-300">
+          {t('admin.welcome', 'Welcome to Hello Madurai CMS', 'ஹலோ மதுரை CMS க்கு வரவேற்கிறோம்')}
+        </p>
+      </div>
 
-        {/* Overview Tab */}
-        {activeTab === 'overview' && (
-          <div className="space-y-8">
-            {/* Stats Grid */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {stats.map((stat) => {
-                const Icon = stat.icon
-                return (
-                  <Card key={stat.name} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                    <CardContent className="p-6">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <Icon className="h-8 w-8 text-primary-600 dark:text-primary-400" />
-                        </div>
-                        <div className="ml-4 flex-1">
-                          <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{stat.name}</p>
-                          <div className="flex items-baseline">
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stat.value}</p>
-                            <p className={`ml-2 text-sm font-medium ${
-                              stat.changeType === 'positive'
-                                ? 'text-green-600 dark:text-green-400'
-                                : 'text-red-600 dark:text-red-400'
-                            }`}>
-                              {stat.change}
-                            </p>
-                          </div>
-                        </div>
+      {/* Stats Grid */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+        {statsData.map((stat) => {
+          const Icon = stat.icon
+          return (
+            <Link key={stat.name} href={stat.href}>
+              <Card className="bg-white dark:bg-purple-900 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200 cursor-pointer group">
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="p-3 bg-primary-100 dark:bg-primary-900 rounded-lg group-hover:bg-primary-200 dark:group-hover:bg-primary-800 transition-colors">
+                        <Icon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                       </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
-            {/* Recent Activity */}
-            <div className="grid gap-8 lg:grid-cols-2">
-              {/* Recent News */}
-              <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 dark:text-white">
-                    {t('admin.recentNews', 'Recent News', 'சமீபத்திய செய்திகள்')}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {recentNews.map((news) => (
-                      <div key={news.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div className="flex-1">
-                          <h4 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
-                            {t(`news.${news.id}.title`, news.title, news.title_ta)}
-                          </h4>
-                          <div className="flex items-center mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            <span className={`px-2 py-1 rounded-full ${
-                              news.status === 'published'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                            }`}>
-                              {news.status}
-                            </span>
-                            <span className="ml-2">{formatDate(news.publishedAt)}</span>
-                            {news.status === 'published' && (
-                              <span className="ml-2 flex items-center">
-                                <EyeIcon className="h-3 w-3 mr-1" />
-                                {news.views}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex space-x-1 ml-2">
-                          <Button size="sm" variant="outline" onClick={() => handleEdit('news', news.id)} className="p-1">
-                            <PencilIcon className="h-3 w-3" />
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={() => handleDelete('news', news.id)} className="p-1 text-red-600 hover:text-red-700">
-                            <TrashIcon className="h-3 w-3" />
-                          </Button>
-                        </div>
+                    </div>
+                    <div className="ml-4 flex-1">
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{stat.name}</p>
+                      <div className="flex items-baseline">
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                        <p className={`ml-2 text-sm font-medium ${
+                          stat.changeType === 'positive'
+                            ? 'text-green-600 dark:text-green-400'
+                            : 'text-red-600 dark:text-red-400'
+                        }`}>
+                          {stat.change}
+                        </p>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
+            </Link>
+          )
+        })}
+      </div>
 
-              {/* Recent Events */}
-              <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 dark:text-white">
-                    {t('admin.recentEvents', 'Recent Events', 'சமீபத்திய நிகழ்வுகள்')}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {recentEvents.map((event) => (
-                      <div key={event.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div className="flex-1">
-                          <h4 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
-                            {t(`events.${event.id}.title`, event.title, event.title_ta)}
-                          </h4>
-                          <div className="flex items-center mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            <span className={`px-2 py-1 rounded-full ${
-                              event.status === 'published'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                            }`}>
-                              {event.status}
-                            </span>
-                            <span className="ml-2">{formatDate(event.startDate)} - {formatDate(event.endDate)}</span>
-                          </div>
-                        </div>
-                        <div className="flex space-x-1 ml-2">
-                          <Button size="sm" variant="outline" onClick={() => handleEdit('events', event.id)} className="p-1">
-                            <PencilIcon className="h-3 w-3" />
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={() => handleDelete('events', event.id)} className="p-1 text-red-600 hover:text-red-700">
-                            <TrashIcon className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        )}
-
-        {/* Other Tabs */}
-        {activeTab !== 'overview' && (
-          <div className="text-center py-12">
-            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-              <CardContent className="p-12">
-                <div className="mx-auto max-w-md">
-                  {tabs.find(tab => tab.id === activeTab) && (() => {
-                    const Icon = tabs.find(tab => tab.id === activeTab)!.icon
-                    return <Icon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
-                  })()}
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                    {tabs.find(tab => tab.id === activeTab)?.name} {t('admin.management', 'Management', 'மேலாண்மை')}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-6">
-                    {activeTab === 'news'
-                      ? t('admin.newsReady', 'News management is ready! Click below to manage your news articles.', 'செய்தி மேலாண்மை தயார்! உங்கள் செய்தி கட்டுரைகளை நிர்வகிக்க கீழே கிளிக் செய்யவும்.')
-                      : t('admin.comingSoon', 'This feature is coming soon! You will be able to manage all your content from here.', 'இந்த அம்சம் விரைவில் வரும்! நீங்கள் இங்கிருந்து உங்கள் அனைத்து உள்ளடக்கத்தையும் நிர்வகிக்க முடியும்.')
-                    }
-                  </p>
-                  <Button onClick={() => handleAdd(activeTab)}>
-                    <PlusIcon className="h-4 w-4 mr-2" />
-                    {activeTab === 'news'
-                      ? t('admin.manageNews', 'Manage News', 'செய்திகளை நிர்வகிக்க')
-                      : `${t('admin.addNew', 'Add New', 'புதிதாக சேர்க்க')} ${tabs.find(tab => tab.id === activeTab)?.name}`
-                    }
-                  </Button>
-                </div>
+      {/* Quick Actions */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          {t('admin.quickActions', 'Quick Actions', 'விரைவு நடவடிக்கைகள்')}
+        </h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Link href="/admin/news">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 border-blue-200 dark:border-blue-700 hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <NewspaperIcon className="h-8 w-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <p className="font-medium text-blue-900 dark:text-blue-100">
+                  {t('admin.addNews', 'Add News', 'செய்தி சேர்க்க')}
+                </p>
               </CardContent>
             </Card>
-          </div>
-        )}
+          </Link>
+          <Link href="/admin/videos">
+            <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900 dark:to-red-800 border-red-200 dark:border-red-700 hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <VideoCameraIcon className="h-8 w-8 text-red-600 dark:text-red-400 mx-auto mb-2" />
+                <p className="font-medium text-red-900 dark:text-red-100">
+                  {t('admin.addVideo', 'Add Video', 'வீடியோ சேர்க்க')}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/admin/events">
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 border-green-200 dark:border-green-700 hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <CalendarIcon className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
+                <p className="font-medium text-green-900 dark:text-green-100">
+                  {t('admin.addEvent', 'Add Event', 'நிகழ்வு சேர்க்க')}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
       </div>
+
+      {/* Recent Content */}
+      {recentContent.news.length > 0 && (
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            {t('admin.recentContent', 'Recent Content', 'சமீபத்திய உள்ளடக்கம்')}
+          </h2>
+          <Card className="bg-white dark:bg-purple-900 border-gray-200 dark:border-gray-700">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {recentContent.news.slice(0, 5).map((item: any) => (
+                  <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-purple-800 rounded-lg">
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {item.category} • {formatDate(item.publishedAt)}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                        <EyeIcon className="h-3 w-3 mr-1" />
+                        {item.views || 0}
+                      </span>
+                      <Link href="/admin/news">
+                        <Button size="sm" variant="outline">
+                          <PencilIcon className="h-3 w-3" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { DocumentArrowDownIcon, EyeIcon, CalendarIcon } from '@heroicons/react/24/outline'
+import AppWrapper from '@/components/AppWrapper'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -16,12 +17,13 @@ interface Magazine {
   pdfUrl: string
   coverImage?: string
   issueNumber: string
-  publishedAt: string
+  publishedAt?: string
+  publicationDate?: string // For fallback data compatibility
   downloads: number
   featured: boolean
 }
 
-export default function MagazinePage() {
+function MagazinePageContent() {
   const { t } = useLanguage()
   const [magazines, setMagazines] = useState<Magazine[]>([])
   const [loading, setLoading] = useState(true)
@@ -50,45 +52,8 @@ export default function MagazinePage() {
     fetchMagazines()
   }, [])
 
-  // Hardcoded magazines removed - now using database data
-  const fallbackMagazines = [
-    {
-      id: 1,
-      title: 'Hello Madurai February 2019',
-      title_ta: 'ஹலோ மதுரை பிப்ரவரி 2019',
-      issueNumber: 1,
-      publicationDate: '2019-02-01',
-      pdfUrl: '/01.02.19-hello-madurai.pdf',
-      description: 'February 2019 issue featuring local news, events, and community stories',
-      description_ta: 'உள்ளூர் செய்திகள், நிகழ்வுகள் மற்றும் சமூக கதைகளைக் கொண்ட பிப்ரவரி 2019 இதழ்',
-      downloadCount: 1250,
-      featured: true
-    },
-    {
-      id: 2,
-      title: 'Hello Madurai September 2019',
-      title_ta: 'ஹலோ மதுரை செப்டம்பர் 2019',
-      issueNumber: 2,
-      publicationDate: '2019-09-01',
-      pdfUrl: '/01.09.19-hello-madurai.pdf',
-      description: 'September 2019 issue with festival coverage and business directory',
-      description_ta: 'திருவிழா கவரேஜ் மற்றும் வணிக அடைவுடன் செப்டம்பர் 2019 இதழ்',
-      downloadCount: 980,
-      featured: false
-    },
-    {
-      id: 3,
-      title: 'Hello Madurai October 2019',
-      title_ta: 'ஹலோ மதுரை அக்டோபர் 2019',
-      issueNumber: 3,
-      publicationDate: '2019-10-01',
-      pdfUrl: '/01.10.19-hello-madurai.pdf',
-      description: 'October 2019 issue highlighting Diwali celebrations and local achievements',
-      description_ta: 'தீபாவளி கொண்டாட்டங்கள் மற்றும் உள்ளூர் சாதனைகளை முன்னிலைப்படுத்தும் அக்டோபர் 2019 இதழ்',
-      downloadCount: 1100,
-      featured: true
-    }
-  ]
+  // No hardcoded magazines - all data comes from database
+  const fallbackMagazines = []
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -113,7 +78,7 @@ export default function MagazinePage() {
   const regularMagazines = magazines.filter(mag => !mag.featured)
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -151,7 +116,7 @@ export default function MagazinePage() {
                       </span>
                       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                         <CalendarIcon className="h-4 w-4 mr-1" />
-                        {formatDate(magazine.publicationDate)}
+                        {formatDate(magazine.publishedAt || magazine.publicationDate)}
                       </div>
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
@@ -163,7 +128,7 @@ export default function MagazinePage() {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                         <EyeIcon className="h-4 w-4 mr-1" />
-                        {(magazine.downloadCount || 0).toLocaleString()} {t('magazine.downloads', 'downloads', 'பதிவிறக்கங்கள்')}
+                        {(magazine.downloads || 0).toLocaleString()} {t('magazine.downloads', 'downloads', 'பதிவிறக்கங்கள்')}
                       </div>
                     </div>
                     <div className="flex space-x-3">
@@ -210,7 +175,7 @@ export default function MagazinePage() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatDate(magazine.publicationDate)}
+                      {formatDate(magazine.publishedAt || magazine.publicationDate)}
                     </span>
                     {magazine.featured && (
                       <span className="text-xs bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 px-2 py-1 rounded">
@@ -227,7 +192,7 @@ export default function MagazinePage() {
                   <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
                     <div className="flex items-center">
                       <EyeIcon className="h-3 w-3 mr-1" />
-                      {magazine.downloadCount.toLocaleString()}
+                      {(magazine.downloads || 0).toLocaleString()}
                     </div>
                   </div>
                   <div className="flex space-x-2">
@@ -272,5 +237,13 @@ export default function MagazinePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function MagazinePage() {
+  return (
+    <AppWrapper>
+      <MagazinePageContent />
+    </AppWrapper>
   )
 }

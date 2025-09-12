@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { PlayIcon, PauseIcon, SpeakerWaveIcon, ClockIcon, CalendarIcon } from '@heroicons/react/24/outline'
+import AppWrapper from '@/components/AppWrapper'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -20,7 +21,7 @@ interface Podcast {
   publishedAt: string
 }
 
-export default function PodcastPage() {
+function PodcastPageContent() {
   const { t } = useLanguage()
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
@@ -106,7 +107,7 @@ export default function PodcastPage() {
   const regularPodcasts = podcasts.filter(podcast => !podcast.featured)
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -154,7 +155,7 @@ export default function PodcastPage() {
             </h2>
             <div className="grid gap-8 lg:grid-cols-2">
               {featuredPodcasts.map((podcast) => (
-                <Card key={podcast.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                <Card key={podcast.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
                   <div className="aspect-w-16 aspect-h-9 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900 dark:to-secondary-900">
                     <div className="flex items-center justify-center">
                       <div className="text-center">
@@ -208,12 +209,12 @@ export default function PodcastPage() {
                       )}
                     </Button>
                     {currentlyPlaying === podcast.id && (
-                      <div className="mt-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                      <div className="mt-4 bg-gray-50 dark:bg-purple-800 rounded-lg p-3">
                         <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
                           <span>{formatTime(currentTime)}</span>
                           <span>{formatTime(duration)}</span>
                         </div>
-                        <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                        <div className="w-full bg-gray-200 dark:bg-purple-700 rounded-full h-2">
                           <div
                             className="bg-primary-600 h-2 rounded-full transition-all duration-300"
                             style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
@@ -236,7 +237,7 @@ export default function PodcastPage() {
           </h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {regularPodcasts.map((podcast) => (
-              <Card key={podcast.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <Card key={podcast.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
                 <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
                   <div className="flex items-center justify-center">
                     <div className="text-center">
@@ -287,12 +288,12 @@ export default function PodcastPage() {
                     )}
                   </Button>
                   {currentlyPlaying === podcast.id && (
-                    <div className="mt-3 bg-gray-50 dark:bg-gray-700 rounded-lg p-2">
+                    <div className="mt-3 bg-gray-50 dark:bg-purple-800 rounded-lg p-2">
                       <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mb-1">
                         <span>{formatTime(currentTime)}</span>
                         <span>{formatTime(duration)}</span>
                       </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1">
+                      <div className="w-full bg-gray-200 dark:bg-purple-700 rounded-full h-1">
                         <div
                           className="bg-primary-600 h-1 rounded-full transition-all duration-300"
                           style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
@@ -310,7 +311,7 @@ export default function PodcastPage() {
         {/* Contact Info */}
         {!loading && (
         <div className="mt-12 text-center">
-          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <Card className="bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
             <CardContent className="p-6">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
                 {t('podcast.contact', 'Contact Hello Madurai Podcasts', 'ஹலோ மதுரை பாட்காஸ்ட்கள் தொடர்பு')}
@@ -341,5 +342,13 @@ export default function PodcastPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function PodcastPage() {
+  return (
+    <AppWrapper>
+      <PodcastPageContent />
+    </AppWrapper>
   )
 }

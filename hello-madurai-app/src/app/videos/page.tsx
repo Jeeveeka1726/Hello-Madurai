@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { PlayIcon, EyeIcon, CalendarIcon, ClockIcon } from '@heroicons/react/24/outline'
+import AppWrapper from '@/components/AppWrapper'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -22,7 +23,7 @@ interface Video {
   publishedAt: string
 }
 
-export default function VideosPage() {
+function VideosPageContent() {
   const { t } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [videos, setVideos] = useState<Video[]>([])
@@ -54,93 +55,8 @@ export default function VideosPage() {
 
   // Variables will be defined later after categories
 
-  // Hardcoded videos removed - now using database data
-  const fallbackVideos = [
-    {
-      id: 1,
-      title: 'Madurai Street Food Tour',
-      title_ta: 'மதுரை தெரு உணவு சுற்றுலா',
-      description: 'Explore the famous street food of Madurai with local vendors',
-      description_ta: 'உள்ளூர் விற்பனையாளர்களுடன் மதுரையின் பிரபலமான தெரு உணவை ஆராயுங்கள்',
-      category: 'business',
-      thumbnail: '/placeholder-video.jpg',
-      duration: '12:45',
-      views: 15420,
-      publishedAt: '2024-03-10',
-      youtubeId: 'dQw4w9WgXcQ',
-      featured: true
-    },
-    {
-      id: 2,
-      title: 'Traditional Agriculture in Madurai District',
-      title_ta: 'மதுரை மாவட்டத்தில் பாரம்பரிய விவசாயம்',
-      description: 'Learn about traditional farming methods still used today',
-      description_ta: 'இன்றும் பயன்படுத்தப்படும் பாரம்பரிய விவசாய முறைகளைப் பற்றி அறியுங்கள்',
-      category: 'agriculture',
-      thumbnail: '/placeholder-video.jpg',
-      duration: '18:30',
-      views: 8750,
-      publishedAt: '2024-03-08',
-      youtubeId: 'dQw4w9WgXcQ',
-      featured: false
-    },
-    {
-      id: 3,
-      title: 'Meenakshi Temple Architecture',
-      title_ta: 'மீனாக்ஷி கோவில் கட்டிடக்கலை',
-      description: 'Detailed look at the architectural marvels of Meenakshi Temple',
-      description_ta: 'மீனாக்ஷி கோவிலின் கட்டிடக்கலை அற்புதங்களின் விரிவான பார்வை',
-      category: 'cultural',
-      thumbnail: '/placeholder-video.jpg',
-      duration: '25:15',
-      views: 22100,
-      publishedAt: '2024-03-05',
-      youtubeId: 'dQw4w9WgXcQ',
-      featured: true
-    },
-    {
-      id: 4,
-      title: 'Local Business Success Stories',
-      title_ta: 'உள்ளூர் வணிக வெற்றிக் கதைகள்',
-      description: 'Inspiring stories of local entrepreneurs and their journey',
-      description_ta: 'உள்ளூர் தொழில்முனைவோர் மற்றும் அவர்களின் பயணத்தின் ஊக்கமளிக்கும் கதைகள்',
-      category: 'business',
-      thumbnail: '/placeholder-video.jpg',
-      duration: '16:20',
-      views: 5680,
-      publishedAt: '2024-03-03',
-      youtubeId: 'dQw4w9WgXcQ',
-      featured: false
-    },
-    {
-      id: 5,
-      title: 'Modern Healthcare Facilities',
-      title_ta: 'நவீன சுகாதார வசதிகள்',
-      description: 'Overview of healthcare improvements in Madurai',
-      description_ta: 'மதுரையில் சுகாதார மேம்பாடுகளின் கண்ணோட்டம்',
-      category: 'medical',
-      thumbnail: '/placeholder-video.jpg',
-      duration: '14:10',
-      views: 9320,
-      publishedAt: '2024-03-01',
-      youtubeId: 'dQw4w9WgXcQ',
-      featured: false
-    },
-    {
-      id: 6,
-      title: 'Pet Care and Veterinary Services',
-      title_ta: 'செல்லப்பிராணி பராமரிப்பு மற்றும் கால்நடை சேவைகள்',
-      description: 'Guide to pet care and available veterinary services',
-      description_ta: 'செல்லப்பிராணி பராமரிப்பு மற்றும் கிடைக்கும் கால்நடை சேவைகளுக்கான வழிகாட்டி',
-      category: 'pets',
-      thumbnail: '/placeholder-video.jpg',
-      duration: '11:45',
-      views: 3450,
-      publishedAt: '2024-02-28',
-      youtubeId: 'dQw4w9WgXcQ',
-      featured: false
-    }
-  ]
+  // No hardcoded videos - all data comes from database
+  const fallbackVideos = []
 
   const categories = [
     { id: 'all', name: t('videos.categories.all', 'All Videos', 'அனைத்து வீடியோக்கள்') },
@@ -179,7 +95,7 @@ export default function VideosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -361,5 +277,13 @@ export default function VideosPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function VideosPage() {
+  return (
+    <AppWrapper>
+      <VideosPageContent />
+    </AppWrapper>
   )
 }

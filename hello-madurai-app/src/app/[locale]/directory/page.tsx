@@ -14,92 +14,8 @@ interface DirectoryPageProps {
   params: Promise<{ locale: string }>
 }
 
-const businesses = [
-  {
-    id: 1,
-    name: 'Madurai Textiles',
-    name_ta: 'மதுரை ஜவுளி',
-    category: 'textiles',
-    description: 'Traditional silk sarees and cotton fabrics',
-    description_ta: 'பாரம்பரிய பட்டு புடவைகள் மற்றும் பருத்தி துணிகள்',
-    address: 'West Masi Street, Madurai',
-    address_ta: 'மேற்கு மாசி தெரு, மதுரை',
-    phone: '+91 452 234 5678',
-    rating: 4.5,
-    hours: '9:00 AM - 8:00 PM',
-    featured: true
-  },
-  {
-    id: 2,
-    name: 'Kumar Medical Store',
-    name_ta: 'குமார் மருந்தகம்',
-    category: 'healthcare',
-    description: 'Complete pharmacy with 24/7 service',
-    description_ta: '24/7 சேவையுடன் முழுமையான மருந்தகம்',
-    address: 'Anna Nagar, Madurai',
-    address_ta: 'அண்ணா நகர், மதுரை',
-    phone: '+91 452 345 6789',
-    rating: 4.8,
-    hours: '24 Hours',
-    featured: false
-  },
-  {
-    id: 3,
-    name: 'Meenakshi Restaurant',
-    name_ta: 'மீனாக்ஷி உணவகம்',
-    category: 'restaurant',
-    description: 'Authentic South Indian cuisine',
-    description_ta: 'உண்மையான தென்னிந்திய உணவு வகைகள்',
-    address: 'Town Hall Road, Madurai',
-    address_ta: 'டவுன் ஹால் சாலை, மதுரை',
-    phone: '+91 452 456 7890',
-    rating: 4.3,
-    hours: '6:00 AM - 11:00 PM',
-    featured: true
-  },
-  {
-    id: 4,
-    name: 'Madurai Auto Parts',
-    name_ta: 'மதுரை வாகன பாகங்கள்',
-    category: 'automotive',
-    description: 'All types of vehicle spare parts',
-    description_ta: 'அனைத்து வகையான வாகன உதிரி பாகங்கள்',
-    address: 'Bypass Road, Madurai',
-    address_ta: 'பைபாஸ் சாலை, மதுரை',
-    phone: '+91 452 567 8901',
-    rating: 4.1,
-    hours: '8:00 AM - 7:00 PM',
-    featured: false
-  },
-  {
-    id: 5,
-    name: 'Sri Krishna Electronics',
-    name_ta: 'ஸ்ரீ கிருஷ்ணா எலக்ட்ரானிக்ஸ்',
-    category: 'electronics',
-    description: 'Home appliances and electronic goods',
-    description_ta: 'வீட்டு உபகரணங்கள் மற்றும் மின்னணு பொருட்கள்',
-    address: 'Periyar Bus Stand, Madurai',
-    address_ta: 'பெரியார் பேருந்து நிலையம், மதுரை',
-    phone: '+91 452 678 9012',
-    rating: 4.4,
-    hours: '9:00 AM - 9:00 PM',
-    featured: false
-  },
-  {
-    id: 6,
-    name: 'Pandian Book Store',
-    name_ta: 'பாண்டியன் புத்தக கடை',
-    category: 'books',
-    description: 'Books, stationery and educational materials',
-    description_ta: 'புத்தகங்கள், எழுதுபொருட்கள் மற்றும் கல்வி பொருட்கள்',
-    address: 'Tallakulam, Madurai',
-    address_ta: 'தல்லாகுளம், மதுரை',
-    phone: '+91 452 789 0123',
-    rating: 4.2,
-    hours: '8:00 AM - 8:00 PM',
-    featured: true
-  }
-]
+// Fetch businesses from database - no hardcoded data
+const businesses = []
 
 const categories = [
   { id: 'all', name: 'All Categories', name_ta: 'அனைத்து வகைகள்' },
@@ -195,7 +111,7 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
                       <CardTitle className="text-lg">
                         {locale === 'ta' ? business.name_ta : business.name}
                       </CardTitle>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                         {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                       </span>
                     </div>
@@ -253,7 +169,7 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
                           {locale === 'ta' ? business.name_ta : business.name}
                         </h3>
                         {business.featured && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                             {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                           </span>
                         )}
@@ -296,7 +212,7 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
         </div>
 
         {/* Add Business CTA */}
-        <div className="mt-12 bg-white rounded-lg shadow-md p-6 text-center">
+        <div className="mt-12 bg-white dark:bg-purple-900 rounded-lg shadow-md p-6 text-center">
           <h3 className="text-xl font-bold text-gray-900 mb-4">
             {locale === 'ta' ? 'உங்கள் வணிகத்தை பட்டியலிடுங்கள்' : 'List Your Business'}
           </h3>

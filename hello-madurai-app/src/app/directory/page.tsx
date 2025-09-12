@@ -2,107 +2,18 @@
 
 import { useState } from 'react'
 import { PhoneIcon, EnvelopeIcon, MapPinIcon, GlobeAltIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import AppWrapper from '@/components/AppWrapper'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
-export default function DirectoryPage() {
+function DirectoryPageContent() {
   const { t } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const businesses = [
-    {
-      id: 1,
-      name: 'Apollo Hospital Madurai',
-      name_ta: 'அப்போலோ மருத்துவமனை மதுரை',
-      description: 'Multi-specialty hospital with advanced medical facilities',
-      description_ta: 'மேம்பட்ட மருத்துவ வசதிகளுடன் பல சிறப்பு மருத்துவமனை',
-      category: 'medical',
-      contactPerson: 'Dr. Rajesh Kumar',
-      phone: '+91 452 258 0000',
-      email: 'info@apollomadurai.com',
-      address: '80 Feet Road, KK Nagar, Madurai',
-      address_ta: '80 அடி சாலை, கே.கே நகர், மதுரை',
-      website: 'https://apollohospitals.com',
-      featured: true
-    },
-    {
-      id: 2,
-      name: 'Thiagarajar College of Engineering',
-      name_ta: 'தியாகராஜர் பொறியியல் கல்லூரி',
-      description: 'Premier engineering college offering various technical courses',
-      description_ta: 'பல்வேறு தொழில்நுட்ப படிப்புகளை வழங்கும் முன்னணி பொறியியல் கல்லூரி',
-      category: 'education',
-      contactPerson: 'Principal Office',
-      phone: '+91 452 248 2240',
-      email: 'principal@tce.edu',
-      address: 'Thiruparankundram, Madurai',
-      address_ta: 'திருப்பரங்குன்றம், மதுரை',
-      website: 'https://tce.edu',
-      featured: false
-    },
-    {
-      id: 3,
-      name: 'Hotel Supreme',
-      name_ta: 'ஹோட்டல் சுப்ரீம்',
-      description: 'Traditional South Indian restaurant famous for authentic cuisine',
-      description_ta: 'உண்மையான உணவுக்கு பிரபலமான பாரம்பரிய தென்னிந்திய உணவகம்',
-      category: 'restaurant',
-      contactPerson: 'Manager',
-      phone: '+91 452 234 3151',
-      email: 'info@hotelsupreme.com',
-      address: 'West Perumal Maistry Street, Madurai',
-      address_ta: 'மேற்கு பெருமாள் மைஸ்திரி தெரு, மதுரை',
-      website: 'https://hotelsupreme.com',
-      featured: true
-    },
-    {
-      id: 4,
-      name: 'Madurai Travels',
-      name_ta: 'மதுரை டிராவல்ஸ்',
-      description: 'Reliable transport service for local and outstation trips',
-      description_ta: 'உள்ளூர் மற்றும் வெளியூர் பயணங்களுக்கான நம்பகமான போக்குவரத்து சேவை',
-      category: 'transport',
-      contactPerson: 'Ravi Kumar',
-      phone: '+91 452 253 4567',
-      email: 'booking@maduraitravels.com',
-      address: 'Periyar Bus Stand, Madurai',
-      address_ta: 'பெரியார் பேருந்து நிலையம், மதுரை',
-      website: 'https://maduraitravels.com',
-      featured: false
-    },
-    {
-      id: 5,
-      name: 'Collector Office Madurai',
-      name_ta: 'கலெக்டர் அலுவலகம் மதுரை',
-      description: 'District administrative office for government services',
-      description_ta: 'அரசு சேவைகளுக்கான மாவட்ட நிர்வாக அலுவலகம்',
-      category: 'government',
-      contactPerson: 'District Collector',
-      phone: '+91 452 252 5000',
-      email: 'collector@madurai.tn.gov.in',
-      address: 'Collectorate Complex, Madurai',
-      address_ta: 'கலெக்டர் வளாகம், மதுரை',
-      website: 'https://madurai.nic.in',
-      featured: false
-    },
-    {
-      id: 6,
-      name: 'Saravana Stores',
-      name_ta: 'சரவணா ஸ்டோர்ஸ்',
-      description: 'Popular textile and clothing store with wide variety',
-      description_ta: 'பரந்த வகைகளுடன் பிரபலமான ஜவுளி மற்றும் ஆடை கடை',
-      category: 'shops',
-      contactPerson: 'Store Manager',
-      phone: '+91 452 234 5678',
-      email: 'info@saravanastores.com',
-      address: 'Main Guard Gate, Madurai',
-      address_ta: 'மெயின் கார்டு கேட், மதுரை',
-      website: 'https://saravanastores.com',
-      featured: true
-    }
-  ]
+  // Fetch businesses from database - no hardcoded data
+  const businesses = []
 
   const categories = [
     { id: 'all', name: t('directory.categories.all', 'All Categories', 'அனைத்து வகைகள்') },
@@ -145,7 +56,7 @@ export default function DirectoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -329,5 +240,13 @@ export default function DirectoryPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function DirectoryPage() {
+  return (
+    <AppWrapper>
+      <DirectoryPageContent />
+    </AppWrapper>
   )
 }

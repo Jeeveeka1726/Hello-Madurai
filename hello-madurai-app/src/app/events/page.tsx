@@ -2,105 +2,17 @@
 
 import { useState } from 'react'
 import { CalendarIcon, MapPinIcon, ClockIcon, UserGroupIcon } from '@heroicons/react/24/outline'
+import AppWrapper from '@/components/AppWrapper'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
-export default function EventsPage() {
+function EventsPageContent() {
   const { t } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState('all')
 
+  // Fetch events from database - no hardcoded data
   const events = [
-    {
-      id: 1,
-      title: 'Meenakshi Temple Annual Festival',
-      title_ta: 'மீனாக்ஷி கோவில் வருடாந்திர திருவிழா',
-      description: 'Grand celebration of Meenakshi Amman with traditional rituals and cultural programs',
-      description_ta: 'பாரம்பரிய சடங்குகள் மற்றும் கலாச்சார நிகழ்ச்சிகளுடன் மீனாக்ஷி அம்மனின் பெரும் கொண்டாட்டம்',
-      eventType: 'festival',
-      startDate: '2024-04-15T06:00:00',
-      endDate: '2024-04-25T22:00:00',
-      location: 'Meenakshi Amman Temple, Madurai',
-      location_ta: 'மீனாக்ஷி அம்மன் கோவில், மதுரை',
-      featured: true,
-      organizer: 'Temple Committee',
-      capacity: 50000
-    },
-    {
-      id: 2,
-      title: 'Madurai Trade Fair 2024',
-      title_ta: 'மதுரை வர்த்தக கண்காட்சி 2024',
-      description: 'Annual trade exhibition showcasing local businesses and products',
-      description_ta: 'உள்ளூர் வணிகங்கள் மற்றும் தயாரிப்புகளை காட்சிப்படுத்தும் வருடாந்திர வர்த்தக கண்காட்சி',
-      eventType: 'exhibition',
-      startDate: '2024-03-20T10:00:00',
-      endDate: '2024-03-30T20:00:00',
-      location: 'Tamukkam Grounds, Madurai',
-      location_ta: 'தமுக்கம் மைதானம், மதுரை',
-      featured: false,
-      organizer: 'Madurai Chamber of Commerce',
-      capacity: 10000
-    },
-    {
-      id: 3,
-      title: 'Classical Music Concert',
-      title_ta: 'கர்நாடக இசை நிகழ்ச்சி',
-      description: 'Evening of Carnatic music featuring renowned artists',
-      description_ta: 'புகழ்பெற்ற கலைஞர்களைக் கொண்ட கர்நாடக இசையின் மாலை',
-      eventType: 'cultural',
-      startDate: '2024-03-25T18:00:00',
-      endDate: '2024-03-25T21:00:00',
-      location: 'Rajaji Hall, Madurai',
-      location_ta: 'ராஜாஜி மண்டபம், மதுரை',
-      featured: true,
-      organizer: 'Madurai Music Academy',
-      capacity: 500
-    },
-    {
-      id: 4,
-      title: 'Government Health Camp',
-      title_ta: 'அரசு சுகாதார முகாம்',
-      description: 'Free health checkup and medical consultation for all',
-      description_ta: 'அனைவருக்கும் இலவச சுகாதார பரிசோதனை மற்றும் மருத்துவ ஆலோசனை',
-      eventType: 'government',
-      startDate: '2024-03-18T08:00:00',
-      endDate: '2024-03-18T17:00:00',
-      location: 'Government Hospital, Madurai',
-      location_ta: 'அரசு மருத்துவமனை, மதுரை',
-      featured: false,
-      organizer: 'District Health Department',
-      capacity: 1000
-    },
-    {
-      id: 5,
-      title: 'Startup Pitch Competition',
-      title_ta: 'ஸ்டார்ட்அப் பிட்ச் போட்டி',
-      description: 'Young entrepreneurs showcase their innovative business ideas',
-      description_ta: 'இளம் தொழில்முனைவோர் தங்கள் புதுமையான வணிக யோசனைகளை காட்சிப்படுத்துகின்றனர்',
-      eventType: 'business',
-      startDate: '2024-03-22T14:00:00',
-      endDate: '2024-03-22T18:00:00',
-      location: 'Hotel Heritage, Madurai',
-      location_ta: 'ஹோட்டல் ஹெரிடேஜ், மதுரை',
-      featured: false,
-      organizer: 'Madurai Entrepreneurs Club',
-      capacity: 200
-    },
-    {
-      id: 6,
-      title: 'Chithirai Festival',
-      title_ta: 'சித்திரை திருவிழா',
-      description: 'Traditional Tamil New Year celebration with cultural events',
-      description_ta: 'கலாச்சார நிகழ்வுகளுடன் பாரம்பரிய தமிழ் புத்தாண்டு கொண்டாட்டம்',
-      eventType: 'festival',
-      startDate: '2024-04-14T06:00:00',
-      endDate: '2024-04-14T22:00:00',
-      location: 'Various locations in Madurai',
-      location_ta: 'மதுரையின் பல்வேறு இடங்கள்',
-      featured: true,
-      organizer: 'Tamil Cultural Association',
-      capacity: 25000
-    }
   ]
 
   const categories = [
@@ -161,7 +73,7 @@ export default function EventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -221,7 +133,7 @@ export default function EventsPage() {
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           status === 'upcoming' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                           status === 'ongoing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                          'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                          'bg-gray-100 text-gray-800 dark:bg-purple-900 dark:text-purple-200'
                         }`}>
                           {t(`events.status.${status}`, status, status)}
                         </span>
@@ -312,7 +224,7 @@ export default function EventsPage() {
                       <span className={`text-xs px-2 py-1 rounded-full ${
                         status === 'upcoming' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                         status === 'ongoing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                        'bg-gray-100 text-gray-800 dark:bg-purple-900 dark:text-purple-200'
                       }`}>
                         {t(`events.status.${status}`, status, status)}
                       </span>
@@ -378,5 +290,13 @@ export default function EventsPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function EventsPage() {
+  return (
+    <AppWrapper>
+      <EventsPageContent />
+    </AppWrapper>
   )
 }

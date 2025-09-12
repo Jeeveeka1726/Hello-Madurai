@@ -25,6 +25,7 @@ const mockNews = [
     excerpt_ta: 'மதுரை மாநகராட்சி வரவிருக்கும் நிதியாண்டுக்கான பல புதிய உள்கட்டமைப்பு வளர்ச்சி திட்டங்களை அறிவித்துள்ளது.',
     category: 'corporation',
     featured_image: '/images/news/corporation-news.jpg',
+    featuredImage: '/images/news/corporation-news.jpg',
     author: 'Admin',
     views_count: 245,
     created_at: '2024-01-15T10:30:00Z'
@@ -120,10 +121,10 @@ export default async function NewsPage({
           {filteredNews.map((news) => (
             <Link key={news.id} href={`/${locale}/news/${news.id}`}>
               <Card hover className="h-full">
-                {news.featured_image && (
+                {(news.featuredImage || news.featured_image) && (
                   <div className="mb-4 -mx-6 -mt-6">
                     <img
-                      src={news.featured_image || '/images/placeholder-news.jpg'}
+                      src={news.featuredImage || news.featured_image || '/images/placeholder-news.jpg'}
                       alt={locale === 'ta' ? news.title_ta : news.title}
                       className="w-full h-48 object-cover rounded-t-lg"
                     />
@@ -132,7 +133,7 @@ export default async function NewsPage({
                 
                 <CardHeader>
                   <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-                    <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-xs">
+                    <span className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-2 py-1 rounded-full text-xs">
                       {locale === 'ta' 
                         ? newsCategories.find(cat => cat.id === news.category)?.name_ta
                         : newsCategories.find(cat => cat.id === news.category)?.name

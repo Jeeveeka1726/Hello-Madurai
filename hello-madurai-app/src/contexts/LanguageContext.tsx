@@ -28,7 +28,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('hello-madurai-language', language)
   }, [language])
 
-  // Translation function
+  // Simple translation function - returns appropriate language text
   const t = (key: string, enText: string, taText: string) => {
     return language === 'ta' ? taText : enText
   }

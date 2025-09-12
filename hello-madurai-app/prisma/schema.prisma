@@ -11,40 +11,42 @@ datasource db {
 }
 
 model News {
-  id          String   @id @default(cuid())
-  title       String
-  title_ta    String?
-  content     String
-  content_ta  String?
-  excerpt     String
-  excerpt_ta  String?
-  category    String
-  author      String
-  publishedAt DateTime @default(now())
-  views       Int      @default(0)
-  featured    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  title_ta      String?
+  content       String
+  content_ta    String?
+  excerpt       String
+  excerpt_ta    String?
+  category      String
+  author        String
+  featuredImage String?
+  publishedAt   DateTime @default(now())
+  views         Int      @default(0)
+  featured      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("news")
 }
 
 model Event {
-  id          String   @id @default(cuid())
-  title       String
-  title_ta    String?
-  description String
+  id            String   @id @default(cuid())
+  title         String
+  title_ta      String?
+  description   String
   description_ta String?
-  location    String
-  location_ta String?
-  startDate   DateTime
-  endDate     DateTime?
-  category    String
-  status      String   @default("upcoming") // upcoming, ongoing, completed
-  featured    Boolean  @default(false)
-  registrations Int    @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  location      String
+  location_ta   String?
+  featuredImage String?
+  startDate     DateTime
+  endDate       DateTime?
+  category      String
+  status        String   @default("upcoming") // upcoming, ongoing, completed
+  featured      Boolean  @default(false)
+  registrations Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("events")
 }
@@ -108,19 +110,20 @@ model Video {
 }
 
 model Magazine {
-  id          String   @id @default(cuid())
-  title       String
-  title_ta    String?
-  description String
+  id            String   @id @default(cuid())
+  title         String
+  title_ta      String?
+  description   String
   description_ta String?
-  pdfUrl      String
-  coverImage  String?
-  issueNumber String
-  publishedAt DateTime @default(now())
-  downloads   Int      @default(0)
-  featured    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  pdfUrl        String
+  coverImage    String?
+  featuredImage String?
+  issueNumber   String
+  publishedAt   DateTime @default(now())
+  downloads     Int      @default(0)
+  featured      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("magazines")
 }

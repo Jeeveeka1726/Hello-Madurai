@@ -16,7 +16,7 @@ const featuredSections = [
     name: 'news',
     href: '/news',
     icon: NewspaperIcon,
-    color: 'bg-blue-500',
+    color: 'bg-purple-500',
     description: 'Latest news from Madurai and surrounding areas'
   },
   {
@@ -51,7 +51,7 @@ const featuredSections = [
     name: 'jobs',
     href: '/jobs',
     icon: BriefcaseIcon,
-    color: 'bg-indigo-500',
+    color: 'bg-purple-500',
     description: 'Local job opportunities and career listings'
   }
 ]
@@ -163,7 +163,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 bg-indigo-600">
+      <section className="py-16 bg-purple-600">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white sm:text-4xl">
             {locale === 'ta' 

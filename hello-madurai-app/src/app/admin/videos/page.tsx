@@ -4,6 +4,11 @@ import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import FileUpload from '@/components/admin/FileUpload'
+import TranslateField from '@/components/admin/TranslateField'
+import TranslatedText from '@/components/TranslatedText'
+import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, VideoCameraIcon, PlayIcon } from '@heroicons/react/24/outline'
+import { toast } from 'react-hot-toast'
 
 interface Video {
   id: string
@@ -19,25 +24,41 @@ interface Video {
   views: number
   featured: boolean
   publishedAt: string
+  createdAt: string
+  updatedAt: string
 }
 
 export default function AdminVideosPage() {
-  const { t } = useLanguage()
+  const { language } = useLanguage()
   const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [editingVideo, setEditingVideo] = useState<Video | null>(null)
   const [formData, setFormData] = useState({
     title: '',
     title_ta: '',
     description: '',
     description_ta: '',
     videoUrl: '',
+    thumbnail: '',
     category: 'business',
     duration: '',
     featured: false
   })
 
-  // Fetch videos
+  const videoCategories = [
+    { value: 'business', label: 'Business' },
+    { value: 'agriculture', label: 'Agriculture' },
+    { value: 'education', label: 'Education' },
+    { value: 'culture', label: 'Culture' },
+    { value: 'tourism', label: 'Tourism' },
+    { value: 'technology', label: 'Technology' },
+    { value: 'entertainment', label: 'Entertainment' },
+    { value: 'news', label: 'News' },
+    { value: 'sports', label: 'Sports' },
+    { value: 'other', label: 'Other' }
+  ]
+
   useEffect(() => {
     fetchVideos()
   }, [])
@@ -48,261 +69,371 @@ export default function AdminVideosPage() {
       if (response.ok) {
         const data = await response.json()
         setVideos(data)
+      } else {
+        toast.error('Failed to fetch videos')
       }
     } catch (error) {
       console.error('Error fetching videos:', error)
+      toast.error('Error fetching videos')
     } finally {
       setLoading(false)
     }
   }
 
+  const extractYouTubeId = (url: string): string | null => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+    const match = url.match(regExp)
+    return (match && match[2].length === 11) ? match[2] : null
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
+
     try {
+      // Extract YouTube ID if it's a YouTube URL
+      const youtubeId = extractYouTubeId(formData.videoUrl)
+      
       const response = await fetch('/api/admin/videos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        method: editingVideo ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          youtubeId,
+          ...(editingVideo && { id: editingVideo.id })
+        }),
       })
 
       if (response.ok) {
-        alert('Video added successfully!')
+        await fetchVideos()
+        setShowForm(false)
+        setEditingVideo(null)
         setFormData({
           title: '',
           title_ta: '',
           description: '',
           description_ta: '',
           videoUrl: '',
+          thumbnail: '',
           category: 'business',
           duration: '',
           featured: false
         })
-        setShowForm(false)
-        fetchVideos()
+        toast.success(editingVideo ? 'Video updated successfully!' : 'Video created successfully!')
       } else {
-        alert('Failed to add video')
+        const errorData = await response.json()
+        toast.error(errorData.error || 'Error saving video')
       }
     } catch (error) {
-      console.error('Error adding video:', error)
-      alert('Error adding video')
+      console.error('Error saving video:', error)
+      toast.error('Error saving video')
+    } finally {
+      setLoading(false)
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t('admin.videos.title', 'Video Management', 'வீடியோ மேலாண்மை')}
-          </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
-            {t('admin.videos.subtitle', 'Manage YouTube videos and local content', 'YouTube வீடியோக்கள் மற்றும் உள்ளூர் உள்ளடக்கத்தை நிர்வகிக்கவும்')}
-          </p>
-        </div>
+  const handleEdit = (video: Video) => {
+    setEditingVideo(video)
+    setFormData({
+      title: video.title,
+      title_ta: video.title_ta || '',
+      description: video.description,
+      description_ta: video.description_ta || '',
+      videoUrl: video.videoUrl,
+      thumbnail: video.thumbnail || '',
+      category: video.category,
+      duration: video.duration || '',
+      featured: video.featured
+    })
+    setShowForm(true)
+  }
 
-        <div className="mb-6">
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this video?')) return
+
+    try {
+      const response = await fetch(`/api/admin/videos/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        await fetchVideos()
+        toast.success('Video deleted successfully!')
+      } else {
+        toast.error('Error deleting video')
+      }
+    } catch (error) {
+      console.error('Error deleting video:', error)
+      toast.error('Error deleting video')
+    }
+  }
+
+  const getVideoThumbnail = (video: Video) => {
+    if (video.thumbnail) return video.thumbnail
+    if (video.youtubeId) return `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`
+    return null
+  }
+
+  if (loading && videos.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-gray-500 dark:text-gray-400">Loading videos...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <TranslatedText>Video Management</TranslatedText>
+            </h1>
+            <p className="mt-2 text-gray-600 dark:text-gray-300">
+              <TranslatedText>Create, edit, and manage video content</TranslatedText>
+            </p>
+          </div>
           <Button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-primary-600 text-white hover:bg-primary-700"
+            onClick={() => {
+              setShowForm(true)
+              setEditingVideo(null)
+              setFormData({
+                title: '',
+                title_ta: '',
+                description: '',
+                description_ta: '',
+                videoUrl: '',
+                thumbnail: '',
+                category: 'business',
+                duration: '',
+                featured: false
+              })
+            }}
           >
-            {showForm ? t('admin.cancel', 'Cancel', 'ரத்து') : t('admin.videos.add', 'Add Video', 'வீடியோ சேர்க்கவும்')}
+            <PlusIcon className="h-4 w-4 mr-2" />
+            <TranslatedText>Add Video</TranslatedText>
           </Button>
         </div>
 
+        {/* Form Modal */}
         {showForm && (
-          <Card className="mb-8 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white">
-                {t('admin.videos.addNew', 'Add New Video', 'புதிய வீடியோ சேர்க்கவும்')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t('admin.title', 'Title (English)', 'தலைப்பு (ஆங்கிலம்)')}
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.title}
-                      onChange={(e) => setFormData({...formData, title: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t('admin.titleTa', 'Title (Tamil)', 'தலைப்பு (தமிழ்)')}
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.title_ta}
-                      onChange={(e) => setFormData({...formData, title_ta: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('admin.videos.url', 'YouTube URL', 'YouTube URL')}
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.videoUrl}
-                    onChange={(e) => setFormData({...formData, videoUrl: e.target.value})}
-                    placeholder="https://www.youtube.com/watch?v=..."
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    required
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-purple-900">
+              <CardHeader>
+                <CardTitle className="text-gray-900 dark:text-white">
+                  <TranslatedText>{editingVideo ? 'Edit Video' : 'Add Video'}</TranslatedText>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <TranslateField
+                    label="Title"
+                    englishValue={formData.title}
+                    tamilValue={formData.title_ta}
+                    onEnglishChange={(value) => setFormData({ ...formData, title: value })}
+                    onTamilChange={(value) => setFormData({ ...formData, title_ta: value })}
+                    required={true}
+                    placeholder={{
+                      english: "Enter video title in English",
+                      tamil: "வீடியோ தலைப்பை தமிழில் உள்ளிடவும்"
+                    }}
                   />
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t('admin.category', 'Category', 'வகை')}
-                    </label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => setFormData({...formData, category: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  <TranslateField
+                    label="Description"
+                    englishValue={formData.description}
+                    tamilValue={formData.description_ta}
+                    onEnglishChange={(value) => setFormData({ ...formData, description: value })}
+                    onTamilChange={(value) => setFormData({ ...formData, description_ta: value })}
+                    type="textarea"
+                    required={true}
+                    placeholder={{
+                      english: "Enter video description in English",
+                      tamil: "வீடியோ விளக்கத்தை தமிழில் உள்ளிடவும்"
+                    }}
+                  />
+
+                  {/* Video Upload/URL */}
+                  <FileUpload
+                    label="Video File or URL"
+                    fileType="video"
+                    currentFile={formData.videoUrl}
+                    onFileUpload={(url) => setFormData({ ...formData, videoUrl: url })}
+                    onUrlChange={(url) => setFormData({ ...formData, videoUrl: url })}
+                    className="mb-6"
+                  />
+
+                  {/* Thumbnail Upload */}
+                  <FileUpload
+                    label="Thumbnail Image"
+                    fileType="image"
+                    currentFile={formData.thumbnail}
+                    onFileUpload={(url) => setFormData({ ...formData, thumbnail: url })}
+                    onUrlChange={(url) => setFormData({ ...formData, thumbnail: url })}
+                    className="mb-6"
+                  />
+
+                  <div className="grid gap-6 md:grid-cols-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Category *
+                      </label>
+                      <select
+                        required
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                      >
+                        {videoCategories.map((category) => (
+                          <option key={category.value} value={category.value}>
+                            {category.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Duration (optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.duration}
+                        onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        placeholder="e.g., 5:30"
+                      />
+                    </div>
+
+                    <div className="flex items-center">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={formData.featured}
+                          onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          <TranslatedText>Featured Video</TranslatedText>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowForm(false)}
                     >
-                      <option value="business">Business</option>
-                      <option value="culture">Culture</option>
-                      <option value="agriculture">Agriculture</option>
-                      <option value="medical">Medical</option>
-                      <option value="education">Education</option>
-                    </select>
+                      <TranslatedText>Cancel</TranslatedText>
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={loading || !formData.title || !formData.description || !formData.videoUrl}
+                    >
+                      {loading ? 'Saving...' : <TranslatedText>{editingVideo ? 'Update Video' : 'Create Video'}</TranslatedText>}
+                    </Button>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t('admin.videos.duration', 'Duration', 'கால அளவு')}
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.duration}
-                      onChange={(e) => setFormData({...formData, duration: e.target.value})}
-                      placeholder="12:34"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t('admin.description', 'Description (English)', 'விளக்கம் (ஆங்கிலம்)')}
-                    </label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t('admin.descriptionTa', 'Description (Tamil)', 'விளக்கம் (தமிழ்)')}
-                    </label>
-                    <textarea
-                      value={formData.description_ta}
-                      onChange={(e) => setFormData({...formData, description_ta: e.target.value})}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formData.featured}
-                      onChange={(e) => setFormData({...formData, featured: e.target.checked})}
-                      className="mr-2"
-                    />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {t('admin.featured', 'Featured Video', 'சிறப்பு வீடியோ')}
-                    </span>
-                  </label>
-                </div>
-
-                <div className="flex space-x-4">
-                  <Button
-                    type="submit"
-                    className="bg-primary-600 text-white hover:bg-primary-700"
-                  >
-                    {t('admin.save', 'Save Video', 'வீடியோவை சேமிக்கவும்')}
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => setShowForm(false)}
-                    className="bg-gray-600 text-white hover:bg-gray-700"
-                  >
-                    {t('admin.cancel', 'Cancel', 'ரத்து')}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading videos...</p>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {videos.map((video) => (
-              <Card key={video.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                    {video.title}
-                  </h3>
-                  {video.title_ta && (
-                    <h4 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {video.title_ta}
-                    </h4>
-                  )}
-                  <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                    {video.description}
-                  </p>
-                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                    <span>Category: {video.category}</span>
-                    <span>Views: {video.views}</span>
-                  </div>
-                  {video.featured && (
-                    <div className="mt-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
-                        Featured
-                      </span>
+        {/* Videos Grid */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {videos.map((video) => (
+            <Card key={video.id} hover className="h-full">
+              <CardContent>
+                <div className="relative mb-4">
+                  {getVideoThumbnail(video) ? (
+                    <div className="relative">
+                      <img
+                        src={getVideoThumbnail(video)!}
+                        alt={video.title}
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-lg">
+                        <PlayIcon className="h-12 w-12 text-white" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 bg-gray-200 dark:bg-purple-800 rounded-lg flex items-center justify-center">
+                      <VideoCameraIcon className="h-12 w-12 text-gray-400" />
                     </div>
                   )}
-                  <div className="mt-4">
-                    <a 
-                      href={video.videoUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-primary-600 hover:text-primary-700 text-sm"
-                    >
-                      View on YouTube →
-                    </a>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                </div>
 
-        {!loading && videos.length === 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
+                    {language === 'ta' && video.title_ta ? video.title_ta : video.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                    {language === 'ta' && video.description_ta ? video.description_ta : video.description}
+                  </p>
+                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                    <span className="capitalize">{video.category}</span>
+                    <div className="flex items-center space-x-2">
+                      {video.duration && <span>{video.duration}</span>}
+                      <div className="flex items-center">
+                        <EyeIcon className="h-4 w-4 mr-1" />
+                        {video.views || 0}
+                      </div>
+                    </div>
+                  </div>
+                  {video.featured && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                      <TranslatedText>Featured</TranslatedText>
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-4 flex justify-between">
+                  <div className="flex space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(video)}
+                    >
+                      <PencilIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleDelete(video.id)}
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => window.open(video.videoUrl, '_blank')}
+                  >
+                    <PlayIcon className="h-4 w-4 mr-1" />
+                    <TranslatedText>Watch</TranslatedText>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {videos.length === 0 && !loading && (
           <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">
-              No videos found. Add your first video!
+            <VideoCameraIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+              <TranslatedText>No videos</TranslatedText>
+            </h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <TranslatedText>Get started by adding a new video.</TranslatedText>
             </p>
           </div>
         )}

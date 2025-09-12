@@ -4,6 +4,11 @@ import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import FileUpload from '@/components/admin/FileUpload'
+import TranslateField from '@/components/admin/TranslateField'
+import TranslatedText from '@/components/TranslatedText'
+import { PlusIcon, PencilIcon, TrashIcon, PlayIcon } from '@heroicons/react/24/outline'
+import { toast } from 'react-hot-toast'
 
 interface Podcast {
   id: string
@@ -88,7 +93,7 @@ export default function AdminPodcastsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -109,7 +114,7 @@ export default function AdminPodcastsPage() {
         </div>
 
         {showForm && (
-          <Card className="mb-8 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <Card className="mb-8 bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
             <CardHeader>
               <CardTitle className="text-gray-900 dark:text-white">
                 {t('admin.podcasts.addNew', 'Add New Podcast', 'புதிய பாட்காஸ்ட் சேர்க்கவும்')}
@@ -126,7 +131,7 @@ export default function AdminPodcastsPage() {
                       type="text"
                       value={formData.title}
                       onChange={(e) => setFormData({...formData, title: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md bg-white dark:bg-purple-800 text-gray-900 dark:text-white"
                       required
                     />
                   </div>
@@ -138,7 +143,7 @@ export default function AdminPodcastsPage() {
                       type="text"
                       value={formData.title_ta}
                       onChange={(e) => setFormData({...formData, title_ta: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md bg-white dark:bg-purple-800 text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -152,7 +157,7 @@ export default function AdminPodcastsPage() {
                     value={formData.audioUrl}
                     onChange={(e) => setFormData({...formData, audioUrl: e.target.value})}
                     placeholder="https://example.com/audio.mp3"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md bg-white dark:bg-purple-800 text-gray-900 dark:text-white"
                     required
                   />
                 </div>
@@ -165,7 +170,7 @@ export default function AdminPodcastsPage() {
                     <select
                       value={formData.category}
                       onChange={(e) => setFormData({...formData, category: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md bg-white dark:bg-purple-800 text-gray-900 dark:text-white"
                     >
                       <option value="talk">Talk Show</option>
                       <option value="music">Music</option>
@@ -183,37 +188,25 @@ export default function AdminPodcastsPage() {
                       value={formData.duration}
                       onChange={(e) => setFormData({...formData, duration: e.target.value})}
                       placeholder="45:30"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md bg-white dark:bg-purple-800 text-gray-900 dark:text-white"
                       required
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t('admin.description', 'Description (English)', 'விளக்கம் (ஆங்கிலம்)')}
-                    </label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t('admin.descriptionTa', 'Description (Tamil)', 'விளக்கம் (தமிழ்)')}
-                    </label>
-                    <textarea
-                      value={formData.description_ta}
-                      onChange={(e) => setFormData({...formData, description_ta: e.target.value})}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
+                <TranslateField
+                  label="Description"
+                  englishValue={formData.description}
+                  tamilValue={formData.description_ta}
+                  onEnglishChange={(value) => setFormData({...formData, description: value})}
+                  onTamilChange={(value) => setFormData({...formData, description_ta: value})}
+                  type="textarea"
+                  required={true}
+                  placeholder={{
+                    english: "Podcast description in English",
+                    tamil: "Podcast description in Tamil"
+                  }}
+                />
 
                 <div>
                   <label className="flex items-center">
@@ -257,7 +250,7 @@ export default function AdminPodcastsPage() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {podcasts.map((podcast) => (
-              <Card key={podcast.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <Card key={podcast.id} className="bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
                 <CardContent className="p-6">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                     {podcast.title}

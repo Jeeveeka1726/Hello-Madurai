@@ -7,98 +7,8 @@ interface EventsPageProps {
   params: Promise<{ locale: string }>
 }
 
-const events = [
-  {
-    id: 1,
-    title: 'Chithirai Festival',
-    title_ta: 'சித்திரை திருவிழா',
-    date: '2024-04-15',
-    time: '6:00 AM - 10:00 PM',
-    location: 'Meenakshi Amman Temple',
-    location_ta: 'மீனாக்ஷி அம்மன் கோவில்',
-    description: 'Annual festival celebrating the divine marriage of Meenakshi and Sundareswarar',
-    description_ta: 'மீனாக்ஷி மற்றும் சுந்தரேஸ்வரர் திருக்கல்யாணத்தை கொண்டாடும் வருடாந்திர திருவிழா',
-    category: 'religious',
-    image: '/events/chithirai.jpg',
-    attendees: '50000+',
-    featured: true
-  },
-  {
-    id: 2,
-    title: 'Madurai Food Festival',
-    title_ta: 'மதுரை உணவு திருவிழா',
-    date: '2024-03-20',
-    time: '5:00 PM - 11:00 PM',
-    location: 'Tamukkam Grounds',
-    location_ta: 'தமுக்கம் மைதானம்',
-    description: 'Taste the authentic flavors of Madurai cuisine',
-    description_ta: 'மதுரையின் உண்மையான சுவைகளை அனுபவியுங்கள்',
-    category: 'cultural',
-    image: '/events/food-festival.jpg',
-    attendees: '5000+',
-    featured: false
-  },
-  {
-    id: 3,
-    title: 'Business Expo 2024',
-    title_ta: 'வணிக கண்காட்சி 2024',
-    date: '2024-03-25',
-    time: '9:00 AM - 6:00 PM',
-    location: 'Trade Center',
-    location_ta: 'வர்த்தக மையம்',
-    description: 'Connect with local businesses and entrepreneurs',
-    description_ta: 'உள்ளூர் வணிகங்கள் மற்றும் தொழில்முனைவோருடன் இணைந்து கொள்ளுங்கள்',
-    category: 'business',
-    image: '/events/business-expo.jpg',
-    attendees: '2000+',
-    featured: false
-  },
-  {
-    id: 4,
-    title: 'Classical Music Concert',
-    title_ta: 'கர்நாடக இசை நிகழ்ச்சி',
-    date: '2024-04-05',
-    time: '7:00 PM - 10:00 PM',
-    location: 'Rajaji Hall',
-    location_ta: 'ராஜாஜி மண்டபம்',
-    description: 'Evening of classical Carnatic music by renowned artists',
-    description_ta: 'புகழ்பெற்ற கலைஞர்களின் கர்நாடக இசை நிகழ்ச்சி',
-    category: 'cultural',
-    image: '/events/music-concert.jpg',
-    attendees: '800+',
-    featured: true
-  },
-  {
-    id: 5,
-    title: 'Agriculture Fair',
-    title_ta: 'விவசாய கண்காட்சி',
-    date: '2024-04-10',
-    time: '8:00 AM - 5:00 PM',
-    location: 'Agricultural College',
-    location_ta: 'விவசாய கல்லூரி',
-    description: 'Latest farming techniques and equipment showcase',
-    description_ta: 'சமீபத்திய விவசாய நுட்பங்கள் மற்றும் உபகரணங்கள் காட்சி',
-    category: 'business',
-    image: '/events/agriculture-fair.jpg',
-    attendees: '3000+',
-    featured: false
-  },
-  {
-    id: 6,
-    title: 'Youth Cultural Program',
-    title_ta: 'இளைஞர் கலாசார நிகழ்ச்சி',
-    date: '2024-03-30',
-    time: '6:00 PM - 9:00 PM',
-    location: 'Corporation Stadium',
-    location_ta: 'மாநகராட்சி அரங்கம்',
-    description: 'Dance, music and drama performances by local youth',
-    description_ta: 'உள்ளூர் இளைஞர்களின் நடனம், இசை மற்றும் நாடக நிகழ்ச்சிகள்',
-    category: 'cultural',
-    image: '/events/youth-program.jpg',
-    attendees: '1500+',
-    featured: false
-  }
-]
+// Fetch events from database - no hardcoded data
+const events = []
 
 const categories = [
   { id: 'all', name: 'All Events', name_ta: 'அனைத்து நிகழ்ச்சிகள்' },
@@ -169,7 +79,7 @@ export default async function EventsPage({ params }: EventsPageProps) {
                   </div>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 capitalize">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 capitalize">
                         {event.category}
                       </span>
                       <span className="text-sm text-gray-500">

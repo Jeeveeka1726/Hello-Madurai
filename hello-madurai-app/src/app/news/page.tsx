@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { CalendarIcon, EyeIcon, UserIcon } from '@heroicons/react/24/outline'
+import AppWrapper from '@/components/AppWrapper'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -23,7 +24,7 @@ interface NewsArticle {
   featured: boolean
 }
 
-export default function NewsPage() {
+function NewsPageContent() {
   const { t } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([])
@@ -82,7 +83,7 @@ export default function NewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -267,5 +268,13 @@ export default function NewsPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function NewsPage() {
+  return (
+    <AppWrapper>
+      <NewsPageContent />
+    </AppWrapper>
   )
 }

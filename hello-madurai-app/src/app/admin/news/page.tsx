@@ -1,10 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
+import TranslatedText from '@/components/TranslatedText'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import FileUpload from '@/components/admin/FileUpload'
+import TranslateField from '@/components/admin/TranslateField'
+import RichTextEditor from '@/components/admin/RichTextEditor'
+import { toast } from 'react-hot-toast'
 
 interface NewsItem {
   id: string
@@ -19,12 +24,13 @@ interface NewsItem {
   publishedAt: string
   views: number
   featured: boolean
+  featuredImage?: string
   createdAt: string
   updatedAt: string
 }
 
 export default function AdminNewsPage() {
-  const { t } = useLanguage()
+  const { language } = useLanguage()
   const [news, setNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -39,7 +45,7 @@ export default function AdminNewsPage() {
     category: 'general',
     author: 'Admin',
     featured: false,
-    imageUrl: '',
+    featuredImage: '',
     tags: ''
   })
 
@@ -100,7 +106,7 @@ export default function AdminNewsPage() {
           category: 'general',
           author: 'Admin',
           featured: false,
-          imageUrl: '',
+          featuredImage: '',
           tags: ''
         })
         alert(editingNews ? 'News updated successfully!' : 'News created successfully!')
@@ -126,7 +132,9 @@ export default function AdminNewsPage() {
       excerpt_ta: newsItem.excerpt_ta || '',
       category: newsItem.category,
       author: newsItem.author,
-      featured: newsItem.featured
+      featured: newsItem.featured,
+      featuredImage: newsItem.featuredImage || '',
+      tags: ''
     })
     setShowForm(true)
   }
@@ -163,7 +171,7 @@ export default function AdminNewsPage() {
 
   if (loading && !showForm) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-gray-600 dark:text-gray-300">Loading...</p>
@@ -174,16 +182,16 @@ export default function AdminNewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {t('admin.news.title', 'News Management', 'செய்தி மேலாண்மை')}
+              <TranslatedText>News Management</TranslatedText>
             </h1>
             <p className="mt-2 text-gray-600 dark:text-gray-300">
-              {t('admin.news.subtitle', 'Create, edit, and manage news articles', 'செய்தி கட்டுரைகளை உருவாக்கவும், திருத்தவும், நிர்வகிக்கவும்')}
+              <TranslatedText>Create, edit, and manage news articles</TranslatedText>
             </p>
           </div>
           <Button
@@ -199,103 +207,95 @@ export default function AdminNewsPage() {
                 excerpt_ta: '',
                 category: 'general',
                 author: 'Admin',
-                featured: false
+                featured: false,
+                featuredImage: '',
+                tags: ''
               })
             }}
           >
             <PlusIcon className="h-4 w-4 mr-2" />
-            {t('admin.news.addNew', 'Add News', 'செய்தி சேர்க்க')}
+            <TranslatedText>Add News</TranslatedText>
           </Button>
         </div>
 
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800">
+            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-purple-900">
               <CardHeader>
                 <CardTitle className="text-gray-900 dark:text-white">
-                  {editingNews ? t('admin.news.edit', 'Edit News', 'செய்தி திருத்து') : t('admin.news.add', 'Add News', 'செய்தி சேர்க்க')}
+                  <TranslatedText>{editingNews ? 'Edit News' : 'Add News'}</TranslatedText>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Title (English) *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Title (Tamil)
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.title_ta}
-                        onChange={(e) => setFormData({ ...formData, title_ta: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    </div>
-                  </div>
+                  <TranslateField
+                    label="Title"
+                    englishValue={formData.title}
+                    tamilValue={formData.title_ta}
+                    onEnglishChange={(value) => setFormData({ ...formData, title: value })}
+                    onTamilChange={(value) => setFormData({ ...formData, title_ta: value })}
+                    required={true}
+                    placeholder={{
+                      english: "Enter news title in English",
+                      tamil: "செய்தி தலைப்பை தமிழில் உள்ளிடவும்"
+                    }}
+                  />
 
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Excerpt (English) *
-                      </label>
-                      <textarea
-                        required
-                        rows={3}
-                        value={formData.excerpt}
-                        onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Excerpt (Tamil)
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={formData.excerpt_ta}
-                        onChange={(e) => setFormData({ ...formData, excerpt_ta: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    </div>
-                  </div>
+                  <TranslateField
+                    label="Excerpt"
+                    englishValue={formData.excerpt}
+                    tamilValue={formData.excerpt_ta}
+                    onEnglishChange={(value) => setFormData({ ...formData, excerpt: value })}
+                    onTamilChange={(value) => setFormData({ ...formData, excerpt_ta: value })}
+                    type="textarea"
+                    required={true}
+                    placeholder={{
+                      english: "Enter a brief excerpt in English",
+                      tamil: "சுருக்கமான விளக்கத்தை தமிழில் உள்ளிடவும்"
+                    }}
+                  />
 
-                  <div className="grid gap-6 md:grid-cols-2">
+                  {/* Rich Text Editor for Content */}
+                  <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Content (English) *
                       </label>
-                      <textarea
-                        required
-                        rows={8}
+                      <RichTextEditor
                         value={formData.content}
-                        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+                        onChange={(value) => setFormData({ ...formData, content: value })}
+                        placeholder="Write your news content in English..."
+                        className="mb-4"
+                        showTranslate={true}
+                        targetLanguage="ta"
                       />
                     </div>
+                    
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Content (Tamil)
                       </label>
-                      <textarea
-                        rows={8}
+                      <RichTextEditor
                         value={formData.content_ta}
-                        onChange={(e) => setFormData({ ...formData, content_ta: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+                        onChange={(value) => setFormData({ ...formData, content_ta: value })}
+                        placeholder="தமிழில் உங்கள் செய்தி உள்ளடக்கத்தை எழுதுங்கள்..."
+                        className="font-tamil"
+                        showTranslate={true}
+                        targetLanguage="en"
                       />
                     </div>
                   </div>
+
+                  {/* Featured Image Upload */}
+                  <FileUpload
+                    label="Featured Image"
+                    fileType="image"
+                    currentFile={formData.featuredImage}
+                    onFileUpload={(url) => setFormData({ ...formData, featuredImage: url })}
+                    onUrlChange={(url) => setFormData({ ...formData, featuredImage: url })}
+                    className="mb-6"
+                  />
 
                   <div className="grid gap-6 md:grid-cols-3">
                     <div>
@@ -306,7 +306,7 @@ export default function AdminNewsPage() {
                         required
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
                       >
                         {categories.map((category) => (
                           <option key={category.id} value={category.id}>
@@ -324,19 +324,7 @@ export default function AdminNewsPage() {
                         required
                         value={formData.author}
                         onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Featured Image URL
-                      </label>
-                      <input
-                        type="url"
-                        value={formData.imageUrl}
-                        onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                        placeholder="https://example.com/image.jpg"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
                       />
                     </div>
                     <div>
@@ -348,7 +336,7 @@ export default function AdminNewsPage() {
                         value={formData.tags}
                         onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                         placeholder="madurai, news, local"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
                       />
                     </div>
                     <div className="flex items-center">
@@ -387,21 +375,38 @@ export default function AdminNewsPage() {
         {/* News List */}
         <div className="space-y-4">
           {news.map((newsItem) => (
-            <Card key={newsItem.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <Card key={newsItem.id} className="bg-white dark:bg-purple-900 border-gray-200 dark:border-purple-800">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
+                  {/* Featured Image */}
+                  {newsItem.featuredImage && (
+                    <div className="flex-shrink-0 mr-4">
+                      <img
+                        src={newsItem.featuredImage}
+                        alt={newsItem.title}
+                        className="w-24 h-24 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+                  
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         newsItem.featured 
                           ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' 
-                          : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                          : 'bg-gray-100 text-gray-800 dark:bg-purple-800 dark:text-purple-200'
                       }`}>
                         {newsItem.featured ? 'Featured' : 'Regular'}
                       </span>
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                         {newsItem.category}
                       </span>
+                      {newsItem.featuredImage && (
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                          <PhotoIcon className="h-3 w-3 inline mr-1" />
+                          Image
+                        </span>
+                      )}
                     </div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                       {newsItem.title}

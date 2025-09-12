@@ -25,7 +25,8 @@ export async function POST(request: NextRequest) {
       excerpt_ta,
       category,
       author,
-      featured
+      featured,
+      featuredImage
     } = body
 
     const news = await prisma.news.create({
@@ -38,7 +39,8 @@ export async function POST(request: NextRequest) {
         excerpt_ta,
         category,
         author,
-        featured: featured || false
+        featured: featured || false,
+        featuredImage: featuredImage || null
       }
     })
 

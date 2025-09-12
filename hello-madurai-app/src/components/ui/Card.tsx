@@ -22,8 +22,8 @@ export default function Card({
   return (
     <div 
       className={`
-        bg-white rounded-lg shadow-md border border-gray-200
-        ${hover ? 'hover:shadow-lg transition-shadow duration-200' : ''}
+        bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 rounded-xl shadow-lg border border-gray-200 dark:border-purple-800 backdrop-blur-sm
+        ${hover ? 'hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 hover-lift' : ''}
         ${paddingClasses[padding]}
         ${className}
       `}
@@ -43,7 +43,7 @@ export function CardHeader({ children, className = '' }: { children: ReactNode, 
 
 export function CardTitle({ children, className = '' }: { children: ReactNode, className?: string }) {
   return (
-    <h3 className={`text-lg font-semibold text-gray-900 ${className}`}>
+    <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${className}`}>
       {children}
     </h3>
   )
@@ -51,7 +51,7 @@ export function CardTitle({ children, className = '' }: { children: ReactNode, c
 
 export function CardContent({ children, className = '' }: { children: ReactNode, className?: string }) {
   return (
-    <div className={`text-gray-600 ${className}`}>
+    <div className={`text-gray-600 dark:text-gray-300 ${className}`}>
       {children}
     </div>
   )
@@ -59,7 +59,7 @@ export function CardContent({ children, className = '' }: { children: ReactNode,
 
 export function CardFooter({ children, className = '' }: { children: ReactNode, className?: string }) {
   return (
-    <div className={`mt-4 pt-4 border-t border-gray-100 ${className}`}>
+    <div className={`mt-4 pt-4 border-t border-white-800 dark:border-primary-700 ${className}`}>
       {children}
     </div>
   )
