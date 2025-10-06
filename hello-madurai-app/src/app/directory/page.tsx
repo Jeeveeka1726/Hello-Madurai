@@ -1,11 +1,24 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { PhoneIcon, EnvelopeIcon, MapPinIcon, GlobeAltIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
+import { 
+  PhoneIcon, 
+  EnvelopeIcon, 
+  MapPinIcon, 
+  GlobeAltIcon, 
+  MagnifyingGlassIcon,
+  VideoCameraIcon,
+  CalendarIcon,
+  ArrowDownTrayIcon,
+  ShareIcon,
+  ChatBubbleLeftIcon
+} from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import Comments from '@/components/Comments'
 
 interface Business {
   id: string
@@ -19,10 +32,28 @@ interface Business {
   phone: string
   email?: string
   website?: string
+  
+  // New business features
+  videoUrl?: string
+  instagramUrl?: string
+  facebookUrl?: string
+  bookingUrl?: string
+  latitude?: number
+  longitude?: number
+  
   featured: boolean
   verified: boolean
   createdAt: string
   updatedAt: string
+  comments: BusinessComment[]
+}
+
+interface BusinessComment {
+  id: string
+  content: string
+  author: string
+  rating?: number
+  createdAt: string
 }
 
 function DirectoryPageContent() {
@@ -31,6 +62,8 @@ function DirectoryPageContent() {
   const [searchTerm, setSearchTerm] = useState('')
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
+  const [showComments, setShowComments] = useState(false)
+  const [commentsBusinessId, setCommentsBusinessId] = useState<string>('')
 
   // Fetch businesses from database
   useEffect(() => {
@@ -78,19 +111,83 @@ function DirectoryPageContent() {
   const regularBusinesses = filteredBusinesses.filter(business => !business.featured)
 
   const handleCall = (phone: string) => {
-    window.open(`tel:${phone}`, '_self')
+    window.location.href = `tel:${phone}`
   }
 
   const handleEmail = (email: string) => {
-    window.open(`mailto:${email}`, '_self')
+    window.location.href = `mailto:${email}`
   }
 
   const handleWebsite = (website: string) => {
     window.open(website, '_blank')
   }
 
+  const handleVideo = (videoUrl: string) => {
+    window.open(videoUrl, '_blank')
+  }
+
+  const handleInstagram = (instagramUrl: string) => {
+    window.open(instagramUrl, '_blank')
+  }
+
+  const handleFacebook = (facebookUrl: string) => {
+    window.open(facebookUrl, '_blank')
+  }
+
+  const handleDirections = (business: Business) => {
+    if (business.latitude && business.longitude) {
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`
+      window.open(url, '_blank')
+    } else {
+      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`
+      window.open(url, '_blank')
+    }
+  }
+
+  const handleBooking = (bookingUrl: string) => {
+    window.open(bookingUrl, '_blank')
+  }
+
+  const handleDownload = async (business: Business) => {
+    try {
+      const response = await fetch(`/api/business/${business.id}/download`)
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${business.name}-info.pdf`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+      }
+    } catch (error) {
+      console.error('Error downloading business info:', error)
+    }
+  }
+
+  const handleShare = (business: Business) => {
+    const url = `${window.location.origin}/directory/${business.id}`
+    if (navigator.share) {
+      navigator.share({
+        title: business.name,
+        text: business.description,
+        url: url,
+      })
+    } else {
+      navigator.clipboard.writeText(url)
+      alert(t('directory.linkCopied', 'Link copied to clipboard!', 'இணைப்பு கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது!'))
+    }
+  }
+
+  const openComments = (businessId: string) => {
+    setCommentsBusinessId(businessId)
+    setShowComments(true)
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -210,20 +307,117 @@ function DirectoryPageContent() {
                             </div>
                           )}
                         </div>
-                        <div className="flex space-x-3">
-                          <Button onClick={() => handleCall(business.phone)} className="flex-1">
+                        <div className="flex flex-wrap gap-2">
+                          <Button onClick={() => handleCall(business.phone)} className="flex-1 min-w-[100px]">
                             <PhoneIcon className="h-4 w-4 mr-2" />
                             {t('directory.call', 'Call', 'அழை')}
                           </Button>
+                          
+                          {business.videoUrl && (
+                            <Button 
+                              variant="outline" 
+                              onClick={() => handleVideo(business.videoUrl!)}
+                              className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                            >
+                              <VideoCameraIcon className="h-4 w-4 mr-2" />
+                              {t('directory.video', 'Video', 'வீடியோ')}
+                            </Button>
+                          )}
+                          
+                          <Button 
+                            variant="outline" 
+                            onClick={() => handleDirections(business)}
+                            className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                          >
+                            <MapPinIcon className="h-4 w-4 mr-2" />
+                            {t('directory.directions', 'Directions', 'திசைகள்')}
+                          </Button>
+                          
                           {business.website && (
                             <Button 
                               variant="outline" 
                               onClick={() => handleWebsite(business.website!)}
                               className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                             >
-                              {t('directory.visit', 'Visit', 'பார்வை')}
+                              <GlobeAltIcon className="h-4 w-4 mr-2" />
+                              {t('directory.website', 'Website', 'வலைத்தளம்')}
                             </Button>
                           )}
+                          
+                          {business.bookingUrl && (
+                            <Button 
+                              variant="outline" 
+                              onClick={() => handleBooking(business.bookingUrl!)}
+                              className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                            >
+                              <CalendarIcon className="h-4 w-4 mr-2" />
+                              {t('directory.booking', 'Book', 'முன்பதிவு')}
+                            </Button>
+                          )}
+                        </div>
+                        
+                        {/* Social and Action Buttons */}
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {business.instagramUrl && (
+                            <Button 
+                              size="sm"
+                              variant="outline" 
+                              onClick={() => handleInstagram(business.instagramUrl!)}
+                              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 hover:from-purple-600 hover:to-pink-600"
+                            >
+                              📷 Instagram
+                            </Button>
+                          )}
+                          
+                          {business.facebookUrl && (
+                            <Button 
+                              size="sm"
+                              variant="outline" 
+                              onClick={() => handleFacebook(business.facebookUrl!)}
+                              className="bg-blue-600 text-white border-0 hover:bg-blue-700"
+                            >
+                              📘 Facebook
+                            </Button>
+                          )}
+                          
+                          <Button 
+                            size="sm"
+                            variant="outline" 
+                            onClick={() => handleDownload(business)}
+                            className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                          >
+                            <ArrowDownTrayIcon className="h-3 w-3 mr-1" />
+                            {t('directory.download', 'Download', 'பதிவிறக்கம்')}
+                          </Button>
+                          
+                          <Button 
+                            size="sm"
+                            variant="outline" 
+                            onClick={() => handleShare(business)}
+                            className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                          >
+                            <ShareIcon className="h-3 w-3 mr-1" />
+                            {t('directory.share', 'Share', 'பகிர்')}
+                          </Button>
+                          
+                          <Button 
+                            size="sm"
+                            variant="outline" 
+                            onClick={() => openComments(business.id)}
+                            className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                          >
+                            <ChatBubbleLeftIcon className="h-3 w-3 mr-1" />
+                            {t('directory.reviews', 'Reviews', 'மதிப்புரைகள்')} ({business.comments?.length || 0})
+                          </Button>
+                          
+                          <Link href={`/directory/${business.id}`}>
+                            <Button 
+                              size="sm"
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              {t('directory.viewProfile', 'View Profile', 'சுயவிவரம் பார்க்க')}
+                            </Button>
+                          </Link>
                         </div>
                       </CardContent>
                     </Card>
@@ -316,6 +510,14 @@ function DirectoryPageContent() {
             )}
           </>
         )}
+
+        {/* Comments Modal */}
+        <Comments
+          itemId={commentsBusinessId}
+          itemType="business"
+          isOpen={showComments}
+          onClose={() => setShowComments(false)}
+        />
       </div>
     </div>
   )

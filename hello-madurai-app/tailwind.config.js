@@ -19,17 +19,17 @@ module.exports = {
         primary: {
           DEFAULT: 'var(--primary)',
           foreground: 'var(--primary-foreground)',
-          50: '#faf5ff',   // Very light purple
-          100: '#f3e8ff',  // Light purple
-          200: '#e9d5ff',  // Lighter purple
-          300: '#d8b4fe',  // Medium light purple
-          400: '#c084fc',  // Medium purple
-          500: '#a855f7',  // Base purple
-          600: '#9333ea',  // Darker purple
-          700: '#7c3aed',  // Dark purple
-          800: '#6b21a8',  // Very dark purple
-          900: '#581c87',  // Deep purple
-          950: '#3b0764',  // Deepest purple
+          50: '#eff6ff',   // Very light blue
+          100: '#dbeafe',  // Light blue
+          200: '#bfdbfe',  // Lighter blue
+          300: '#93c5fd',  // Medium light blue
+          400: '#60a5fa',  // Medium blue
+          500: '#3b82f6',  // Base blue
+          600: '#2563eb',  // Darker blue
+          700: '#1d4ed8',  // Dark blue
+          800: '#1e40af',  // Very dark blue
+          900: '#1e3a8a',  // Deep blue
+          950: '#172554',  // Deepest blue
         },
         secondary: {
           DEFAULT: 'var(--secondary)',

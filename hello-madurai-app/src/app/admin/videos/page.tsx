@@ -94,13 +94,16 @@ export default function AdminVideosPage() {
       // Extract YouTube ID if it's a YouTube URL
       const youtubeId = extractYouTubeId(formData.videoUrl)
       
-      const response = await fetch('/api/admin/videos', {
+      const url = editingVideo 
+        ? `/api/admin/videos/${editingVideo.id}`
+        : '/api/admin/videos'
+      
+      const response = await fetch(url, {
         method: editingVideo ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          youtubeId,
-          ...(editingVideo && { id: editingVideo.id })
+          youtubeId
         }),
       })
 
@@ -176,7 +179,7 @@ export default function AdminVideosPage() {
 
   if (loading && videos.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-gray-500 dark:text-gray-400">Loading videos...</p>
@@ -187,7 +190,7 @@ export default function AdminVideosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
@@ -224,7 +227,7 @@ export default function AdminVideosPage() {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-purple-900">
+            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-blue-900">
               <CardHeader>
                 <CardTitle className="text-gray-900 dark:text-white">
                   <TranslatedText>{editingVideo ? 'Edit Video' : 'Add Video'}</TranslatedText>
@@ -288,7 +291,7 @@ export default function AdminVideosPage() {
                         required
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                       >
                         {videoCategories.map((category) => (
                           <option key={category.value} value={category.value}>
@@ -306,7 +309,7 @@ export default function AdminVideosPage() {
                         type="text"
                         value={formData.duration}
                         onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                         placeholder="e.g., 5:30"
                       />
                     </div>
@@ -365,7 +368,7 @@ export default function AdminVideosPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full h-48 bg-gray-200 dark:bg-purple-800 rounded-lg flex items-center justify-center">
+                    <div className="w-full h-48 bg-gray-200 dark:bg-blue-800 rounded-lg flex items-center justify-center">
                       <VideoCameraIcon className="h-12 w-12 text-gray-400" />
                     </div>
                   )}
@@ -389,7 +392,7 @@ export default function AdminVideosPage() {
                     </div>
                   </div>
                   {video.featured && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200">
                       <TranslatedText>Featured</TranslatedText>
                     </span>
                   )}

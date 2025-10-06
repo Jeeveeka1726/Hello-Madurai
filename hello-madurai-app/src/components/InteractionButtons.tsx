@@ -1,0 +1,291 @@
+'use client'
+
+import { useState } from 'react'
+import { 
+  HandThumbUpIcon, 
+  HandThumbDownIcon, 
+  ChatBubbleLeftIcon, 
+  ShareIcon,
+  HeartIcon
+} from '@heroicons/react/24/outline'
+import {
+  HandThumbUpIcon as HandThumbUpSolid,
+  HandThumbDownIcon as HandThumbDownSolid,
+  HeartIcon as HeartSolid
+} from '@heroicons/react/24/solid'
+import { 
+  FacebookShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+  TelegramShareButton,
+  FacebookIcon,
+  TwitterIcon,
+  WhatsappIcon,
+  TelegramIcon
+} from 'react-share'
+
+interface InteractionButtonsProps {
+  itemId: string
+  itemType: 'news' | 'video' | 'radio'
+  title: string
+  url: string
+  likes?: number
+  dislikes?: number
+  comments?: number
+  shares?: number
+  onLike?: () => void
+  onDislike?: () => void
+  onComment?: () => void
+  className?: string
+}
+
+export default function InteractionButtons({
+  itemId,
+  itemType,
+  title,
+  url,
+  likes = 0,
+  dislikes = 0,
+  comments = 0,
+  shares = 0,
+  onLike,
+  onDislike,
+  onComment,
+  className = ''
+}: InteractionButtonsProps) {
+  const [isLiked, setIsLiked] = useState(false)
+  const [isDisliked, setIsDisliked] = useState(false)
+  const [showShareMenu, setShowShareMenu] = useState(false)
+  const [localLikes, setLocalLikes] = useState(likes)
+  const [localDislikes, setLocalDislikes] = useState(dislikes)
+  const [localShares, setLocalShares] = useState(shares)
+
+  const handleLike = async (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
+    
+    console.log('👍 Like button clicked!')
+    console.log('Item:', itemType, itemId)
+    
+    try {
+      const newLiked = !isLiked
+      const action = newLiked ? 'like' : 'unlike'
+      
+      console.log('Sending like request:', action)
+      
+      const response = await fetch(`/api/${itemType}/${itemId}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action })
+      })
+      
+      console.log('Like response status:', response.status)
+      
+      if (response.ok) {
+        const data = await response.json()
+        console.log('✅ Like successful:', data)
+        
+        setIsLiked(newLiked)
+        setLocalLikes(prev => newLiked ? prev + 1 : prev - 1)
+        
+        // If we're liking, remove dislike if it was active
+        if (newLiked && isDisliked) {
+          // Call dislike API to decrement
+          await fetch(`/api/${itemType}/${itemId}/dislike`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action: 'undislike' })
+          })
+          setIsDisliked(false)
+          setLocalDislikes(prev => prev - 1)
+        }
+        
+        onLike?.()
+      } else {
+        console.error('❌ Like failed:', response.status, await response.text())
+      }
+    } catch (error) {
+      console.error('❌ Error liking item:', error)
+    }
+  }
+
+  const handleDislike = async () => {
+    try {
+      const newDisliked = !isDisliked
+      const action = newDisliked ? 'dislike' : 'undislike'
+      
+      const response = await fetch(`/api/${itemType}/${itemId}/dislike`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action })
+      })
+      
+      if (response.ok) {
+        setIsDisliked(newDisliked)
+        setLocalDislikes(prev => newDisliked ? prev + 1 : prev - 1)
+        
+        // If we're disliking, remove like if it was active
+        if (newDisliked && isLiked) {
+          // Call like API to decrement
+          await fetch(`/api/${itemType}/${itemId}/like`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action: 'unlike' })
+          })
+          setIsLiked(false)
+          setLocalLikes(prev => prev - 1)
+        }
+        
+        onDislike?.()
+      }
+    } catch (error) {
+      console.error('Error disliking item:', error)
+    }
+  }
+
+  const handleShare = async (platform: string) => {
+    try {
+      await fetch(`/api/${itemType}/${itemId}/share`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ platform })
+      })
+      
+      setLocalShares(prev => prev + 1)
+      setShowShareMenu(false)
+    } catch (error) {
+      console.error('Error recording share:', error)
+    }
+  }
+
+  return (
+    <div className={`flex items-center gap-4 ${className}`}>
+      {/* Like Button */}
+      <button
+        type="button"
+        onClick={(e) => handleLike(e)}
+        className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+          isLiked 
+            ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300' 
+            : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
+        }`}
+        aria-label={isLiked ? 'Unlike' : 'Like'}
+      >
+        {isLiked ? (
+          <HandThumbUpSolid className="h-4 w-4" />
+        ) : (
+          <HandThumbUpIcon className="h-4 w-4" />
+        )}
+        <span className="text-sm font-medium">{localLikes}</span>
+      </button>
+
+      {/* Dislike Button (only for news) */}
+      {itemType === 'news' && (
+        <button
+          onClick={handleDislike}
+          className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
+            isDisliked 
+              ? 'bg-red-100 text-red-600' 
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+          }`}
+        >
+          {isDisliked ? (
+            <HandThumbDownSolid className="h-4 w-4" />
+          ) : (
+            <HandThumbDownIcon className="h-4 w-4" />
+          )}
+          <span className="text-sm font-medium">{localDislikes}</span>
+        </button>
+      )}
+
+      {/* Comment Button */}
+      <button
+        onClick={onComment}
+        className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+      >
+        <ChatBubbleLeftIcon className="h-4 w-4" />
+        <span className="text-sm font-medium">{comments}</span>
+      </button>
+
+      {/* Share Button */}
+      <div className="relative">
+        <button
+          onClick={() => setShowShareMenu(!showShareMenu)}
+          className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+        >
+          <ShareIcon className="h-4 w-4" />
+          <span className="text-sm font-medium">{localShares}</span>
+        </button>
+
+        {/* Share Menu */}
+        {showShareMenu && (
+          <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg border p-3 z-10 min-w-[200px]">
+            <div className="flex gap-2">
+              <FacebookShareButton
+                url={url}
+                quote={title}
+                onShareWindowClose={() => handleShare('facebook')}
+              >
+                <FacebookIcon size={32} round />
+              </FacebookShareButton>
+
+              <TwitterShareButton
+                url={url}
+                title={title}
+                onShareWindowClose={() => handleShare('twitter')}
+              >
+                <TwitterIcon size={32} round />
+              </TwitterShareButton>
+
+              <WhatsappShareButton
+                url={url}
+                title={title}
+                onShareWindowClose={() => handleShare('whatsapp')}
+              >
+                <WhatsappIcon size={32} round />
+              </WhatsappShareButton>
+
+              <TelegramShareButton
+                url={url}
+                title={title}
+                onShareWindowClose={() => handleShare('telegram')}
+              >
+                <TelegramIcon size={32} round />
+              </TelegramShareButton>
+            </div>
+            
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(url)
+                handleShare('copy')
+                setShowShareMenu(false)
+              }}
+              className="w-full mt-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded"
+            >
+              Copy Link
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Click outside to close share menu */}
+      {showShareMenu && (
+        <div
+          className="fixed inset-0 z-5"
+          onClick={() => setShowShareMenu(false)}
+        />
+      )}
+    </div>
+  )
+}
+

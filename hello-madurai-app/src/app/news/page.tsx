@@ -7,7 +7,6 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
-import { BannerAd, ResponsiveAd } from '@/components/ads/GoogleAdsense'
 
 interface NewsArticle {
   id: string
@@ -84,7 +83,7 @@ function NewsPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -126,9 +125,6 @@ function NewsPageContent() {
                 ))}
               </div>
             </div>
-
-            {/* Top Banner Ad */}
-            <BannerAd className="mb-8" />
 
             {/* Featured News */}
         {featuredNews.length > 0 && (
@@ -188,9 +184,6 @@ function NewsPageContent() {
             </div>
           </div>
         )}
-
-        {/* Middle Banner Ad */}
-        <ResponsiveAd className="mb-8" />
 
         {/* Regular News */}
         <div>

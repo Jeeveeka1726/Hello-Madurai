@@ -142,7 +142,7 @@ export default function AdminMagazinesPage() {
 
   if (loading && magazines.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-gray-500 dark:text-gray-400">Loading magazines...</p>
@@ -153,7 +153,7 @@ export default function AdminMagazinesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
@@ -189,7 +189,7 @@ export default function AdminMagazinesPage() {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100">
+            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100">
               <CardHeader>
                 <CardTitle className="text-gray-900 dark:text-white">
                   <TranslatedText>{editingMagazine ? 'Edit Magazine' : 'Add Magazine'}</TranslatedText>
@@ -254,7 +254,7 @@ export default function AdminMagazinesPage() {
                         required
                         value={formData.issueNumber}
                         onChange={(e) => setFormData({ ...formData, issueNumber: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                         placeholder="e.g., Issue 1, Vol 2"
                       />
                     </div>
@@ -322,7 +322,7 @@ export default function AdminMagazinesPage() {
                     </div>
                   </div>
                   {magazine.featured && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200">
                       <TranslatedText>Featured</TranslatedText>
                     </span>
                   )}

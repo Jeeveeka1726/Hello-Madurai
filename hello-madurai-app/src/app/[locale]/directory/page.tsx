@@ -111,7 +111,7 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
                       <CardTitle className="text-lg">
                         {locale === 'ta' ? business.name_ta : business.name}
                       </CardTitle>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200">
                         {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                       </span>
                     </div>
@@ -169,7 +169,7 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
                           {locale === 'ta' ? business.name_ta : business.name}
                         </h3>
                         {business.featured && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200">
                             {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                           </span>
                         )}
@@ -212,7 +212,7 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
         </div>
 
         {/* Add Business CTA */}
-        <div className="mt-12 bg-white dark:bg-purple-900 rounded-lg shadow-md p-6 text-center">
+        <div className="mt-12 bg-white dark:bg-blue-900 rounded-lg shadow-md p-6 text-center">
           <h3 className="text-xl font-bold text-gray-900 mb-4">
             {locale === 'ta' ? 'உங்கள் வணிகத்தை பட்டியலிடுங்கள்' : 'List Your Business'}
           </h3>

@@ -89,7 +89,7 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gray-100 dark:bg-purple-950">
+    <div className="h-screen flex overflow-hidden bg-gray-100 dark:bg-blue-950">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -102,7 +102,7 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-purple-900 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+        fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-blue-900 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex flex-col h-full">
@@ -198,7 +198,7 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
         </div>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-purple-950">
+        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-blue-950">
           {children}
         </main>
       </div>

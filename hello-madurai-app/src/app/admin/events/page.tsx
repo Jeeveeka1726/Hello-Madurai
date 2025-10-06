@@ -167,7 +167,7 @@ export default function AdminEventsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     )
@@ -175,7 +175,7 @@ export default function AdminEventsPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             <TranslatedText>Access Denied</TranslatedText>
@@ -189,7 +189,7 @@ export default function AdminEventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -255,7 +255,7 @@ export default function AdminEventsPage() {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100">
+            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100">
               <CardHeader>
                 <CardTitle className="text-gray-900 dark:text-white">
                   <TranslatedText>{editingEvent ? 'Edit Event' : 'Add Event'}</TranslatedText>
@@ -290,7 +290,7 @@ export default function AdminEventsPage() {
                         required
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                         placeholder="Event title in English"
                       />
                     </div>
@@ -302,7 +302,7 @@ export default function AdminEventsPage() {
                         type="text"
                         value={formData.title_ta}
                         onChange={(e) => setFormData({ ...formData, title_ta: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                         placeholder="Event title in Tamil"
                       />
                     </div>
@@ -319,7 +319,7 @@ export default function AdminEventsPage() {
                         required
                         value={formData.startDate}
                         onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                       />
                     </div>
                     <div>
@@ -329,7 +329,7 @@ export default function AdminEventsPage() {
                       <select
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                       >
                         {eventCategories.map(cat => (
                           <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -349,7 +349,7 @@ export default function AdminEventsPage() {
                         required
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                         placeholder="Event location in English"
                       />
                     </div>
@@ -361,7 +361,7 @@ export default function AdminEventsPage() {
                         type="text"
                         value={formData.location_ta}
                         onChange={(e) => setFormData({ ...formData, location_ta: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                         placeholder="Event location in Tamil"
                       />
                     </div>
@@ -431,7 +431,7 @@ export default function AdminEventsPage() {
         {/* Events List */}
         <div className="space-y-4">
           {events.map((event) => (
-            <Card key={event.id} className="bg-white dark:bg-purple-900 border-gray-200 dark:border-purple-800">
+            <Card key={event.id} className="bg-white dark:bg-blue-900 border-gray-200 dark:border-blue-800">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   {/* Featured Image */}
@@ -449,8 +449,8 @@ export default function AdminEventsPage() {
                     <div className="flex items-center space-x-2 mb-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         event.featured 
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' 
-                          : 'bg-gray-100 text-gray-800 dark:bg-purple-800 dark:text-purple-200'
+                          ? 'bg-yellow-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
+                          : 'bg-gray-100 text-gray-800 dark:bg-blue-800 dark:text-blue-200'
                       }`}>
                         {event.featured ? 'Featured' : 'Regular'}
                       </span>

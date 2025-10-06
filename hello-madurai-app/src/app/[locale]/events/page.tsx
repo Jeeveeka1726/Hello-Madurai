@@ -79,7 +79,7 @@ export default async function EventsPage({ params }: EventsPageProps) {
                   </div>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 capitalize">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200 capitalize">
                         {event.category}
                       </span>
                       <span className="text-sm text-gray-500">

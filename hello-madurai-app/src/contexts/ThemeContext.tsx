@@ -1,84 +1,51 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 type Theme = 'light' | 'dark'
 
 interface ThemeContextType {
   theme: Theme
   toggleTheme: () => void
-  mounted: boolean
+  setTheme: (theme: Theme) => void
 }
 
-const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light',
-  toggleTheme: () => {},
-  mounted: false
-})
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light')
-  const [mounted, setMounted] = useState(false)
+  const [theme, setThemeState] = useState<Theme>('dark') // Default to dark theme
 
-  // Initialize theme
   useEffect(() => {
-    const initializeTheme = () => {
-      try {
-        // Check localStorage first
-        const savedTheme = localStorage.getItem('hello-madurai-theme')
-        if (savedTheme === 'dark' || savedTheme === 'light') {
-          setTheme(savedTheme)
-          applyTheme(savedTheme)
-        } else {
-          // Default to light mode (ignore system preference for now)
-          setTheme('light')
-          applyTheme('light')
-          localStorage.setItem('hello-madurai-theme', 'light')
-        }
-      } catch (error) {
-        console.log('Theme initialization error:', error)
-        setTheme('light')
-        applyTheme('light')
-      }
-      setMounted(true)
+    // Check for saved theme preference or default to 'dark'
+    const savedTheme = localStorage.getItem('theme') as Theme
+    if (savedTheme) {
+      setThemeState(savedTheme)
+    } else {
+      // Check system preference
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      setThemeState(systemPrefersDark ? 'dark' : 'dark') // Always default to dark for Hello Madurai
     }
-
-    initializeTheme()
   }, [])
 
-  const applyTheme = (newTheme: Theme) => {
-    try {
-      const root = document.documentElement
-      const body = document.body
-
-      if (newTheme === 'dark') {
-        root.classList.add('dark')
-        body.classList.add('dark')
-        root.style.colorScheme = 'dark'
-      } else {
-        root.classList.remove('dark')
-        body.classList.remove('dark')
-        root.style.colorScheme = 'light'
-      }
-    } catch (error) {
-      console.log('Theme application error:', error)
-    }
-  }
+  useEffect(() => {
+    // Apply theme to document
+    document.documentElement.classList.remove('light', 'dark')
+    document.documentElement.classList.add(theme)
+    
+    // Save to localStorage
+    localStorage.setItem('theme', theme)
+  }, [theme])
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)
-    applyTheme(newTheme)
+    setThemeState(prev => prev === 'light' ? 'dark' : 'light')
+  }
 
-    try {
-      localStorage.setItem('hello-madurai-theme', newTheme)
-    } catch (error) {
-      console.log('Theme save error:', error)
-    }
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme)
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, mounted }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   )
@@ -86,5 +53,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export function useTheme() {
   const context = useContext(ThemeContext)
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider')
+  }
   return context
 }

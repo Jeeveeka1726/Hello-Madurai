@@ -21,11 +21,20 @@ model News {
   category      String
   author        String
   featuredImage String?
+  videoUrl      String?  // Support for embedded videos
+  videoType     String?  // youtube, vimeo, direct
   publishedAt   DateTime @default(now())
   views         Int      @default(0)
+  likes         Int      @default(0)
+  dislikes      Int      @default(0)
   featured      Boolean  @default(false)
+  allowDownload Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  // Relationships
+  comments      NewsComment[]
+  shares        NewsShare[]
 
   @@map("news")
 }
@@ -89,6 +98,10 @@ model RadioShow {
   folderId    String
   folder      RadioFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
 
+  // New relationships
+  comments    RadioComment[]
+  shares      RadioShare[]
+
   @@map("radio_shows")
 }
 
@@ -104,10 +117,22 @@ model Business {
   website     String?
   address     String
   address_ta  String?
+  
+  // New business features
+  videoUrl    String?  // Promotional video
+  instagramUrl String?
+  facebookUrl String?
+  bookingUrl  String?
+  latitude    Float?   // For Google Maps
+  longitude   Float?   // For Google Maps
+  
   featured    Boolean  @default(false)
   verified    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // Relationships
+  comments    BusinessComment[]
 
   @@map("businesses")
 }
@@ -124,10 +149,15 @@ model Video {
   category    String
   duration    String?
   views       Int      @default(0)
+  likes       Int      @default(0)
   featured    Boolean  @default(false)
   publishedAt DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // New relationships
+  comments    VideoComment[]
+  shares      VideoShare[]
 
   @@map("videos")
 }
@@ -172,4 +202,196 @@ model Magazine {
   collection    MagazineCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
   @@map("magazines")
+}
+
+// Comments for news articles
+model NewsComment {
+  id        String   @id @default(cuid())
+  content   String
+  author    String
+  email     String?
+  newsId    String
+  news      News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("news_comments")
+}
+
+// Share tracking for news articles
+model NewsShare {
+  id        String   @id @default(cuid())
+  newsId    String
+  news      News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  platform  String   // facebook, twitter, whatsapp, etc.
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("news_shares")
+}
+
+// Comments for videos
+model VideoComment {
+  id        String   @id @default(cuid())
+  content   String
+  author    String
+  email     String?
+  videoId   String
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("video_comments")
+}
+
+// Share tracking for videos
+model VideoShare {
+  id        String   @id @default(cuid())
+  videoId   String
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  platform  String
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("video_shares")
+}
+
+// Comments for radio shows
+model RadioComment {
+  id          String    @id @default(cuid())
+  content     String
+  author      String
+  email       String?
+  radioShowId String
+  radioShow   RadioShow @relation(fields: [radioShowId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("radio_comments")
+}
+
+// Share tracking for radio shows
+model RadioShare {
+  id          String    @id @default(cuid())
+  radioShowId String
+  radioShow   RadioShow @relation(fields: [radioShowId], references: [id], onDelete: Cascade)
+  platform    String
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+
+  @@map("radio_shares")
+}
+
+// Business directory comments
+model BusinessComment {
+  id         String   @id @default(cuid())
+  content    String
+  author     String
+  email      String?
+  rating     Int?     // 1-5 star rating
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("business_comments")
+}
+
+// Helpline contacts
+model Helpline {
+  id          String   @id @default(cuid())
+  name        String
+  name_ta     String?
+  phone       String
+  category    String   // emergency, medical, police, etc.
+  description String?
+  description_ta String?
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("helplines")
+}
+
+// Popup ads management
+model PopupAd {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  imageUrl    String?
+  actionUrl   String?
+  actionText  String?
+  active      Boolean  @default(true)
+  startDate   DateTime @default(now())
+  endDate     DateTime?
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("popup_ads")
+}
+
+// User subscriptions
+model Subscription {
+  id          String   @id @default(cuid())
+  email       String?
+  phone       String?
+  name        String?
+  categories  String   // JSON array of subscribed categories
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([email])
+  @@unique([phone])
+  @@map("subscriptions")
+}
+
+// Push notifications
+model Notification {
+  id          String   @id @default(cuid())
+  title       String
+  message     String
+  category    String
+  targetUrl   String?
+  sent        Boolean  @default(false)
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("notifications")
+}
+
+// Digital discount cards
+model DiscountCard {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  userName      String
+  userEmail     String?
+  userPhone     String?
+  dCode         String   @unique // Discount code
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relationship to usage tracking
+  usages        DiscountUsage[]
+
+  @@map("discount_cards")
+}
+
+// Discount card usage tracking
+model DiscountUsage {
+  id              String       @id @default(cuid())
+  cardId          String
+  card            DiscountCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  businessName    String
+  businessPhone   String?
+  shopkeeperName  String?
+  amount          Float?
+  usedAt          DateTime     @default(now())
+  createdAt       DateTime     @default(now())
+
+  @@map("discount_usages")
 }

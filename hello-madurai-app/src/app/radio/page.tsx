@@ -17,6 +17,10 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import InteractionButtons from '@/components/InteractionButtons'
+import Comments from '@/components/Comments'
+import EnhancedRadioPlayer from '@/components/EnhancedRadioPlayer'
+import BluetoothManager from '@/components/BluetoothManager'
 
 interface RadioFolder {
   id: string
@@ -42,6 +46,21 @@ interface RadioShow {
   plays: number
   publishedAt: string
   folderId: string
+  comments: RadioComment[]
+  shares: RadioShare[]
+}
+
+interface RadioComment {
+  id: string
+  content: string
+  author: string
+  createdAt: string
+}
+
+interface RadioShare {
+  id: string
+  platform: string
+  createdAt: string
 }
 
 function RadioPageContent() {
@@ -52,6 +71,12 @@ function RadioPageContent() {
   const [duration, setDuration] = useState(0)
   const [radioFolders, setRadioFolders] = useState<RadioFolder[]>([])
   const [loading, setLoading] = useState(true)
+  const [showComments, setShowComments] = useState(false)
+  const [commentsShowId, setCommentsShowId] = useState<string>('')
+  const [showEnhancedPlayer, setShowEnhancedPlayer] = useState(false)
+  const [showBluetoothManager, setShowBluetoothManager] = useState(false)
+  const [currentShowIndex, setCurrentShowIndex] = useState(0)
+  const [allShows, setAllShows] = useState<RadioShow[]>([])
   const audioRef = useRef<HTMLAudioElement>(null)
 
   // Fetch radio folders and shows from database
@@ -62,6 +87,13 @@ function RadioPageContent() {
         if (response.ok) {
           const data = await response.json()
           setRadioFolders(data)
+          
+          // Flatten all shows from all folders
+          const shows: RadioShow[] = []
+          data.forEach((folder: RadioFolder) => {
+            shows.push(...folder.radioShows)
+          })
+          setAllShows(shows)
         } else {
           console.error('Failed to fetch radio data')
         }
@@ -74,6 +106,31 @@ function RadioPageContent() {
 
     fetchRadioData()
   }, [])
+
+  // Enhanced player functions
+  const openEnhancedPlayer = (showId: string) => {
+    const showIndex = allShows.findIndex(show => show.id === showId)
+    if (showIndex !== -1) {
+      setCurrentShowIndex(showIndex)
+      setShowEnhancedPlayer(true)
+    }
+  }
+
+  const handleShowChange = (newIndex: number) => {
+    setCurrentShowIndex(newIndex)
+    if (allShows[newIndex]) {
+      setCurrentlyPlaying(allShows[newIndex].id)
+    }
+  }
+
+  const handleBluetoothConnect = (device: any) => {
+    console.log('Bluetooth device connected:', device.name)
+    // Audio will automatically route to Bluetooth device
+  }
+
+  const handleBluetoothDisconnect = (device: any) => {
+    console.log('Bluetooth device disconnected:', device.name)
+  }
 
 
 
@@ -127,13 +184,17 @@ function RadioPageContent() {
     setCurrentTime(0)
   }
 
-  // Get all shows from all folders
-  const allShows = radioFolders.flatMap(folder => folder.radioShows)
+  const openComments = (showId: string) => {
+    setCommentsShowId(showId)
+    setShowComments(true)
+  }
+
+  // Get featured and regular shows
   const featuredShows = allShows.filter(show => show.featured)
   const regularShows = allShows.filter(show => !show.featured)
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -152,6 +213,27 @@ function RadioPageContent() {
           <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
             {t('radio.subtitle', 'Listen to local stories, interviews, and discussions', 'உள்ளூர் கதைகள், நேர்காணல்கள் மற்றும் விவாதங்களைக் கேளுங்கள்')}
           </p>
+        </div>
+
+        {/* Enhanced Controls */}
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <Button
+            onClick={() => setShowEnhancedPlayer(true)}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+            disabled={allShows.length === 0}
+          >
+            <SpeakerWaveIcon className="h-5 w-5" />
+            {t('radio.enhancedPlayer', 'Enhanced Player', 'மேம்பட்ட பிளேயர்')}
+          </Button>
+          
+          <Button
+            onClick={() => setShowBluetoothManager(true)}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <SpeakerWaveIcon className="h-5 w-5" />
+            {t('radio.bluetooth', 'Bluetooth', 'புளூடூத்')}
+          </Button>
         </div>
 
         {/* Audio Player */}
@@ -181,10 +263,10 @@ function RadioPageContent() {
             </h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {radioFolders.map((folder) => (
-                <Card key={folder.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
+                <Card key={folder.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-blue-800">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <FolderIcon className="h-8 w-8 text-purple-600 dark:text-purple-400 mr-3" />
+                      <FolderIcon className="h-8 w-8 text-purple-600 dark:text-yellow-400 mr-3" />
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                           {folder.name}
@@ -208,7 +290,7 @@ function RadioPageContent() {
                         {folder.radioShows.length} {t('radio.shows', 'shows', 'நிகழ்ச்சிகள்')}
                       </span>
                       {folder.featured && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                           <StarIcon className="h-3 w-3 mr-1" />
                           {t('radio.featured', 'Featured', 'சிறப்பு')}
                         </span>
@@ -217,7 +299,7 @@ function RadioPageContent() {
 
                     <Button
                       onClick={() => router.push(`/radio/${folder.id}`)}
-                      className="w-full bg-purple-600 text-white hover:bg-purple-700"
+                      className="w-full bg-blue-600 text-white hover:bg-blue-700"
                     >
                       {t('radio.viewShows', 'View Shows', 'நிகழ்ச்சிகளைப் பார்க்கவும்')}
                       <ChevronRightIcon className="h-4 w-4 ml-2" />
@@ -238,7 +320,7 @@ function RadioPageContent() {
             </h2>
             <div className="grid gap-8 lg:grid-cols-2">
               {featuredShows.map((show) => (
-                <Card key={show.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
+                <Card key={show.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-blue-800">
                   <div className="aspect-w-16 aspect-h-9 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900 dark:to-secondary-900">
                     <div className="flex items-center justify-center">
                       <div className="text-center">
@@ -292,12 +374,12 @@ function RadioPageContent() {
                       )}
                     </Button>
                     {currentlyPlaying === show.id && (
-                      <div className="mt-4 bg-gray-50 dark:bg-purple-800 rounded-lg p-3">
+                      <div className="mt-4 bg-gray-50 dark:bg-blue-800 rounded-lg p-3">
                         <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
                           <span>{formatTime(currentTime)}</span>
                           <span>{formatTime(duration)}</span>
                         </div>
-                        <div className="w-full bg-gray-200 dark:bg-purple-700 rounded-full h-2">
+                        <div className="w-full bg-gray-200 dark:bg-blue-700 rounded-full h-2">
                           <div
                             className="bg-primary-600 h-2 rounded-full transition-all duration-300"
                             style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
@@ -305,6 +387,20 @@ function RadioPageContent() {
                         </div>
                       </div>
                     )}
+                    
+                    {/* Interaction Buttons */}
+                    <div className="mt-4">
+                      <InteractionButtons
+                        itemId={show.id}
+                        itemType="radio"
+                        title={show.title}
+                        url={`${typeof window !== 'undefined' ? window.location.origin : ''}/radio#${show.id}`}
+                        likes={0} // Radio shows don't have likes, just plays
+                        comments={show.comments?.length || 0}
+                        shares={show.shares?.length || 0}
+                        onComment={() => openComments(show.id)}
+                      />
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -320,7 +416,7 @@ function RadioPageContent() {
           </h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {regularShows.map((show) => (
-              <Card key={show.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
+              <Card key={show.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-blue-800">
                 <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
                   <div className="flex items-center justify-center">
                     <div className="text-center">
@@ -371,20 +467,35 @@ function RadioPageContent() {
                     )}
                   </Button>
                   {currentlyPlaying === show.id && (
-                    <div className="mt-3 bg-gray-50 dark:bg-purple-800 rounded-lg p-2">
+                    <div className="mt-3 bg-gray-50 dark:bg-blue-800 rounded-lg p-2">
                       <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mb-1">
                         <span>{formatTime(currentTime)}</span>
                         <span>{formatTime(duration)}</span>
                       </div>
-                      <div className="w-full bg-gray-200 dark:bg-purple-700 rounded-full h-1">
+                      <div className="w-full bg-gray-200 dark:bg-blue-700 rounded-full h-1">
                         <div
                           className="bg-primary-600 h-1 rounded-full transition-all duration-300"
                           style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                         ></div>
                       </div>
+                      </div>
+                    )}
+                    
+                    {/* Interaction Buttons */}
+                    <div className="mt-3">
+                      <InteractionButtons
+                        itemId={show.id}
+                        itemType="radio"
+                        title={show.title}
+                        url={`${typeof window !== 'undefined' ? window.location.origin : ''}/radio#${show.id}`}
+                        likes={0}
+                        comments={show.comments?.length || 0}
+                        shares={show.shares?.length || 0}
+                        onComment={() => openComments(show.id)}
+                        className="text-xs"
+                      />
                     </div>
-                  )}
-                </CardContent>
+                  </CardContent>
               </Card>
             ))}
           </div>
@@ -393,6 +504,61 @@ function RadioPageContent() {
 
         {/* Contact Info */}
 
+        {/* Comments Modal */}
+        <Comments
+          itemId={commentsShowId}
+          itemType="radio"
+          isOpen={showComments}
+          onClose={() => setShowComments(false)}
+        />
+
+        {/* Enhanced Radio Player Modal */}
+        {showEnhancedPlayer && allShows.length > 0 && (
+          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {t('radio.enhancedPlayer', 'Enhanced Radio Player', 'மேம்பட்ட வானொலி பிளேயர்')}
+                </h3>
+                <button
+                  onClick={() => setShowEnhancedPlayer(false)}
+                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+              <EnhancedRadioPlayer
+                shows={allShows}
+                currentShowIndex={currentShowIndex}
+                onShowChange={handleShowChange}
+                onCommentClick={openComments}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Bluetooth Manager Modal */}
+        {showBluetoothManager && (
+          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {t('radio.bluetoothManager', 'Bluetooth Manager', 'புளூடூத் மேலாளர்')}
+                </h3>
+                <button
+                  onClick={() => setShowBluetoothManager(false)}
+                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+              <BluetoothManager
+                onDeviceConnect={handleBluetoothConnect}
+                onDeviceDisconnect={handleBluetoothDisconnect}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

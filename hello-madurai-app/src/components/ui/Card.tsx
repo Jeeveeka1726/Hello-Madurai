@@ -22,7 +22,7 @@ export default function Card({
   return (
     <div 
       className={`
-        bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 rounded-xl shadow-lg border border-gray-200 dark:border-purple-800 backdrop-blur-sm
+        bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 rounded-xl shadow-lg border border-gray-200 dark:border-blue-800 backdrop-blur-sm
         ${hover ? 'hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 hover-lift' : ''}
         ${paddingClasses[padding]}
         ${className}

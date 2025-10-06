@@ -95,7 +95,7 @@ function MagazinePageContent() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -115,10 +115,10 @@ function MagazinePageContent() {
             </h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {collections.map((collection) => (
-                <Card key={collection.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
+                <Card key={collection.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-blue-800">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <FolderIcon className="h-8 w-8 text-purple-600 dark:text-purple-400 mr-3" />
+                      <FolderIcon className="h-8 w-8 text-purple-600 dark:text-yellow-400 mr-3" />
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                           {collection.name}
@@ -142,7 +142,7 @@ function MagazinePageContent() {
                         {collection.magazines.length} {t('magazine.issues', 'issues', 'இதழ்கள்')}
                       </span>
                       {collection.featured && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                           <StarIcon className="h-3 w-3 mr-1" />
                           {t('magazine.featured', 'Featured', 'சிறப்பு')}
                         </span>
@@ -151,7 +151,7 @@ function MagazinePageContent() {
 
                     <Button
                       onClick={() => router.push(`/magazine/${collection.id}`)}
-                      className="w-full bg-purple-600 text-white hover:bg-purple-700"
+                      className="w-full bg-blue-600 text-white hover:bg-blue-700"
                     >
                       {t('magazine.viewIssues', 'View Issues', 'இதழ்களைப் பார்க்கவும்')}
                       <ChevronRightIcon className="h-4 w-4 ml-2" />
@@ -171,11 +171,11 @@ function MagazinePageContent() {
             </h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {featuredMagazines.map((magazine) => (
-                <Card key={magazine.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 border-gray-200 dark:border-purple-800">
+                <Card key={magazine.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 border-gray-200 dark:border-blue-800">
                   <div className="aspect-w-16 aspect-h-12 bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-800 dark:to-yellow-900">
                     <div className="flex items-center justify-center">
                       <div className="text-center">
-                        <DocumentArrowDownIcon className="h-16 w-16 text-yellow-600 dark:text-yellow-400 mx-auto mb-2" />
+                        <DocumentArrowDownIcon className="h-16 w-16 text-blue-600 dark:text-yellow-400 mx-auto mb-2" />
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {t('magazine.issue', 'Issue', 'இதழ்')} #{magazine.issueNumber}
                         </p>
@@ -184,7 +184,7 @@ function MagazinePageContent() {
                   </div>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                         <StarIcon className="h-3 w-3 mr-1" />
                         {t('magazine.featured', 'Featured', 'சிறப்பு')}
                       </span>
@@ -212,7 +212,7 @@ function MagazinePageContent() {
                     </div>
                     <Button
                       onClick={() => handleDownload(magazine.pdfUrl, magazine.title)}
-                      className="w-full bg-yellow-600 text-white hover:bg-yellow-700"
+                      className="w-full bg-blue-600 text-white hover:bg-blue-700"
                     >
                       <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
                       {t('magazine.download', 'Download PDF', 'PDF பதிவிறக்கம்')}

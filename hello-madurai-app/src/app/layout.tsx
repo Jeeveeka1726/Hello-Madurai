@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import { AdminProvider } from '@/contexts/AdminContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
+import PopupAds from '@/components/PopupAds'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,11 +29,14 @@ export default function RootLayout({
         ></script>
       </head>
       <body className={`${inter.className} dark`}>
-        <LanguageProvider>
-          <AdminProvider>
-            {children}
-          </AdminProvider>
-        </LanguageProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <AdminProvider>
+              {children}
+              <PopupAds />
+            </AdminProvider>
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

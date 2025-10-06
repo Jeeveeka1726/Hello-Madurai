@@ -112,7 +112,7 @@ function EventsPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -184,7 +184,7 @@ function EventsPageContent() {
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           status === 'upcoming' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                           status === 'ongoing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                          'bg-gray-100 text-gray-800 dark:bg-purple-900 dark:text-purple-200'
+                          'bg-gray-100 text-gray-800 dark:bg-blue-900 dark:text-blue-200'
                         }`}>
                           {t(`events.status.${status}`, status, status)}
                         </span>
@@ -276,7 +276,7 @@ function EventsPageContent() {
                       <span className={`text-xs px-2 py-1 rounded-full ${
                         status === 'upcoming' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                         status === 'ongoing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                        'bg-gray-100 text-gray-800 dark:bg-purple-900 dark:text-purple-200'
+                        'bg-gray-100 text-gray-800 dark:bg-blue-900 dark:text-blue-200'
                       }`}>
                         {t(`events.status.${status}`, status, status)}
                       </span>

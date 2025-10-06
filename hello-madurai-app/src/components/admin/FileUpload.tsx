@@ -194,7 +194,7 @@ export default function FileUpload({
             <div
               className={`relative border-2 border-dashed rounded-lg p-6 text-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
                 isDragging
-                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                  ? 'border-purple-500 bg-purple-50 dark:bg-blue-900/20'
                   : 'border-gray-300 dark:border-gray-600'
               }`}
               onDragOver={handleDragOver}

@@ -179,7 +179,7 @@ export default function AdminMagazinesNewPage() {
         <div className="mb-6 flex space-x-4">
           <Button
             onClick={() => setShowCollectionForm(!showCollectionForm)}
-            className="bg-purple-600 text-white hover:bg-purple-700"
+            className="bg-blue-600 text-white hover:bg-blue-700"
           >
             <FolderIcon className="h-4 w-4 mr-2" />
             {showCollectionForm ? t('admin.cancel', 'Cancel', 'ரத்து') : t('admin.magazines.addCollection', 'Add Collection', 'தொகுப்பு சேர்க்கவும்')}
@@ -284,7 +284,7 @@ export default function AdminMagazinesNewPage() {
                 </div>
 
                 <div className="flex space-x-4">
-                  <Button type="submit" className="bg-purple-600 text-white hover:bg-purple-700">
+                  <Button type="submit" className="bg-blue-600 text-white hover:bg-blue-700">
                     {t('admin.save', 'Save Collection', 'தொகுப்பை சேமிக்கவும்')}
                   </Button>
                   <Button
@@ -499,7 +499,7 @@ export default function AdminMagazinesNewPage() {
                             href={magazine.pdfUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                            className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                           >
                             <DocumentIcon className="h-4 w-4 mr-1" />
                             View PDF

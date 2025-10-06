@@ -133,7 +133,7 @@ export default async function NewsPage({
                 
                 <CardHeader>
                   <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-                    <span className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-2 py-1 rounded-full text-xs">
+                    <span className="bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full text-xs">
                       {locale === 'ta' 
                         ? newsCategories.find(cat => cat.id === news.category)?.name_ta
                         : newsCategories.find(cat => cat.id === news.category)?.name

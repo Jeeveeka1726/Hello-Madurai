@@ -93,7 +93,7 @@ export default function RichTextEditor({
   }
 
   const insertImage = (url: string) => {
-    const img = `<img src="${url}" alt="Uploaded image" style="max-width: 800px; width: 100%; height: auto; margin: 16px 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />`
+    const img = `<img src="${url}" alt="Uploaded image" class="news-image" />`
     executeCommand('insertHTML', img)
   }
 
@@ -349,7 +349,7 @@ export default function RichTextEditor({
         onInput={handleInput}
         onPaste={handlePaste}
         onKeyDown={handleKeyDown}
-        className="min-h-[200px] p-4 focus:outline-none text-gray-900 dark:text-white bg-white dark:bg-purple-900"
+        className="min-h-[200px] p-4 focus:outline-none text-gray-900 dark:text-white bg-white dark:bg-blue-900"
         style={{
           wordWrap: 'break-word',
           overflowWrap: 'break-word',
@@ -366,14 +366,21 @@ export default function RichTextEditor({
           pointer-events: none;
           font-style: italic;
         }
-        [contenteditable] img {
-          max-width: 800px;
-          width: 100%;
+        [contenteditable] img,
+        .news-image {
+          max-width: 100%;
+          width: auto;
           height: auto;
-          margin: 16px 0;
+          margin: 1rem auto;
           border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
           display: block;
+        }
+        @media (min-width: 640px) {
+          [contenteditable] img,
+          .news-image {
+            max-width: 600px;
+          }
         }
         [contenteditable] h1 {
           font-size: 1.875rem;

@@ -40,7 +40,7 @@ function AdminLoginPageContent() {
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
             Hello Madurai
           </h1>
-          <h2 className="text-2xl font-semibold text-purple-600 dark:text-purple-400 mb-4">
+          <h2 className="text-2xl font-semibold text-purple-600 dark:text-yellow-400 mb-4">
             {t('admin.login.title', 'Admin Login', 'நிர்வாக உள்நுழைவு')}
           </h2>
           <p className="text-gray-600 dark:text-gray-300">
@@ -93,7 +93,7 @@ function AdminLoginPageContent() {
               <Button
                 type="submit"
                 disabled={isLoading || !password}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
@@ -110,7 +110,7 @@ function AdminLoginPageContent() {
               <div className="text-center">
                 <button
                   onClick={() => router.push('/')}
-                  className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 text-sm font-medium"
+                  className="text-purple-600 hover:text-purple-700 dark:text-yellow-400 dark:hover:text-blue-300 text-sm font-medium"
                 >
                   ← {t('admin.login.back', 'Back to Website', 'வலைத்தளத்திற்கு திரும்பு')}
                 </button>

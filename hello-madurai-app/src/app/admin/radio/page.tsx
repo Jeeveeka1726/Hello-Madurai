@@ -199,7 +199,7 @@ export default function AdminRadioPage() {
         <div className="mb-6 flex space-x-4">
           <Button
             onClick={() => setShowFolderForm(!showFolderForm)}
-            className="bg-purple-600 text-white hover:bg-purple-700"
+            className="bg-blue-600 text-white hover:bg-blue-700"
           >
             <FolderIcon className="h-4 w-4 mr-2" />
             {showFolderForm ? t('admin.cancel', 'Cancel', 'ரத்து') : t('admin.radio.addFolder', 'Add Folder', 'கோப்பு சேர்க்கவும்')}
@@ -304,7 +304,7 @@ export default function AdminRadioPage() {
                 </div>
 
                 <div className="flex space-x-4">
-                  <Button type="submit" className="bg-purple-600 text-white hover:bg-purple-700">
+                  <Button type="submit" className="bg-blue-600 text-white hover:bg-blue-700">
                     {t('admin.save', 'Save Folder', 'கோப்பை சேமிக்கவும்')}
                   </Button>
                   <Button

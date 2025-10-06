@@ -27,9 +27,9 @@ export default function Button({
   
   const variantClasses = {
     primary: 'gradient-bg text-white hover:shadow-lg hover:shadow-purple-500/25 focus:ring-purple-500 hover-lift',
-    secondary: 'bg-purple-100 text-purple-800 hover:bg-purple-200 focus:ring-purple-500 dark:bg-purple-900 dark:text-purple-200 dark:hover:bg-purple-800 hover-lift',
-    outline: 'border border-purple-300 bg-white text-purple-700 hover:bg-purple-50 focus:ring-purple-500 dark:border-purple-600 dark:bg-purple-900 dark:text-purple-300 dark:hover:bg-purple-800 hover-lift',
-    ghost: 'text-purple-700 hover:bg-purple-100 focus:ring-purple-500 dark:text-purple-300 dark:hover:bg-purple-900 hover-lift',
+    secondary: 'bg-purple-100 text-purple-800 hover:bg-purple-200 focus:ring-purple-500 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 hover-lift',
+    outline: 'border border-purple-300 bg-white text-purple-700 hover:bg-purple-50 focus:ring-purple-500 dark:border-purple-600 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 hover-lift',
+    ghost: 'text-purple-700 hover:bg-purple-100 focus:ring-purple-500 dark:text-blue-300 dark:hover:bg-blue-900 hover-lift',
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 hover-lift'
   }
   

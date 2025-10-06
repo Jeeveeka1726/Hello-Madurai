@@ -137,7 +137,7 @@ export default function TranslateField({
 
       {/* Translation Status */}
       {translating && (
-        <div className="flex items-center space-x-2 text-sm text-purple-600 dark:text-purple-400">
+        <div className="flex items-center space-x-2 text-sm text-purple-600 dark:text-yellow-400">
           <ArrowPathIcon className="h-4 w-4 animate-spin" />
           <span>Translating...</span>
         </div>

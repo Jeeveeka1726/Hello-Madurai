@@ -131,7 +131,7 @@ function RadioFolderPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
@@ -146,7 +146,7 @@ function RadioFolderPageContent() {
 
   if (!folder) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
             <p className="text-gray-600 dark:text-gray-300">
@@ -165,7 +165,7 @@ function RadioFolderPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -195,7 +195,7 @@ function RadioFolderPageContent() {
             <div className="mt-4 flex items-center justify-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
               <span>{folder.radioShows.length} {t('radio.shows', 'shows', 'நிகழ்ச்சிகள்')}</span>
               {folder.featured && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                   <StarIcon className="h-3 w-3 mr-1" />
                   {t('radio.featured', 'Featured', 'சிறப்பு')}
                 </span>
@@ -229,11 +229,11 @@ function RadioFolderPageContent() {
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {folder.radioShows.map((show) => (
-                <Card key={show.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-purple-800">
+                <Card key={show.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-blue-800">
                   <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900">
                     <div className="flex items-center justify-center">
                       <div className="text-center">
-                        <MicrophoneIcon className="h-12 w-12 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                        <MicrophoneIcon className="h-12 w-12 text-purple-600 dark:text-yellow-400 mx-auto mb-2" />
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {show.duration}
                         </p>
@@ -243,7 +243,7 @@ function RadioFolderPageContent() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-2">
                       {show.featured && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                           <StarIcon className="h-3 w-3 mr-1" />
                           {t('radio.featured', 'Featured', 'சிறப்பு')}
                         </span>
@@ -298,12 +298,12 @@ function RadioFolderPageContent() {
                     </Button>
                     
                     {currentlyPlaying === show.id && (
-                      <div className="mt-4 bg-gray-50 dark:bg-purple-800 rounded-lg p-3">
+                      <div className="mt-4 bg-gray-50 dark:bg-blue-800 rounded-lg p-3">
                         <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
                           <span>{formatTime(currentTime)}</span>
                           <span>{formatTime(duration)}</span>
                         </div>
-                        <div className="w-full bg-gray-200 dark:bg-purple-700 rounded-full h-2">
+                        <div className="w-full bg-gray-200 dark:bg-blue-700 rounded-full h-2">
                           <div
                             className="bg-green-600 h-2 rounded-full transition-all duration-300"
                             style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}

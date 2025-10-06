@@ -15,64 +15,90 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #1a0b2e !important; /* Force dark purple background */
-  color: #f8fafc !important; /* Force light text */
+  background-color: #1d4ed8 !important; /* Beautiful dark blue background - blue-700 */
+  color: #eff6ff !important; /* Cool light blue text */
 }
 
 /* Force dark theme globally */
 html.dark,
 html,
 body {
-  background-color: #1a0b2e !important;
-  color: #f8fafc !important;
+  background-color: #1d4ed8 !important;
+  color: #eff6ff !important;
 }
 
-/* Beautiful Purple and White theme - Light mode */
+/* Beautiful Blue and White theme - Light mode */
 :root,
 .light {
   --background: #ffffff;
   --foreground: #1f2937;
   --card: #ffffff;
   --card-foreground: #1f2937;
-  --primary: #8b5cf6;
+  --primary: #3b82f6;
   --primary-foreground: #ffffff;
-  --secondary: #f8fafc;
+  --secondary: #eff6ff;
   --secondary-foreground: #374151;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #f3e8ff;
-  --accent-foreground: #7c3aed;
-  --border: #e2e8f0;
+  --muted: #dbeafe;
+  --muted-foreground: #78716c;
+  --accent: #dbeafe;
+  --accent-foreground: #2563eb;
+  --border: #93c5fd;
   --input: #ffffff;
-  --ring: #8b5cf6;
-  --gradient-from: #8b5cf6;
-  --gradient-to: #a855f7;
+  --ring: #3b82f6;
+  --gradient-from: #3b82f6;
+  --gradient-to: #2563eb;
 }
 
-/* Dark Purple theme */
+/* Dark Blue theme */
 .dark {
-  --background: #1a0b2e;
-  --foreground: #f8fafc;
-  --card: #2d1b4e;
-  --card-foreground: #f8fafc;
-  --primary: #a78bfa;
-  --primary-foreground: #2d1b4e;
-  --secondary: #4c1d95;
-  --secondary-foreground: #e0e7ff;
-  --muted: #2d1b4e;
-  --muted-foreground: #a5b4fc;
-  --accent: #8b5cf6;
-  --accent-foreground: #e0e7ff;
-  --border: #4c1d95;
-  --input: #2d1b4e;
-  --ring: #a78bfa;
-  --gradient-from: #a78bfa;
-  --gradient-to: #c084fc;
+  --background: #1d4ed8;
+  --foreground: #eff6ff;
+  --card: #2563eb;
+  --card-foreground: #eff6ff;
+  --primary: #93c5fd;
+  --primary-foreground: #1d4ed8;
+  --secondary: #2563eb;
+  --secondary-foreground: #dbeafe;
+  --muted: #2563eb;
+  --muted-foreground: #93c5fd;
+  --accent: #3b82f6;
+  --accent-foreground: #dbeafe;
+  --border: #2563eb;
+  --input: #2563eb;
+  --ring: #93c5fd;
+  --gradient-from: #93c5fd;
+  --gradient-to: #3b82f6;
 }
 
 /* Tamil font support */
 .font-tamil {
   font-family: 'Noto Sans Tamil', 'Latha', 'Vijaya', sans-serif;
+}
+
+/* News image styling */
+.news-content img,
+.news-image {
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 1.5rem auto !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+  display: block !important;
+}
+
+@media (min-width: 640px) {
+  .news-content img,
+  .news-image {
+    max-width: 700px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .news-content img,
+  .news-image {
+    max-width: 800px !important;
+  }
 }
 
 /* Smooth transitions and animations */
@@ -100,8 +126,8 @@ body {
 }
 
 .dark .glass {
-  background: rgba(30, 27, 75, 0.3);
-  border: 1px solid rgba(167, 139, 250, 0.2);
+  background: rgba(120, 53, 15, 0.3);
+  border: 1px solid rgba(251, 191, 36, 0.2);
 }
 
 /* Hover effects */
@@ -111,11 +137,11 @@ body {
 
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15);
 }
 
 .dark .hover-lift:hover {
-  box-shadow: 0 10px 25px rgba(167, 139, 250, 0.25);
+  box-shadow: 0 10px 25px rgba(251, 191, 36, 0.25);
 }
 
 /* Optimize for performance */

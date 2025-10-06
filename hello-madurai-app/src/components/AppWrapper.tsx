@@ -22,7 +22,7 @@ export default function AppWrapper({
     <ThemeProvider>
       <LanguageProvider>
         <AdminProvider>
-          <div className="min-h-screen bg-white dark:bg-purple-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+          <div className="min-h-screen bg-white dark:bg-blue-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
             {showHeader && <NewHeader />}
             <main>
               {children}

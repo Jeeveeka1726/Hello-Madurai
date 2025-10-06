@@ -164,7 +164,7 @@ export default function AdminDirectoryPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     )
@@ -175,7 +175,7 @@ export default function AdminDirectoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
@@ -214,7 +214,7 @@ export default function AdminDirectoryPage() {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white dark:bg-purple-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-blue-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                   <TranslatedText>{editingBusiness ? 'Edit Business' : 'Add Business'}</TranslatedText>
@@ -268,7 +268,7 @@ export default function AdminDirectoryPage() {
                       <select
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                         required
                       >
                         {businessCategories.map((category) => (
@@ -288,7 +288,7 @@ export default function AdminDirectoryPage() {
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                         placeholder="+91 98765 43210"
                         required
                       />
@@ -305,7 +305,7 @@ export default function AdminDirectoryPage() {
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                         placeholder="business@example.com"
                       />
                     </div>
@@ -319,7 +319,7 @@ export default function AdminDirectoryPage() {
                         type="url"
                         value={formData.website}
                         onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-purple-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-purple-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                         placeholder="https://example.com"
                       />
                     </div>
@@ -364,7 +364,7 @@ export default function AdminDirectoryPage() {
 
         {/* Stats */}
         <div className="grid gap-6 md:grid-cols-3 mb-8">
-          <Card className="bg-white dark:bg-purple-900 border-gray-200 dark:border-gray-700">
+          <Card className="bg-white dark:bg-blue-900 border-gray-200 dark:border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <BuildingOfficeIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -380,10 +380,10 @@ export default function AdminDirectoryPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-purple-900 border-gray-200 dark:border-gray-700">
+          <Card className="bg-white dark:bg-blue-900 border-gray-200 dark:border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <BuildingOfficeIcon className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
+                <BuildingOfficeIcon className="h-8 w-8 text-blue-600 dark:text-yellow-400" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                     <TranslatedText>Featured</TranslatedText>
@@ -396,7 +396,7 @@ export default function AdminDirectoryPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-purple-900 border-gray-200 dark:border-gray-700">
+          <Card className="bg-white dark:bg-blue-900 border-gray-200 dark:border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <BuildingOfficeIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
@@ -414,7 +414,7 @@ export default function AdminDirectoryPage() {
         </div>
 
         {/* Business List */}
-        <Card className="bg-white dark:bg-purple-900 border-gray-200 dark:border-gray-700">
+        <Card className="bg-white dark:bg-blue-900 border-gray-200 dark:border-gray-700">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">
               <TranslatedText>All Businesses</TranslatedText>
@@ -434,7 +434,7 @@ export default function AdminDirectoryPage() {
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {businesses.map((business) => (
-                  <Card key={business.id} className="bg-gray-50 dark:bg-purple-800 border-gray-200 dark:border-purple-700">
+                  <Card key={business.id} className="bg-gray-50 dark:bg-blue-800 border-gray-200 dark:border-yellow-700">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
@@ -451,7 +451,7 @@ export default function AdminDirectoryPage() {
                               {businessCategories.find(cat => cat.id === business.category)?.name || business.category}
                             </span>
                             {business.featured && (
-                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                 Featured
                               </span>
                             )}

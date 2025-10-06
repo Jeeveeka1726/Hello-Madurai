@@ -89,7 +89,7 @@ function MagazineCollectionPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
@@ -104,7 +104,7 @@ function MagazineCollectionPageContent() {
 
   if (!collection) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
             <p className="text-gray-600 dark:text-gray-300">
@@ -123,7 +123,7 @@ function MagazineCollectionPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -153,7 +153,7 @@ function MagazineCollectionPageContent() {
             <div className="mt-4 flex items-center justify-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
               <span>{collection.magazines.length} {t('magazine.issues', 'issues', 'இதழ்கள்')}</span>
               {collection.featured && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                   <StarIcon className="h-3 w-3 mr-1" />
                   {t('magazine.featured', 'Featured', 'சிறப்பு')}
                 </span>
@@ -178,11 +178,11 @@ function MagazineCollectionPageContent() {
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {collection.magazines.map((magazine) => (
-                <Card key={magazine.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-purple-900 border-gray-200 dark:border-purple-800">
+                <Card key={magazine.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 border-gray-200 dark:border-blue-800">
                   <div className="aspect-w-16 aspect-h-12 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900">
                     <div className="flex items-center justify-center">
                       <div className="text-center">
-                        <DocumentArrowDownIcon className="h-16 w-16 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                        <DocumentArrowDownIcon className="h-16 w-16 text-purple-600 dark:text-yellow-400 mx-auto mb-2" />
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {t('magazine.issue', 'Issue', 'இதழ்')} #{magazine.issueNumber}
                         </p>
@@ -192,7 +192,7 @@ function MagazineCollectionPageContent() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-2">
                       {magazine.featured && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                           <StarIcon className="h-3 w-3 mr-1" />
                           {t('magazine.featured', 'Featured', 'சிறப்பு')}
                         </span>
@@ -226,7 +226,7 @@ function MagazineCollectionPageContent() {
                     <div className="flex space-x-3">
                       <Button
                         onClick={() => handleDownload(magazine.pdfUrl, magazine.title)}
-                        className="flex-1 bg-purple-600 text-white hover:bg-purple-700"
+                        className="flex-1 bg-blue-600 text-white hover:bg-blue-700"
                       >
                         <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
                         {t('magazine.download', 'Download PDF', 'PDF பதிவிறக்கம்')}
@@ -258,3 +258,5 @@ export default function MagazineCollectionPage() {
     </div>
   )
 }
+
+

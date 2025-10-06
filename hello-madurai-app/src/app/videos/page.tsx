@@ -1,11 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { PlayIcon, EyeIcon, CalendarIcon, ClockIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import InteractionButtons from '@/components/InteractionButtons'
+import Comments from '@/components/Comments'
+
+// Dynamic import ReactPlayer to avoid SSR issues
+const ReactPlayer = dynamic(() => import('react-player'), { ssr: false })
 
 interface Video {
   id: string
@@ -19,8 +25,24 @@ interface Video {
   category: string
   duration?: string
   views: number
+  likes: number
   featured: boolean
   publishedAt: string
+  comments: Comment[]
+  shares: Share[]
+}
+
+interface Comment {
+  id: string
+  content: string
+  author: string
+  createdAt: string
+}
+
+interface Share {
+  id: string
+  platform: string
+  createdAt: string
 }
 
 function VideosPageContent() {
@@ -28,6 +50,9 @@ function VideosPageContent() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
+  const [showComments, setShowComments] = useState(false)
+  const [commentsVideoId, setCommentsVideoId] = useState<string>('')
 
   // Fetch videos from database
   useEffect(() => {
@@ -83,8 +108,20 @@ function VideosPageContent() {
     })
   }
 
-  const playVideo = (youtubeId: string) => {
-    window.open(`https://www.youtube.com/watch?v=${youtubeId}`, '_blank')
+  const playVideo = (video: Video) => {
+    setSelectedVideo(video)
+    // Increment view count
+    fetch(`/api/video/${video.id}/view`, { method: 'POST' })
+      .catch(error => console.error('Error tracking view:', error))
+  }
+
+  const closeVideo = () => {
+    setSelectedVideo(null)
+  }
+
+  const openComments = (videoId: string) => {
+    setCommentsVideoId(videoId)
+    setShowComments(true)
   }
 
   const getYouTubeThumbnail = (youtubeId?: string) => {
@@ -95,7 +132,7 @@ function VideosPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-purple-950 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -149,9 +186,9 @@ function VideosPageContent() {
             <div className="grid gap-8 lg:grid-cols-2">
               {featuredVideos.map((video) => (
                 <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                  <div className="relative aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 cursor-pointer" onClick={() => playVideo(video.youtubeId)}>
+                  <div className="relative aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 cursor-pointer" onClick={() => playVideo(video)}>
                     <img
-                      src={getYouTubeThumbnail(video.youtubeId)}
+                      src={video.thumbnail || getYouTubeThumbnail(video.youtubeId)}
                       alt={video.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -198,10 +235,22 @@ function VideosPageContent() {
                         </div>
                       </div>
                     </div>
-                    <Button onClick={() => playVideo(video.youtubeId)} className="w-full">
+                    <Button onClick={() => playVideo(video)} className="w-full mb-4">
                       <PlayIcon className="h-4 w-4 mr-2" />
                       {t('videos.watch', 'Watch Video', 'வீடியோ பார்க்க')}
                     </Button>
+                    
+                    {/* Interaction Buttons */}
+                    <InteractionButtons
+                      itemId={video.id}
+                      itemType="video"
+                      title={video.title}
+                      url={`${typeof window !== 'undefined' ? window.location.origin : ''}/videos#${video.id}`}
+                      likes={video.likes || 0}
+                      comments={video.comments?.length || 0}
+                      shares={video.shares?.length || 0}
+                      onComment={() => openComments(video.id)}
+                    />
                   </CardContent>
                 </Card>
               ))}
@@ -220,9 +269,17 @@ function VideosPageContent() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {(selectedCategory === 'all' ? regularVideos : filteredVideos).map((video) => (
               <Card key={video.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                <div className="relative aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 cursor-pointer" onClick={() => playVideo(video.youtubeId)}>
-                  <div className="flex items-center justify-center">
-                    <div className="bg-black bg-opacity-50 rounded-full p-3 hover:bg-opacity-70 transition-all">
+                <div className="relative aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 cursor-pointer" onClick={() => playVideo(video)}>
+                  <img
+                    src={video.thumbnail || getYouTubeThumbnail(video.youtubeId)}
+                    alt={video.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder-video.jpg'
+                    }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-all">
+                    <div className="bg-red-600 rounded-full p-3 hover:bg-red-700 transition-all">
                       <PlayIcon className="h-8 w-8 text-white" />
                     </div>
                   </div>
@@ -255,10 +312,23 @@ function VideosPageContent() {
                       {video.duration}
                     </div>
                   </div>
-                  <Button size="sm" onClick={() => playVideo(video.youtubeId)} className="w-full">
+                  <Button size="sm" onClick={() => playVideo(video)} className="w-full mb-3">
                     <PlayIcon className="h-3 w-3 mr-1" />
                     {t('videos.watch', 'Watch', 'பார்க்க')}
                   </Button>
+                  
+                  {/* Interaction Buttons */}
+                  <InteractionButtons
+                    itemId={video.id}
+                    itemType="video"
+                    title={video.title}
+                    url={`${typeof window !== 'undefined' ? window.location.origin : ''}/videos#${video.id}`}
+                    likes={video.likes || 0}
+                    comments={video.comments?.length || 0}
+                    shares={video.shares?.length || 0}
+                    onComment={() => openComments(video.id)}
+                    className="text-xs"
+                  />
                 </CardContent>
               </Card>
             ))}
@@ -275,6 +345,153 @@ function VideosPageContent() {
         )}
           </>
         )}
+
+        {/* Video Player Modal */}
+        {selectedVideo && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50"
+            onClick={(e) => {
+              // Close when clicking outside the modal
+              if (e.target === e.currentTarget) {
+                closeVideo()
+              }
+            }}
+          >
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-1">
+                  {selectedVideo.title}
+                </h3>
+                <button
+                  onClick={closeVideo}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl font-bold ml-4 flex-shrink-0"
+                  aria-label="Close video"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Video Player - Using Native YouTube Embed */}
+              <div className="w-full bg-black" style={{ aspectRatio: '16/9', position: 'relative' }}>
+                {selectedVideo.videoUrl && selectedVideo.youtubeId ? (
+                  <iframe
+                    key={`iframe-${selectedVideo.id}`}
+                    src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?rel=0&modestbranding=1&playsinline=1`}
+                    title={selectedVideo.title}
+                    width="100%"
+                    height="100%"
+                    style={{ 
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      border: 'none'
+                    }}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    onLoad={() => {
+                      console.log('✅ YouTube iframe loaded!')
+                      console.log('Video ID:', selectedVideo.youtubeId)
+                      console.log('Title:', selectedVideo.title)
+                    }}
+                    onError={(error) => {
+                      console.error('❌ YouTube iframe error:', error)
+                    }}
+                  />
+                ) : selectedVideo.videoUrl ? (
+                  // Fallback to ReactPlayer for non-YouTube videos
+                  <ReactPlayer
+                    key={`player-${selectedVideo.id}`}
+                    url={selectedVideo.videoUrl}
+                    width="100%"
+                    height="100%"
+                    controls={true}
+                    playing={false}
+                    playsinline={true}
+                    style={{ backgroundColor: '#000' }}
+                    config={{
+                      file: {
+                        attributes: {
+                          controlsList: 'nodownload',
+                          playsInline: true
+                        }
+                      }
+                    }}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full bg-black text-white">
+                    <div className="text-center p-8">
+                      <p className="text-lg mb-2">No video URL</p>
+                      <p className="text-sm text-gray-400">Add a YouTube URL in admin panel</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Video Info */}
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center">
+                      <EyeIcon className="h-4 w-4 mr-1" />
+                      {selectedVideo.views.toLocaleString()} {t('videos.views', 'views', 'பார்வைகள்')}
+                    </div>
+                    <div className="flex items-center">
+                      <CalendarIcon className="h-4 w-4 mr-1" />
+                      {formatDate(selectedVideo.publishedAt)}
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 capitalize">
+                    {selectedVideo.category}
+                  </span>
+                </div>
+
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  {t(`videos.${selectedVideo.id}.description`, selectedVideo.description, selectedVideo.description_ta)}
+                </p>
+
+                {/* Interaction Buttons */}
+                <InteractionButtons
+                  itemId={selectedVideo.id}
+                  itemType="video"
+                  title={selectedVideo.title}
+                  url={`${typeof window !== 'undefined' ? window.location.origin : ''}/videos#${selectedVideo.id}`}
+                  likes={selectedVideo.likes || 0}
+                  comments={selectedVideo.comments?.length || 0}
+                  shares={selectedVideo.shares?.length || 0}
+                  onLike={async () => {
+                    // Refresh the video data after like
+                    try {
+                      const response = await fetch(`/api/admin/videos`)
+                      if (response.ok) {
+                        const data = await response.json()
+                        setVideos(data)
+                        // Update selectedVideo with fresh data
+                        const updatedVideo = data.find((v: Video) => v.id === selectedVideo.id)
+                        if (updatedVideo) {
+                          setSelectedVideo(updatedVideo)
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Error refreshing video data:', error)
+                    }
+                  }}
+                  onComment={() => openComments(selectedVideo.id)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Comments Modal */}
+        <Comments
+          itemId={commentsVideoId}
+          itemType="video"
+          isOpen={showComments}
+          onClose={() => setShowComments(false)}
+        />
       </div>
     </div>
   )
