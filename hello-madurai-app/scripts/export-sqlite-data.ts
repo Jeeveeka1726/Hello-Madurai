@@ -25,11 +25,7 @@ async function exportData() {
           shares: true
         }
       }),
-      events: await prisma.event.findMany({
-        include: {
-          registrations: true
-        }
-      }),
+      events: await prisma.event.findMany(),
       businesses: await prisma.business.findMany({
         include: {
           comments: true
