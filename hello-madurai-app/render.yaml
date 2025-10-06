@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: hello-madurai
+    runtime: node
+    region: singapore
+    plan: free
+    rootDir: Hello-Madurai/hello-madurai-app
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npx prisma db push --accept-data-loss && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ADMIN_PASSWORD
+        value: admin123
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: NEXTAUTH_URL
+        value: https://hello-madurai.onrender.com
+    disk:
+      name: sqlite-data
+      mountPath: /app/prisma
+      sizeGB: 1
+
