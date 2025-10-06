@@ -8,3 +8,6 @@ healthcheckPath = "/"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
 
+[[deploy.volumes]]
+mountPath = "/app/prisma"
+name = "sqlite-data"
