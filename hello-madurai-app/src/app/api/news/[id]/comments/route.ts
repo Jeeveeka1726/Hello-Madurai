@@ -1,19 +1,39 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
 
+const prisma = new PrismaClient()
+
+// GET /api/news/[id]/comments - Fetch comments for a news article
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const newsId = params.id
+    const { id: newsId } = await params
 
+    // Fetch only top-level comments (parentId is null) with their replies
     const comments = await prisma.newsComment.findMany({
-      where: { newsId },
-      orderBy: { createdAt: 'desc' }
+      where: {
+        newsId,
+        approved: true,
+        parentId: null, // Only get parent comments
+      },
+      include: {
+        replies: {
+          where: {
+            approved: true,
+          },
+          orderBy: {
+            createdAt: 'asc', // Replies in chronological order
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
 
-    return NextResponse.json(comments)
+    return NextResponse.json(comments || [])
   } catch (error) {
     console.error('Error fetching news comments:', error)
     return NextResponse.json(
@@ -23,14 +43,15 @@ export async function GET(
   }
 }
 
+// POST /api/news/[id]/comments - Create a comment
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const newsId = params.id
+    const { id: newsId } = await params
     const body = await request.json()
-    const { content, author, email } = body
+    const { content, author, email, parentId } = body
 
     if (!content || !author) {
       return NextResponse.json(
@@ -43,9 +64,11 @@ export async function POST(
       data: {
         content,
         author,
-        email,
-        newsId
-      }
+        email: email || undefined,
+        newsId,
+        parentId: parentId || undefined,
+        approved: false, // Requires admin approval
+      },
     })
 
     return NextResponse.json(comment, { status: 201 })
@@ -57,4 +80,3 @@ export async function POST(
     )
   }
 }
-

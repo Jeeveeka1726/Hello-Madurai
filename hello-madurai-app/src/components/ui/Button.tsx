@@ -26,10 +26,10 @@ export default function Button({
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
   
   const variantClasses = {
-    primary: 'gradient-bg text-white hover:shadow-lg hover:shadow-purple-500/25 focus:ring-purple-500 hover-lift',
-    secondary: 'bg-purple-100 text-purple-800 hover:bg-purple-200 focus:ring-purple-500 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 hover-lift',
-    outline: 'border border-purple-300 bg-white text-purple-700 hover:bg-purple-50 focus:ring-purple-500 dark:border-purple-600 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 hover-lift',
-    ghost: 'text-purple-700 hover:bg-purple-100 focus:ring-purple-500 dark:text-blue-300 dark:hover:bg-blue-900 hover-lift',
+    primary: 'gradient-bg text-white hover:shadow-lg hover:shadow-blue-500/25 focus:ring-blue-500 hover-lift',
+    secondary: 'bg-blue-100 text-blue-800 hover:bg-blue-200 focus:ring-blue-500 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 hover-lift',
+    outline: 'border border-blue-300 bg-white text-blue-700 hover:bg-blue-50 focus:ring-blue-500 dark:border-blue-600 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 hover-lift',
+    ghost: 'text-blue-700 hover:bg-blue-100 focus:ring-blue-500 dark:text-blue-300 dark:hover:bg-blue-900 hover-lift',
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 hover-lift'
   }
   

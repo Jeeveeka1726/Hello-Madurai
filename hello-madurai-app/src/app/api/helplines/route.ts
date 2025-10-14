@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function GET() {
   try {
+    // Fetch helplines from Hostinger MySQL
     const helplines = await prisma.helpline.findMany({
       orderBy: [
         { featured: 'desc' },
@@ -11,7 +14,7 @@ export async function GET() {
       ]
     })
 
-    return NextResponse.json(helplines)
+    return NextResponse.json(helplines || [])
   } catch (error) {
     console.error('Error fetching helplines:', error)
     return NextResponse.json(
@@ -26,6 +29,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { name, name_ta, phone, category, description, description_ta, featured } = body
 
+    // Create helpline in Hostinger MySQL
     const helpline = await prisma.helpline.create({
       data: {
         name,
@@ -47,4 +51,3 @@ export async function POST(request: Request) {
     )
   }
 }
-

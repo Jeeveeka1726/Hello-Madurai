@@ -3,14 +3,14 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const radioShows = await prisma.radioShow.findMany({
+      orderBy: {
+        createdAt: 'desc'
+      },
       include: {
         folder: true
-      },
-      orderBy: {
-        publishedAt: 'desc'
       }
     })
 
@@ -32,27 +32,20 @@ export async function POST(request: NextRequest) {
       title_ta, 
       description, 
       description_ta, 
-      host, 
-      duration, 
-      audioUrl, 
-      featured, 
-      folderId 
+      audioFileUrl, 
+      duration,
+      folderId
     } = body
 
     const radioShow = await prisma.radioShow.create({
       data: {
         title,
-        title_ta,
-        description,
-        description_ta,
-        host,
-        duration,
-        audioUrl,
-        featured: featured || false,
-        folderId
-      },
-      include: {
-        folder: true
+        title_ta: title_ta || undefined,
+        description: description || undefined,
+        description_ta: description_ta || undefined,
+        audioFileUrl,
+        duration: duration || undefined,
+        folderId: folderId || undefined
       }
     })
 

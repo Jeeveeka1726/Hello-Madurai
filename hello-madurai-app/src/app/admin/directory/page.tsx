@@ -5,7 +5,7 @@ import { useAdmin } from '@/contexts/AdminContext'
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import TranslatedText from '@/components/TranslatedText'
-import TranslateField from '@/components/admin/TranslateField'
+import BilingualField from '@/components/admin/BilingualField'
 import { 
   BuildingOfficeIcon, 
   PlusIcon, 
@@ -222,7 +222,7 @@ export default function AdminDirectoryPage() {
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Business Name */}
-                  <TranslateField
+                  <BilingualField
                     label="Business Name"
                     value={formData.name}
                     value_ta={formData.name_ta}
@@ -234,7 +234,7 @@ export default function AdminDirectoryPage() {
                   />
 
                   {/* Description */}
-                  <TranslateField
+                  <BilingualField
                     label="Description"
                     value={formData.description}
                     value_ta={formData.description_ta}
@@ -247,7 +247,7 @@ export default function AdminDirectoryPage() {
                   />
 
                   {/* Address */}
-                  <TranslateField
+                  <BilingualField
                     label="Address"
                     value={formData.address}
                     value_ta={formData.address_ta}

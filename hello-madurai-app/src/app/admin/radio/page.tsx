@@ -532,7 +532,7 @@ export default function AdminRadioPage() {
         {/* Radio Folders Display */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-300">Loading radio data...</p>
           </div>
         ) : (
@@ -541,11 +541,11 @@ export default function AdminRadioPage() {
               <Card key={folder.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                 <CardHeader>
                   <CardTitle className="text-gray-900 dark:text-white flex items-center">
-                    <FolderIcon className="h-5 w-5 mr-2 text-purple-600" />
+                    <FolderIcon className="h-5 w-5 mr-2 text-blue-600" />
                     {folder.name}
                     {folder.name_ta && <span className="ml-2 text-gray-600 dark:text-gray-400">({folder.name_ta})</span>}
                     {folder.featured && (
-                      <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         Featured
                       </span>
                     )}

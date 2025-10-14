@@ -59,7 +59,7 @@ function VideosPageContent() {
     const fetchVideos = async () => {
       try {
         console.log('Fetching videos from API...')
-        const response = await fetch('/api/admin/videos')
+        const response = await fetch('/api/videos')
         console.log('Response status:', response.status)
         if (response.ok) {
           const data = await response.json()
@@ -464,7 +464,7 @@ function VideosPageContent() {
                   onLike={async () => {
                     // Refresh the video data after like
                     try {
-                      const response = await fetch(`/api/admin/videos`)
+                      const response = await fetch(`/api/videos`)
                       if (response.ok) {
                         const data = await response.json()
                         setVideos(data)

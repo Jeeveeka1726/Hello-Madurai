@@ -4,16 +4,22 @@ import { CalendarIcon, EyeIcon, UserIcon } from '@heroicons/react/24/outline'
 import Card, { CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
-// Mock data - will be replaced with Supabase data
+// Complete list of news categories (matching admin panel)
 const newsCategories = [
   { id: 'all', name: 'All News', name_ta: 'அனைத்து செய்திகள்' },
+  { id: 'general', name: 'General', name_ta: 'பொதுவானது' },
   { id: 'collector', name: 'Collector', name_ta: 'கலெக்டர்' },
-  { id: 'corporation', name: 'Corporation', name_ta: 'மாநகராட்சி' },
-  { id: 'police', name: 'Police', name_ta: 'போலீஸ்' },
-  { id: 'agriculture', name: 'Agriculture', name_ta: 'விவசாயம்' },
+  { id: 'corporation', name: 'Corporation', name_ta: 'நகராட்சி' },
+  { id: 'education', name: 'Education', name_ta: 'கல்வி' },
+  { id: 'religious', name: 'Religious', name_ta: 'மதம்' },
   { id: 'cinema', name: 'Cinema', name_ta: 'சினிமா' },
-  { id: 'articles', name: 'Articles', name_ta: 'கட்டுரைகள்' },
-  { id: 'jobs', name: 'Job Opportunities', name_ta: 'வேலை வாய்ப்பு' },
+  { id: 'games', name: 'Games', name_ta: 'விளையாட்டு' },
+  { id: 'political', name: 'Political', name_ta: 'அரசியல்' },
+  { id: 'police', name: 'Police', name_ta: 'போலீஸ்' },
+  { id: 'agri', name: 'Agriculture', name_ta: 'விவசாயம்' },
+  { id: 'jobs', name: 'Jobs', name_ta: 'வேலைவாய்ப்பு' },
+  { id: 'article', name: 'Article', name_ta: 'கட்டுரை' },
+  { id: 'others', name: 'Others', name_ta: 'மற்றவை' }
 ]
 
 const mockNews = [
@@ -133,7 +139,7 @@ export default async function NewsPage({
                 
                 <CardHeader>
                   <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-                    <span className="bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full text-xs">
+                    <span className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full text-xs">
                       {locale === 'ta' 
                         ? newsCategories.find(cat => cat.id === news.category)?.name_ta
                         : newsCategories.find(cat => cat.id === news.category)?.name

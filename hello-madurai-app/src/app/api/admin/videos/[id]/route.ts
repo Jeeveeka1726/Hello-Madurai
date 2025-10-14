@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 // GET /api/admin/videos/[id] - Get single video
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    
     const video = await prisma.video.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         comments: true,
         shares: true
@@ -35,9 +39,10 @@ export async function GET(
 // PUT /api/admin/videos/[id] - Update video
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     
     // Extract YouTube ID from URL if provided
@@ -68,17 +73,17 @@ export async function PUT(
     }
 
     const video = await prisma.video.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title: body.title,
-        title_ta: body.title_ta,
-        description: body.description,
-        description_ta: body.description_ta,
+        title_ta: body.title_ta || undefined,
+        description: body.description || undefined,
+        description_ta: body.description_ta || undefined,
         videoUrl: cleanVideoUrl,
-        youtubeId: youtubeId,
+        youtubeId: youtubeId || undefined,
         thumbnail: body.thumbnail || (youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : undefined),
         category: body.category,
-        duration: body.duration,
+        duration: body.duration || undefined,
         featured: body.featured,
         publishedAt: body.publishedAt ? new Date(body.publishedAt) : undefined
       }
@@ -97,12 +102,14 @@ export async function PUT(
 // DELETE /api/admin/videos/[id] - Delete video
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    
     // Delete the video (will cascade delete comments and shares)
     await prisma.video.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ 
@@ -117,4 +124,3 @@ export async function DELETE(
     )
   }
 }
-

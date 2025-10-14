@@ -34,13 +34,13 @@ function AdminLoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
             Hello Madurai
           </h1>
-          <h2 className="text-2xl font-semibold text-purple-600 dark:text-yellow-400 mb-4">
+          <h2 className="text-2xl font-semibold text-blue-600 dark:text-yellow-400 mb-4">
             {t('admin.login.title', 'Admin Login', 'நிர்வாக உள்நுழைவு')}
           </h2>
           <p className="text-gray-600 dark:text-gray-300">
@@ -66,7 +66,7 @@ function AdminLoginPageContent() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder={t('admin.login.placeholder', 'Enter admin password', 'நிர்வாக கடவுச்சொல்லை உள்ளிடவும்')}
                     required
                   />
@@ -110,7 +110,7 @@ function AdminLoginPageContent() {
               <div className="text-center">
                 <button
                   onClick={() => router.push('/')}
-                  className="text-purple-600 hover:text-purple-700 dark:text-yellow-400 dark:hover:text-blue-300 text-sm font-medium"
+                  className="text-blue-600 hover:text-blue-700 dark:text-yellow-400 dark:hover:text-blue-300 text-sm font-medium"
                 >
                   ← {t('admin.login.back', 'Back to Website', 'வலைத்தளத்திற்கு திரும்பு')}
                 </button>

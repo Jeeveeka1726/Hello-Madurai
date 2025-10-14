@@ -194,7 +194,7 @@ export default function FileUpload({
             <div
               className={`relative border-2 border-dashed rounded-lg p-6 text-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
                 isDragging
-                  ? 'border-purple-500 bg-purple-50 dark:bg-blue-900/20'
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                   : 'border-gray-300 dark:border-gray-600'
               }`}
               onDragOver={handleDragOver}
@@ -221,7 +221,7 @@ export default function FileUpload({
                     </div>
                   ) : (
                     <>
-                      <span className="font-medium text-purple-600 hover:text-purple-500">
+                      <span className="font-medium text-blue-600 hover:text-blue-500">
                         Click to upload
                       </span>{' '}
                       or drag and drop
@@ -239,7 +239,7 @@ export default function FileUpload({
             <div className="relative border border-gray-300 dark:border-gray-600 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <IconComponent className="h-8 w-8 text-purple-600" />
+                  <IconComponent className="h-8 w-8 text-blue-600" />
                   <div>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {config.label} uploaded
@@ -281,7 +281,7 @@ export default function FileUpload({
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               placeholder={`Enter ${config.label.toLowerCase()} URL...`}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
             />
             <Button
               type="button"
@@ -295,7 +295,7 @@ export default function FileUpload({
           {currentUrl && (
             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
               <div className="flex items-center space-x-2">
-                <LinkIcon className="h-4 w-4 text-purple-600" />
+                <LinkIcon className="h-4 w-4 text-blue-600" />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
                   {currentUrl}
                 </span>

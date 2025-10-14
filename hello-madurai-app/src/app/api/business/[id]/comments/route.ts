@@ -1,12 +1,15 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const businessId = params.id
+    const { id } = await params
+    const businessId = parseInt(id)
 
     const comments = await prisma.businessComment.findMany({
       where: { businessId },
@@ -24,11 +27,12 @@ export async function GET(
 }
 
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const businessId = params.id
+    const { id } = await params
+    const businessId = parseInt(id)
     const body = await request.json()
     const { content, author, email, rating } = body
 
@@ -43,8 +47,8 @@ export async function POST(
       data: {
         content,
         author,
-        email,
-        rating: rating ? parseInt(rating) : null,
+        email: email || undefined,
+        rating: rating ? parseInt(rating) : undefined,
         businessId
       }
     })
@@ -58,4 +62,3 @@ export async function POST(
     )
   }
 }
-

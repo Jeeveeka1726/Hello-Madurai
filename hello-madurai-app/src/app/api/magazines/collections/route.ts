@@ -3,20 +3,15 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const collections = await prisma.magazineCollection.findMany({
-      include: {
-        magazines: {
-          orderBy: {
-            publishedAt: 'desc'
-          }
-        }
+      orderBy: {
+        createdAt: 'desc'
       },
-      orderBy: [
-        { featured: 'desc' },
-        { createdAt: 'desc' }
-      ]
+      include: {
+        magazines: true
+      }
     })
 
     return NextResponse.json(collections)
@@ -37,10 +32,10 @@ export async function POST(request: NextRequest) {
     const collection = await prisma.magazineCollection.create({
       data: {
         name,
-        name_ta,
-        description,
-        description_ta,
-        coverImage,
+        name_ta: name_ta || undefined,
+        description: description || undefined,
+        description_ta: description_ta || undefined,
+        coverImage: coverImage || undefined,
         featured: featured || false
       }
     })

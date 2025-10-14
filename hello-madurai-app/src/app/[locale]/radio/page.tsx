@@ -98,7 +98,7 @@ export default async function RadioPage({ params }: RadioPageProps) {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             {locale === 'ta' ? 'தற்போது ஒளிபரப்பு' : 'Now Playing'}
           </h2>
-          <Card className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+          <Card className="bg-gradient-to-r from-indigo-500 to-blue-600 text-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>

@@ -9,9 +9,12 @@ import PopupAds from '@/components/PopupAds'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Hello Madurai - Your Local News & Information Hub",
-  description: "Stay connected with Madurai's latest news, events, directory, and local information in Tamil and English",
-  keywords: "Madurai, Tamil Nadu, News, Events, Directory, Local Information",
+  title: "ஹலோ மதுரை - உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம்",
+  description: "மதுரையின் சமீபத்திய செய்திகள், நிகழ்வுகள், முகவரி நூல் மற்றும் உள்ளூர் தகவல்களை பெறுங்கள்",
+  keywords: "மதுரை, தமிழ்நாடு, செய்திகள், நிகழ்வுகள், முகவரி நூல், உள்ளூர் தகவல்",
+  other: {
+    'google': 'notranslate',
+  },
 };
 
 export default function RootLayout({
@@ -20,8 +23,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ta" translate="no" suppressHydrationWarning>
       <head>
+        {/* Disable browser auto-translate */}
+        <meta name="google" content="notranslate" />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXXX"

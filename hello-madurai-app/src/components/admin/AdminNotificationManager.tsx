@@ -150,7 +150,7 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'news': return 'text-red-600 bg-red-100'
-      case 'event': return 'text-purple-600 bg-purple-100'
+      case 'event': return 'text-blue-600 bg-blue-100'
       case 'offer': return 'text-yellow-600 bg-yellow-100'
       default: return 'text-gray-600 bg-gray-100'
     }
@@ -455,4 +455,6 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
     </div>
   )
 }
+
+
 

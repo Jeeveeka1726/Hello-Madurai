@@ -10,7 +10,8 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import InteractionButtons from '@/components/InteractionButtons'
-import Comments from '@/components/Comments'
+import CommentsSection from '@/components/news/CommentsSection'
+import ContentWithAds from '@/components/news/ContentWithAds'
 import { BannerAd, ResponsiveAd } from '@/components/ads/GoogleAdsense'
 
 // Dynamic import ReactPlayer to avoid SSR issues
@@ -59,7 +60,6 @@ function NewsDetailPageContent() {
   const [article, setArticle] = useState<NewsArticle | null>(null)
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([])
   const [loading, setLoading] = useState(true)
-  const [showComments, setShowComments] = useState(false)
 
   // Fetch article and related articles from database
   useEffect(() => {
@@ -281,13 +281,11 @@ function NewsDetailPageContent() {
                   </div>
                 </div>
 
-                {/* Article Content */}
-                <div className="prose prose-lg max-w-none dark:prose-invert news-content mb-8">
-                  <div 
-                    className="text-gray-700 dark:text-gray-300 leading-relaxed"
-                    dangerouslySetInnerHTML={{
-                      __html: t(`news.${article.id}.content`, article.content, article.content_ta)
-                    }}
+                {/* Article Content with Auto-Inserted Ads */}
+                <div className="mb-8">
+                  <ContentWithAds 
+                    content={t(`news.${article.id}.content`, article.content, article.content_ta)}
+                    newsId={article.id}
                   />
                 </div>
 
@@ -302,14 +300,18 @@ function NewsDetailPageContent() {
                     dislikes={article.dislikes}
                     comments={article.comments?.length || 0}
                     shares={article.shares?.length || 0}
-                    onComment={() => setShowComments(true)}
                     className="mb-6"
                   />
                 </div>
               </CardContent>
             </Card>
 
-            {/* Ad Space Below Article */}
+            {/* Comments Section - Inline below article */}
+            <div className="mt-8">
+              <CommentsSection newsId={article.id} />
+            </div>
+
+            {/* Ad Space Below Comments */}
             <div className="mt-6">
               <BannerAd />
             </div>
@@ -366,14 +368,6 @@ function NewsDetailPageContent() {
               ))}
           </div>
         </div>
-
-        {/* Comments Modal */}
-        <Comments
-          itemId={article.id}
-          itemType="news"
-          isOpen={showComments}
-          onClose={() => setShowComments(false)}
-        />
       </div>
     </div>
   )

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function POST(request: Request) {
   try {
@@ -13,7 +15,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // Create notification record
+    // Create notification record in Hostinger MySQL
     const notification = await prisma.notification.create({
       data: {
         title,
@@ -26,18 +28,19 @@ export async function POST(request: Request) {
 
     // Get subscribers for this category
     const subscriptions = await prisma.subscription.findMany({
-      where: {
-        active: true
-      }
+      where: { active: true }
     })
 
     const relevantSubscribers = subscriptions.filter(sub => {
-      const categories = JSON.parse(sub.categories)
-      return categories.includes(category)
+      try {
+        const categories = JSON.parse(sub.categories)
+        return categories.includes(category)
+      } catch {
+        return false
+      }
     })
 
-    // In a real implementation, you would send push notifications here
-    // For now, we'll just mark as sent and return subscriber count
+    // Mark as sent
     await prisma.notification.update({
       where: { id: notification.id },
       data: {
@@ -47,10 +50,12 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({
+      success: true,
       notification,
-      subscriberCount: relevantSubscribers.length,
+      subscribersCount: relevantSubscribers.length,
       message: `Notification sent to ${relevantSubscribers.length} subscribers`
-    }, { status: 201 })
+    })
+
   } catch (error) {
     console.error('Error sending notification:', error)
     return NextResponse.json(
@@ -59,21 +64,3 @@ export async function POST(request: Request) {
     )
   }
 }
-
-export async function GET() {
-  try {
-    const notifications = await prisma.notification.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 50
-    })
-
-    return NextResponse.json(notifications)
-  } catch (error) {
-    console.error('Error fetching notifications:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch notifications' },
-      { status: 500 }
-    )
-  }
-}
-

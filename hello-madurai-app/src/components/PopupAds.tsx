@@ -38,11 +38,10 @@ export default function PopupAds({ className = '' }: PopupAdsProps) {
 
         const response = await fetch('/api/popup-ads/active')
         if (response.ok) {
-          const ads = await response.json()
+          const ad = await response.json()
           
-          if (ads.length > 0) {
-            // Show the first active ad
-            const ad = ads[0]
+          if (ad) {
+            // Show the active ad
             setCurrentAd(ad)
             
             // Delay showing popup by 3 seconds
@@ -148,4 +147,6 @@ export default function PopupAds({ className = '' }: PopupAdsProps) {
     </div>
   )
 }
+
+
 

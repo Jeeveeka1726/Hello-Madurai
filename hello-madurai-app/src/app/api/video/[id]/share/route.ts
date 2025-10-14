@@ -1,19 +1,21 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const videoId = params.id
+    const { id } = await params
     const body = await request.json()
     const { platform } = body
 
     // Record the share
     await prisma.videoShare.create({
       data: {
-        videoId,
+        videoId: id,
         platform: platform || 'unknown',
         userAgent: request.headers.get('user-agent') || undefined
       }
@@ -21,7 +23,7 @@ export async function POST(
 
     // Get updated share count
     const shareCount = await prisma.videoShare.count({
-      where: { videoId }
+      where: { videoId: id }
     })
 
     return NextResponse.json({ shares: shareCount })
@@ -33,4 +35,3 @@ export async function POST(
     )
   }
 }
-

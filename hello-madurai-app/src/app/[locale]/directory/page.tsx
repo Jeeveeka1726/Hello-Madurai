@@ -111,7 +111,7 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
                       <CardTitle className="text-lg">
                         {locale === 'ta' ? business.name_ta : business.name}
                       </CardTitle>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                         {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                       </span>
                     </div>
@@ -169,7 +169,7 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
                           {locale === 'ta' ? business.name_ta : business.name}
                         </h3>
                         {business.featured && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                             {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                           </span>
                         )}

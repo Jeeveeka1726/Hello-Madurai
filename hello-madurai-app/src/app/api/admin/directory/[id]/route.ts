@@ -5,27 +5,28 @@ const prisma = new PrismaClient()
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const data = await request.json()
-    const businessId = parseInt(params.id)
+    const businessId = parseInt(id)
     
     const business = await prisma.business.update({
       where: { id: businessId },
       data: {
         name: data.name,
-        name_ta: data.name_ta || '',
-        description: data.description || '',
-        description_ta: data.description_ta || '',
+        name_ta: data.name_ta || undefined,
+        description: data.description || undefined,
+        description_ta: data.description_ta || undefined,
         category: data.category,
         address: data.address,
-        address_ta: data.address_ta || '',
+        address_ta: data.address_ta || undefined,
         phone: data.phone,
-        email: data.email || null,
-        website: data.website || null,
+        email: data.email || undefined,
+        website: data.website || undefined,
         featured: data.featured || false,
-        image: data.image || null
+        image: data.image || undefined
       }
     })
     
@@ -38,10 +39,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const businessId = parseInt(params.id)
+    const { id } = await params
+    const businessId = parseInt(id)
     
     await prisma.business.delete({
       where: { id: businessId }

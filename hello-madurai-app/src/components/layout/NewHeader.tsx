@@ -8,7 +8,6 @@ import {
   LanguageIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
-import TranslatedText from '@/components/TranslatedText'
 
 export default function NewHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -16,15 +15,15 @@ export default function NewHeader() {
 
   const navigation = [
     { 
-      name: t('nav.home', 'Home', 'முகப்பு'), 
+      name: t('nav.home', 'Home', 'முகப்பு'),
       href: '/' 
     },
     { 
-      name: t('nav.news', 'News', 'செய்திகள்'), 
+      name: t('nav.news', 'News', 'செய்திகள்'),
       href: '/news' 
     },
     { 
-      name: t('nav.events', 'Events', 'நிகழ்வுகள்'), 
+      name: t('nav.events', 'Events', 'நிகழ்வுகள்'),
       href: '/events' 
     },
     {
@@ -32,11 +31,11 @@ export default function NewHeader() {
       href: '/radio'
     },
     { 
-      name: t('nav.magazine', 'Magazine', 'பத்திரிகை'), 
+      name: t('nav.magazine', 'Magazine', 'பத்திரிகை'),
       href: '/magazine' 
     },
     { 
-      name: t('nav.videos', 'Videos', 'வீடியோக்கள்'), 
+      name: t('nav.videos', 'Videos', 'வீடியோக்கள்'),
       href: '/videos' 
     },
     {
@@ -54,7 +53,7 @@ export default function NewHeader() {
   }
 
   return (
-    <header className="bg-white/95 dark:bg-blue-950/95 backdrop-blur-sm border-b border-purple-100 dark:border-purple-900/50 shadow-lg transition-all duration-300">
+    <header className="bg-white/95 dark:bg-blue-950/95 backdrop-blur-sm border-b border-blue-100 dark:border-blue-900/50 shadow-lg transition-all duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -74,7 +73,7 @@ export default function NewHeader() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors duration-200 hover-lift"
+                className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors duration-200 hover-lift"
               >
                 {item.name}
               </Link>
@@ -87,7 +86,7 @@ export default function NewHeader() {
             <button
               onClick={toggleLanguage}
               className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-neutral-700 dark:text-white hover:text-primary-600 dark:hover:text-primary-300 hover:bg-white-600 dark:hover:bg-primary-800 transition-colors duration-200"
-              title={language === 'en' ? 'Switch to Tamil' : 'Switch to English'}
+              title={language === 'en' ? 'தமிழுக்கு மாற்று' : 'Switch to English'}
             >
               <LanguageIcon className="h-5 w-5" />
               <span className="hidden sm:block">
@@ -97,8 +96,6 @@ export default function NewHeader() {
                 {language === 'en' ? 'த' : 'En'}
               </span>
             </button>
-
-
 
             {/* Mobile menu button */}
             <button

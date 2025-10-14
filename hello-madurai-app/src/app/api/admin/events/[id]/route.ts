@@ -5,25 +5,25 @@ const prisma = new PrismaClient()
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const data = await request.json()
-    const eventId = parseInt(params.id)
     
     const event = await prisma.event.update({
-      where: { id: eventId },
+      where: { id: parseInt(id) },
       data: {
         title: data.title,
-        title_ta: data.title_ta || '',
+        title_ta: data.title_ta || undefined,
         description: data.description,
-        description_ta: data.description_ta || '',
+        description_ta: data.description_ta || undefined,
         date: new Date(data.date),
         location: data.location,
-        location_ta: data.location_ta || '',
+        location_ta: data.location_ta || undefined,
         category: data.category,
         featured: data.featured || false,
-        featuredImage: data.featuredImage || null
+        featuredImage: data.featuredImage || undefined
       }
     })
     
@@ -36,13 +36,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const eventId = parseInt(params.id)
+    const { id } = await params
     
     await prisma.event.delete({
-      where: { id: eventId }
+      where: { id: parseInt(id) }
     })
     
     return NextResponse.json({ success: true })

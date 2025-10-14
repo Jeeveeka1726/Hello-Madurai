@@ -134,7 +134,7 @@ function RadioFolderPageContent() {
       <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-300">
               {t('radio.loading', 'Loading radio shows...', 'வானொலி நிகழ்ச்சிகள் ஏற்றப்படுகின்றன...')}
             </p>
@@ -230,10 +230,10 @@ function RadioFolderPageContent() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {folder.radioShows.map((show) => (
                 <Card key={show.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-blue-800">
-                  <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900">
+                  <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-900">
                     <div className="flex items-center justify-center">
                       <div className="text-center">
-                        <MicrophoneIcon className="h-12 w-12 text-purple-600 dark:text-yellow-400 mx-auto mb-2" />
+                        <MicrophoneIcon className="h-12 w-12 text-blue-600 dark:text-yellow-400 mx-auto mb-2" />
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {show.duration}
                         </p>

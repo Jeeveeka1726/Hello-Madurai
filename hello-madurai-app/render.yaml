@@ -5,8 +5,8 @@ services:
     region: singapore
     plan: free
     rootDir: Hello-Madurai/hello-madurai-app
-    buildCommand: npm install && npx prisma generate && npm run build
-    startCommand: npx prisma db push --accept-data-loss && npm start
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -16,8 +16,11 @@ services:
         generateValue: true
       - key: NEXTAUTH_URL
         value: https://hello-madurai.onrender.com
-    disk:
-      name: sqlite-data
-      mountPath: /app/prisma
-      sizeGB: 1
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        value: your-supabase-url
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        value: your-supabase-anon-key
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        value: your-supabase-service-role-key
+
 

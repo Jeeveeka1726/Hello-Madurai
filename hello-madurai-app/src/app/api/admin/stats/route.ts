@@ -5,20 +5,20 @@ const prisma = new PrismaClient()
 
 export async function GET() {
   try {
-    // Get counts from all tables
+    // Get counts from all tables in Hostinger MySQL
     const [
       newsCount,
       eventsCount,
       videosCount,
       businessesCount,
-      podcastsCount,
+      radioCount,
       magazinesCount
     ] = await Promise.all([
       prisma.news.count(),
       prisma.event.count(),
       prisma.video.count(),
       prisma.business.count(),
-      prisma.podcast.count(),
+      prisma.radioShow.count(),
       prisma.magazine.count()
     ])
 
@@ -26,10 +26,10 @@ export async function GET() {
       newsCount,
       eventsCount,
       videosCount,
-      businessesCount: businessesCount, // This is what the homepage expects
-      podcastsCount,
+      businessesCount,
+      podcastsCount: radioCount,
       magazinesCount,
-      total: newsCount + eventsCount + videosCount + businessesCount + podcastsCount + magazinesCount
+      total: newsCount + eventsCount + videosCount + businessesCount + radioCount + magazinesCount
     })
 
   } catch (error) {

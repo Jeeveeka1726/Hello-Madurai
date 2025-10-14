@@ -1,7 +1,9 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
 
-export async function POST(request: Request) {
+const prisma = new PrismaClient()
+
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { dCode, businessName, businessPhone, shopkeeperName, amount } = body
@@ -42,9 +44,9 @@ export async function POST(request: Request) {
       data: {
         cardId: card.id,
         businessName,
-        businessPhone,
-        shopkeeperName,
-        amount: amount ? parseFloat(amount) : null
+        businessPhone: businessPhone || undefined,
+        shopkeeperName: shopkeeperName || undefined,
+        amount: amount ? parseFloat(amount) : undefined
       }
     })
 
@@ -67,7 +69,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const dCode = searchParams.get('dCode')
@@ -108,4 +110,3 @@ export async function GET(request: Request) {
     )
   }
 }
-

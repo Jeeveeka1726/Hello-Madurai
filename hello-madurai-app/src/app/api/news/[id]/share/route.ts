@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const newsId = params.id
+    const { id: newsId } = await params
     const body = await request.json()
     const { platform } = body
 
-    // Record the share
+    // Record the share in Hostinger MySQL
     await prisma.newsShare.create({
       data: {
         newsId,
@@ -24,7 +26,7 @@ export async function POST(
       where: { newsId }
     })
 
-    return NextResponse.json({ shares: shareCount })
+    return NextResponse.json({ shares: shareCount, success: true })
   } catch (error) {
     console.error('Error recording news share:', error)
     return NextResponse.json(
@@ -33,4 +35,3 @@ export async function POST(
     )
   }
 }
-

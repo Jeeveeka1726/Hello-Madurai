@@ -66,7 +66,7 @@ export default function AdminMagazinesNewPage() {
 
   const fetchCollections = async () => {
     try {
-      const response = await fetch('/api/magazines/collections')
+      const response = await fetch('/api/magazines')
       if (response.ok) {
         const data = await response.json()
         setCollections(data)
@@ -81,7 +81,7 @@ export default function AdminMagazinesNewPage() {
   const handleCollectionSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await fetch('/api/magazines/collections', {
+      const response = await fetch('/api/magazines', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(collectionFormData),
@@ -456,7 +456,7 @@ export default function AdminMagazinesNewPage() {
         {/* Collections Display */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-300">Loading magazine collections...</p>
           </div>
         ) : (
@@ -465,11 +465,11 @@ export default function AdminMagazinesNewPage() {
               <Card key={collection.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                 <CardHeader>
                   <CardTitle className="text-gray-900 dark:text-white flex items-center">
-                    <FolderIcon className="h-5 w-5 mr-2 text-purple-600" />
+                    <FolderIcon className="h-5 w-5 mr-2 text-blue-600" />
                     {collection.name}
                     {collection.name_ta && <span className="ml-2 text-gray-600 dark:text-gray-400">({collection.name_ta})</span>}
                     {collection.featured && (
-                      <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         Featured
                       </span>
                     )}

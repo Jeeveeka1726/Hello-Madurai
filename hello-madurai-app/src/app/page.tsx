@@ -32,7 +32,7 @@ export default function RootPage() {
       description: t('home.videosDesc', 'Watch local videos and content', 'உள்ளூர் வீடியோக்கள் மற்றும் உள்ளடக்கத்தைப் பார்க்கவும்'),
       href: '/videos',
       icon: VideoCameraIcon,
-      color: 'bg-purple-500'
+      color: 'bg-blue-500'
     },
     {
       name: t('nav.radio', 'Radio', 'வானொலி'),

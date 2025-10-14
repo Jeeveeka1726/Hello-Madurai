@@ -2,12 +2,14 @@ const { createServer } = require('http')
 const { parse } = require('url')
 const next = require('next')
 
-const dev = process.env.NODE_ENV !== 'production'
-const hostname = '0.0.0.0'
-const port = parseInt(process.env.PORT || '3000', 10)
+const dev = false
+const hostname = 'localhost'
+const port = process.env.PORT || 3000
 
 const app = next({ dev, hostname, port })
 const handle = app.getRequestHandler()
+
+console.log('Starting Hello Madurai production server...')
 
 app.prepare().then(() => {
   createServer(async (req, res) => {
@@ -20,12 +22,11 @@ app.prepare().then(() => {
       res.end('internal server error')
     }
   })
-    .once('error', (err) => {
-      console.error(err)
-      process.exit(1)
-    })
-    .listen(port, () => {
-      console.log(`> Ready on http://${hostname}:${port}`)
-    })
+  .once('error', (err) => {
+    console.error(err)
+    process.exit(1)
+  })
+  .listen(port, () => {
+    console.log(`> Hello Madurai ready on http://${hostname}:${port}`)
+  })
 })
-

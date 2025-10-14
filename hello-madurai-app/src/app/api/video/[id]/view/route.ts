@@ -1,16 +1,18 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const videoId = params.id
+    const { id } = await params
 
     // Update views count
     const video = await prisma.video.update({
-      where: { id: videoId },
+      where: { id },
       data: {
         views: {
           increment: 1
@@ -27,4 +29,3 @@ export async function POST(
     )
   }
 }
-

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function GET(request: Request) {
   try {
@@ -11,346 +13,118 @@ export async function GET(request: Request) {
     const daysBack = range === '7d' ? 7 : range === '30d' ? 30 : 90
     const startDate = new Date(now.getTime() - (daysBack * 24 * 60 * 60 * 1000))
 
-    // Get total views, likes, comments, shares
+    // Get content counts from Hostinger MySQL
     const [
-      newsStats,
-      videoStats,
-      radioStats,
-      businessStats,
-      subscriptions,
-      discountCards,
       newsCount,
       videoCount,
       radioCount,
-      businessCount
+      businessCount,
+      eventCount,
+      magazineCount
     ] = await Promise.all([
-      // News statistics
-      prisma.news.aggregate({
-        _sum: {
-          views: true,
-          likes: true,
-          dislikes: true
-        },
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
-      }),
-      
-      // Video statistics
-      prisma.video.aggregate({
-        _sum: {
-          views: true
-        },
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
-      }),
-
-      // Radio statistics
-      prisma.radioShow.aggregate({
-        _sum: {
-          plays: true
-        },
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
-      }),
-
-      // Business statistics
-      prisma.business.count({
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
-      }),
-
-      // Subscriptions
-      prisma.subscription.count({
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
-      }),
-
-      // Discount cards
-      prisma.discountCard.count({
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
-      }),
-
-      // Content counts
       prisma.news.count(),
       prisma.video.count(),
       prisma.radioShow.count(),
-      prisma.business.count()
+      prisma.business.count(),
+      prisma.event.count(),
+      prisma.magazine.count()
     ])
 
-    // Get comments count across all content types
-    const [newsComments, videoComments, radioComments, businessComments] = await Promise.all([
-      prisma.newsComment.count({
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
+    // Get recent content counts
+    const [
+      recentNewsCount,
+      recentVideoCount,
+      recentRadioCount,
+      recentBusinessCount
+    ] = await Promise.all([
+      prisma.news.count({
+        where: { createdAt: { gte: startDate } }
       }),
-      prisma.videoComment.count({
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
+      prisma.video.count({
+        where: { createdAt: { gte: startDate } }
       }),
-      prisma.radioComment.count({
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
+      prisma.radioShow.count({
+        where: { createdAt: { gte: startDate } }
       }),
-      prisma.businessComment.count({
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
+      prisma.business.count({
+        where: { createdAt: { gte: startDate } }
       })
     ])
 
-    // Get shares count across all content types
-    const [newsShares, videoShares, radioShares] = await Promise.all([
-      prisma.newsShare.count({
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
-      }),
-      prisma.videoShare.count({
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
-      }),
-      prisma.radioShare.count({
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
-      })
-    ])
-
-    // Get top performing content
-    const [topNews, topVideos, topRadio] = await Promise.all([
+    // Get total views and interactions
+    const [newsData, videoData, radioData] = await Promise.all([
       prisma.news.findMany({
-        select: {
-          id: true,
-          title: true,
-          views: true,
-          likes: true,
-          _count: {
-            select: {
-              comments: true
-            }
-          }
-        },
-        orderBy: [
-          { views: 'desc' },
-          { likes: 'desc' }
-        ],
-        take: 10,
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
+        where: { createdAt: { gte: startDate } },
+        select: { views: true, likes: true, dislikes: true }
       }),
       prisma.video.findMany({
-        select: {
-          id: true,
-          title: true,
-          views: true,
-          _count: {
-            select: {
-              comments: true
-            }
-          }
-        },
-        orderBy: {
-          views: 'desc'
-        },
-        take: 10,
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
+        where: { createdAt: { gte: startDate } },
+        select: { views: true }
       }),
       prisma.radioShow.findMany({
-        select: {
-          id: true,
-          title: true,
-          plays: true,
-          _count: {
-            select: {
-              comments: true
-            }
-          }
+        where: { createdAt: { gte: startDate } },
+        select: { plays: true }
+      })
+    ])
+
+    // Calculate totals
+    const totalViews = 
+      newsData.reduce((sum, item) => sum + (item.views || 0), 0) +
+      videoData.reduce((sum, item) => sum + (item.views || 0), 0) +
+      radioData.reduce((sum, item) => sum + (item.plays || 0), 0)
+
+    const totalLikes = newsData.reduce((sum, item) => sum + (item.likes || 0), 0)
+    const totalDislikes = newsData.reduce((sum, item) => sum + (item.dislikes || 0), 0)
+
+    // Get comments count
+    const commentsCount = await prisma.newsComment.count({
+      where: { createdAt: { gte: startDate } }
+    })
+
+    // Get subscriptions count
+    const subscriptionsCount = await prisma.subscription.count({
+      where: { createdAt: { gte: startDate } }
+    })
+
+    return NextResponse.json({
+      period: range,
+      startDate: startDate.toISOString(),
+      endDate: now.toISOString(),
+      content: {
+        total: {
+          news: newsCount,
+          videos: videoCount,
+          radio: radioCount,
+          businesses: businessCount,
+          events: eventCount,
+          magazines: magazineCount
         },
-        orderBy: {
-          plays: 'desc'
-        },
-        take: 10,
-        where: {
-          createdAt: {
-            gte: startDate
-          }
+        recent: {
+          news: recentNewsCount,
+          videos: recentVideoCount,
+          radio: recentRadioCount,
+          businesses: recentBusinessCount
         }
-      })
-    ])
-
-    // Get recent activity
-    const recentActivity = await Promise.all([
-      // Recent news
-      prisma.news.findMany({
-        select: {
-          id: true,
-          title: true,
-          author: true,
-          createdAt: true
-        },
-        orderBy: {
-          createdAt: 'desc'
-        },
-        take: 5
-      }),
-      // Recent comments
-      prisma.newsComment.findMany({
-        select: {
-          id: true,
-          content: true,
-          author: true,
-          createdAt: true,
-          news: {
-            select: {
-              title: true
-            }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc'
-        },
-        take: 5
-      }),
-      // Recent subscriptions
-      prisma.subscription.findMany({
-        select: {
-          id: true,
-          email: true,
-          phone: true,
-          createdAt: true
-        },
-        orderBy: {
-          createdAt: 'desc'
-        },
-        take: 5
-      })
-    ])
-
-    // Combine and format top content
-    const topContent = [
-      ...topNews.map(item => ({
-        id: item.id,
-        title: item.title,
-        type: 'news' as const,
-        views: item.views,
-        likes: item.likes,
-        comments: item._count.comments
-      })),
-      ...topVideos.map(item => ({
-        id: item.id,
-        title: item.title,
-        type: 'video' as const,
-        views: item.views,
-        likes: 0,
-        comments: item._count.comments
-      })),
-      ...topRadio.map(item => ({
-        id: item.id,
-        title: item.title,
-        type: 'radio' as const,
-        views: item.plays,
-        likes: 0,
-        comments: item._count.comments
-      }))
-    ].sort((a, b) => b.views - a.views)
-
-    // Format recent activity
-    const formattedActivity = [
-      ...recentActivity[0].map(item => ({
-        id: item.id,
-        type: 'news' as const,
-        title: item.title,
-        action: 'Published',
-        timestamp: item.createdAt.toISOString(),
-        user: item.author
-      })),
-      ...recentActivity[1].map(item => ({
-        id: item.id,
-        type: 'comment' as const,
-        title: item.news.title,
-        action: 'Commented on',
-        timestamp: item.createdAt.toISOString(),
-        user: item.author
-      })),
-      ...recentActivity[2].map(item => ({
-        id: item.id,
-        type: 'subscription' as const,
-        title: 'New Subscription',
-        action: 'Subscribed',
-        timestamp: item.createdAt.toISOString(),
-        user: item.email || item.phone
-      }))
-    ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-
-    const analytics = {
-      totalViews: (newsStats._sum.views || 0) + (videoStats._sum.views || 0) + (radioStats._sum.plays || 0),
-      totalLikes: (newsStats._sum.likes || 0),
-      totalComments: newsComments + videoComments + radioComments + businessComments,
-      totalShares: newsShares + videoShares + radioShares,
-      totalSubscriptions: subscriptions,
-      totalDiscountCards: discountCards,
-      contentStats: {
-        news: newsCount,
-        videos: videoCount,
-        radio: radioCount,
-        businesses: businessCount
       },
-      topContent: topContent.slice(0, 10),
-      recentActivity: formattedActivity.slice(0, 20),
-      userEngagement: [] // This would require more complex queries for time-series data
-    }
+      engagement: {
+        totalViews,
+        totalLikes,
+        totalDislikes,
+        totalComments: commentsCount,
+        totalSubscriptions: subscriptionsCount
+      },
+      summary: {
+        totalContent: newsCount + videoCount + radioCount + businessCount + eventCount + magazineCount,
+        totalEngagement: totalViews + totalLikes + commentsCount,
+        averageViewsPerContent: totalViews / Math.max(1, newsCount + videoCount + radioCount)
+      }
+    })
 
-    return NextResponse.json(analytics)
   } catch (error) {
-    console.error('Error fetching analytics:', error)
+    console.error('Analytics error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch analytics' },
       { status: 500 }
     )
   }
 }
-

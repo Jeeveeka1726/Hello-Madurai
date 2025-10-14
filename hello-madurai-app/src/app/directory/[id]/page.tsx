@@ -406,7 +406,7 @@ export default function BusinessProfilePage() {
                       {business.instagramUrl && (
                         <Button 
                           onClick={() => handleInstagram(business.instagramUrl!)}
-                          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0"
+                          className="bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 text-white border-0"
                         >
                           📷 Instagram
                         </Button>

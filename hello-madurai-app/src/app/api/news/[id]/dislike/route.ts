@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const newsId = params.id
+    const { id: newsId } = await params
     const body = await request.json()
     const { action } = body // 'dislike' or 'undislike'
 
-    // Update dislikes count based on action
+    // Update dislikes count in Hostinger MySQL
     const news = await prisma.news.update({
       where: { id: newsId },
       data: {
@@ -29,4 +31,3 @@ export async function POST(
     )
   }
 }
-

@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
 import { cookies } from 'next/headers'
+
+const prisma = new PrismaClient()
 
 // Generate a unique discount code
 function generateDCode(): string {
@@ -10,11 +12,11 @@ function generateDCode(): string {
   return `${prefix}${timestamp}${random}`
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // In a real app, you'd get the user ID from authentication
     // For now, we'll use a cookie-based approach
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const userId = cookieStore.get('discount_user_id')?.value
 
     if (!userId) {
@@ -24,14 +26,9 @@ export async function GET() {
       )
     }
 
-    const card = await prisma.discountCard.findUnique({
+    const card = await prisma.discountCard.findFirst({
       where: { userId },
-      include: {
-        usages: {
-          orderBy: { usedAt: 'desc' },
-          take: 10
-        }
-      }
+      take: 1
     })
 
     if (!card) {
@@ -51,7 +48,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { name, email, phone } = body
@@ -71,13 +68,10 @@ export async function POST(request: Request) {
       data: {
         userId,
         userName: name,
-        userEmail: email,
-        userPhone: phone,
+        userEmail: email || undefined,
+        userPhone: phone || undefined,
         dCode,
         isActive: true
-      },
-      include: {
-        usages: true
       }
     })
 
@@ -99,4 +93,3 @@ export async function POST(request: Request) {
     )
   }
 }
-

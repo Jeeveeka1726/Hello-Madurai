@@ -35,7 +35,7 @@ function NewsPageContent() {
     const fetchNews = async () => {
       try {
         console.log('Fetching news from API...')
-        const response = await fetch('/api/admin/news')
+        const response = await fetch('/api/news')
         console.log('Response status:', response.status)
         if (response.ok) {
           const data = await response.json()
@@ -58,11 +58,19 @@ function NewsPageContent() {
 
   const categories = [
     { id: 'all', name: t('categories.all', 'All News', 'அனைத்து செய்திகள்') },
-    { id: 'corporation', name: t('categories.corporation', 'Corporation', 'மாநகராட்சி') },
-    { id: 'agriculture', name: t('categories.agriculture', 'Agriculture', 'விவசாயம்') },
-    { id: 'religious', name: t('categories.religious', 'Religious', 'மத நிகழ்ச்சிகள்') },
-    { id: 'business', name: t('categories.business', 'Business', 'வணிகம்') },
-    { id: 'education', name: t('categories.education', 'Education', 'கல்வி') }
+    { id: 'general', name: t('categories.general', 'General', 'பொதுவானது') },
+    { id: 'collector', name: t('categories.collector', 'Collector', 'கலெக்டர்') },
+    { id: 'corporation', name: t('categories.corporation', 'Corporation', 'நகராட்சி') },
+    { id: 'education', name: t('categories.education', 'Education', 'கல்வி') },
+    { id: 'religious', name: t('categories.religious', 'Religious', 'மதம்') },
+    { id: 'cinema', name: t('categories.cinema', 'Cinema', 'சினிமா') },
+    { id: 'games', name: t('categories.games', 'Games', 'விளையாட்டு') },
+    { id: 'political', name: t('categories.political', 'Political', 'அரசியல்') },
+    { id: 'police', name: t('categories.police', 'Police', 'போலீஸ்') },
+    { id: 'agri', name: t('categories.agri', 'Agriculture', 'விவசாயம்') },
+    { id: 'jobs', name: t('categories.jobs', 'Jobs', 'வேலைவாய்ப்பு') },
+    { id: 'article', name: t('categories.article', 'Article', 'கட்டுரை') },
+    { id: 'others', name: t('categories.others', 'Others', 'மற்றவை') }
   ]
 
   // Filter articles based on selected category

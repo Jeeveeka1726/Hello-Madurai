@@ -238,7 +238,7 @@ export default function AdminEventsPage() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center">
-                <ClockIcon className="h-8 w-8 text-purple-600" />
+                <ClockIcon className="h-8 w-8 text-blue-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                     <TranslatedText>Upcoming Events</TranslatedText>

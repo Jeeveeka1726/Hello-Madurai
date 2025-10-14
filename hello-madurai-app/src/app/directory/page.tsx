@@ -69,7 +69,7 @@ function DirectoryPageContent() {
   useEffect(() => {
     const fetchBusinesses = async () => {
       try {
-        const response = await fetch('/api/admin/directory')
+        const response = await fetch('/api/directory')
         if (response.ok) {
           const data = await response.json()
           setBusinesses(data)
@@ -363,7 +363,7 @@ function DirectoryPageContent() {
                               size="sm"
                               variant="outline" 
                               onClick={() => handleInstagram(business.instagramUrl!)}
-                              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 hover:from-purple-600 hover:to-pink-600"
+                              className="bg-gradient-to-r from-blue-500 to-pink-500 text-white border-0 hover:from-blue-600 hover:to-pink-600"
                             >
                               📷 Instagram
                             </Button>

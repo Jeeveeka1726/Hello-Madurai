@@ -1,15 +1,17 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const radioShowId = params.id
+    const { id } = await params
 
     const comments = await prisma.radioComment.findMany({
-      where: { radioShowId },
+      where: { radioShowId: id },
       orderBy: { createdAt: 'desc' }
     })
 
@@ -24,11 +26,11 @@ export async function GET(
 }
 
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const radioShowId = params.id
+    const { id } = await params
     const body = await request.json()
     const { content, author, email } = body
 
@@ -43,8 +45,8 @@ export async function POST(
       data: {
         content,
         author,
-        email,
-        radioShowId
+        email: email || undefined,
+        radioShowId: id
       }
     })
 
@@ -57,4 +59,3 @@ export async function POST(
     )
   }
 }
-

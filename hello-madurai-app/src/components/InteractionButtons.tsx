@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { 
   HandThumbUpIcon, 
   HandThumbDownIcon, 
@@ -60,6 +60,18 @@ export default function InteractionButtons({
   const [localDislikes, setLocalDislikes] = useState(dislikes)
   const [localShares, setLocalShares] = useState(shares)
 
+  // Check localStorage on mount to see if user has already liked/disliked
+  useEffect(() => {
+    const likeKey = `${itemType}_${itemId}_liked`
+    const dislikeKey = `${itemType}_${itemId}_disliked`
+    
+    const hasLiked = localStorage.getItem(likeKey) === 'true'
+    const hasDisliked = localStorage.getItem(dislikeKey) === 'true'
+    
+    setIsLiked(hasLiked)
+    setIsDisliked(hasDisliked)
+  }, [itemId, itemType])
+
   const handleLike = async (e?: React.MouseEvent) => {
     e?.preventDefault()
     e?.stopPropagation()
@@ -90,6 +102,14 @@ export default function InteractionButtons({
         setIsLiked(newLiked)
         setLocalLikes(prev => newLiked ? prev + 1 : prev - 1)
         
+        // Save to localStorage
+        const likeKey = `${itemType}_${itemId}_liked`
+        if (newLiked) {
+          localStorage.setItem(likeKey, 'true')
+        } else {
+          localStorage.removeItem(likeKey)
+        }
+        
         // If we're liking, remove dislike if it was active
         if (newLiked && isDisliked) {
           // Call dislike API to decrement
@@ -102,6 +122,7 @@ export default function InteractionButtons({
           })
           setIsDisliked(false)
           setLocalDislikes(prev => prev - 1)
+          localStorage.removeItem(`${itemType}_${itemId}_disliked`)
         }
         
         onLike?.()
@@ -130,6 +151,14 @@ export default function InteractionButtons({
         setIsDisliked(newDisliked)
         setLocalDislikes(prev => newDisliked ? prev + 1 : prev - 1)
         
+        // Save to localStorage
+        const dislikeKey = `${itemType}_${itemId}_disliked`
+        if (newDisliked) {
+          localStorage.setItem(dislikeKey, 'true')
+        } else {
+          localStorage.removeItem(dislikeKey)
+        }
+        
         // If we're disliking, remove like if it was active
         if (newDisliked && isLiked) {
           // Call like API to decrement
@@ -142,6 +171,7 @@ export default function InteractionButtons({
           })
           setIsLiked(false)
           setLocalLikes(prev => prev - 1)
+          localStorage.removeItem(`${itemType}_${itemId}_liked`)
         }
         
         onDislike?.()
@@ -207,15 +237,6 @@ export default function InteractionButtons({
           <span className="text-sm font-medium">{localDislikes}</span>
         </button>
       )}
-
-      {/* Comment Button */}
-      <button
-        onClick={onComment}
-        className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
-      >
-        <ChatBubbleLeftIcon className="h-4 w-4" />
-        <span className="text-sm font-medium">{comments}</span>
-      </button>
 
       {/* Share Button */}
       <div className="relative">

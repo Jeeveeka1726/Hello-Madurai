@@ -1,14 +1,17 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
 import jsPDF from 'jspdf'
+
+const prisma = new PrismaClient()
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const newsId = params.id
+    const { id: newsId } = await params
 
+    // Fetch article from Hostinger MySQL
     const article = await prisma.news.findUnique({
       where: { id: newsId }
     })
@@ -61,4 +64,3 @@ export async function GET(
     )
   }
 }
-

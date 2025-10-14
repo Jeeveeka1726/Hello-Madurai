@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
 
+const prisma = new PrismaClient()
+
+// GET /api/admin/news/[id] - Fetch single news article
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const news = await prisma.news.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!news) {
@@ -21,12 +26,18 @@ export async function GET(
   }
 }
 
+// PUT /api/admin/news/[id] - Update news article
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    console.log('📝 Received PUT request to update news:', id)
+    
     const body = await request.json()
+    console.log('📝 Update body:', { ...body, content: body.content?.substring(0, 50) + '...' })
+    
     const {
       title,
       title_ta,
@@ -36,38 +47,65 @@ export async function PUT(
       excerpt_ta,
       category,
       author,
-      featured
+      featured,
+      featuredImage
     } = body
 
+    if (!title || !content || !category || !author) {
+      console.error('❌ Validation failed:', { title: !!title, content: !!content, category: !!category, author: !!author })
+      return NextResponse.json(
+        { error: 'Title, content, category, and author are required' },
+        { status: 400 }
+      )
+    }
+
+    // Auto-generate excerpt from content if not provided
+    const finalExcerpt = excerpt || content.substring(0, 200).replace(/<[^>]*>/g, '') + '...'
+
+    console.log('💾 Attempting to update news in database...')
     const news = await prisma.news.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title,
-        title_ta,
+        title_ta: title_ta || undefined,
         content,
-        content_ta,
-        excerpt,
-        excerpt_ta,
+        content_ta: content_ta || undefined,
+        excerpt: finalExcerpt,
+        excerpt_ta: excerpt_ta || undefined,
         category,
         author,
-        featured
+        featured: featured || false,
+        featuredImage: featuredImage || undefined
       }
     })
 
+    console.log('✅ News updated successfully:', news.id)
     return NextResponse.json(news)
   } catch (error) {
-    console.error('Error updating news:', error)
-    return NextResponse.json({ error: 'Failed to update news' }, { status: 500 })
+    console.error('❌ Error updating news:', error)
+    console.error('Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
+    return NextResponse.json({ 
+      error: 'Failed to update news',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      type: error instanceof Error ? error.name : 'Unknown'
+    }, { status: 500 })
   }
 }
 
+// DELETE /api/admin/news/[id] - Delete news article
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     await prisma.news.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'News deleted successfully' })

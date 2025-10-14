@@ -248,7 +248,7 @@ function RadioPageContent() {
         {/* Loading State */}
         {loading && (
           <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-300">
               {t('podcast.loading', 'Loading podcasts...', 'பாட்காஸ்ட்கள் ஏற்றப்படுகின்றன...')}
             </p>
@@ -266,7 +266,7 @@ function RadioPageContent() {
                 <Card key={folder.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-blue-800">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <FolderIcon className="h-8 w-8 text-purple-600 dark:text-yellow-400 mr-3" />
+                      <FolderIcon className="h-8 w-8 text-blue-600 dark:text-yellow-400 mr-3" />
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                           {folder.name}

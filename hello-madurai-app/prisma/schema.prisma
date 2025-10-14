@@ -6,23 +6,24 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:/app/prisma/dev.db"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model News {
   id            String   @id @default(cuid())
-  title         String
-  title_ta      String?
-  content       String
-  content_ta    String?
-  excerpt       String
-  excerpt_ta    String?
+  title         String   @db.VarChar(500)
+  title_ta      String?  @db.VarChar(500)
+  content       String   @db.LongText  // Unlimited content!
+  content_ta    String?  @db.LongText  // Unlimited content!
+  excerpt       String   @db.Text
+  excerpt_ta    String?  @db.Text
   category      String
   author        String
-  featuredImage String?
-  videoUrl      String?  // Support for embedded videos
-  videoType     String?  // youtube, vimeo, direct
+  featuredImage String?  @db.VarChar(500)
+  videoUrl      String?  @db.VarChar(500)
+  videoType     String?
   publishedAt   DateTime @default(now())
   views         Int      @default(0)
   likes         Int      @default(0)
@@ -210,11 +211,22 @@ model NewsComment {
   content   String
   author    String
   email     String?
+  approved  Boolean  @default(false)  // Admin moderation
+  isAdminReply Boolean @default(false) // True if reply is from admin
   newsId    String
   news      News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  
+  // Reply functionality
+  parentId  String?
+  parent    NewsComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   NewsComment[] @relation("CommentReplies")
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([newsId])
+  @@index([approved])
+  @@index([parentId])
   @@map("news_comments")
 }
 
@@ -394,4 +406,25 @@ model DiscountUsage {
   createdAt       DateTime     @default(now())
 
   @@map("discount_usages")
+}
+
+// In-content Ads (displayed between paragraphs in news articles)
+model Ad {
+  id          String   @id @default(cuid())
+  title       String
+  title_ta    String?
+  imageUrl    String?  // Image ad
+  htmlCode    String?  @db.Text // HTML/AdSense code
+  link        String?  // Click-through URL
+  active      Boolean  @default(true)
+  position    Int      @default(0) // Order of display
+  category    String?  // Which section (news, videos, etc.)
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active])
+  @@index([position])
+  @@map("ads")
 }

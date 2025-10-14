@@ -13,7 +13,8 @@ import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  MegaphoneIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAdmin } from '@/contexts/AdminContext'
@@ -63,6 +64,13 @@ const navigation = [
     name_ta: 'வானொலி',
     href: '/admin/radio',
     icon: ChartBarIcon
+  },
+  {
+    name: 'Ads',
+    name_ta: 'விளம்பரங்கள்',
+    href: '/admin/ads',
+    icon: MegaphoneIcon,
+    badge: 'new'
   }
 ]
 

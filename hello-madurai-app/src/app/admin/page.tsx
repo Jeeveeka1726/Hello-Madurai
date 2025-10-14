@@ -371,10 +371,10 @@ export default function AdminDashboard() {
                 </Card>
               </Link>
               <Link href="/admin/radio">
-                <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 border-purple-200 dark:border-yellow-700 hover:shadow-md transition-shadow cursor-pointer">
+                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 border-blue-200 dark:border-yellow-700 hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4 text-center">
-                    <MicrophoneIcon className="h-8 w-8 text-purple-600 dark:text-yellow-400 mx-auto mb-2" />
-                    <p className="font-medium text-purple-900 dark:text-purple-100">
+                    <MicrophoneIcon className="h-8 w-8 text-blue-600 dark:text-yellow-400 mx-auto mb-2" />
+                    <p className="font-medium text-blue-900 dark:text-blue-100">
                       {t('admin.addRadio', 'Manage Radio', 'வானொலி நிர்வகிக்க')}
                     </p>
                   </CardContent>

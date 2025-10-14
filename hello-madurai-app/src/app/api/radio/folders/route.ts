@@ -3,23 +3,18 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const radioFolders = await prisma.radioFolder.findMany({
-      include: {
-        radioShows: {
-          orderBy: {
-            publishedAt: 'desc'
-          }
-        }
+    const folders = await prisma.radioFolder.findMany({
+      orderBy: {
+        createdAt: 'desc'
       },
-      orderBy: [
-        { featured: 'desc' },
-        { createdAt: 'desc' }
-      ]
+      include: {
+        shows: true
+      }
     })
 
-    return NextResponse.json(radioFolders)
+    return NextResponse.json(folders)
   } catch (error) {
     console.error('Error fetching radio folders:', error)
     return NextResponse.json(
@@ -32,20 +27,18 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, name_ta, description, description_ta, coverImage, featured } = body
+    const { name, name_ta, description, description_ta } = body
 
-    const radioFolder = await prisma.radioFolder.create({
+    const folder = await prisma.radioFolder.create({
       data: {
         name,
-        name_ta,
-        description,
-        description_ta,
-        coverImage,
-        featured: featured || false
+        name_ta: name_ta || undefined,
+        description: description || undefined,
+        description_ta: description_ta || undefined
       }
     })
 
-    return NextResponse.json(radioFolder, { status: 201 })
+    return NextResponse.json(folder, { status: 201 })
   } catch (error) {
     console.error('Error creating radio folder:', error)
     return NextResponse.json(

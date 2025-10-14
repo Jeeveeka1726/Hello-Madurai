@@ -49,7 +49,7 @@ export default async function MagazinePage({ params }: MagazinePageProps) {
             <div className="grid gap-8 lg:grid-cols-2">
               {featuredMagazines.map((magazine) => (
                 <Card key={magazine.id} className="overflow-hidden hover:shadow-xl transition-shadow">
-                  <div className="aspect-w-3 aspect-h-4 bg-gradient-to-br from-indigo-500 to-purple-600">
+                  <div className="aspect-w-3 aspect-h-4 bg-gradient-to-br from-indigo-500 to-blue-600">
                     <div className="flex items-center justify-center text-white">
                       <div className="text-center">
                         <DocumentIcon className="h-16 w-16 mx-auto mb-4" />
@@ -67,7 +67,7 @@ export default async function MagazinePage({ params }: MagazinePageProps) {
                       <span className="text-sm text-gray-500">
                         {formatDate(magazine.date)}
                       </span>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                         {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                       </span>
                     </div>
@@ -129,7 +129,7 @@ export default async function MagazinePage({ params }: MagazinePageProps) {
                       {formatDate(magazine.date)}
                     </span>
                     {magazine.featured && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                         {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                       </span>
                     )}

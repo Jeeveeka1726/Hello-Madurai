@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function POST(request: Request) {
   try {
@@ -20,15 +22,12 @@ export async function POST(request: Request) {
       )
     }
 
-    // Check if subscription already exists
-    const existingSubscription = await prisma.subscription.findFirst({
-      where: {
-        OR: [
-          { email: email || undefined },
-          { phone: phone || undefined }
-        ]
-      }
-    })
+    // Check if subscription already exists in Hostinger MySQL
+    const existingSubscription = email 
+      ? await prisma.subscription.findUnique({ where: { email } })
+      : phone 
+      ? await prisma.subscription.findUnique({ where: { phone } })
+      : null
 
     let subscription
 
@@ -57,49 +56,17 @@ export async function POST(request: Request) {
       })
     }
 
-    return NextResponse.json(subscription, { status: 201 })
-  } catch (error) {
-    console.error('Error creating subscription:', error)
-    return NextResponse.json(
-      { error: 'Failed to create subscription' },
-      { status: 500 }
-    )
-  }
-}
-
-export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const category = searchParams.get('category')
-    const active = searchParams.get('active')
-
-    let whereClause: any = {}
-
-    if (active === 'true') {
-      whereClause.active = true
-    }
-
-    const subscriptions = await prisma.subscription.findMany({
-      where: whereClause,
-      orderBy: { createdAt: 'desc' }
+    return NextResponse.json({ 
+      success: true, 
+      subscription,
+      message: existingSubscription ? 'Subscription updated' : 'Subscription created'
     })
 
-    // Filter by category if specified
-    let filteredSubscriptions = subscriptions
-    if (category) {
-      filteredSubscriptions = subscriptions.filter(sub => {
-        const categories = JSON.parse(sub.categories)
-        return categories.includes(category)
-      })
-    }
-
-    return NextResponse.json(filteredSubscriptions)
   } catch (error) {
-    console.error('Error fetching subscriptions:', error)
+    console.error('Error managing subscription:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch subscriptions' },
+      { error: 'Failed to manage subscription' },
       { status: 500 }
     )
   }
 }
-

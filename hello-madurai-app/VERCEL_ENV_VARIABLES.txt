@@ -1,0 +1,14 @@
+# Copy these Environment Variables to Vercel
+# Go to: Vercel Dashboard → Your Project → Settings → Environment Variables
+
+# IMPORTANT: Use srv1990.hstgr.io (NOT localhost) because Vercel is remote!
+
+DATABASE_URL
+mysql://u449309789_hellomadurai25:HelloMadurai123@srv1990.hstgr.io:3306/u449309789_hello_madurai?connection_limit=10&pool_timeout=20
+
+NODE_ENV
+production
+
+NEXT_PUBLIC_APP_URL
+https://hellomadurai.com
+

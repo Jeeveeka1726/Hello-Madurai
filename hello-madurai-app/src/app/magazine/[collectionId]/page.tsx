@@ -48,7 +48,7 @@ function MagazineCollectionPageContent() {
   useEffect(() => {
     const fetchCollectionData = async () => {
       try {
-        const response = await fetch(`/api/magazines/collections`)
+        const response = await fetch(`/api/magazines`)
         if (response.ok) {
           const collections = await response.json()
           const selectedCollection = collections.find((c: MagazineCollection) => c.id === collectionId)
@@ -92,7 +92,7 @@ function MagazineCollectionPageContent() {
       <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-300">
               {t('magazine.loading', 'Loading magazine collection...', 'பத்திரிகை தொகுப்பு ஏற்றப்படுகிறது...')}
             </p>
@@ -179,10 +179,10 @@ function MagazineCollectionPageContent() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {collection.magazines.map((magazine) => (
                 <Card key={magazine.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 border-gray-200 dark:border-blue-800">
-                  <div className="aspect-w-16 aspect-h-12 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-800 dark:to-purple-900">
+                  <div className="aspect-w-16 aspect-h-12 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-900">
                     <div className="flex items-center justify-center">
                       <div className="text-center">
-                        <DocumentArrowDownIcon className="h-16 w-16 text-purple-600 dark:text-yellow-400 mx-auto mb-2" />
+                        <DocumentArrowDownIcon className="h-16 w-16 text-blue-600 dark:text-yellow-400 mx-auto mb-2" />
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {t('magazine.issue', 'Issue', 'இதழ்')} #{magazine.issueNumber}
                         </p>

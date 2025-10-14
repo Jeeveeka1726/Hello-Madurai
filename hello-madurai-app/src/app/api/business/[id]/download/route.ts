@@ -1,13 +1,16 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
 import jsPDF from 'jspdf'
 
+const prisma = new PrismaClient()
+
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const businessId = params.id
+    const { id } = await params
+    const businessId = parseInt(id)
 
     const business = await prisma.business.findUnique({
       where: { id: businessId }
@@ -32,13 +35,15 @@ export async function GET(
     pdf.text(`Category: ${business.category}`, 20, 50)
     
     // Add description
-    pdf.setFontSize(12)
-    const descLines = pdf.splitTextToSize(business.description, 170)
-    pdf.text(descLines, 20, 70)
+    if (business.description) {
+      pdf.setFontSize(12)
+      const descLines = pdf.splitTextToSize(business.description, 170)
+      pdf.text(descLines, 20, 70)
+    }
     
     // Add contact info
     pdf.setFontSize(11)
-    let yPos = 70 + (descLines.length * 5) + 20
+    let yPos = business.description ? 70 + 20 : 70
     
     pdf.text('Contact Information:', 20, yPos)
     yPos += 10
@@ -73,4 +78,3 @@ export async function GET(
     )
   }
 }
-

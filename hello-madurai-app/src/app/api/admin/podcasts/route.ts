@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
 
-export async function GET() {
+const prisma = new PrismaClient()
+
+export async function GET(request: NextRequest) {
   try {
     const podcasts = await prisma.podcast.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: {
+        createdAt: 'desc'
+      }
     })
+    
     return NextResponse.json(podcasts)
   } catch (error) {
     console.error('Error fetching podcasts:', error)
@@ -23,19 +28,19 @@ export async function POST(request: NextRequest) {
       description_ta,
       host,
       duration,
-      audioUrl,
+      audio_file_url,
       featured
     } = body
 
     const podcast = await prisma.podcast.create({
       data: {
         title,
-        title_ta,
-        description,
-        description_ta,
+        title_ta: title_ta || undefined,
+        description: description || undefined,
+        description_ta: description_ta || undefined,
         host,
         duration,
-        audioUrl,
+        audioFileUrl: audio_file_url,
         featured: featured || false
       }
     })

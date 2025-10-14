@@ -6,18 +6,14 @@ const prisma = new PrismaClient()
 // GET /api/admin/videos - Get all videos
 export async function GET() {
   try {
+    // Fetch all videos from Hostinger MySQL
     const videos = await prisma.video.findMany({
-      include: {
-        comments: {
-          orderBy: { createdAt: 'desc' }
-        },
-        shares: true
-      },
       orderBy: {
-        publishedAt: 'desc'
+        createdAt: 'desc'
       }
     })
-    return NextResponse.json(videos)
+
+    return NextResponse.json(videos || [])
   } catch (error) {
     console.error('Error fetching videos:', error)
     return NextResponse.json(
@@ -39,42 +35,37 @@ export async function POST(request: NextRequest) {
     // Try to extract YouTube ID from various URL formats
     if (body.videoUrl) {
       if (body.videoUrl.includes('youtube.com/watch')) {
-        // https://www.youtube.com/watch?v=VIDEO_ID
         const urlParams = new URLSearchParams(body.videoUrl.split('?')[1])
         youtubeId = urlParams.get('v')
       } else if (body.videoUrl.includes('youtu.be/')) {
-        // https://youtu.be/VIDEO_ID
         youtubeId = body.videoUrl.split('youtu.be/')[1]?.split(/[?#]/)[0]
       } else if (body.videoUrl.includes('youtube.com/embed/')) {
-        // https://www.youtube.com/embed/VIDEO_ID
         youtubeId = body.videoUrl.split('embed/')[1]?.split(/[?#]/)[0]
       } else if (body.videoUrl.length === 11 && !body.videoUrl.includes('/')) {
-        // Just the video ID
         youtubeId = body.videoUrl
       }
       
-      // If we found a YouTube ID, normalize the URL
       if (youtubeId) {
         cleanVideoUrl = `https://www.youtube.com/watch?v=${youtubeId}`
       }
     }
 
+    // Create video in Hostinger MySQL
     const video = await prisma.video.create({
       data: {
         title: body.title,
         title_ta: body.title_ta,
-        description: body.description,
+        description: body.description || '',
         description_ta: body.description_ta,
         videoUrl: cleanVideoUrl,
-        youtubeId: youtubeId,
-        thumbnail: body.thumbnail || (youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : null),
-        category: body.category,
+        youtubeId: youtubeId || undefined,
+        thumbnail: body.thumbnail,
+        category: body.category || 'general',
         duration: body.duration,
-        featured: body.featured || false,
-        publishedAt: body.publishedAt ? new Date(body.publishedAt) : new Date()
+        featured: body.featured || false
       }
     })
-    
+
     return NextResponse.json(video, { status: 201 })
   } catch (error) {
     console.error('Error creating video:', error)

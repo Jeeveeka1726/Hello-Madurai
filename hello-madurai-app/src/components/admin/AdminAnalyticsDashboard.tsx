@@ -14,8 +14,8 @@ import {
   BuildingOfficeIcon,
   BellIcon,
   CreditCardIcon,
-  TrendingUpIcon,
-  TrendingDownIcon
+  ArrowUpIcon,
+  ArrowDownIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 
@@ -92,7 +92,10 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
     }
   }
 
-  const formatNumber = (num: number) => {
+  const formatNumber = (num: number | undefined) => {
+    if (!num || isNaN(num)) {
+      return '0'
+    }
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1) + 'M'
     }
@@ -126,7 +129,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'news': return 'text-red-600 bg-red-100'
-      case 'video': return 'text-purple-600 bg-purple-100'
+      case 'video': return 'text-blue-600 bg-blue-100'
       case 'radio': return 'text-green-600 bg-green-100'
       case 'business': return 'text-blue-600 bg-blue-100'
       case 'subscription': return 'text-yellow-600 bg-yellow-100'
@@ -203,10 +206,10 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t('admin.analytics.totalViews', 'Total Views', 'மொத்த பார்வைகள்')}
+                {t('admin.analytics?.totalViews || 0', 'Total Views', 'மொத்த பார்வைகள்')}
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatNumber(analytics.totalViews)}
+                {formatNumber(analytics?.totalViews || 0)}
               </p>
             </div>
             <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
@@ -214,7 +217,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
             </div>
           </div>
           <div className="flex items-center mt-2">
-            <TrendingUpIcon className="h-4 w-4 text-green-500 mr-1" />
+            <ArrowUpIcon className="h-4 w-4 text-green-500 mr-1" />
             <span className="text-sm text-green-600">+12.5%</span>
             <span className="text-sm text-gray-500 ml-1">vs last period</span>
           </div>
@@ -224,10 +227,10 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t('admin.analytics.totalLikes', 'Total Likes', 'மொத்த விருப்பங்கள்')}
+                {t('admin.analytics?.totalLikes || 0', 'Total Likes', 'மொத்த விருப்பங்கள்')}
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatNumber(analytics.totalLikes)}
+                {formatNumber(analytics?.totalLikes || 0)}
               </p>
             </div>
             <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
@@ -235,7 +238,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
             </div>
           </div>
           <div className="flex items-center mt-2">
-            <TrendingUpIcon className="h-4 w-4 text-green-500 mr-1" />
+            <ArrowUpIcon className="h-4 w-4 text-green-500 mr-1" />
             <span className="text-sm text-green-600">+8.2%</span>
             <span className="text-sm text-gray-500 ml-1">vs last period</span>
           </div>
@@ -245,10 +248,10 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t('admin.analytics.totalComments', 'Total Comments', 'மொத்த கருத்துகள்')}
+                {t('admin.analytics?.totalComments || 0', 'Total Comments', 'மொத்த கருத்துகள்')}
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatNumber(analytics.totalComments)}
+                {formatNumber(analytics?.totalComments || 0)}
               </p>
             </div>
             <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
@@ -256,7 +259,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
             </div>
           </div>
           <div className="flex items-center mt-2">
-            <TrendingDownIcon className="h-4 w-4 text-red-500 mr-1" />
+            <ArrowDownIcon className="h-4 w-4 text-red-500 mr-1" />
             <span className="text-sm text-red-600">-2.1%</span>
             <span className="text-sm text-gray-500 ml-1">vs last period</span>
           </div>
@@ -269,7 +272,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
                 {t('admin.analytics.totalSubscriptions', 'Subscriptions', 'சந்தாக்கள்')}
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatNumber(analytics.totalSubscriptions)}
+                {formatNumber(analytics?.totalSubscriptions)}
               </p>
             </div>
             <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
@@ -277,7 +280,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
             </div>
           </div>
           <div className="flex items-center mt-2">
-            <TrendingUpIcon className="h-4 w-4 text-green-500 mr-1" />
+            <ArrowUpIcon className="h-4 w-4 text-green-500 mr-1" />
             <span className="text-sm text-green-600">+15.7%</span>
             <span className="text-sm text-gray-500 ml-1">vs last period</span>
           </div>
@@ -288,7 +291,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
         {/* Content Statistics */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            {t('admin.analytics.contentStats', 'Content Statistics', 'உள்ளடக்க புள்ளிவிவரங்கள்')}
+            {t('admin.analytics?.contentStats', 'Content Statistics', 'உள்ளடக்க புள்ளிவிவரங்கள்')}
           </h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -301,21 +304,21 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
                 </span>
               </div>
               <span className="text-xl font-bold text-gray-900 dark:text-white">
-                {analytics.contentStats.news}
+                {analytics?.contentStats?.news || 0}
               </span>
             </div>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                  <VideoCameraIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <VideoCameraIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <span className="text-gray-900 dark:text-white">
                   {t('admin.analytics.videos', 'Videos', 'வீடியோக்கள்')}
                 </span>
               </div>
               <span className="text-xl font-bold text-gray-900 dark:text-white">
-                {analytics.contentStats.videos}
+                {analytics?.contentStats?.videos || 0}
               </span>
             </div>
 
@@ -329,7 +332,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
                 </span>
               </div>
               <span className="text-xl font-bold text-gray-900 dark:text-white">
-                {analytics.contentStats.radio}
+                {analytics?.contentStats?.radio || 0}
               </span>
             </div>
 
@@ -343,7 +346,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
                 </span>
               </div>
               <span className="text-xl font-bold text-gray-900 dark:text-white">
-                {analytics.contentStats.businesses}
+                {analytics?.contentStats?.businesses || 0}
               </span>
             </div>
           </div>
@@ -355,7 +358,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
             {t('admin.analytics.topContent', 'Top Performing Content', 'சிறந்த செயல்திறன் உள்ளடக்கம்')}
           </h3>
           <div className="space-y-4">
-            {analytics.topContent.slice(0, 5).map((item, index) => (
+            {analytics?.topContent?.slice(0, 5).map((item, index) => (
               <div key={item.id} className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                   index === 0 ? 'bg-yellow-100 text-yellow-800' :
@@ -399,7 +402,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
           {t('admin.analytics.recentActivity', 'Recent Activity', 'சமீபத்திய செயல்பாடு')}
         </h3>
         <div className="space-y-4">
-          {analytics.recentActivity.slice(0, 10).map((activity) => {
+          {analytics?.recentActivity?.slice(0, 10).map((activity) => {
             const IconComponent = getActivityIcon(activity.type)
             return (
               <div key={activity.id} className="flex items-start gap-3">
@@ -424,4 +427,5 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
     </div>
   )
 }
+
 

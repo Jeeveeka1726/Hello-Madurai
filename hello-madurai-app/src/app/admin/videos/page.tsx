@@ -5,7 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import FileUpload from '@/components/admin/FileUpload'
-import TranslateField from '@/components/admin/TranslateField'
+import BilingualField from '@/components/admin/BilingualField'
 import TranslatedText from '@/components/TranslatedText'
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, VideoCameraIcon, PlayIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
@@ -235,7 +235,7 @@ export default function AdminVideosPage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <TranslateField
+                  <BilingualField
                     label="Title"
                     englishValue={formData.title}
                     tamilValue={formData.title_ta}
@@ -248,7 +248,7 @@ export default function AdminVideosPage() {
                     }}
                   />
 
-                  <TranslateField
+                  <BilingualField
                     label="Description"
                     englishValue={formData.description}
                     tamilValue={formData.description_ta}
@@ -392,7 +392,7 @@ export default function AdminVideosPage() {
                     </div>
                   </div>
                   {video.featured && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-blue-900 dark:text-blue-200">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                       <TranslatedText>Featured</TranslatedText>
                     </span>
                   )}

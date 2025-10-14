@@ -1,13 +1,15 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const videoId = params.id
-    console.log('📹 Like API called for video:', videoId)
+    const { id } = await params
+    console.log('📹 Like API called for video:', id)
     
     const body = await request.json()
     const { action } = body // 'like' or 'unlike'
@@ -15,11 +17,11 @@ export async function POST(
 
     // Check if video exists first
     const existingVideo = await prisma.video.findUnique({
-      where: { id: videoId }
+      where: { id }
     })
 
     if (!existingVideo) {
-      console.error('❌ Video not found:', videoId)
+      console.error('❌ Video not found:', id)
       return NextResponse.json(
         { error: 'Video not found' },
         { status: 404 }
@@ -30,7 +32,7 @@ export async function POST(
 
     // Update likes count based on action
     const video = await prisma.video.update({
-      where: { id: videoId },
+      where: { id },
       data: {
         likes: {
           increment: action === 'like' ? 1 : -1
@@ -57,4 +59,3 @@ export async function POST(
     )
   }
 }
-

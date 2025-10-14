@@ -3,41 +3,63 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+// GET /api/admin/events - Get all events
 export async function GET() {
   try {
+    // Fetch all events from Hostinger MySQL
     const events = await prisma.event.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: {
+        startDate: 'desc'
+      }
     })
-    return NextResponse.json(events)
+
+    return NextResponse.json(events || [])
   } catch (error) {
     console.error('Error fetching events:', error)
-    return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to fetch events' },
+      { status: 500 }
+    )
   }
 }
 
+// POST /api/admin/events - Create new event
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json()
-    
+    const body = await request.json()
+
+    // Validate required fields
+    if (!body.title || !body.description || !body.startDate || !body.location || !body.category) {
+      return NextResponse.json(
+        { error: 'Title, description, startDate, location, and category are required' },
+        { status: 400 }
+      )
+    }
+
+    // Create event in Hostinger MySQL
     const event = await prisma.event.create({
       data: {
-        title: data.title,
-        title_ta: data.title_ta || '',
-        description: data.description,
-        description_ta: data.description_ta || '',
-        startDate: new Date(data.startDate || data.date),
-        endDate: data.endDate ? new Date(data.endDate) : null,
-        location: data.location,
-        location_ta: data.location_ta || '',
-        category: data.category,
-        featured: data.featured || false,
-        featuredImage: data.featuredImage || null
+        title: body.title,
+        title_ta: body.title_ta,
+        description: body.description,
+        description_ta: body.description_ta,
+        location: body.location,
+        location_ta: body.location_ta,
+        featuredImage: body.featuredImage,
+        startDate: new Date(body.startDate),
+        endDate: body.endDate ? new Date(body.endDate) : undefined,
+        category: body.category,
+        status: body.status || 'upcoming',
+        featured: body.featured || false
       }
     })
-    
+
     return NextResponse.json(event, { status: 201 })
   } catch (error) {
     console.error('Error creating event:', error)
-    return NextResponse.json({ error: 'Failed to create event' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to create event' },
+      { status: 500 }
+    )
   }
 }
