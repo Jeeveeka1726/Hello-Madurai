@@ -113,14 +113,20 @@ export default function FileUpload({
       if (response.ok) {
         const data = await response.json()
         onFileUpload(data.url)
-        toast.success(`${config.label} uploaded successfully!`)
+        
+        if (data.resized) {
+          toast.success(`✅ ${config.label} uploaded and resized to 1280x720!`)
+        } else {
+          toast.success(`✅ ${config.label} uploaded successfully!`)
+        }
       } else {
-        const errorData = await response.json()
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('Upload failed:', errorData)
         toast.error(errorData.error || `Failed to upload ${config.label.toLowerCase()}.`)
       }
     } catch (error) {
       console.error('Upload error:', error)
-      toast.error('An unexpected error occurred during upload.')
+      toast.error(`Error uploading ${config.label.toLowerCase()}: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setUploading(false)
     }

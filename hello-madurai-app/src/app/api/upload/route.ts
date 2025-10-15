@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
-import { existsSync } from 'fs'
+import sharp from 'sharp'
+import { IMAGE_CONFIG } from '@/lib/utils/imageResize'
 
 const allowedFileTypes = {
   image: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'],
@@ -49,36 +48,70 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Generate unique filename
-    const timestamp = Date.now()
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-    const filename = `${timestamp}_${originalName}`
+    let processedBuffer = buffer
+    let resized = false
+    let originalWidth = 0
+    let originalHeight = 0
 
-    // Create uploads directory structure
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', fileType)
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true })
+    // Process images with sharp (resize + optimize)
+    if (fileType === 'image' && file.type !== 'image/svg+xml') {
+      try {
+        const metadata = await sharp(buffer).metadata()
+        originalWidth = metadata.width || 0
+        originalHeight = metadata.height || 0
+
+        // Check if resize is needed (for featured images, use news config)
+        const needsResize = 
+          originalWidth !== IMAGE_CONFIG.news.width || 
+          originalHeight !== IMAGE_CONFIG.news.height
+
+        if (needsResize) {
+          processedBuffer = await sharp(buffer)
+            .resize(IMAGE_CONFIG.news.width, IMAGE_CONFIG.news.height, {
+              fit: 'contain',
+              background: { r: 255, g: 255, b: 255, alpha: 1 },
+            })
+            .webp({ quality: IMAGE_CONFIG.news.quality })
+            .toBuffer()
+          resized = true
+        }
+      } catch (sharpError) {
+        console.error('Sharp processing error:', sharpError)
+        // Continue with original buffer if sharp fails
+      }
     }
 
-    // Save file
-    const filepath = join(uploadsDir, filename)
-    await writeFile(filepath, buffer)
-
-    // Return the URL path
-    const url = `/uploads/${fileType}/${filename}`
+    // Convert to base64 data URL (works on Vercel)
+    const base64 = processedBuffer.toString('base64')
+    const mimeType = resized ? 'image/webp' : file.type
+    const dataUrl = `data:${mimeType};base64,${base64}`
 
     return NextResponse.json({
       success: true,
-      url,
-      filename,
-      size: file.size,
-      type: file.type,
-      category: fileType
+      url: dataUrl,
+      filename: file.name,
+      size: processedBuffer.length,
+      type: mimeType,
+      category: fileType,
+      originalDimensions: originalWidth && originalHeight ? {
+        width: originalWidth,
+        height: originalHeight,
+      } : undefined,
+      targetDimensions: resized ? {
+        width: IMAGE_CONFIG.news.width,
+        height: IMAGE_CONFIG.news.height,
+      } : undefined,
+      resized,
+      isBase64: true,
     })
 
   } catch (error) {
     console.error('Upload error:', error)
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : 'Upload failed'
+    return NextResponse.json(
+      { error: errorMessage, details: error instanceof Error ? error.stack : undefined }, 
+      { status: 500 }
+    )
   }
 }
 
