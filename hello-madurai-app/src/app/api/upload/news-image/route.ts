@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
+import { writeFile, mkdir, readFile } from 'fs/promises'
 import path from 'path'
-import { resizeImage, validateImageDimensions, IMAGE_CONFIG } from '@/lib/utils/imageResize'
+import sharp from 'sharp'
+import { IMAGE_CONFIG } from '@/lib/utils/imageResize'
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,60 +31,60 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create upload directory
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'news-images')
-    await mkdir(uploadDir, { recursive: true })
-
-    // Generate unique filename
-    const timestamp = Date.now()
-    const ext = path.extname(file.name)
-    const filename = `${timestamp}${ext}`
-    const filepath = path.join(uploadDir, filename)
-
-    // Save file temporarily
+    // Get file buffer
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    await writeFile(filepath, buffer)
 
-    // Validate dimensions
-    const validation = await validateImageDimensions(
-      filepath,
-      IMAGE_CONFIG.news.width,
-      IMAGE_CONFIG.news.height
-    )
+    // Get original image metadata
+    const metadata = await sharp(buffer).metadata()
+    const originalWidth = metadata.width || 0
+    const originalHeight = metadata.height || 0
 
-    let finalPath = filepath
+    // Check if resize is needed
+    const needsResize = 
+      originalWidth !== IMAGE_CONFIG.news.width || 
+      originalHeight !== IMAGE_CONFIG.news.height
+
+    let processedBuffer = buffer
     let resized = false
 
-    // Auto-resize if needed
-    if (validation.needsResize) {
-      const resizedFilename = `${timestamp}_resized.webp`
-      const resizedPath = path.join(uploadDir, resizedFilename)
-
-      const resizeResult = await resizeImage(filepath, resizedPath, IMAGE_CONFIG.news)
-
-      if (resizeResult.success) {
-        finalPath = resizedPath
-        resized = true
-      }
+    // Resize if needed
+    if (needsResize) {
+      processedBuffer = await sharp(buffer)
+        .resize(IMAGE_CONFIG.news.width, IMAGE_CONFIG.news.height, {
+          fit: 'contain',
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        })
+        .webp({ quality: IMAGE_CONFIG.news.quality })
+        .toBuffer()
+      resized = true
     }
 
-    // Return public URL
-    const publicPath = finalPath.replace(path.join(process.cwd(), 'public'), '')
-    const url = publicPath.replace(/\\/g, '/')
+    // Convert to base64 data URL
+    const base64 = processedBuffer.toString('base64')
+    const mimeType = resized ? 'image/webp' : file.type
+    const dataUrl = `data:${mimeType};base64,${base64}`
 
     return NextResponse.json({
-      url,
-      originalDimensions: validation.actual,
+      url: dataUrl,
+      originalDimensions: {
+        width: originalWidth,
+        height: originalHeight,
+      },
       targetDimensions: {
         width: IMAGE_CONFIG.news.width,
         height: IMAGE_CONFIG.news.height,
       },
       resized,
+      isBase64: true,
     })
   } catch (error) {
     console.error('Error uploading image:', error)
-    return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : 'Failed to upload image'
+    return NextResponse.json(
+      { error: errorMessage, details: error instanceof Error ? error.stack : undefined }, 
+      { status: 500 }
+    )
   }
 }
 

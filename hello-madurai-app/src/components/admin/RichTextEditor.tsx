@@ -128,11 +128,13 @@ export default function RichTextEditor({
 
         editor.chain().focus().setImage({ src: data.url }).run()
       } else {
-        toast.error('Failed to upload image')
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('Upload failed:', errorData)
+        toast.error(`Failed to upload: ${errorData.error || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error uploading image:', error)
-      toast.error('Error uploading image')
+      toast.error(`Error uploading image: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setUploading(false)
     }
