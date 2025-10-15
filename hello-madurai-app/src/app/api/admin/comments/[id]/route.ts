@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import prisma from '@/lib/prisma'
 
 // PUT: Approve/reject comment
 export async function PUT(
@@ -41,4 +39,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 })
   }
 }
-

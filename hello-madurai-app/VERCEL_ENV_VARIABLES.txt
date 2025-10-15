@@ -1,14 +1,44 @@
-# Copy these Environment Variables to Vercel
-# Go to: Vercel Dashboard → Your Project → Settings → Environment Variables
+# ========================================
+# VERCEL ENVIRONMENT VARIABLES
+# ========================================
+# Copy these into Vercel Dashboard → Settings → Environment Variables
+# Select "Production" for all variables unless specified
 
-# IMPORTANT: Use srv1990.hstgr.io (NOT localhost) because Vercel is remote!
+# Database Connection (OPTIMIZED for Performance)
+DATABASE_URL=mysql://u449309789_hellomadurai25:HelloMadurai123@srv1990.hstgr.io:3306/u449309789_hello_madurai?connection_limit=20&pool_timeout=30&connect_timeout=10
 
-DATABASE_URL
-mysql://u449309789_hellomadurai25:HelloMadurai123@srv1990.hstgr.io:3306/u449309789_hello_madurai?connection_limit=10&pool_timeout=20
+# Node Environment
+NODE_ENV=production
 
-NODE_ENV
-production
+# Public App URL
+NEXT_PUBLIC_APP_URL=https://hello-madurai-c5xr.vercel.app
 
-NEXT_PUBLIC_APP_URL
-https://hellomadurai.com
+# ========================================
+# PERFORMANCE OPTIMIZATIONS APPLIED
+# ========================================
+# 1. ✅ Prisma Connection Pooling (singleton pattern)
+# 2. ✅ API Response Caching (60s with stale-while-revalidate)
+# 3. ✅ Optimized database queries (select only necessary fields)
+# 4. ✅ Increased connection pool (20 connections)
+# 5. ✅ Added connection timeout (10s)
+# 6. ✅ Increased pool timeout (30s)
 
+# ========================================
+# DEPLOYMENT STEPS
+# ========================================
+# 1. Go to: https://vercel.com/dashboard
+# 2. Click your "hello-madurai-c5xr" project
+# 3. Go to Settings → Environment Variables
+# 4. Add DATABASE_URL (copy exact value above)
+# 5. Add NODE_ENV = production
+# 6. Add NEXT_PUBLIC_APP_URL (copy exact value above)
+# 7. Go to Deployments tab
+# 8. Click "Redeploy" on latest deployment
+# 9. Wait 2-3 minutes
+# 10. Test: https://hello-madurai-c5xr.vercel.app
+
+# ========================================
+# EXPECTED PERFORMANCE IMPROVEMENTS
+# ========================================
+# Before: 5-10 seconds load time
+# After: 1-3 seconds initial load, <1s cached loads

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import prisma from '@/lib/prisma'
 
 // POST /api/admin/news/[id]/view - Increment view count
 export async function POST(
@@ -33,4 +31,3 @@ export async function POST(
     )
   }
 }
-

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import prisma from '@/lib/prisma'
 
 // GET: Fetch all comments (for admin) with replies
 export async function GET(request: NextRequest) {
@@ -41,4 +39,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 })
   }
 }
-
