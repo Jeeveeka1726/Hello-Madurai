@@ -171,12 +171,12 @@ function NewsDetailPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-4 sm:py-8">
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-8">
         {/* Back Button */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <Link href="/news">
-            <Button variant="outline" className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <Button variant="outline" className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 touch-target">
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
               {t('news.backToNews', 'Back to News', 'செய்திகளுக்கு திரும்பு')}
             </Button>
@@ -184,7 +184,7 @@ function NewsDetailPageContent() {
         </div>
 
         {/* Article Layout with External Sidebar Ads */}
-        <div className="flex gap-6">
+        <div className="flex flex-col xl:flex-row gap-4 xl:gap-6">
           {/* Left Sidebar Ad - Outside Article */}
           <div className="hidden xl:block w-40 flex-shrink-0">
             <div className="sticky top-4">
@@ -193,7 +193,7 @@ function NewsDetailPageContent() {
           </div>
 
           {/* Article Card */}
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               {/* Featured Image or Video */}
               {article.videoUrl ? (
@@ -242,26 +242,26 @@ function NewsDetailPageContent() {
                 </div>
               )}
 
-              <CardContent className="p-8">
+              <CardContent className="p-4 sm:p-6 lg:p-8">
                 {/* Article Header */}
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
+                <div className="mb-4 sm:mb-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 w-fit">
                       {article.category}
                     </span>
                     {article.allowDownload && (
-                      <Button variant="outline" onClick={handleDownload} className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <Button variant="outline" onClick={handleDownload} className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 touch-target w-full sm:w-auto">
                         <DownloadIcon className="h-4 w-4 mr-2" />
                         {t('news.download', 'Download', 'பதிவிறக்கம்')}
                       </Button>
                     )}
                   </div>
                   
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight">
                     {t(`news.${article.id}.title`, article.title, article.title_ta)}
                   </h1>
                   
-                  <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
+                  <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 leading-relaxed">
                     {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
                   </p>
 
@@ -290,7 +290,7 @@ function NewsDetailPageContent() {
                 </div>
 
                 {/* Interaction Buttons */}
-                <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
                   <InteractionButtons
                     itemId={article.id}
                     itemType="news"
@@ -300,19 +300,19 @@ function NewsDetailPageContent() {
                     dislikes={article.dislikes}
                     comments={article.comments?.length || 0}
                     shares={article.shares?.length || 0}
-                    className="mb-6"
+                    className="mb-4 sm:mb-6"
                   />
                 </div>
               </CardContent>
             </Card>
 
             {/* Comments Section - Inline below article */}
-            <div className="mt-8">
+            <div className="mt-6 sm:mt-8">
               <CommentsSection newsId={article.id} />
             </div>
 
             {/* Ad Space Below Comments */}
-            <div className="mt-6">
+            <div className="mt-6 sm:mt-8">
               <BannerAd />
             </div>
           </div>
@@ -326,11 +326,11 @@ function NewsDetailPageContent() {
         </div>
 
         {/* Related Articles */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        <div className="mt-8 sm:mt-12">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
             {t('news.relatedArticles', 'Related Articles', 'தொடர்புடைய கட்டுரைகள்')}
           </h2>
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
             {relatedArticles.map((relatedArticle) => (
                 <Link key={relatedArticle.id} href={`/news/${relatedArticle.id}`}>
                   <Card className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">

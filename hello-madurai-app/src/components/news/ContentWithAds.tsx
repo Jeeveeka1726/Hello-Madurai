@@ -126,25 +126,65 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: `
+        .news-content {
+          word-wrap: break-word !important;
+          overflow-wrap: break-word !important;
+        }
         .news-content ul {
           list-style-type: disc !important;
-          padding-left: 2rem !important;
+          padding-left: 1.5rem !important;
           margin: 0.75rem 0 !important;
           list-style-position: outside !important;
         }
+        @media (min-width: 640px) {
+          .news-content ul {
+            padding-left: 2rem !important;
+          }
+        }
         .news-content ol {
           list-style-type: decimal !important;
-          padding-left: 2rem !important;
+          padding-left: 1.5rem !important;
           margin: 0.75rem 0 !important;
           list-style-position: outside !important;
+        }
+        @media (min-width: 640px) {
+          .news-content ol {
+            padding-left: 2rem !important;
+          }
         }
         .news-content li {
           display: list-item !important;
           margin: 0.5rem 0 !important;
           color: #374151 !important;
+          word-wrap: break-word !important;
         }
         .dark .news-content li {
           color: #F9FAFB !important;
+        }
+        .news-content p {
+          margin: 0.75rem 0 !important;
+          line-height: 1.7 !important;
+        }
+        .news-content h1, .news-content h2, .news-content h3, .news-content h4, .news-content h5, .news-content h6 {
+          margin: 1rem 0 0.5rem 0 !important;
+          line-height: 1.3 !important;
+        }
+        .news-content img {
+          max-width: 100% !important;
+          height: auto !important;
+          margin: 1rem auto !important;
+          display: block !important;
+        }
+        .news-content blockquote {
+          margin: 1rem 0 !important;
+          padding: 0.75rem 1rem !important;
+          border-left: 4px solid #3B82F6 !important;
+          background-color: #F8FAFC !important;
+          border-radius: 0 0.5rem 0.5rem 0 !important;
+        }
+        .dark .news-content blockquote {
+          background-color: #1E293B !important;
+          border-left-color: #93C5FD !important;
         }
       `}} />
       <div 
