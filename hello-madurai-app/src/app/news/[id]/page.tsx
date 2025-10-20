@@ -265,18 +265,18 @@ function NewsDetailPageContent() {
                     {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
                   </p>
 
-                  <div className="flex items-center space-x-6 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-sm text-gray-500 dark:text-gray-400">
                     <div className="flex items-center">
                       <UserIcon className="h-4 w-4 mr-2" />
-                      {article.author}
+                      <span className="truncate">{article.author}</span>
                     </div>
                     <div className="flex items-center">
                       <CalendarIcon className="h-4 w-4 mr-2" />
-                      {formatDate(article.publishedAt)}
+                      <span className="truncate">{formatDate(article.publishedAt)}</span>
                     </div>
                     <div className="flex items-center">
                       <EyeIcon className="h-4 w-4 mr-2" />
-                      {article.views.toLocaleString()} {t('news.views', 'views', 'பார்வைகள்')}
+                      <span className="truncate">{article.views.toLocaleString()} {t('news.views', 'views', 'பார்வைகள்')}</span>
                     </div>
                   </div>
                 </div>

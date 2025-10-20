@@ -237,3 +237,4 @@ These messages appear in **blue** so users know images will be automatically pro
 2. Upload an image
 3. Watch it auto-resize to 1280×720!
 
+

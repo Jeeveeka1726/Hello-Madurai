@@ -210,12 +210,12 @@ export default function AdminAdsPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               {language === 'ta' ? 'விளம்பர மேலாண்மை' : 'Ads Management'}
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-300">
+            <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
               {language === 'ta' 
                 ? 'செய்தி கட்டுரைகளில் தானாக காண்பிக்க விளம்பரங்களை நிர்வகிக்கவும்'
                 : 'Manage ads that appear automatically in news articles'}

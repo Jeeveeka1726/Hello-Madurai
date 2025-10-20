@@ -25,6 +25,8 @@ export default function RootLayout({
   return (
     <html lang="ta" translate="no" suppressHydrationWarning>
       <head>
+        {/* Mobile viewport optimization */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
         {/* Disable browser auto-translate */}
         <meta name="google" content="notranslate" />
         <script

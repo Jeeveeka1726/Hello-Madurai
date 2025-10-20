@@ -165,19 +165,19 @@ function NewsPageContent() {
                     <p className="text-gray-600 dark:text-gray-300 mb-4">
                       {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
                     </p>
-                    <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
-                      <div className="flex items-center space-x-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                      <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                         <div className="flex items-center">
                           <UserIcon className="h-4 w-4 mr-1" />
-                          {article.author}
+                          <span className="truncate">{article.author}</span>
                         </div>
                         <div className="flex items-center">
                           <CalendarIcon className="h-4 w-4 mr-1" />
-                          {formatDate(article.publishedAt)}
+                          <span className="truncate">{formatDate(article.publishedAt)}</span>
                         </div>
                         <div className="flex items-center">
                           <EyeIcon className="h-4 w-4 mr-1" />
-                          {article.views.toLocaleString()}
+                          <span className="truncate">{article.views.toLocaleString()}</span>
                         </div>
                       </div>
                     </div>

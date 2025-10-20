@@ -192,22 +192,24 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Mobile header */}
-        <div className="lg:hidden bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between h-16 px-4">
+        <div className="lg:hidden bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+          <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-target p-2"
             >
-              <Bars3Icon className="h-6 w-6" />
+              <Bars3Icon className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">Admin Panel</h1>
-            <div></div> {/* Spacer */}
+            <h1 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Admin Panel</h1>
+            <div className="w-9 sm:w-10"></div> {/* Spacer for centering */}
           </div>
         </div>
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-blue-950">
-          {children}
+          <div className="mobile-padding">
+            {children}
+          </div>
         </main>
       </div>
     </div>

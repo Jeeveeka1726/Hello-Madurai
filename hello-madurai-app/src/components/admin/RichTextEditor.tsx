@@ -324,10 +324,19 @@ export default function RichTextEditor({
         </ul>
       </div>
 
-      {/* TipTap Styles */}
+      {/* TipTap Styles - Mobile Optimized */}
       <style jsx global>{`
         .ProseMirror {
-          min-height: 400px;
+          min-height: 300px;
+          font-size: 16px;
+          line-height: 1.6;
+        }
+        @media (min-width: 640px) {
+          .ProseMirror {
+            min-height: 400px;
+            font-size: 14px;
+            line-height: 1.75;
+          }
         }
         .ProseMirror:focus {
           outline: 2px solid #3B82F6;
@@ -335,22 +344,44 @@ export default function RichTextEditor({
         }
         .ProseMirror p {
           margin: 0.75rem 0;
-          line-height: 1.75;
+          line-height: 1.6;
+        }
+        @media (min-width: 640px) {
+          .ProseMirror p {
+            line-height: 1.75;
+          }
         }
         .ProseMirror h1 {
-          font-size: 2rem;
-          font-weight: bold;
-          margin: 1.5rem 0 1rem;
-        }
-        .ProseMirror h2 {
           font-size: 1.5rem;
           font-weight: bold;
-          margin: 1.25rem 0 0.75rem;
+          margin: 1rem 0 0.75rem;
+        }
+        @media (min-width: 640px) {
+          .ProseMirror h1 {
+            font-size: 2rem;
+            margin: 1.5rem 0 1rem;
+          }
+        }
+        .ProseMirror h2 {
+          font-size: 1.25rem;
+          font-weight: bold;
+          margin: 1rem 0 0.5rem;
+        }
+        @media (min-width: 640px) {
+          .ProseMirror h2 {
+            font-size: 1.5rem;
+            margin: 1.25rem 0 0.75rem;
+          }
         }
         .ProseMirror ul, .ProseMirror ol {
-          padding-left: 2rem;
+          padding-left: 1.5rem;
           margin: 0.75rem 0;
           list-style-position: outside;
+        }
+        @media (min-width: 640px) {
+          .ProseMirror ul, .ProseMirror ol {
+            padding-left: 2rem;
+          }
         }
         .ProseMirror ul {
           list-style-type: disc;

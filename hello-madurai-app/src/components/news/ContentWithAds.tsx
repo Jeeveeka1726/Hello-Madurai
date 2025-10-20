@@ -151,8 +151,8 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
         className="news-content prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none dark:prose-invert"
         dangerouslySetInnerHTML={{ __html: contentWithAds }}
         style={{
-          fontSize: '1.1rem',
-          lineHeight: '1.8'
+          fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
+          lineHeight: '1.7'
         }}
       />
     </>
