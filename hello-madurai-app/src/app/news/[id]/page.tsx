@@ -14,8 +14,15 @@ import CommentsSection from '@/components/news/CommentsSection'
 import ContentWithAds from '@/components/news/ContentWithAds'
 import { BannerAd, ResponsiveAd } from '@/components/ads/GoogleAdsense'
 
-// Dynamic import ReactPlayer to avoid SSR issues
-const ReactPlayer = dynamic(() => import('react-player'), { ssr: false })
+// Dynamic import ReactPlayer to avoid SSR issues with lazy loading
+const ReactPlayer = dynamic(() => import('react-player'), { 
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    </div>
+  )
+})
 
 interface NewsArticle {
   id: string
@@ -60,6 +67,7 @@ function NewsDetailPageContent() {
   const [article, setArticle] = useState<NewsArticle | null>(null)
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([])
   const [loading, setLoading] = useState(true)
+  const [videoLoaded, setVideoLoaded] = useState(false)
 
   // Fetch article and related articles from database
   useEffect(() => {
@@ -96,6 +104,30 @@ function NewsDetailPageContent() {
       fetchArticle()
     }
   }, [newsId])
+
+  // Intersection Observer for video lazy loading
+  useEffect(() => {
+    if (article?.videoUrl) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setVideoLoaded(true)
+              observer.disconnect()
+            }
+          })
+        },
+        { threshold: 0.1 }
+      )
+
+      const videoContainer = document.getElementById('video-container')
+      if (videoContainer) {
+        observer.observe(videoContainer)
+      }
+
+      return () => observer.disconnect()
+    }
+  }, [article?.videoUrl])
 
   const handleDownload = async () => {
     if (!article) return
@@ -197,31 +229,59 @@ function NewsDetailPageContent() {
             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               {/* Featured Image or Video */}
               {article.videoUrl ? (
-                <div className="bg-black" style={{ aspectRatio: '16/9' }}>
-                  <ReactPlayer
-                    url={article.videoUrl}
-                    width="100%"
-                    height="100%"
-                    controls={true}
-                    playing={false}
-                    playsinline={true}
-                    style={{ backgroundColor: '#000' }}
-                    config={{
-                      youtube: {
-                        playerVars: { 
-                          rel: 0,
-                          modestbranding: 1,
-                          fs: 1
-                        }
-                      }
-                    }}
-                    onReady={() => {
-                      console.log('✅ News video ready:', article.title)
-                    }}
-                    onError={(error) => {
-                      console.error('❌ News video error:', error)
-                    }}
-                  />
+                <div id="video-container" className="relative w-full bg-black rounded-t-xl overflow-hidden">
+                  <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+                    {videoLoaded ? (
+                      <ReactPlayer
+                        url={article.videoUrl}
+                        width="100%"
+                        height="100%"
+                        controls={true}
+                        playing={false}
+                        playsinline={true}
+                        light={false}
+                        pip={false}
+                        style={{ backgroundColor: '#000' }}
+                        config={{
+                          youtube: {
+                            playerVars: { 
+                              rel: 0,
+                              modestbranding: 1,
+                              fs: 1,
+                              cc_load_policy: 0,
+                              iv_load_policy: 3,
+                              autohide: 0,
+                              autoplay: 0,
+                              controls: 1,
+                              disablekb: 0,
+                              enablejsapi: 1,
+                              end: 0,
+                              hl: 'en',
+                              loop: 0,
+                              modestbranding: 1,
+                              origin: typeof window !== 'undefined' ? window.location.origin : '',
+                              playlist: '',
+                              playsinline: 1,
+                              start: 0
+                            }
+                          }
+                        }}
+                        onReady={() => {
+                          console.log('✅ News video ready:', article.title)
+                        }}
+                        onError={(error) => {
+                          console.error('❌ News video error:', error)
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">Loading video...</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : article.featuredImage ? (
                 <div className="aspect-w-16 aspect-h-9 overflow-hidden">

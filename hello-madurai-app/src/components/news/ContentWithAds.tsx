@@ -48,6 +48,28 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
     }
   }
 
+  const validateImageSrc = (src: string): string => {
+    // Check if it's a valid base64 image
+    if (src.startsWith('data:image/')) {
+      try {
+        // Basic validation for base64 data URL
+        const base64Match = src.match(/^data:image\/([a-zA-Z]*);base64,(.*)$/)
+        if (base64Match && base64Match[2]) {
+          // Check if base64 string is valid
+          const base64String = base64Match[2]
+          if (base64String.length > 0 && /^[A-Za-z0-9+/]*={0,2}$/.test(base64String)) {
+            return src
+          }
+        }
+      } catch (error) {
+        console.warn('Invalid base64 image URL:', src.substring(0, 50) + '...')
+      }
+      // Return a placeholder for invalid base64 images
+      return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2NjY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIFVuYXZhaWxhYmxlPC90ZXh0Pjwvc3ZnPg=='
+    }
+    return src
+  }
+
   const injectAds = () => {
     if (ads.length === 0) {
       setContentWithAds(content)
@@ -57,6 +79,19 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
     // Parse HTML and find paragraphs
     const parser = new DOMParser()
     const doc = parser.parseFromString(content, 'text/html')
+    
+    // Fix any invalid image sources
+    const images = doc.querySelectorAll('img')
+    images.forEach((img) => {
+      const originalSrc = img.getAttribute('src')
+      if (originalSrc) {
+        const validatedSrc = validateImageSrc(originalSrc)
+        if (validatedSrc !== originalSrc) {
+          img.setAttribute('src', validatedSrc)
+        }
+      }
+    })
+    
     const paragraphs = Array.from(doc.querySelectorAll('p, div'))
 
     let adIndex = 0
@@ -174,6 +209,30 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
           height: auto !important;
           margin: 1rem auto !important;
           display: block !important;
+        }
+        .news-content img[src^="data:image/"] {
+          max-width: 100% !important;
+          height: auto !important;
+          object-fit: contain !important;
+        }
+        .news-content img[src*="base64"] {
+          max-width: 100% !important;
+          height: auto !important;
+          object-fit: contain !important;
+        }
+        .news-content iframe {
+          max-width: 100% !important;
+          height: auto !important;
+          min-height: 200px !important;
+          border-radius: 0.5rem !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+          margin: 1rem auto !important;
+        }
+        @media (max-width: 640px) {
+          .news-content iframe {
+            min-height: 180px !important;
+            margin: 0.75rem auto !important;
+          }
         }
         .news-content blockquote {
           margin: 1rem 0 !important;

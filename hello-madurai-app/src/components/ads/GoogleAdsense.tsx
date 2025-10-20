@@ -34,8 +34,11 @@ export default function GoogleAdsense({
         
         // Only push to adsbygoogle if this specific ad hasn't been initialized
         if (insElement && !insElement.getAttribute('data-adsbygoogle-status')) {
-          (window.adsbygoogle = window.adsbygoogle || []).push({})
-          hasInitialized.current = true
+          // Check if adsbygoogle is available and has proper configuration
+          if (window.adsbygoogle && ADSENSE_CONFIG.publisherId !== 'ca-pub-XXXXXXXXXXXXXXXXX') {
+            (window.adsbygoogle = window.adsbygoogle || []).push({})
+            hasInitialized.current = true
+          }
         }
       }
     } catch (error) {
