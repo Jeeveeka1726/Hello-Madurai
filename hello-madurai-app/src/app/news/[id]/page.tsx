@@ -229,8 +229,8 @@ function NewsDetailPageContent() {
             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               {/* Featured Image or Video */}
               {article.videoUrl ? (
-                <div id="video-container" className="relative w-full bg-black rounded-t-xl overflow-hidden">
-                  <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+                <div id="video-container" className="video-container bg-black rounded-t-xl">
+                  <div className="video-aspect-container">
                     {videoLoaded ? (
                       <ReactPlayer
                         url={article.videoUrl}
@@ -241,7 +241,9 @@ function NewsDetailPageContent() {
                         playsinline={true}
                         light={false}
                         pip={false}
-                        style={{ backgroundColor: '#000' }}
+                        style={{ 
+                          backgroundColor: '#000'
+                        }}
                         config={{
                           youtube: {
                             playerVars: { 
