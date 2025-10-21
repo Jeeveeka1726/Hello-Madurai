@@ -121,9 +121,9 @@ export default function InteractionButtons({
     try {
       const action = newLiked ? 'like' : 'unlike'
       
-      // Single API call with shorter timeout for better UX
+      // Single API call with reasonable timeout
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
       
       const response = await fetch(`/api/${itemType}/${itemId}/like`, {
         method: 'POST',
@@ -169,7 +169,15 @@ export default function InteractionButtons({
         setIsDisliked(originalDisliked)
         setLocalDislikes(originalDislikes)
       }
-      console.error('❌ Error liking item:', error)
+      
+      // Handle different error types
+      if (error.name === 'AbortError') {
+        console.warn('⚠️ Like request timed out, but UI was updated optimistically')
+        // Don't revert on timeout - keep the optimistic update
+        return
+      } else {
+        console.error('❌ Error liking item:', error)
+      }
     } finally {
       setIsLoading(false)
     }
@@ -222,9 +230,9 @@ export default function InteractionButtons({
     try {
       const action = newDisliked ? 'dislike' : 'undislike'
       
-      // Single API call with shorter timeout
+      // Single API call with reasonable timeout
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
       
       const response = await fetch(`/api/${itemType}/${itemId}/dislike`, {
         method: 'POST',
@@ -270,7 +278,15 @@ export default function InteractionButtons({
         setIsLiked(originalLiked)
         setLocalLikes(originalLikes)
       }
-      console.error('❌ Error disliking item:', error)
+      
+      // Handle different error types
+      if (error.name === 'AbortError') {
+        console.warn('⚠️ Dislike request timed out, but UI was updated optimistically')
+        // Don't revert on timeout - keep the optimistic update
+        return
+      } else {
+        console.error('❌ Error disliking item:', error)
+      }
     } finally {
       setIsLoading(false)
     }
