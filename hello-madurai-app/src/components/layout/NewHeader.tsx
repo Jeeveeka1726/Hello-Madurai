@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   Bars3Icon,
   XMarkIcon,
@@ -12,6 +13,10 @@ import { useLanguage } from '@/contexts/LanguageContext'
 export default function NewHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { language, setLanguage, t } = useLanguage()
+  const pathname = usePathname()
+  
+  // Check if we're on news pages
+  const isNewsPage = pathname.includes('/news')
 
   const navigation = [
     { 
@@ -52,11 +57,24 @@ export default function NewHeader() {
     <header className="bg-white/95 dark:bg-blue-950/95 backdrop-blur-sm shadow-lg transition-all duration-300 sticky top-0 z-50">
       <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
-          {/* Home Link */}
+          {/* Logo/Home Link */}
           <div className="flex items-center">
-            <Link href="/" className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
-              {t('nav.home', 'Home', 'முகப்பு')}
-            </Link>
+            {isNewsPage ? (
+              <Link href="/" className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
+                {t('nav.home', 'Home', 'முகப்பு')}
+              </Link>
+            ) : (
+              <Link href="/" className="flex items-center space-x-2 sm:space-x-3">
+                <img 
+                  src="/logo.jpg" 
+                  alt="Hello Madurai Logo" 
+                  className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover"
+                />
+                <span className="hidden sm:block text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                  Hello Madurai
+                </span>
+              </Link>
+            )}
           </div>
 
           {/* Desktop Navigation */}
