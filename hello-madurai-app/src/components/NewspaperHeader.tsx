@@ -14,14 +14,14 @@ export default function NewspaperHeader({ className = '' }: NewspaperHeaderProps
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center py-4 sm:py-6">
           {/* Logo and Title */}
-          <div className="flex items-center justify-center space-x-3 mb-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
             <img 
               src="/logo.jpg" 
               alt="Hello Madurai Logo" 
-              className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shadow-md"
+              className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shadow-md flex-shrink-0"
             />
             <div className="text-center">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-blue-600 dark:text-blue-400 leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-blue-600 dark:text-blue-400 leading-tight">
                 Hello Madurai
               </h1>
               <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium mt-1">
@@ -45,8 +45,6 @@ export default function NewspaperHeader({ className = '' }: NewspaperHeaderProps
             {t('news.newspaperTagline', 'Your Local News & Information Center', 'உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம்')}
           </p>
           
-          {/* Decorative line */}
-          <div className="mt-4 h-1 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 dark:from-blue-400 dark:via-blue-300 dark:to-blue-400 rounded-full"></div>
         </div>
       </div>
     </div>
