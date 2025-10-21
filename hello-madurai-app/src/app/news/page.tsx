@@ -144,7 +144,7 @@ function NewsPageContent() {
             </h2>
             <div className="grid gap-8 lg:grid-cols-2">
               {featuredNews.map((article) => (
-                <Card key={article.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                <Card key={article.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full flex flex-col">
                   <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
                     <div className="flex items-center justify-center text-gray-400 dark:text-gray-500">
                       <span className="text-sm">
@@ -152,7 +152,7 @@ function NewsPageContent() {
                       </span>
                     </div>
                   </div>
-                  <CardContent className="p-6">
+                  <CardContent className="p-6 flex flex-col flex-grow">
                     <div className="flex items-center justify-between mb-2">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                         {t('news.featured', 'Featured', 'சிறப்பு')}
@@ -183,7 +183,7 @@ function NewsPageContent() {
                         </div>
                       </div>
                     </div>
-                    <Link href={`/news/${article.id}`}>
+                    <Link href={`/news/${article.id}`} className="mt-auto">
                       <Button className="w-full">
                         {t('news.readMore', 'Read More', 'மேலும் படிக்க')}
                       </Button>
@@ -205,7 +205,7 @@ function NewsPageContent() {
           </h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {(selectedCategory === 'all' ? regularNews : filteredArticles.filter(a => !a.featured)).map((article) => (
-              <Card key={article.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <Card key={article.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full flex flex-col">
                 {article.featuredImage ? (
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                     <img
@@ -223,7 +223,7 @@ function NewsPageContent() {
                     </div>
                   </div>
                 )}
-                <CardContent className="p-4">
+                <CardContent className="p-4 flex flex-col flex-grow">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                       {article.category}
@@ -245,7 +245,7 @@ function NewsPageContent() {
                       {article.views.toLocaleString()}
                     </div>
                   </div>
-                  <Link href={`/news/${article.id}`}>
+                  <Link href={`/news/${article.id}`} className="mt-auto">
                     <Button size="sm" className="w-full">
                       {t('news.readMore', 'Read More', 'மேலும் படிக்க')}
                     </Button>
