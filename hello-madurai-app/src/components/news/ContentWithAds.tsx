@@ -126,7 +126,7 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
       `
     } else if (ad.imageUrl) {
       // Image ad with optional link
-      const img = `<img src="${ad.imageUrl}" alt="${ad.title}" class="w-full h-auto rounded-lg shadow-md" />`
+      const img = `<img src="${ad.imageUrl}" alt="${ad.title}" class="ad-image w-full h-auto rounded-lg shadow-md" />`
       const clickHandler = ad.link ? `onclick="handleAdClick('${ad.id}', '${ad.link}')"` : ''
       
       return `

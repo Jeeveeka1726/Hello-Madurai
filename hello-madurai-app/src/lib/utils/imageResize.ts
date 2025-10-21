@@ -15,8 +15,8 @@ export const IMAGE_CONFIG = {
     quality: 90,
   },
   thumbnail: {
-    width: 400,
-    height: 225,
+    width: 1280,
+    height: 720,
     quality: 80,
   },
 }

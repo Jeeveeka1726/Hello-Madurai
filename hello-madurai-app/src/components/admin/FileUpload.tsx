@@ -234,6 +234,9 @@ export default function FileUpload({
                       <br />
                       <span className="text-xs">
                         Max size: {maxSize || config.maxSize}MB
+                        {fileType === 'image' && (
+                          <><br />Recommended: 1280px × 720px</>
+                        )}
                       </span>
                     </>
                   )}

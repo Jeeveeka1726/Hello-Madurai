@@ -104,6 +104,33 @@ body {
   }
 }
 
+/* Standardized 1280x720 aspect ratio for all images */
+.standard-image {
+  aspect-ratio: 16/9 !important;
+  object-fit: cover !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Featured image styling with 1280x720 aspect ratio */
+.featured-image {
+  aspect-ratio: 16/9 !important;
+  object-fit: cover !important;
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+/* Ad image styling with 1280x720 aspect ratio */
+.ad-image {
+  aspect-ratio: 16/9 !important;
+  object-fit: cover !important;
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 8px !important;
+}
+
 /* Mobile-first responsive typography */
 .prose {
   font-size: 0.95rem !important;
