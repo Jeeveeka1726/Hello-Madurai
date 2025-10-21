@@ -121,7 +121,7 @@ function NewsDetailPageContent() {
         { threshold: 0.1 }
       )
 
-      const videoContainer = document.getElementById('video-container')
+      const videoContainer = document.getElementById('video-ultimate-container')
       if (videoContainer) {
         observer.observe(videoContainer)
       }
@@ -129,6 +129,70 @@ function NewsDetailPageContent() {
       return () => observer.disconnect()
     }
   }, [article?.videoUrl])
+
+  // Force video responsiveness with JavaScript
+  useEffect(() => {
+    const forceVideoResponsiveness = () => {
+      const videoContainer = document.getElementById('video-ultimate-container')
+      const videoPlayer = document.getElementById('video-ultimate-player')
+      
+      if (videoContainer && videoPlayer) {
+        // Force container to be full width
+        videoContainer.style.width = '100vw'
+        videoContainer.style.maxWidth = '100vw'
+        videoContainer.style.marginLeft = '-50vw'
+        videoContainer.style.marginRight = '-50vw'
+        videoContainer.style.left = '50%'
+        videoContainer.style.right = '50%'
+        
+        // Calculate responsive height
+        const viewportWidth = window.innerWidth
+        let height = '56.25vw'
+        
+        if (viewportWidth <= 360) {
+          height = '35vh'
+        } else if (viewportWidth <= 480) {
+          height = '40vh'
+        } else if (viewportWidth <= 768) {
+          height = '50vh'
+        }
+        
+        videoContainer.style.height = height
+        videoContainer.style.maxHeight = height
+        
+        // Force player to fill container
+        videoPlayer.style.width = '100%'
+        videoPlayer.style.height = '100%'
+        videoPlayer.style.maxWidth = '100%'
+        videoPlayer.style.maxHeight = '100%'
+        
+        // Force all iframes to be responsive
+        const iframes = videoPlayer.querySelectorAll('iframe')
+        iframes.forEach(iframe => {
+          iframe.style.width = '100%'
+          iframe.style.height = '100%'
+          iframe.style.maxWidth = '100%'
+          iframe.style.maxHeight = '100%'
+          iframe.style.position = 'absolute'
+          iframe.style.top = '0'
+          iframe.style.left = '0'
+        })
+      }
+    }
+
+    // Run on mount and resize
+    forceVideoResponsiveness()
+    window.addEventListener('resize', forceVideoResponsiveness)
+    
+    // Run after video loads
+    if (videoLoaded) {
+      setTimeout(forceVideoResponsiveness, 100)
+    }
+
+    return () => {
+      window.removeEventListener('resize', forceVideoResponsiveness)
+    }
+  }, [videoLoaded, article?.videoUrl])
 
   const handleDownload = async () => {
     if (!article) return
@@ -231,193 +295,206 @@ function NewsDetailPageContent() {
               {/* Featured Image or Video */}
               {article.videoUrl ? (
                 <>
-                  {/* NUCLEAR CSS INJECTION - MAXIMUM PRIORITY */}
+                  {/* ULTIMATE NUCLEAR CSS - VIEWPORT UNITS */}
                   <style dangerouslySetInnerHTML={{
                     __html: `
-                      #video-container-nuclear {
-                        position: relative !important;
-                        width: 100% !important;
-                        max-width: 100% !important;
-                        max-width: 100vw !important;
-                        overflow: hidden !important;
+                      /* RESET EVERYTHING */
+                      * {
                         box-sizing: border-box !important;
+                      }
+                      
+                      /* VIDEO CONTAINER - VIEWPORT UNITS */
+                      #video-ultimate-container {
+                        position: relative !important;
+                        width: 100vw !important;
+                        max-width: 100vw !important;
+                        height: 56.25vw !important;
+                        max-height: 56.25vw !important;
+                        overflow: hidden !important;
                         margin: 0 !important;
                         padding: 0 !important;
+                        left: 50% !important;
+                        right: 50% !important;
+                        margin-left: -50vw !important;
+                        margin-right: -50vw !important;
                         transform: none !important;
-                        left: 0 !important;
-                        right: 0 !important;
-                      }
-                      #video-aspect-nuclear {
-                        position: relative !important;
-                        width: 100% !important;
-                        max-width: 100% !important;
-                        max-width: 100vw !important;
-                        height: 0 !important;
-                        padding-bottom: 56.25% !important;
-                        overflow: hidden !important;
                         box-sizing: border-box !important;
-                        margin: 0 !important;
-                        padding-left: 0 !important;
-                        padding-right: 0 !important;
-                        padding-top: 0 !important;
                       }
-                      #video-player-nuclear {
+                      
+                      /* VIDEO PLAYER WRAPPER */
+                      #video-ultimate-player {
                         position: absolute !important;
                         top: 0 !important;
                         left: 0 !important;
                         width: 100% !important;
                         height: 100% !important;
                         max-width: 100% !important;
-                        max-width: 100vw !important;
                         max-height: 100% !important;
-                        box-sizing: border-box !important;
                         overflow: hidden !important;
-                        transform: none !important;
                         margin: 0 !important;
                         padding: 0 !important;
+                        transform: none !important;
+                        box-sizing: border-box !important;
                       }
-                      #video-player-nuclear iframe {
+                      
+                      /* REACT PLAYER */
+                      #video-ultimate-player > div {
                         position: absolute !important;
                         top: 0 !important;
                         left: 0 !important;
                         width: 100% !important;
                         height: 100% !important;
                         max-width: 100% !important;
-                        max-width: 100vw !important;
                         max-height: 100% !important;
-                        box-sizing: border-box !important;
                         overflow: hidden !important;
-                        transform: none !important;
                         margin: 0 !important;
                         padding: 0 !important;
+                        transform: none !important;
+                        box-sizing: border-box !important;
                       }
+                      
+                      /* IFRAME OVERRIDE */
+                      #video-ultimate-player iframe,
+                      #video-ultimate-player > div iframe {
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        max-width: 100% !important;
+                        max-height: 100% !important;
+                        overflow: hidden !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        transform: none !important;
+                        box-sizing: border-box !important;
+                        border: none !important;
+                      }
+                      
+                      /* MOBILE OVERRIDES */
                       @media (max-width: 768px) {
-                        #video-container-nuclear {
-                          max-width: 100vw !important;
+                        #video-ultimate-container {
                           width: 100vw !important;
-                          margin-left: 0 !important;
-                          margin-right: 0 !important;
-                          padding-left: 0 !important;
-                          padding-right: 0 !important;
-                          transform: translateX(0) !important;
-                          left: 0 !important;
-                          right: 0 !important;
-                        }
-                        #video-aspect-nuclear {
                           max-width: 100vw !important;
-                          width: 100vw !important;
-                          padding-bottom: 56.25% !important;
-                        }
-                        #video-player-nuclear {
-                          max-width: 100vw !important;
+                          height: 50vh !important;
                           max-height: 50vh !important;
-                          width: 100% !important;
-                          height: auto !important;
-                        }
-                        #video-player-nuclear iframe {
-                          max-width: 100vw !important;
-                          max-height: 50vh !important;
-                          width: 100% !important;
-                          height: auto !important;
+                          margin-left: -50vw !important;
+                          margin-right: -50vw !important;
+                          left: 50% !important;
+                          right: 50% !important;
                         }
                       }
+                      
                       @media (max-width: 480px) {
-                        #video-container-nuclear {
-                          max-width: 100vw !important;
+                        #video-ultimate-container {
                           width: 100vw !important;
-                          margin: 0 !important;
-                          padding: 0 !important;
-                          transform: none !important;
-                        }
-                        #video-aspect-nuclear {
                           max-width: 100vw !important;
+                          height: 40vh !important;
+                          max-height: 40vh !important;
+                          margin-left: -50vw !important;
+                          margin-right: -50vw !important;
+                          left: 50% !important;
+                          right: 50% !important;
+                        }
+                      }
+                      
+                      /* EXTRA SMALL MOBILE */
+                      @media (max-width: 360px) {
+                        #video-ultimate-container {
                           width: 100vw !important;
-                          padding-bottom: 56.25% !important;
-                        }
-                        #video-player-nuclear {
                           max-width: 100vw !important;
-                          max-height: 40vh !important;
-                          width: 100% !important;
-                          height: auto !important;
+                          height: 35vh !important;
+                          max-height: 35vh !important;
+                          margin-left: -50vw !important;
+                          margin-right: -50vw !important;
+                          left: 50% !important;
+                          right: 50% !important;
                         }
-                        #video-player-nuclear iframe {
-                          max-width: 100vw !important;
-                          max-height: 40vh !important;
-                          width: 100% !important;
-                          height: auto !important;
-                        }
+                      }
+                      
+                      /* FORCE ALL ELEMENTS TO BEHAVE */
+                      #video-ultimate-container *,
+                      #video-ultimate-player *,
+                      #video-ultimate-player > div *,
+                      #video-ultimate-player iframe,
+                      #video-ultimate-player > div iframe {
+                        max-width: 100% !important;
+                        max-height: 100% !important;
+                        overflow: hidden !important;
+                        box-sizing: border-box !important;
+                        transform: none !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
                       }
                     `
                   }} />
                   
                   <div 
-                    id="video-container-nuclear" 
+                    id="video-ultimate-container" 
                     className="bg-black rounded-t-xl"
                   >
-                    <div id="video-aspect-nuclear">
-                      {videoLoaded ? (
-                        <div id="video-player-nuclear">
-                          <ReactPlayer
-                            url={article.videoUrl}
-                            width="100%"
-                            height="100%"
-                            controls={true}
-                            playing={false}
-                            playsinline={true}
-                            light={false}
-                            pip={false}
-                            config={{
-                              youtube: {
-                                playerVars: { 
-                                  rel: 0,
-                                  modestbranding: 1,
-                                  fs: 1,
-                                  cc_load_policy: 0,
-                                  iv_load_policy: 3,
-                                  autohide: 0,
-                                  autoplay: 0,
-                                  controls: 1,
-                                  disablekb: 0,
-                                  enablejsapi: 1,
-                                  end: 0,
-                                  hl: 'en',
-                                  loop: 0,
-                                  modestbranding: 1,
-                                  origin: typeof window !== 'undefined' ? window.location.origin : '',
-                                  playlist: '',
-                                  playsinline: 1,
-                                  start: 0
-                                }
+                    {videoLoaded ? (
+                      <div id="video-ultimate-player">
+                        <ReactPlayer
+                          url={article.videoUrl}
+                          width="100%"
+                          height="100%"
+                          controls={true}
+                          playing={false}
+                          playsinline={true}
+                          light={false}
+                          pip={false}
+                          config={{
+                            youtube: {
+                              playerVars: { 
+                                rel: 0,
+                                modestbranding: 1,
+                                fs: 1,
+                                cc_load_policy: 0,
+                                iv_load_policy: 3,
+                                autohide: 0,
+                                autoplay: 0,
+                                controls: 1,
+                                disablekb: 0,
+                                enablejsapi: 1,
+                                end: 0,
+                                hl: 'en',
+                                loop: 0,
+                                modestbranding: 1,
+                                origin: typeof window !== 'undefined' ? window.location.origin : '',
+                                playlist: '',
+                                playsinline: 1,
+                                start: 0
                               }
-                            }}
-                            onReady={() => {
-                              console.log('✅ News video ready:', article.title)
-                            }}
-                            onError={(error) => {
-                              console.error('❌ News video error:', error)
-                            }}
-                          />
-                        </div>
-                      ) : (
-                        <div 
-                          className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
-                          style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            maxWidth: '100%',
-                            boxSizing: 'border-box'
+                            }
                           }}
-                        >
-                          <div className="text-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">Loading video...</p>
-                          </div>
+                          onReady={() => {
+                            console.log('✅ News video ready:', article.title)
+                          }}
+                          onError={(error) => {
+                            console.error('❌ News video error:', error)
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div 
+                        className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          maxWidth: '100%',
+                          boxSizing: 'border-box'
+                        }}
+                      >
+                        <div className="text-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">Loading video...</p>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </>
               ) : article.featuredImage ? (
