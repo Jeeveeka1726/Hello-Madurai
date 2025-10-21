@@ -15,10 +15,6 @@ export default function NewHeader() {
 
   const navigation = [
     { 
-      name: t('nav.home', 'Home', 'முகப்பு'),
-      href: '/' 
-    },
-    { 
       name: t('nav.news', 'News', 'செய்திகள்'),
       href: '/news' 
     },
@@ -53,20 +49,13 @@ export default function NewHeader() {
   }
 
   return (
-    <header className="bg-white/95 dark:bg-blue-950/95 backdrop-blur-sm border-b border-blue-100 dark:border-blue-900/50 shadow-lg transition-all duration-300 sticky top-0 z-50">
+    <header className="bg-white/95 dark:bg-blue-950/95 backdrop-blur-sm shadow-lg transition-all duration-300 sticky top-0 z-50">
       <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
-          {/* Logo */}
+          {/* Home Link */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2 sm:space-x-3">
-              <img 
-                src="/logo.jpg" 
-                alt="Hello Madurai Logo" 
-                className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover"
-              />
-              <span className="hidden sm:block text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                Hello Madurai
-              </span>
+            <Link href="/" className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
+              {t('nav.home', 'Home', 'முகப்பு')}
             </Link>
           </div>
 
