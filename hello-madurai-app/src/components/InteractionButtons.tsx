@@ -56,9 +56,9 @@ export default function InteractionButtons({
   const [isLiked, setIsLiked] = useState(false)
   const [isDisliked, setIsDisliked] = useState(false)
   const [showShareMenu, setShowShareMenu] = useState(false)
-  const [localLikes, setLocalLikes] = useState(likes)
-  const [localDislikes, setLocalDislikes] = useState(dislikes)
-  const [localShares, setLocalShares] = useState(shares)
+  const [localLikes, setLocalLikes] = useState(Math.max(0, likes))
+  const [localDislikes, setLocalDislikes] = useState(Math.max(0, dislikes))
+  const [localShares, setLocalShares] = useState(Math.max(0, shares))
   const [isLoading, setIsLoading] = useState(false)
 
   // Check localStorage on mount to see if user has already liked/disliked
@@ -91,7 +91,13 @@ export default function InteractionButtons({
     
     // Update UI immediately with bounds checking
     setIsLiked(newLiked)
-    setLocalLikes(prev => Math.max(0, newLiked ? prev + 1 : prev - 1))
+    setLocalLikes(prev => {
+      if (newLiked) {
+        return prev + 1 // Adding a like
+      } else {
+        return Math.max(0, prev - 1) // Removing a like, but never go below 0
+      }
+    })
     
     // If switching from dislike to like, update dislike UI too
     if (newLiked && wasDisliked) {
@@ -186,7 +192,13 @@ export default function InteractionButtons({
     
     // Update UI immediately with bounds checking
     setIsDisliked(newDisliked)
-    setLocalDislikes(prev => Math.max(0, newDisliked ? prev + 1 : prev - 1))
+    setLocalDislikes(prev => {
+      if (newDisliked) {
+        return prev + 1 // Adding a dislike
+      } else {
+        return Math.max(0, prev - 1) // Removing a dislike, but never go below 0
+      }
+    })
     
     // If switching from like to dislike, update like UI too
     if (newDisliked && wasLiked) {
