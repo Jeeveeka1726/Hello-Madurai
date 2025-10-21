@@ -230,116 +230,196 @@ function NewsDetailPageContent() {
             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               {/* Featured Image or Video */}
               {article.videoUrl ? (
-                <div 
-                  id="video-container" 
-                  className="video-container bg-black rounded-t-xl"
-                  style={{
-                    maxWidth: '100%',
-                    maxWidth: '100vw',
-                    width: '100%',
-                    overflow: 'hidden',
-                    boxSizing: 'border-box',
-                    margin: '0',
-                    padding: '0',
-                    position: 'relative',
-                    transform: 'none'
-                  }}
-                >
+                <>
+                  {/* NUCLEAR CSS INJECTION - MAXIMUM PRIORITY */}
+                  <style dangerouslySetInnerHTML={{
+                    __html: `
+                      #video-container-nuclear {
+                        position: relative !important;
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        max-width: 100vw !important;
+                        overflow: hidden !important;
+                        box-sizing: border-box !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        transform: none !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                      }
+                      #video-aspect-nuclear {
+                        position: relative !important;
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        max-width: 100vw !important;
+                        height: 0 !important;
+                        padding-bottom: 56.25% !important;
+                        overflow: hidden !important;
+                        box-sizing: border-box !important;
+                        margin: 0 !important;
+                        padding-left: 0 !important;
+                        padding-right: 0 !important;
+                        padding-top: 0 !important;
+                      }
+                      #video-player-nuclear {
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        max-width: 100% !important;
+                        max-width: 100vw !important;
+                        max-height: 100% !important;
+                        box-sizing: border-box !important;
+                        overflow: hidden !important;
+                        transform: none !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                      }
+                      #video-player-nuclear iframe {
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        max-width: 100% !important;
+                        max-width: 100vw !important;
+                        max-height: 100% !important;
+                        box-sizing: border-box !important;
+                        overflow: hidden !important;
+                        transform: none !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                      }
+                      @media (max-width: 768px) {
+                        #video-container-nuclear {
+                          max-width: 100vw !important;
+                          width: 100vw !important;
+                          margin-left: 0 !important;
+                          margin-right: 0 !important;
+                          padding-left: 0 !important;
+                          padding-right: 0 !important;
+                          transform: translateX(0) !important;
+                          left: 0 !important;
+                          right: 0 !important;
+                        }
+                        #video-aspect-nuclear {
+                          max-width: 100vw !important;
+                          width: 100vw !important;
+                          padding-bottom: 56.25% !important;
+                        }
+                        #video-player-nuclear {
+                          max-width: 100vw !important;
+                          max-height: 50vh !important;
+                          width: 100% !important;
+                          height: auto !important;
+                        }
+                        #video-player-nuclear iframe {
+                          max-width: 100vw !important;
+                          max-height: 50vh !important;
+                          width: 100% !important;
+                          height: auto !important;
+                        }
+                      }
+                      @media (max-width: 480px) {
+                        #video-container-nuclear {
+                          max-width: 100vw !important;
+                          width: 100vw !important;
+                          margin: 0 !important;
+                          padding: 0 !important;
+                          transform: none !important;
+                        }
+                        #video-aspect-nuclear {
+                          max-width: 100vw !important;
+                          width: 100vw !important;
+                          padding-bottom: 56.25% !important;
+                        }
+                        #video-player-nuclear {
+                          max-width: 100vw !important;
+                          max-height: 40vh !important;
+                          width: 100% !important;
+                          height: auto !important;
+                        }
+                        #video-player-nuclear iframe {
+                          max-width: 100vw !important;
+                          max-height: 40vh !important;
+                          width: 100% !important;
+                          height: auto !important;
+                        }
+                      }
+                    `
+                  }} />
+                  
                   <div 
-                    className="video-aspect-container"
-                    style={{
-                      position: 'relative',
-                      width: '100%',
-                      maxWidth: '100%',
-                      maxWidth: '100vw',
-                      height: 0,
-                      paddingBottom: '56.25%',
-                      overflow: 'hidden',
-                      boxSizing: 'border-box',
-                      margin: '0',
-                      paddingLeft: '0',
-                      paddingRight: '0',
-                      paddingTop: '0'
-                    }}
+                    id="video-container-nuclear" 
+                    className="bg-black rounded-t-xl"
                   >
-                    {videoLoaded ? (
-                      <ReactPlayer
-                        url={article.videoUrl}
-                        width="100%"
-                        height="100%"
-                        controls={true}
-                        playing={false}
-                        playsinline={true}
-                        light={false}
-                        pip={false}
-                        style={{ 
-                          backgroundColor: '#000',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          maxWidth: '100%',
-                          maxWidth: '100vw',
-                          maxHeight: '100%',
-                          boxSizing: 'border-box',
-                          overflow: 'hidden',
-                          transform: 'none',
-                          margin: '0',
-                          padding: '0'
-                        }}
-                        config={{
-                          youtube: {
-                            playerVars: { 
-                              rel: 0,
-                              modestbranding: 1,
-                              fs: 1,
-                              cc_load_policy: 0,
-                              iv_load_policy: 3,
-                              autohide: 0,
-                              autoplay: 0,
-                              controls: 1,
-                              disablekb: 0,
-                              enablejsapi: 1,
-                              end: 0,
-                              hl: 'en',
-                              loop: 0,
-                              modestbranding: 1,
-                              origin: typeof window !== 'undefined' ? window.location.origin : '',
-                              playlist: '',
-                              playsinline: 1,
-                              start: 0
-                            }
-                          }
-                        }}
-                        onReady={() => {
-                          console.log('✅ News video ready:', article.title)
-                        }}
-                        onError={(error) => {
-                          console.error('❌ News video error:', error)
-                        }}
-                      />
-                    ) : (
-                      <div 
-                        className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
-                        style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          maxWidth: '100%',
-                          boxSizing: 'border-box'
-                        }}
-                      >
-                        <div className="text-center">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">Loading video...</p>
+                    <div id="video-aspect-nuclear">
+                      {videoLoaded ? (
+                        <div id="video-player-nuclear">
+                          <ReactPlayer
+                            url={article.videoUrl}
+                            width="100%"
+                            height="100%"
+                            controls={true}
+                            playing={false}
+                            playsinline={true}
+                            light={false}
+                            pip={false}
+                            config={{
+                              youtube: {
+                                playerVars: { 
+                                  rel: 0,
+                                  modestbranding: 1,
+                                  fs: 1,
+                                  cc_load_policy: 0,
+                                  iv_load_policy: 3,
+                                  autohide: 0,
+                                  autoplay: 0,
+                                  controls: 1,
+                                  disablekb: 0,
+                                  enablejsapi: 1,
+                                  end: 0,
+                                  hl: 'en',
+                                  loop: 0,
+                                  modestbranding: 1,
+                                  origin: typeof window !== 'undefined' ? window.location.origin : '',
+                                  playlist: '',
+                                  playsinline: 1,
+                                  start: 0
+                                }
+                              }
+                            }}
+                            onReady={() => {
+                              console.log('✅ News video ready:', article.title)
+                            }}
+                            onError={(error) => {
+                              console.error('❌ News video error:', error)
+                            }}
+                          />
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <div 
+                          className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            maxWidth: '100%',
+                            boxSizing: 'border-box'
+                          }}
+                        >
+                          <div className="text-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm">Loading video...</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </>
               ) : article.featuredImage ? (
                 <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                   <img

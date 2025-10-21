@@ -59,6 +59,7 @@ export default function InteractionButtons({
   const [localLikes, setLocalLikes] = useState(likes)
   const [localDislikes, setLocalDislikes] = useState(dislikes)
   const [localShares, setLocalShares] = useState(shares)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Check localStorage on mount to see if user has already liked/disliked
   useEffect(() => {
@@ -75,6 +76,10 @@ export default function InteractionButtons({
   const handleLike = async (e?: React.MouseEvent) => {
     e?.preventDefault()
     e?.stopPropagation()
+    
+    if (isLoading) return // Prevent multiple clicks
+    
+    setIsLoading(true)
     
     // Optimistic update for instant UI response
     const newLiked = !isLiked
@@ -106,9 +111,9 @@ export default function InteractionButtons({
     try {
       const action = newLiked ? 'like' : 'unlike'
       
-      // Single API call with timeout
+      // Single API call with shorter timeout for better UX
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
       
       const response = await fetch(`/api/${itemType}/${itemId}/like`, {
         method: 'POST',
@@ -126,19 +131,13 @@ export default function InteractionButtons({
         // Update with server response
         setLocalLikes(data.likes)
         
-        // Handle dislike removal if needed
+        // Handle dislike removal if needed (async, don't wait)
         if (newLiked && wasDisliked) {
-          try {
-            await fetch(`/api/${itemType}/${itemId}/dislike`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'undislike' }),
-              signal: controller.signal
-            })
-            setLocalDislikes(prev => prev - 1)
-          } catch (error) {
-            console.warn('Failed to remove dislike:', error)
-          }
+          fetch(`/api/${itemType}/${itemId}/dislike`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'undislike' })
+          }).catch(error => console.warn('Failed to remove dislike:', error))
         }
         
         onLike?.()
@@ -161,10 +160,16 @@ export default function InteractionButtons({
         setLocalDislikes(prev => prev + 1)
       }
       console.error('❌ Error liking item:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const handleDislike = async () => {
+    if (isLoading) return // Prevent multiple clicks
+    
+    setIsLoading(true)
+    
     // Optimistic update for instant UI response
     const newDisliked = !isDisliked
     const wasLiked = isLiked
@@ -195,9 +200,9 @@ export default function InteractionButtons({
     try {
       const action = newDisliked ? 'dislike' : 'undislike'
       
-      // Single API call with timeout
+      // Single API call with shorter timeout
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
       
       const response = await fetch(`/api/${itemType}/${itemId}/dislike`, {
         method: 'POST',
@@ -215,19 +220,13 @@ export default function InteractionButtons({
         // Update with server response
         setLocalDislikes(data.dislikes)
         
-        // Handle like removal if needed
+        // Handle like removal if needed (async, don't wait)
         if (newDisliked && wasLiked) {
-          try {
-            await fetch(`/api/${itemType}/${itemId}/like`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'unlike' }),
-              signal: controller.signal
-            })
-            setLocalLikes(prev => prev - 1)
-          } catch (error) {
-            console.warn('Failed to remove like:', error)
-          }
+          fetch(`/api/${itemType}/${itemId}/like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'unlike' })
+          }).catch(error => console.warn('Failed to remove like:', error))
         }
         
         onDislike?.()
@@ -250,6 +249,8 @@ export default function InteractionButtons({
         setLocalLikes(prev => prev + 1)
       }
       console.error('❌ Error disliking item:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -276,14 +277,19 @@ export default function InteractionButtons({
       <button
         type="button"
         onClick={(e) => handleLike(e)}
+        disabled={isLoading}
         className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
-          isLiked 
-            ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300' 
-            : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
+          isLoading 
+            ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+            : isLiked 
+              ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300' 
+              : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
         }`}
         aria-label={isLiked ? 'Unlike' : 'Like'}
       >
-        {isLiked ? (
+        {isLoading ? (
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+        ) : isLiked ? (
           <HandThumbUpSolid className="h-4 w-4" />
         ) : (
           <HandThumbUpIcon className="h-4 w-4" />
@@ -295,13 +301,18 @@ export default function InteractionButtons({
       {itemType === 'news' && (
         <button
           onClick={handleDislike}
+          disabled={isLoading}
           className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-            isDisliked 
-              ? 'bg-red-100 text-red-600' 
-              : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+            isLoading 
+              ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+              : isDisliked 
+                ? 'bg-red-100 text-red-600' 
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
           }`}
         >
-          {isDisliked ? (
+          {isLoading ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+          ) : isDisliked ? (
             <HandThumbDownSolid className="h-4 w-4" />
           ) : (
             <HandThumbDownIcon className="h-4 w-4" />
