@@ -94,18 +94,6 @@ export default async function NewsPage({
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-            {locale === 'ta' ? 'செய்திகள்' : 'News'}
-          </h1>
-          <p className="mt-2 text-lg text-gray-600">
-            {locale === 'ta' 
-              ? 'மதுரை மற்றும் சுற்றுவட்டார பகுதிகளின் சமீபத்திய செய்திகள்'
-              : 'Latest news from Madurai and surrounding areas'
-            }
-          </p>
-        </div>
 
         {/* Category Filter */}
         <div className="mb-8">

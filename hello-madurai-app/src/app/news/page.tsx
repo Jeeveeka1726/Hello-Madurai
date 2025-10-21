@@ -95,15 +95,6 @@ function NewsPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-            {t('news.title', 'Latest News', 'சமீபத்திய செய்திகள்')}
-          </h1>
-          <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
-            {t('news.subtitle', 'Stay updated with the latest happenings in Madurai', 'மதுரையில் நடக்கும் சமீபத்திய நிகழ்வுகளுடன் புதுப்பித்த நிலையில் இருங்கள்')}
-          </p>
-        </div>
 
         {/* Loading State */}
         {loading && (
