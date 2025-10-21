@@ -706,6 +706,23 @@ function NewsDetailPageContent() {
                     )}
                   </div>
                   
+                  {/* Hello Madurai Header - Newspaper Style */}
+                  <div className="text-center mb-6 py-3 border-t-2 border-b-2 border-blue-600 dark:border-blue-400">
+                    <div className="flex items-center justify-center space-x-2 mb-2">
+                      <img 
+                        src="/logo.jpg" 
+                        alt="Hello Madurai Logo" 
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                      <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
+                        Hello Madurai
+                      </h1>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                      {t('news.newspaperTagline', 'Your Local News & Information Center', 'உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம்')}
+                    </p>
+                  </div>
+                  
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight">
                     {t(`news.${article.id}.title`, article.title, article.title_ta)}
                   </h1>

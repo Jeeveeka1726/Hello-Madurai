@@ -93,6 +93,23 @@ function NewsPageContent() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Hello Madurai Header - Newspaper Style */}
+        <div className="text-center mb-8 py-4 border-t-2 border-b-2 border-blue-600 dark:border-blue-400 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div className="flex items-center justify-center space-x-3 mb-3">
+            <img 
+              src="/logo.jpg" 
+              alt="Hello Madurai Logo" 
+              className="h-10 w-10 rounded-full object-cover"
+            />
+            <h1 className="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400">
+              Hello Madurai
+            </h1>
+          </div>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-medium">
+            {t('news.newspaperTagline', 'Your Local News & Information Center', 'உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம்')}
+          </p>
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">

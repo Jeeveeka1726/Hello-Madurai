@@ -90,6 +90,26 @@ export default async function NewsPage({
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Hello Madurai Header - Newspaper Style */}
+        <div className="text-center mb-8 py-4 border-t-2 border-b-2 border-blue-600 bg-white rounded-lg shadow-sm">
+          <div className="flex items-center justify-center space-x-3 mb-3">
+            <img 
+              src="/logo.jpg" 
+              alt="Hello Madurai Logo" 
+              className="h-10 w-10 rounded-full object-cover"
+            />
+            <h1 className="text-3xl sm:text-4xl font-bold text-blue-600">
+              Hello Madurai
+            </h1>
+          </div>
+          <p className="text-sm sm:text-base text-gray-600 font-medium">
+            {locale === 'ta' 
+              ? 'உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம்'
+              : 'Your Local News & Information Center'
+            }
+          </p>
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
