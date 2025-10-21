@@ -61,6 +61,8 @@ export default function InteractionButtons({
   const [localShares, setLocalShares] = useState(Math.max(0, shares))
   const [isLoading, setIsLoading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false) // New state to prevent multiple clicks
+  const [isLikeLoading, setIsLikeLoading] = useState(false) // Separate loading state for like
+  const [isDislikeLoading, setIsDislikeLoading] = useState(false) // Separate loading state for dislike
 
   // Check localStorage on mount to see if user has already liked/disliked
   useEffect(() => {
@@ -79,13 +81,13 @@ export default function InteractionButtons({
     e?.stopPropagation()
     
     // Prevent multiple simultaneous clicks
-    if (isProcessing || isLoading) {
+    if (isProcessing || isLikeLoading) {
       console.log('🚫 Like action already in progress, ignoring click')
       return
     }
     
     setIsProcessing(true)
-    setIsLoading(true)
+    setIsLikeLoading(true)
     
     try {
       const action = isLiked ? 'unlike' : 'like'
@@ -140,20 +142,20 @@ export default function InteractionButtons({
     } catch (error) {
       console.error('❌ Error in handleLike:', error)
     } finally {
-      setIsLoading(false)
+      setIsLikeLoading(false)
       setIsProcessing(false)
     }
   }
 
   const handleDislike = async () => {
     // Prevent multiple simultaneous clicks
-    if (isProcessing || isLoading) {
+    if (isProcessing || isDislikeLoading) {
       console.log('🚫 Dislike action already in progress, ignoring click')
       return
     }
     
     setIsProcessing(true)
-    setIsLoading(true)
+    setIsDislikeLoading(true)
     
     try {
       const action = isDisliked ? 'undislike' : 'dislike'
@@ -208,7 +210,7 @@ export default function InteractionButtons({
     } catch (error) {
       console.error('❌ Error in handleDislike:', error)
     } finally {
-      setIsLoading(false)
+      setIsDislikeLoading(false)
       setIsProcessing(false)
     }
   }
@@ -236,9 +238,9 @@ export default function InteractionButtons({
       <button
         type="button"
         onClick={(e) => handleLike(e)}
-        disabled={isLoading || isProcessing}
+        disabled={isLikeLoading || isProcessing}
         className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-          (isLoading || isProcessing)
+          (isLikeLoading || isProcessing)
             ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
             : isLiked 
               ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800' 
@@ -246,7 +248,7 @@ export default function InteractionButtons({
         }`}
         aria-label={isLiked ? 'Unlike' : 'Like'}
       >
-        {(isLoading || isProcessing) ? (
+        {(isLikeLoading || isProcessing) ? (
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
         ) : isLiked ? (
           <HandThumbUpSolid className="h-4 w-4" />
@@ -260,16 +262,16 @@ export default function InteractionButtons({
       {itemType === 'news' && (
         <button
           onClick={handleDislike}
-          disabled={isLoading || isProcessing}
+          disabled={isDislikeLoading || isProcessing}
           className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-            (isLoading || isProcessing)
+            (isDislikeLoading || isProcessing)
               ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
               : isDisliked 
                 ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800' 
                 : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
           }`}
         >
-          {(isLoading || isProcessing) ? (
+          {(isDislikeLoading || isProcessing) ? (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
           ) : isDisliked ? (
             <HandThumbDownSolid className="h-4 w-4" />

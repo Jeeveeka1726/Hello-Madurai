@@ -358,19 +358,30 @@ function NewsDetailPageContent() {
                       /* VIDEO CONTAINER - VIEWPORT UNITS */
                       #video-ultimate-container {
                         position: relative !important;
-                        width: 100vw !important;
-                        max-width: 100vw !important;
-                        height: 56.25vw !important;
-                        max-height: 56.25vw !important;
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        height: 0 !important;
+                        padding-bottom: 56.25% !important;
                         overflow: hidden !important;
                         margin: 0 !important;
                         padding: 0 !important;
-                        left: 50% !important;
-                        right: 50% !important;
-                        margin-left: -50vw !important;
-                        margin-right: -50vw !important;
                         transform: none !important;
                         box-sizing: border-box !important;
+                      }
+                      
+                      /* LAPTOP VIEW - FIX CUTTING ISSUE */
+                      @media (min-width: 1024px) {
+                        #video-ultimate-container {
+                          width: 100% !important;
+                          max-width: 100% !important;
+                          height: 0 !important;
+                          padding-bottom: 56.25% !important;
+                          margin: 0 !important;
+                          left: 0 !important;
+                          right: 0 !important;
+                          margin-left: 0 !important;
+                          margin-right: 0 !important;
+                        }
                       }
                       
                       /* VIDEO PLAYER WRAPPER */

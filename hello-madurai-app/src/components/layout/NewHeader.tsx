@@ -71,12 +71,12 @@ export default function NewHeader() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-4 xl:space-x-6">
+          <nav className="hidden md:flex items-center space-x-2 lg:space-x-4 xl:space-x-6">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-2 xl:px-3 py-2 text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
+                className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-1 lg:px-2 xl:px-3 py-2 text-xs lg:text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
               >
                 {item.name}
               </Link>
@@ -103,7 +103,7 @@ export default function NewHeader() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 rounded-md text-neutral-700 dark:text-white hover:text-primary-600 dark:hover:text-primary-300 hover:bg-white-600 dark:hover:bg-primary-800 transition-colors duration-200"
+              className="md:hidden p-2 rounded-md text-neutral-700 dark:text-white hover:text-primary-600 dark:hover:text-primary-300 hover:bg-white-600 dark:hover:bg-primary-800 transition-colors duration-200"
             >
               {isMenuOpen ? (
                 <XMarkIcon className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -116,7 +116,7 @@ export default function NewHeader() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="lg:hidden">
+          <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 bg-blue-50 dark:bg-blue-900 border-t border-blue-200 dark:border-blue-700">
               {navigation.map((item) => (
                 <Link
