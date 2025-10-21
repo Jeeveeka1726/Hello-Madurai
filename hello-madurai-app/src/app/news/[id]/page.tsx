@@ -138,28 +138,41 @@ function NewsDetailPageContent() {
       const videoPlayer = document.getElementById('video-ultimate-player')
       
       if (videoContainer && videoPlayer) {
-        // Force container to be full width
-        videoContainer.style.width = '100vw'
-        videoContainer.style.maxWidth = '100vw'
-        videoContainer.style.marginLeft = '-50vw'
-        videoContainer.style.marginRight = '-50vw'
-        videoContainer.style.left = '50%'
-        videoContainer.style.right = '50%'
-        
-        // Calculate responsive height
+        // Get container width and calculate proper dimensions
+        const containerWidth = videoContainer.offsetWidth || window.innerWidth
         const viewportWidth = window.innerWidth
-        let height = '56.25vw'
         
-        if (viewportWidth <= 360) {
-          height = '35vh'
-        } else if (viewportWidth <= 480) {
-          height = '40vh'
-        } else if (viewportWidth <= 768) {
-          height = '50vh'
+        // For laptop screens (1024px+), use container width instead of viewport width
+        if (viewportWidth >= 1024) {
+          videoContainer.style.width = '100%'
+          videoContainer.style.maxWidth = '100%'
+          videoContainer.style.marginLeft = '0'
+          videoContainer.style.marginRight = '0'
+          videoContainer.style.left = '0'
+          videoContainer.style.right = '0'
+          videoContainer.style.height = '0'
+          videoContainer.style.paddingBottom = '56.25%'
+        } else {
+          // For mobile/tablet, use viewport width
+          videoContainer.style.width = '100vw'
+          videoContainer.style.maxWidth = '100vw'
+          videoContainer.style.marginLeft = '-50vw'
+          videoContainer.style.marginRight = '-50vw'
+          videoContainer.style.left = '50%'
+          videoContainer.style.right = '50%'
+          
+          // Calculate responsive height for mobile/tablet
+          let height = '56.25vw'
+          if (viewportWidth <= 360) {
+            height = '35vh'
+          } else if (viewportWidth <= 480) {
+            height = '40vh'
+          } else if (viewportWidth <= 768) {
+            height = '50vh'
+          }
+          videoContainer.style.height = height
+          videoContainer.style.maxHeight = height
         }
-        
-        videoContainer.style.height = height
-        videoContainer.style.maxHeight = height
         
         // Force player to fill container
         videoPlayer.style.width = '100%'
@@ -602,16 +615,43 @@ function NewsDetailPageContent() {
                         transform: none !important;
                         box-sizing: border-box !important;
                       }
+                      
+                      /* LAPTOP VIEW - ENSURE FULL VIDEO DISPLAY */
+                      @media (min-width: 1024px) {
+                        #video-ultimate-container {
+                          width: 100% !important;
+                          max-width: 100% !important;
+                          height: 0 !important;
+                          padding-bottom: 56.25% !important;
+                          position: relative !important;
+                          overflow: hidden !important;
+                        }
+                        
+                        #video-ultimate-player {
+                          position: absolute !important;
+                          top: 0 !important;
+                          left: 0 !important;
+                          width: 100% !important;
+                          height: 100% !important;
+                          max-width: 100% !important;
+                          max-height: 100% !important;
+                        }
+                        
+                        #video-ultimate-player > div {
+                          width: 100% !important;
+                          height: 100% !important;
+                          max-width: 100% !important;
+                          max-height: 100% !important;
+                        }
+                      }
                     `
                   }} />
                   
                   <div 
                     id="video-ultimate-container" 
-                    className="bg-black rounded-t-xl relative w-full"
+                    className="bg-black rounded-t-xl relative w-full aspect-video"
                     style={{
-                      aspectRatio: '16/9',
-                      width: '100%',
-                      height: 'auto'
+                      width: '100%'
                     }}
                   >
                     {videoLoaded ? (
