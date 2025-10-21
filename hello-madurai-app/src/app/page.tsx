@@ -126,7 +126,7 @@ export default function RootPage() {
               return (
                 <Link key={feature.name} href={feature.href}>
                   <div className="bg-blue-600 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 p-6 cursor-pointer group h-full flex flex-col">
-                    <div className={`inline-flex items-center justify-center p-3 ${feature.color} rounded-lg mb-4 group-hover:scale-110 transition-transform duration-200`}>
+                    <div className={`inline-flex items-center justify-center w-12 h-12 ${feature.color} rounded-lg mb-4 group-hover:scale-110 transition-transform duration-200`}>
                       <Icon className="h-6 w-6 text-white" />
                     </div>
                     <h3 className="text-xl font-semibold text-white mb-2">

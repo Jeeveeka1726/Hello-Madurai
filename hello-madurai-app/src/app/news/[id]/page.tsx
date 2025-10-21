@@ -203,6 +203,32 @@ function NewsDetailPageContent() {
           div.style.top = '0'
           div.style.left = '0'
         })
+        
+        // Force all video elements to fill completely
+        const videos = videoPlayer.querySelectorAll('video')
+        videos.forEach(video => {
+          video.style.width = '100%'
+          video.style.height = '100%'
+          video.style.maxWidth = '100%'
+          video.style.maxHeight = '100%'
+          video.style.objectFit = 'cover'
+          video.style.position = 'absolute'
+          video.style.top = '0'
+          video.style.left = '0'
+        })
+        
+        // Force all elements with video/player classes
+        const videoElements = videoPlayer.querySelectorAll('[class*="video"], [class*="player"], [class*="preview"]')
+        videoElements.forEach(element => {
+          element.style.width = '100%'
+          element.style.height = '100%'
+          element.style.maxWidth = '100%'
+          element.style.maxHeight = '100%'
+          element.style.objectFit = 'cover'
+          element.style.position = 'absolute'
+          element.style.top = '0'
+          element.style.left = '0'
+        })
       }
     }
 
@@ -512,6 +538,44 @@ function NewsDetailPageContent() {
                       /* YOUTUBE THUMBNAIL OVERRIDE */
                       #video-ultimate-player .ytp-cued-thumbnail-overlay,
                       #video-ultimate-player .ytp-thumbnail-overlay {
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        max-width: 100% !important;
+                        max-height: 100% !important;
+                        object-fit: cover !important;
+                        overflow: hidden !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        transform: none !important;
+                        box-sizing: border-box !important;
+                      }
+                      
+                      /* FORCE VIDEO TO FILL CONTAINER */
+                      #video-ultimate-player video,
+                      #video-ultimate-player > div video,
+                      #video-ultimate-player .react-player__preview video {
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        max-width: 100% !important;
+                        max-height: 100% !important;
+                        object-fit: cover !important;
+                        overflow: hidden !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        transform: none !important;
+                        box-sizing: border-box !important;
+                      }
+                      
+                      /* FORCE ALL VIDEO ELEMENTS */
+                      #video-ultimate-player [class*="video"],
+                      #video-ultimate-player [class*="player"],
+                      #video-ultimate-player [class*="preview"] {
                         position: absolute !important;
                         top: 0 !important;
                         left: 0 !important;
