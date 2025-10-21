@@ -309,7 +309,7 @@ export default function RichTextEditor({
       </div>
 
       {/* Editor Content */}
-      <div className="max-h-[600px] overflow-y-auto">
+      <div className="max-h-[600px] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md">
         <EditorContent editor={editor} />
       </div>
 
@@ -330,6 +330,23 @@ export default function RichTextEditor({
           min-height: 300px;
           font-size: 16px;
           line-height: 1.6;
+          color: #374151 !important;
+          background-color: white !important;
+          padding: 1rem;
+        }
+        .dark .ProseMirror {
+          color: #F9FAFB !important;
+          background-color: #1F2937 !important;
+        }
+        .ProseMirror p.is-editor-empty:first-child::before {
+          color: #9CA3AF;
+          content: attr(data-placeholder);
+          float: left;
+          height: 0;
+          pointer-events: none;
+        }
+        .dark .ProseMirror p.is-editor-empty:first-child::before {
+          color: #6B7280;
         }
         @media (min-width: 640px) {
           .ProseMirror {
