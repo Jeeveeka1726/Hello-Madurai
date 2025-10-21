@@ -607,7 +607,12 @@ function NewsDetailPageContent() {
                   
                   <div 
                     id="video-ultimate-container" 
-                    className="bg-black rounded-t-xl"
+                    className="bg-black rounded-t-xl relative w-full"
+                    style={{
+                      aspectRatio: '16/9',
+                      width: '100%',
+                      height: 'auto'
+                    }}
                   >
                     {videoLoaded ? (
                       <div id="video-ultimate-player">
@@ -618,8 +623,15 @@ function NewsDetailPageContent() {
                     controls={true}
                     playing={false}
                     playsinline={true}
-                          light={false}
-                          pip={false}
+                    light={false}
+                    pip={false}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%'
+                    }}
                     config={{
                       youtube: {
                         playerVars: { 

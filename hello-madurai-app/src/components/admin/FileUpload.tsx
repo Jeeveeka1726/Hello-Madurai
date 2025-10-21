@@ -105,10 +105,16 @@ export default function FileUpload({
     formData.append('type', fileType)
 
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+      
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
+        signal: controller.signal
       })
+
+      clearTimeout(timeoutId)
 
       if (response.ok) {
         const data = await response.json()
@@ -122,11 +128,15 @@ export default function FileUpload({
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
         console.error('Upload failed:', errorData)
-        toast.error(errorData.error || `Failed to upload ${config.label.toLowerCase()}.`)
+        toast.error(`❌ Upload failed: ${errorData.error || 'Unknown error'}. Please try again.`)
       }
     } catch (error) {
       console.error('Upload error:', error)
-      toast.error(`Error uploading ${config.label.toLowerCase()}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast.error(`⏰ Upload timeout. Please try again with a smaller file.`)
+      } else {
+        toast.error(`❌ Upload error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`)
+      }
     } finally {
       setUploading(false)
     }

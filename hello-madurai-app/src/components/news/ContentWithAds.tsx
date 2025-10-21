@@ -119,8 +119,8 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
     if (ad.htmlCode) {
       // HTML/AdSense code
       return `
-        <div class="ad-container my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-blue-200 dark:border-blue-700">
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">Advertisement</p>
+        <div class="ad-container my-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg border-2 border-blue-300 dark:border-blue-600 shadow-lg">
+          <p class="text-xs text-blue-600 dark:text-blue-400 mb-3 text-center font-semibold">📢 Advertisement</p>
           ${ad.htmlCode}
         </div>
       `
@@ -130,10 +130,10 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
       const clickHandler = ad.link ? `onclick="handleAdClick('${ad.id}', '${ad.link}')"` : ''
       
       return `
-        <div class="ad-container my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-blue-200 dark:border-blue-700">
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">Advertisement</p>
+        <div class="ad-container my-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg border-2 border-blue-300 dark:border-blue-600 shadow-lg">
+          <p class="text-xs text-blue-600 dark:text-blue-400 mb-3 text-center font-semibold">📢 Advertisement</p>
           ${ad.link 
-            ? `<a href="${ad.link}" target="_blank" rel="noopener noreferrer" ${clickHandler} class="block hover:opacity-90 transition-opacity">${img}</a>`
+            ? `<a href="${ad.link}" target="_blank" rel="noopener noreferrer" ${clickHandler} class="block hover:opacity-90 transition-opacity cursor-pointer">${img}</a>`
             : img
           }
         </div>
