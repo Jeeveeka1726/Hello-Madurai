@@ -76,108 +76,180 @@ export default function InteractionButtons({
     e?.preventDefault()
     e?.stopPropagation()
     
-    console.log('👍 Like button clicked!')
-    console.log('Item:', itemType, itemId)
+    // Optimistic update for instant UI response
+    const newLiked = !isLiked
+    const wasDisliked = isDisliked
+    
+    // Update UI immediately
+    setIsLiked(newLiked)
+    setLocalLikes(prev => newLiked ? prev + 1 : prev - 1)
+    
+    // If switching from dislike to like, update dislike UI too
+    if (newLiked && wasDisliked) {
+      setIsDisliked(false)
+      setLocalDislikes(prev => prev - 1)
+    }
+    
+    // Save to localStorage immediately
+    const likeKey = `${itemType}_${itemId}_liked`
+    const dislikeKey = `${itemType}_${itemId}_disliked`
+    
+    if (newLiked) {
+      localStorage.setItem(likeKey, 'true')
+      if (wasDisliked) {
+        localStorage.removeItem(dislikeKey)
+      }
+    } else {
+      localStorage.removeItem(likeKey)
+    }
     
     try {
-      const newLiked = !isLiked
       const action = newLiked ? 'like' : 'unlike'
       
-      console.log('Sending like request:', action)
+      // Single API call with timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
       
       const response = await fetch(`/api/${itemType}/${itemId}/like`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ action })
+        body: JSON.stringify({ action }),
+        signal: controller.signal
       })
       
-      console.log('Like response status:', response.status)
+      clearTimeout(timeoutId)
       
       if (response.ok) {
         const data = await response.json()
-        console.log('✅ Like successful:', data)
+        // Update with server response
+        setLocalLikes(data.likes)
         
-        setIsLiked(newLiked)
-        setLocalLikes(prev => newLiked ? prev + 1 : prev - 1)
-        
-        // Save to localStorage
-        const likeKey = `${itemType}_${itemId}_liked`
-        if (newLiked) {
-          localStorage.setItem(likeKey, 'true')
-        } else {
-          localStorage.removeItem(likeKey)
-        }
-        
-        // If we're liking, remove dislike if it was active
-        if (newLiked && isDisliked) {
-          // Call dislike API to decrement
-          await fetch(`/api/${itemType}/${itemId}/dislike`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ action: 'undislike' })
-          })
-          setIsDisliked(false)
-          setLocalDislikes(prev => prev - 1)
-          localStorage.removeItem(`${itemType}_${itemId}_disliked`)
+        // Handle dislike removal if needed
+        if (newLiked && wasDisliked) {
+          try {
+            await fetch(`/api/${itemType}/${itemId}/dislike`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'undislike' }),
+              signal: controller.signal
+            })
+            setLocalDislikes(prev => prev - 1)
+          } catch (error) {
+            console.warn('Failed to remove dislike:', error)
+          }
         }
         
         onLike?.()
       } else {
-        console.error('❌ Like failed:', response.status, await response.text())
+        // Revert optimistic update on failure
+        setIsLiked(!newLiked)
+        setLocalLikes(prev => newLiked ? prev - 1 : prev + 1)
+        if (newLiked && wasDisliked) {
+          setIsDisliked(true)
+          setLocalDislikes(prev => prev + 1)
+        }
+        console.error('❌ Like failed:', response.status)
       }
     } catch (error) {
+      // Revert optimistic update on error
+      setIsLiked(!newLiked)
+      setLocalLikes(prev => newLiked ? prev - 1 : prev + 1)
+      if (newLiked && wasDisliked) {
+        setIsDisliked(true)
+        setLocalDislikes(prev => prev + 1)
+      }
       console.error('❌ Error liking item:', error)
     }
   }
 
   const handleDislike = async () => {
+    // Optimistic update for instant UI response
+    const newDisliked = !isDisliked
+    const wasLiked = isLiked
+    
+    // Update UI immediately
+    setIsDisliked(newDisliked)
+    setLocalDislikes(prev => newDisliked ? prev + 1 : prev - 1)
+    
+    // If switching from like to dislike, update like UI too
+    if (newDisliked && wasLiked) {
+      setIsLiked(false)
+      setLocalLikes(prev => prev - 1)
+    }
+    
+    // Save to localStorage immediately
+    const dislikeKey = `${itemType}_${itemId}_disliked`
+    const likeKey = `${itemType}_${itemId}_liked`
+    
+    if (newDisliked) {
+      localStorage.setItem(dislikeKey, 'true')
+      if (wasLiked) {
+        localStorage.removeItem(likeKey)
+      }
+    } else {
+      localStorage.removeItem(dislikeKey)
+    }
+    
     try {
-      const newDisliked = !isDisliked
       const action = newDisliked ? 'dislike' : 'undislike'
+      
+      // Single API call with timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
       
       const response = await fetch(`/api/${itemType}/${itemId}/dislike`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ action })
+        body: JSON.stringify({ action }),
+        signal: controller.signal
       })
       
+      clearTimeout(timeoutId)
+      
       if (response.ok) {
-        setIsDisliked(newDisliked)
-        setLocalDislikes(prev => newDisliked ? prev + 1 : prev - 1)
+        const data = await response.json()
+        // Update with server response
+        setLocalDislikes(data.dislikes)
         
-        // Save to localStorage
-        const dislikeKey = `${itemType}_${itemId}_disliked`
-        if (newDisliked) {
-          localStorage.setItem(dislikeKey, 'true')
-        } else {
-          localStorage.removeItem(dislikeKey)
-        }
-        
-        // If we're disliking, remove like if it was active
-        if (newDisliked && isLiked) {
-          // Call like API to decrement
-          await fetch(`/api/${itemType}/${itemId}/like`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ action: 'unlike' })
-          })
-          setIsLiked(false)
-          setLocalLikes(prev => prev - 1)
-          localStorage.removeItem(`${itemType}_${itemId}_liked`)
+        // Handle like removal if needed
+        if (newDisliked && wasLiked) {
+          try {
+            await fetch(`/api/${itemType}/${itemId}/like`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'unlike' }),
+              signal: controller.signal
+            })
+            setLocalLikes(prev => prev - 1)
+          } catch (error) {
+            console.warn('Failed to remove like:', error)
+          }
         }
         
         onDislike?.()
+      } else {
+        // Revert optimistic update on failure
+        setIsDisliked(!newDisliked)
+        setLocalDislikes(prev => newDisliked ? prev - 1 : prev + 1)
+        if (newDisliked && wasLiked) {
+          setIsLiked(true)
+          setLocalLikes(prev => prev + 1)
+        }
+        console.error('❌ Dislike failed:', response.status)
       }
     } catch (error) {
-      console.error('Error disliking item:', error)
+      // Revert optimistic update on error
+      setIsDisliked(!newDisliked)
+      setLocalDislikes(prev => newDisliked ? prev - 1 : prev + 1)
+      if (newDisliked && wasLiked) {
+        setIsLiked(true)
+        setLocalLikes(prev => prev + 1)
+      }
+      console.error('❌ Error disliking item:', error)
     }
   }
 

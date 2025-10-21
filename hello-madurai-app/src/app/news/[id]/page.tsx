@@ -235,9 +235,14 @@ function NewsDetailPageContent() {
                   className="video-container bg-black rounded-t-xl"
                   style={{
                     maxWidth: '100%',
+                    maxWidth: '100vw',
                     width: '100%',
                     overflow: 'hidden',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    margin: '0',
+                    padding: '0',
+                    position: 'relative',
+                    transform: 'none'
                   }}
                 >
                   <div 
@@ -245,11 +250,16 @@ function NewsDetailPageContent() {
                     style={{
                       position: 'relative',
                       width: '100%',
+                      maxWidth: '100%',
+                      maxWidth: '100vw',
                       height: 0,
                       paddingBottom: '56.25%',
                       overflow: 'hidden',
-                      maxWidth: '100%',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      margin: '0',
+                      paddingLeft: '0',
+                      paddingRight: '0',
+                      paddingTop: '0'
                     }}
                   >
                     {videoLoaded ? (
@@ -270,8 +280,13 @@ function NewsDetailPageContent() {
                           width: '100%',
                           height: '100%',
                           maxWidth: '100%',
+                          maxWidth: '100vw',
                           maxHeight: '100%',
-                          boxSizing: 'border-box'
+                          boxSizing: 'border-box',
+                          overflow: 'hidden',
+                          transform: 'none',
+                          margin: '0',
+                          padding: '0'
                         }}
                         config={{
                           youtube: {
