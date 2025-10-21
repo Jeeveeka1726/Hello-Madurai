@@ -237,15 +237,15 @@ export default function AdminNewsPage() {
 
         {/* Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-blue-900">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+            <Card className="w-full max-w-2xl sm:max-w-3xl max-h-[95vh] overflow-y-auto bg-white dark:bg-blue-900">
               <CardHeader>
                 <CardTitle className="text-gray-900 dark:text-white">
                   {editingNews ? (language === 'ta' ? 'செய்தி திருத்து' : 'Edit News') : (language === 'ta' ? 'செய்தி சேர்க்க' : 'Add News')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Title - English & Tamil */}
                   <BilingualField
                     label="Title"
@@ -279,7 +279,7 @@ export default function AdminNewsPage() {
                   />
 
                   {/* Content - English & Tamil */}
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Content (English) *
@@ -314,7 +314,7 @@ export default function AdminNewsPage() {
                     className="mb-6"
                   />
 
-                  <div className="grid gap-6 md:grid-cols-3">
+                  <div className="grid gap-4 md:grid-cols-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         {language === 'ta' ? 'வகை' : 'Category'} *

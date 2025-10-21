@@ -62,7 +62,7 @@ export default function BilingualField({
   const inputType = isTextarea ? undefined : type
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-3 sm:space-y-4">
       {/* English Field */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

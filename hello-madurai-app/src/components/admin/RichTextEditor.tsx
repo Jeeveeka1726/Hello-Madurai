@@ -309,7 +309,7 @@ export default function RichTextEditor({
       </div>
 
       {/* Editor Content */}
-      <div className="max-h-[600px] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md">
+      <div className="max-h-[400px] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md">
         <EditorContent editor={editor} />
       </div>
 
@@ -327,7 +327,7 @@ export default function RichTextEditor({
       {/* TipTap Styles - Mobile Optimized */}
       <style jsx global>{`
         .ProseMirror {
-          min-height: 300px;
+          min-height: 200px;
           font-size: 16px;
           line-height: 1.6;
           color: #374151 !important;
