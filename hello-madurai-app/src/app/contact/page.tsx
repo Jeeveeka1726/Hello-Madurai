@@ -90,18 +90,18 @@ export default function ContactPage() {
             {contactInfo.map((info, index) => {
               const Icon = info.icon
               return (
-                <Card key={index} className="bg-blue-600 border-blue-500 hover:bg-blue-500 transition-colors">
-                  <CardContent className="p-6 text-center">
+                <Card key={index} className="bg-blue-600 border-blue-500 hover:bg-blue-500 transition-colors h-full">
+                  <CardContent className="p-6 text-center h-full flex flex-col">
                     <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-500 rounded-lg mb-4">
                       <Icon className="h-6 w-6 text-white" />
                     </div>
                     <h3 className="text-lg font-semibold text-white mb-2">
                       {info.title}
                     </h3>
-                    <p className="text-blue-200 font-medium mb-2">
+                    <p className="text-blue-200 font-medium mb-2 break-words">
                       {info.value}
                     </p>
-                    <p className="text-blue-300 text-sm">
+                    <p className="text-blue-300 text-sm flex-grow">
                       {info.description}
                     </p>
                   </CardContent>

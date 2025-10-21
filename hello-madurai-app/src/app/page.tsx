@@ -125,14 +125,14 @@ export default function RootPage() {
               const Icon = feature.icon
               return (
                 <Link key={feature.name} href={feature.href}>
-                  <div className="bg-blue-600 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 p-6 cursor-pointer group">
+                  <div className="bg-blue-600 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 p-6 cursor-pointer group h-full flex flex-col">
                     <div className={`inline-flex items-center justify-center p-3 ${feature.color} rounded-lg mb-4 group-hover:scale-110 transition-transform duration-200`}>
                       <Icon className="h-6 w-6 text-white" />
                     </div>
                     <h3 className="text-xl font-semibold text-white mb-2">
                       {feature.name}
                     </h3>
-                    <p className="text-blue-200">
+                    <p className="text-blue-200 flex-grow">
                       {feature.description}
                     </p>
                   </div>
