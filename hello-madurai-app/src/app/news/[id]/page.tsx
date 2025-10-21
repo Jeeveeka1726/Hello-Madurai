@@ -177,6 +177,32 @@ function NewsDetailPageContent() {
           iframe.style.top = '0'
           iframe.style.left = '0'
         })
+        
+        // Force all images (thumbnails) to fill completely
+        const images = videoPlayer.querySelectorAll('img')
+        images.forEach(img => {
+          img.style.width = '100%'
+          img.style.height = '100%'
+          img.style.maxWidth = '100%'
+          img.style.maxHeight = '100%'
+          img.style.objectFit = 'cover'
+          img.style.position = 'absolute'
+          img.style.top = '0'
+          img.style.left = '0'
+        })
+        
+        // Force all divs to fill completely
+        const divs = videoPlayer.querySelectorAll('div')
+        divs.forEach(div => {
+          div.style.width = '100%'
+          div.style.height = '100%'
+          div.style.maxWidth = '100%'
+          div.style.maxHeight = '100%'
+          div.style.objectFit = 'cover'
+          div.style.position = 'absolute'
+          div.style.top = '0'
+          div.style.left = '0'
+        })
       }
     }
 
@@ -351,6 +377,43 @@ function NewsDetailPageContent() {
                         padding: 0 !important;
                         transform: none !important;
                         box-sizing: border-box !important;
+                        object-fit: cover !important;
+                      }
+                      
+                      /* VIDEO THUMBNAIL/COVER */
+                      #video-ultimate-player > div > div {
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        max-width: 100% !important;
+                        max-height: 100% !important;
+                        overflow: hidden !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        transform: none !important;
+                        box-sizing: border-box !important;
+                        object-fit: cover !important;
+                      }
+                      
+                      /* VIDEO THUMBNAIL IMAGE */
+                      #video-ultimate-player img,
+                      #video-ultimate-player > div img,
+                      #video-ultimate-player > div > div img {
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        max-width: 100% !important;
+                        max-height: 100% !important;
+                        object-fit: cover !important;
+                        overflow: hidden !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        transform: none !important;
+                        box-sizing: border-box !important;
                       }
                       
                       /* IFRAME OVERRIDE */
@@ -426,6 +489,43 @@ function NewsDetailPageContent() {
                         margin: 0 !important;
                         padding: 0 !important;
                       }
+                      
+                      /* VIDEO THUMBNAIL FULL COVERAGE */
+                      #video-ultimate-player .react-player__preview,
+                      #video-ultimate-player .react-player__shadow,
+                      #video-ultimate-player .react-player__poster {
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        max-width: 100% !important;
+                        max-height: 100% !important;
+                        object-fit: cover !important;
+                        overflow: hidden !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        transform: none !important;
+                        box-sizing: border-box !important;
+                      }
+                      
+                      /* YOUTUBE THUMBNAIL OVERRIDE */
+                      #video-ultimate-player .ytp-cued-thumbnail-overlay,
+                      #video-ultimate-player .ytp-thumbnail-overlay {
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        max-width: 100% !important;
+                        max-height: 100% !important;
+                        object-fit: cover !important;
+                        overflow: hidden !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        transform: none !important;
+                        box-sizing: border-box !important;
+                      }
                     `
                   }} />
                   
@@ -435,20 +535,20 @@ function NewsDetailPageContent() {
                   >
                     {videoLoaded ? (
                       <div id="video-ultimate-player">
-                        <ReactPlayer
-                          url={article.videoUrl}
-                          width="100%"
-                          height="100%"
-                          controls={true}
-                          playing={false}
-                          playsinline={true}
+                  <ReactPlayer
+                    url={article.videoUrl}
+                    width="100%"
+                    height="100%"
+                    controls={true}
+                    playing={false}
+                    playsinline={true}
                           light={false}
                           pip={false}
-                          config={{
-                            youtube: {
-                              playerVars: { 
-                                rel: 0,
-                                modestbranding: 1,
+                    config={{
+                      youtube: {
+                        playerVars: { 
+                          rel: 0,
+                          modestbranding: 1,
                                 fs: 1,
                                 cc_load_policy: 0,
                                 iv_load_policy: 3,
@@ -465,17 +565,17 @@ function NewsDetailPageContent() {
                                 playlist: '',
                                 playsinline: 1,
                                 start: 0
-                              }
-                            }
-                          }}
-                          onReady={() => {
-                            console.log('✅ News video ready:', article.title)
-                          }}
-                          onError={(error) => {
-                            console.error('❌ News video error:', error)
-                          }}
-                        />
-                      </div>
+                        }
+                      }
+                    }}
+                    onReady={() => {
+                      console.log('✅ News video ready:', article.title)
+                    }}
+                    onError={(error) => {
+                      console.error('❌ News video error:', error)
+                    }}
+                  />
+                </div>
                     ) : (
                       <div 
                         className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
