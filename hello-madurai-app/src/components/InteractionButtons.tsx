@@ -79,20 +79,24 @@ export default function InteractionButtons({
     
     if (isLoading) return // Prevent multiple clicks
     
-    setIsLoading(true)
+    // Store original values for potential rollback
+    const originalLiked = isLiked
+    const originalDisliked = isDisliked
+    const originalLikes = localLikes
+    const originalDislikes = localDislikes
     
     // Optimistic update for instant UI response
     const newLiked = !isLiked
     const wasDisliked = isDisliked
     
-    // Update UI immediately
+    // Update UI immediately with bounds checking
     setIsLiked(newLiked)
-    setLocalLikes(prev => newLiked ? prev + 1 : prev - 1)
+    setLocalLikes(prev => Math.max(0, newLiked ? prev + 1 : prev - 1))
     
     // If switching from dislike to like, update dislike UI too
     if (newLiked && wasDisliked) {
       setIsDisliked(false)
-      setLocalDislikes(prev => prev - 1)
+      setLocalDislikes(prev => Math.max(0, prev - 1))
     }
     
     // Save to localStorage immediately
@@ -113,7 +117,7 @@ export default function InteractionButtons({
       
       // Single API call with shorter timeout for better UX
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 second timeout
       
       const response = await fetch(`/api/${itemType}/${itemId}/like`, {
         method: 'POST',
@@ -128,8 +132,8 @@ export default function InteractionButtons({
       
       if (response.ok) {
         const data = await response.json()
-        // Update with server response
-        setLocalLikes(data.likes)
+        // Update with server response, ensure non-negative
+        setLocalLikes(Math.max(0, data.likes || 0))
         
         // Handle dislike removal if needed (async, don't wait)
         if (newLiked && wasDisliked) {
@@ -143,21 +147,21 @@ export default function InteractionButtons({
         onLike?.()
       } else {
         // Revert optimistic update on failure
-        setIsLiked(!newLiked)
-        setLocalLikes(prev => newLiked ? prev - 1 : prev + 1)
+        setIsLiked(originalLiked)
+        setLocalLikes(originalLikes)
         if (newLiked && wasDisliked) {
-          setIsDisliked(true)
-          setLocalDislikes(prev => prev + 1)
+          setIsDisliked(originalDisliked)
+          setLocalDislikes(originalDislikes)
         }
         console.error('❌ Like failed:', response.status)
       }
     } catch (error) {
       // Revert optimistic update on error
-      setIsLiked(!newLiked)
-      setLocalLikes(prev => newLiked ? prev - 1 : prev + 1)
+      setIsLiked(originalLiked)
+      setLocalLikes(originalLikes)
       if (newLiked && wasDisliked) {
-        setIsDisliked(true)
-        setLocalDislikes(prev => prev + 1)
+        setIsDisliked(originalDisliked)
+        setLocalDislikes(originalDislikes)
       }
       console.error('❌ Error liking item:', error)
     } finally {
@@ -168,20 +172,26 @@ export default function InteractionButtons({
   const handleDislike = async () => {
     if (isLoading) return // Prevent multiple clicks
     
+    // Store original values for potential rollback
+    const originalLiked = isLiked
+    const originalDisliked = isDisliked
+    const originalLikes = localLikes
+    const originalDislikes = localDislikes
+    
     setIsLoading(true)
     
     // Optimistic update for instant UI response
     const newDisliked = !isDisliked
     const wasLiked = isLiked
     
-    // Update UI immediately
+    // Update UI immediately with bounds checking
     setIsDisliked(newDisliked)
-    setLocalDislikes(prev => newDisliked ? prev + 1 : prev - 1)
+    setLocalDislikes(prev => Math.max(0, newDisliked ? prev + 1 : prev - 1))
     
     // If switching from like to dislike, update like UI too
     if (newDisliked && wasLiked) {
       setIsLiked(false)
-      setLocalLikes(prev => prev - 1)
+      setLocalLikes(prev => Math.max(0, prev - 1))
     }
     
     // Save to localStorage immediately
@@ -202,7 +212,7 @@ export default function InteractionButtons({
       
       // Single API call with shorter timeout
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 second timeout
       
       const response = await fetch(`/api/${itemType}/${itemId}/dislike`, {
         method: 'POST',
@@ -217,8 +227,8 @@ export default function InteractionButtons({
       
       if (response.ok) {
         const data = await response.json()
-        // Update with server response
-        setLocalDislikes(data.dislikes)
+        // Update with server response, ensure non-negative
+        setLocalDislikes(Math.max(0, data.dislikes || 0))
         
         // Handle like removal if needed (async, don't wait)
         if (newDisliked && wasLiked) {
@@ -232,21 +242,21 @@ export default function InteractionButtons({
         onDislike?.()
       } else {
         // Revert optimistic update on failure
-        setIsDisliked(!newDisliked)
-        setLocalDislikes(prev => newDisliked ? prev - 1 : prev + 1)
+        setIsDisliked(originalDisliked)
+        setLocalDislikes(originalDislikes)
         if (newDisliked && wasLiked) {
-          setIsLiked(true)
-          setLocalLikes(prev => prev + 1)
+          setIsLiked(originalLiked)
+          setLocalLikes(originalLikes)
         }
         console.error('❌ Dislike failed:', response.status)
       }
     } catch (error) {
       // Revert optimistic update on error
-      setIsDisliked(!newDisliked)
-      setLocalDislikes(prev => newDisliked ? prev - 1 : prev + 1)
+      setIsDisliked(originalDisliked)
+      setLocalDislikes(originalDislikes)
       if (newDisliked && wasLiked) {
-        setIsLiked(true)
-        setLocalLikes(prev => prev + 1)
+        setIsLiked(originalLiked)
+        setLocalLikes(originalLikes)
       }
       console.error('❌ Error disliking item:', error)
     } finally {
@@ -278,11 +288,11 @@ export default function InteractionButtons({
         type="button"
         onClick={(e) => handleLike(e)}
         disabled={isLoading}
-        className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+        className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
           isLoading 
             ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
             : isLiked 
-              ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300' 
+              ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800' 
               : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
         }`}
         aria-label={isLiked ? 'Unlike' : 'Like'}
@@ -294,7 +304,7 @@ export default function InteractionButtons({
         ) : (
           <HandThumbUpIcon className="h-4 w-4" />
         )}
-        <span className="text-sm font-medium">{localLikes}</span>
+        <span className="text-sm font-medium">{Math.max(0, localLikes)}</span>
       </button>
 
       {/* Dislike Button (only for news) */}
@@ -306,8 +316,8 @@ export default function InteractionButtons({
             isLoading 
               ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
               : isDisliked 
-                ? 'bg-red-100 text-red-600' 
-                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+                ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800' 
+                : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
           }`}
         >
           {isLoading ? (
@@ -317,7 +327,7 @@ export default function InteractionButtons({
           ) : (
             <HandThumbDownIcon className="h-4 w-4" />
           )}
-          <span className="text-sm font-medium">{localDislikes}</span>
+          <span className="text-sm font-medium">{Math.max(0, localDislikes)}</span>
         </button>
       )}
 
