@@ -60,6 +60,7 @@ export default function InteractionButtons({
   const [localDislikes, setLocalDislikes] = useState(Math.max(0, dislikes))
   const [localShares, setLocalShares] = useState(Math.max(0, shares))
   const [isLoading, setIsLoading] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false) // New state to prevent multiple clicks
 
   // Check localStorage on mount to see if user has already liked/disliked
   useEffect(() => {
@@ -77,72 +78,53 @@ export default function InteractionButtons({
     e?.preventDefault()
     e?.stopPropagation()
     
-    if (isLoading) return // Prevent multiple clicks
-    
-    // Store original values for potential rollback
-    const originalLiked = isLiked
-    const originalDisliked = isDisliked
-    const originalLikes = localLikes
-    const originalDislikes = localDislikes
-    
-    // Optimistic update for instant UI response
-    const newLiked = !isLiked
-    const wasDisliked = isDisliked
-    
-    // Update UI immediately with bounds checking
-    setIsLiked(newLiked)
-    setLocalLikes(prev => {
-      if (newLiked) {
-        return prev + 1 // Adding a like
-      } else {
-        return Math.max(0, prev - 1) // Removing a like, but never go below 0
-      }
-    })
-    
-    // If switching from dislike to like, update dislike UI too
-    if (newLiked && wasDisliked) {
-      setIsDisliked(false)
-      setLocalDislikes(prev => Math.max(0, prev - 1))
+    // Prevent multiple simultaneous clicks
+    if (isProcessing || isLoading) {
+      console.log('🚫 Like action already in progress, ignoring click')
+      return
     }
     
-    // Save to localStorage immediately
-    const likeKey = `${itemType}_${itemId}_liked`
-    const dislikeKey = `${itemType}_${itemId}_disliked`
-    
-    if (newLiked) {
-      localStorage.setItem(likeKey, 'true')
-      if (wasDisliked) {
-        localStorage.removeItem(dislikeKey)
-      }
-    } else {
-      localStorage.removeItem(likeKey)
-    }
+    setIsProcessing(true)
+    setIsLoading(true)
     
     try {
-      const action = newLiked ? 'like' : 'unlike'
+      const action = isLiked ? 'unlike' : 'like'
+      console.log(`👍 Processing ${action} for ${itemType} ${itemId}`)
       
-      // Single API call with reasonable timeout
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
-      
+      // Make API call first
       const response = await fetch(`/api/${itemType}/${itemId}/like`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ action }),
-        signal: controller.signal
+        body: JSON.stringify({ action })
       })
-      
-      clearTimeout(timeoutId)
       
       if (response.ok) {
         const data = await response.json()
-        // Update with server response, ensure non-negative
+        
+        // Update state with server response
+        setIsLiked(!isLiked)
         setLocalLikes(Math.max(0, data.likes || 0))
         
-        // Handle dislike removal if needed (async, don't wait)
-        if (newLiked && wasDisliked) {
+        // Update localStorage
+        const likeKey = `${itemType}_${itemId}_liked`
+        if (!isLiked) {
+          localStorage.setItem(likeKey, 'true')
+        } else {
+          localStorage.removeItem(likeKey)
+        }
+        
+        // If switching from dislike to like, handle dislike removal
+        if (!isLiked && isDisliked) {
+          setIsDisliked(false)
+          setLocalDislikes(prev => Math.max(0, prev - 1))
+          
+          // Remove dislike from localStorage
+          const dislikeKey = `${itemType}_${itemId}_disliked`
+          localStorage.removeItem(dislikeKey)
+          
+          // Call dislike API to remove dislike
           fetch(`/api/${itemType}/${itemId}/dislike`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -151,107 +133,66 @@ export default function InteractionButtons({
         }
         
         onLike?.()
+        console.log(`✅ ${action} successful: ${data.likes} likes`)
       } else {
-        // Revert optimistic update on failure
-        setIsLiked(originalLiked)
-        setLocalLikes(originalLikes)
-        if (newLiked && wasDisliked) {
-          setIsDisliked(originalDisliked)
-          setLocalDislikes(originalDislikes)
-        }
-        console.error('❌ Like failed:', response.status)
+        console.error('❌ Like API failed:', response.status)
       }
     } catch (error) {
-      // Revert optimistic update on error
-      setIsLiked(originalLiked)
-      setLocalLikes(originalLikes)
-      if (newLiked && wasDisliked) {
-        setIsDisliked(originalDisliked)
-        setLocalDislikes(originalDislikes)
-      }
-      
-      // Handle different error types
-      if (error.name === 'AbortError') {
-        console.warn('⚠️ Like request timed out, but UI was updated optimistically')
-        // Don't revert on timeout - keep the optimistic update
-        return
-      } else {
-        console.error('❌ Error liking item:', error)
-      }
+      console.error('❌ Error in handleLike:', error)
     } finally {
       setIsLoading(false)
+      setIsProcessing(false)
     }
   }
 
   const handleDislike = async () => {
-    if (isLoading) return // Prevent multiple clicks
+    // Prevent multiple simultaneous clicks
+    if (isProcessing || isLoading) {
+      console.log('🚫 Dislike action already in progress, ignoring click')
+      return
+    }
     
-    // Store original values for potential rollback
-    const originalLiked = isLiked
-    const originalDisliked = isDisliked
-    const originalLikes = localLikes
-    const originalDislikes = localDislikes
-    
+    setIsProcessing(true)
     setIsLoading(true)
     
-    // Optimistic update for instant UI response
-    const newDisliked = !isDisliked
-    const wasLiked = isLiked
-    
-    // Update UI immediately with bounds checking
-    setIsDisliked(newDisliked)
-    setLocalDislikes(prev => {
-      if (newDisliked) {
-        return prev + 1 // Adding a dislike
-      } else {
-        return Math.max(0, prev - 1) // Removing a dislike, but never go below 0
-      }
-    })
-    
-    // If switching from like to dislike, update like UI too
-    if (newDisliked && wasLiked) {
-      setIsLiked(false)
-      setLocalLikes(prev => Math.max(0, prev - 1))
-    }
-    
-    // Save to localStorage immediately
-    const dislikeKey = `${itemType}_${itemId}_disliked`
-    const likeKey = `${itemType}_${itemId}_liked`
-    
-    if (newDisliked) {
-      localStorage.setItem(dislikeKey, 'true')
-      if (wasLiked) {
-        localStorage.removeItem(likeKey)
-      }
-    } else {
-      localStorage.removeItem(dislikeKey)
-    }
-    
     try {
-      const action = newDisliked ? 'dislike' : 'undislike'
+      const action = isDisliked ? 'undislike' : 'dislike'
+      console.log(`👎 Processing ${action} for ${itemType} ${itemId}`)
       
-      // Single API call with reasonable timeout
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
-      
+      // Make API call first
       const response = await fetch(`/api/${itemType}/${itemId}/dislike`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ action }),
-        signal: controller.signal
+        body: JSON.stringify({ action })
       })
-      
-      clearTimeout(timeoutId)
       
       if (response.ok) {
         const data = await response.json()
-        // Update with server response, ensure non-negative
+        
+        // Update state with server response
+        setIsDisliked(!isDisliked)
         setLocalDislikes(Math.max(0, data.dislikes || 0))
         
-        // Handle like removal if needed (async, don't wait)
-        if (newDisliked && wasLiked) {
+        // Update localStorage
+        const dislikeKey = `${itemType}_${itemId}_disliked`
+        if (!isDisliked) {
+          localStorage.setItem(dislikeKey, 'true')
+        } else {
+          localStorage.removeItem(dislikeKey)
+        }
+        
+        // If switching from like to dislike, handle like removal
+        if (!isDisliked && isLiked) {
+          setIsLiked(false)
+          setLocalLikes(prev => Math.max(0, prev - 1))
+          
+          // Remove like from localStorage
+          const likeKey = `${itemType}_${itemId}_liked`
+          localStorage.removeItem(likeKey)
+          
+          // Call like API to remove like
           fetch(`/api/${itemType}/${itemId}/like`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -260,35 +201,15 @@ export default function InteractionButtons({
         }
         
         onDislike?.()
+        console.log(`✅ ${action} successful: ${data.dislikes} dislikes`)
       } else {
-        // Revert optimistic update on failure
-        setIsDisliked(originalDisliked)
-        setLocalDislikes(originalDislikes)
-        if (newDisliked && wasLiked) {
-          setIsLiked(originalLiked)
-          setLocalLikes(originalLikes)
-        }
-        console.error('❌ Dislike failed:', response.status)
+        console.error('❌ Dislike API failed:', response.status)
       }
     } catch (error) {
-      // Revert optimistic update on error
-      setIsDisliked(originalDisliked)
-      setLocalDislikes(originalDislikes)
-      if (newDisliked && wasLiked) {
-        setIsLiked(originalLiked)
-        setLocalLikes(originalLikes)
-      }
-      
-      // Handle different error types
-      if (error.name === 'AbortError') {
-        console.warn('⚠️ Dislike request timed out, but UI was updated optimistically')
-        // Don't revert on timeout - keep the optimistic update
-        return
-      } else {
-        console.error('❌ Error disliking item:', error)
-      }
+      console.error('❌ Error in handleDislike:', error)
     } finally {
       setIsLoading(false)
+      setIsProcessing(false)
     }
   }
 
@@ -315,9 +236,9 @@ export default function InteractionButtons({
       <button
         type="button"
         onClick={(e) => handleLike(e)}
-        disabled={isLoading}
+        disabled={isLoading || isProcessing}
         className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-          isLoading 
+          (isLoading || isProcessing)
             ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
             : isLiked 
               ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800' 
@@ -325,7 +246,7 @@ export default function InteractionButtons({
         }`}
         aria-label={isLiked ? 'Unlike' : 'Like'}
       >
-        {isLoading ? (
+        {(isLoading || isProcessing) ? (
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
         ) : isLiked ? (
           <HandThumbUpSolid className="h-4 w-4" />
@@ -339,16 +260,16 @@ export default function InteractionButtons({
       {itemType === 'news' && (
         <button
           onClick={handleDislike}
-          disabled={isLoading}
+          disabled={isLoading || isProcessing}
           className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-            isLoading 
+            (isLoading || isProcessing)
               ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
               : isDisliked 
                 ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800' 
                 : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
           }`}
         >
-          {isLoading ? (
+          {(isLoading || isProcessing) ? (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
           ) : isDisliked ? (
             <HandThumbDownSolid className="h-4 w-4" />
