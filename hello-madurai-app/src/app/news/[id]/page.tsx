@@ -230,8 +230,28 @@ function NewsDetailPageContent() {
             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               {/* Featured Image or Video */}
               {article.videoUrl ? (
-                <div id="video-container" className="video-container bg-black rounded-t-xl">
-                  <div className="video-aspect-container">
+                <div 
+                  id="video-container" 
+                  className="video-container bg-black rounded-t-xl"
+                  style={{
+                    maxWidth: '100%',
+                    width: '100%',
+                    overflow: 'hidden',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  <div 
+                    className="video-aspect-container"
+                    style={{
+                      position: 'relative',
+                      width: '100%',
+                      height: 0,
+                      paddingBottom: '56.25%',
+                      overflow: 'hidden',
+                      maxWidth: '100%',
+                      boxSizing: 'border-box'
+                    }}
+                  >
                     {videoLoaded ? (
                       <ReactPlayer
                         url={article.videoUrl}
@@ -243,7 +263,15 @@ function NewsDetailPageContent() {
                         light={false}
                         pip={false}
                         style={{ 
-                          backgroundColor: '#000'
+                          backgroundColor: '#000',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          maxWidth: '100%',
+                          maxHeight: '100%',
+                          boxSizing: 'border-box'
                         }}
                         config={{
                           youtube: {
@@ -277,7 +305,18 @@ function NewsDetailPageContent() {
                         }}
                       />
                     ) : (
-                      <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                      <div 
+                        className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          maxWidth: '100%',
+                          boxSizing: 'border-box'
+                        }}
+                      >
                         <div className="text-center">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
                           <p className="text-gray-600 dark:text-gray-400 text-sm">Loading video...</p>
