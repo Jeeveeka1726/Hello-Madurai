@@ -152,18 +152,6 @@ export default function RichTextEditor({
     }
   }
 
-  const addYouTubeVideo = () => {
-    const url = prompt('Enter YouTube URL:')
-    if (url) {
-      const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/
-      if (!youtubeRegex.test(url)) {
-        toast.error('Please enter a valid YouTube URL')
-        return
-      }
-      editor.commands.setYoutubeVideo({ src: url })
-      toast.success('✅ YouTube video embedded!')
-    }
-  }
 
   const addImageFromURL = () => {
     const url = prompt('Enter image URL:')
@@ -290,15 +278,6 @@ export default function RichTextEditor({
           🖼️ URL
         </button>
 
-        {/* YouTube Video */}
-        <button
-          type="button"
-          onClick={addYouTubeVideo}
-          className="px-2 py-1 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors text-gray-700 dark:text-gray-300"
-          title="Embed YouTube Video"
-        >
-          ▶️ Video
-        </button>
 
         {uploading && (
           <div className="flex items-center px-2">
@@ -319,7 +298,6 @@ export default function RichTextEditor({
         <ul className="space-y-1 ml-4">
           <li>• <strong>Type freely</strong> - ALL content saves! No truncation!</li>
           <li>• <strong>Images:</strong> Click 📷 to upload or 🖼️ URL for links</li>
-          <li>• <strong>Videos:</strong> Click ▶️ Video and paste YouTube URL</li>
           <li>• <strong>Format:</strong> Use toolbar buttons or Ctrl+B (bold), Ctrl+I (italic)</li>
         </ul>
       </div>

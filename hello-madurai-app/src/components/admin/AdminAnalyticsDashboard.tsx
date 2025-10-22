@@ -116,7 +116,6 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'news': return NewspaperIcon
-      case 'video': return DocumentIcon
       case 'radio': return MicrophoneIcon
       case 'business': return BuildingOfficeIcon
       case 'subscription': return BellIcon
