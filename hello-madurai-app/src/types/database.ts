@@ -1,7 +1,6 @@
 export type UserRole = 'user' | 'admin' | 'moderator';
 export type ContentStatus = 'draft' | 'published' | 'archived';
 export type NewsCategory = 'collector' | 'corporation' | 'police' | 'agriculture' | 'cinema' | 'articles' | 'jobs';
-export type VideoCategory = 'business' | 'agriculture' | 'hotel' | 'medical' | 'vehicle' | 'pets';
 export type DirectoryCategory = 'medical' | 'education' | 'business' | 'restaurant' | 'transport' | 'government' | 'shops' | 'services';
 export type EventType = 'festival' | 'exhibition' | 'cultural' | 'government' | 'business';
 
@@ -33,24 +32,6 @@ export interface News {
   author?: Profile;
 }
 
-export interface Video {
-  id: string;
-  title: string;
-  title_ta?: string;
-  description?: string;
-  description_ta?: string;
-  category: VideoCategory;
-  youtube_url?: string;
-  video_file_url?: string;
-  thumbnail_url?: string;
-  is_self_uploaded: boolean;
-  status: ContentStatus;
-  author_id?: string;
-  views_count: number;
-  created_at: string;
-  updated_at: string;
-  author?: Profile;
-}
 
 export interface RadioContent {
   id: string;
@@ -128,7 +109,6 @@ export interface Directory {
   updated_at: string;
   author?: Profile;
   images?: DirectoryImage[];
-  videos?: DirectoryVideo[];
 }
 
 export interface DirectoryImage {
@@ -141,15 +121,6 @@ export interface DirectoryImage {
   created_at: string;
 }
 
-export interface DirectoryVideo {
-  id: string;
-  directory_id: string;
-  video_url: string;
-  title?: string;
-  title_ta?: string;
-  sort_order: number;
-  created_at: string;
-}
 
 export interface Job {
   id: string;
@@ -302,11 +273,6 @@ export interface Database {
         Row: News;
         Insert: Omit<News, 'id' | 'created_at' | 'updated_at' | 'views_count'>;
         Update: Partial<Omit<News, 'id' | 'created_at' | 'updated_at'>>;
-      };
-      videos: {
-        Row: Video;
-        Insert: Omit<Video, 'id' | 'created_at' | 'updated_at' | 'views_count'>;
-        Update: Partial<Omit<Video, 'id' | 'created_at' | 'updated_at'>>;
       };
       // Add other table types as needed
     };
