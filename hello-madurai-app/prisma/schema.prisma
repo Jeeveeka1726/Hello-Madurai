@@ -376,3 +376,17 @@ model Ad {
   @@index([position])
   @@map("ads")
 }
+
+// Image storage table
+model Image {
+  id          String   @id @default(cuid())
+  filename    String
+  data        Bytes    @db.LongBlob // Store the actual image data
+  mimeType    String
+  size        Int
+  width       Int?
+  height      Int?
+  createdAt   DateTime @default(now())
+
+  @@map("images")
+}
