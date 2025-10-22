@@ -371,28 +371,18 @@ function NewsDetailPageContent() {
                         box-sizing: border-box !important;
                       }
                       
-                      /* VIDEO CONTAINER - FORCE ULTRA LARGE SIZE */
+                      /* VIDEO CONTAINER - LARGE SIZE */
                       #video-ultimate-container {
                         position: relative !important;
                         width: 100% !important;
                         max-width: 100% !important;
                         height: 1200px !important;
                         max-height: 1500px !important;
-                        min-height: 1200px !important;
                         overflow: hidden !important;
                         margin: 0 !important;
                         padding: 0 !important;
                         transform: none !important;
                         box-sizing: border-box !important;
-                        display: block !important;
-                        visibility: visible !important;
-                      }
-                      
-                      /* FORCE SIZE WITH HIGHER SPECIFICITY */
-                      div#video-ultimate-container {
-                        height: 1200px !important;
-                        max-height: 1500px !important;
-                        min-height: 1200px !important;
                       }
                       
                       /* DESKTOP VIEW - ULTRA LARGE SIZE */
@@ -656,11 +646,11 @@ function NewsDetailPageContent() {
                     id="video-ultimate-container" 
                     className="bg-black rounded-t-xl relative w-full"
                     style={{
-                      width: '100% !important',
-                      height: '1200px !important',
-                      maxHeight: '1500px !important',
-                      position: 'relative !important',
-                      minHeight: '1200px !important'
+                      width: '100%',
+                      height: '1200px',
+                      maxHeight: '1500px',
+                      position: 'relative',
+                      minHeight: '1200px'
                     }}
                   >
                     {videoLoaded ? (
