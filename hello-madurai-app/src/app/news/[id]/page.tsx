@@ -67,16 +67,16 @@ function NewsDetailPageContent() {
     const fetchArticle = async () => {
       try {
         // Fetch specific article
-        const articleResponse = await fetch(`/api/admin/news/${newsId}`)
+        const articleResponse = await fetch(`/api/news/${newsId}`)
         if (articleResponse.ok) {
           const articleData = await articleResponse.json()
           setArticle(articleData)
 
           // Increment view count
-          await fetch(`/api/admin/news/${newsId}/view`, { method: 'POST' })
+          await fetch(`/api/news/${newsId}/view`, { method: 'POST' })
 
           // Fetch all articles for related articles
-          const allResponse = await fetch('/api/admin/news')
+          const allResponse = await fetch('/api/news')
           if (allResponse.ok) {
             const allData = await allResponse.json()
             // Filter out current article and get related ones

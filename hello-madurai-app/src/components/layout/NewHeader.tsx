@@ -34,10 +34,6 @@ export default function NewHeader() {
       name: t('nav.magazine', 'Magazine', 'பத்திரிகை'),
       href: '/magazine' 
     },
-    { 
-      name: t('nav.videos', 'Videos', 'வீடியோக்கள்'),
-      href: '/videos' 
-    },
     {
       name: t('nav.directory', 'Directory', 'முகவரி நூல்'),
       href: '/directory'

@@ -5,7 +5,6 @@ import Link from 'next/link'
 import {
   NewspaperIcon,
   CalendarIcon,
-  VideoCameraIcon,
   BuildingOfficeIcon,
   UserGroupIcon,
   ChartBarIcon,
@@ -30,7 +29,6 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({
     totalNews: 0,
     totalEvents: 0,
-    totalVideos: 0,
     totalBusinesses: 0,
     totalUsers: 0,
     monthlyViews: 0
@@ -38,11 +36,9 @@ export default function AdminDashboard() {
   const [recentContent, setRecentContent] = useState<{
     news: any[]
     events: any[]
-    videos: any[]
   }>({
     news: [],
     events: [],
-    videos: []
   })
   const [loading, setLoading] = useState(true)
 
@@ -53,16 +49,14 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       // Fetch real stats from APIs
-      const [newsRes, eventsRes, videosRes] = await Promise.all([
+      const [newsRes, eventsRes] = await Promise.all([
         fetch('/api/admin/news').then(r => r.json()).catch(() => []),
-        fetch('/api/admin/events').then(r => r.json()).catch(() => []),
-        fetch('/api/admin/videos').then(r => r.json()).catch(() => [])
+        fetch('/api/admin/events').then(r => r.json()).catch(() => [])
       ])
 
       setStats({
         totalNews: Array.isArray(newsRes) ? newsRes.length : 0,
         totalEvents: Array.isArray(eventsRes) ? eventsRes.length : 0,
-        totalVideos: Array.isArray(videosRes) ? videosRes.length : 0,
         totalBusinesses: 0, // Will be fetched from database when businesses feature is implemented
         totalUsers: 0, // Will be fetched from database when user management is implemented
         monthlyViews: 0 // Will be fetched from analytics when implemented
@@ -71,7 +65,6 @@ export default function AdminDashboard() {
       setRecentContent({
         news: Array.isArray(newsRes) ? newsRes.slice(0, 5) : [],
         events: Array.isArray(eventsRes) ? eventsRes.slice(0, 5) : [],
-        videos: Array.isArray(videosRes) ? videosRes.slice(0, 5) : []
       })
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
