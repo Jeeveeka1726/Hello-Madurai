@@ -102,16 +102,28 @@ export async function DELETE(
   try {
     const { id } = await params
 
-    // First delete all related records
+    // First delete all comment replies (child comments)
     await prisma.newsComment.deleteMany({
-      where: { newsId: id }
+      where: { 
+        newsId: id,
+        parentId: { not: null }
+      }
     })
 
+    // Then delete all parent comments
+    await prisma.newsComment.deleteMany({
+      where: { 
+        newsId: id,
+        parentId: null
+      }
+    })
+
+    // Delete all shares
     await prisma.newsShare.deleteMany({
       where: { newsId: id }
     })
 
-    // Then delete the news article
+    // Finally delete the news article
     await prisma.news.delete({
       where: { id }
     })
