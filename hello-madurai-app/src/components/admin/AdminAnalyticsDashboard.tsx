@@ -9,7 +9,6 @@ import {
   ChatBubbleLeftIcon,
   ShareIcon,
   NewspaperIcon,
-  VideoCameraIcon,
   MicrophoneIcon,
   BuildingOfficeIcon,
   BellIcon,
@@ -117,7 +116,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'news': return NewspaperIcon
-      case 'video': return VideoCameraIcon
+      case 'video': return DocumentIcon
       case 'radio': return MicrophoneIcon
       case 'business': return BuildingOfficeIcon
       case 'subscription': return BellIcon
@@ -311,7 +310,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <VideoCameraIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <DocumentIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <span className="text-gray-900 dark:text-white">
                   {t('admin.analytics.videos', 'Videos', 'வீடியோக்கள்')}

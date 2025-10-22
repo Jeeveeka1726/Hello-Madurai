@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import {
   NewspaperIcon,
-  VideoCameraIcon,
   CalendarIcon,
   BuildingOfficeIcon,
   MapIcon,
   BriefcaseIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  DocumentIcon
 } from '@heroicons/react/24/outline'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -22,7 +22,7 @@ const featuredSections = [
   {
     name: 'videos',
     href: '/videos',
-    icon: VideoCameraIcon,
+    icon: DocumentIcon,
     color: 'bg-red-500',
     description: 'Watch videos about local businesses, agriculture, and more'
   },

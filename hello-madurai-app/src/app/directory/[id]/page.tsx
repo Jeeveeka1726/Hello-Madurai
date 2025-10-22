@@ -9,7 +9,6 @@ import {
   EnvelopeIcon, 
   MapPinIcon, 
   GlobeAltIcon,
-  VideoCameraIcon,
   CalendarIcon,
   ArrowDownTrayIcon,
   ShareIcon,

@@ -176,7 +176,6 @@ export default function AdminDashboard() {
     { id: 'notifications', name: t('admin.tabs.notifications', 'Notifications', 'அறிவிப்புகள்'), icon: BellIcon },
     { id: 'news', name: t('admin.tabs.news', 'News', 'செய்திகள்'), icon: NewspaperIcon },
     { id: 'events', name: t('admin.tabs.events', 'Events', 'நிகழ்வுகள்'), icon: CalendarIcon },
-    { id: 'videos', name: t('admin.tabs.videos', 'Videos', 'வீடியோக்கள்'), icon: VideoCameraIcon },
     { id: 'directory', name: t('admin.tabs.directory', 'Directory', 'முகவரி நூல்'), icon: BuildingOfficeIcon },
     { id: 'users', name: t('admin.tabs.users', 'Users', 'பயனர்கள்'), icon: UserGroupIcon }
   ]
@@ -338,7 +337,7 @@ export default function AdminDashboard() {
               <Link href="/admin/videos">
                 <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900 dark:to-red-800 border-red-200 dark:border-red-700 hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4 text-center">
-                    <VideoCameraIcon className="h-8 w-8 text-red-600 dark:text-red-400 mx-auto mb-2" />
+                    <DocumentIcon className="h-8 w-8 text-red-600 dark:text-red-400 mx-auto mb-2" />
                     <p className="font-medium text-red-900 dark:text-red-100">
                       {t('admin.addVideo', 'Add Video', 'வீடியோ சேர்க்க')}
                     </p>
@@ -432,7 +431,7 @@ export default function AdminDashboard() {
       )}
       {activeTab === 'videos' && (
         <div className="text-center py-12">
-          <VideoCameraIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <DocumentIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Videos Management</h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">Manage your video content</p>
           <Link href="/admin/videos">
