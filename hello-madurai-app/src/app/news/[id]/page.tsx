@@ -173,6 +173,57 @@ function NewsDetailPageContent() {
     })
   }
 
+  // Update document meta tags for social sharing
+  useEffect(() => {
+    if (article) {
+      const title = article.title
+      const description = article.excerpt || article.content.substring(0, 160)
+      const imageUrl = article.featuredImage 
+        ? (article.featuredImage.startsWith('http') 
+          ? article.featuredImage 
+          : `${window.location.origin}${article.featuredImage}`)
+        : `${window.location.origin}/logo.jpg`
+      const url = window.location.href
+
+      // Update Open Graph meta tags
+      const updateMetaTag = (property: string, content: string) => {
+        let element = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement
+        if (!element) {
+          element = document.createElement('meta')
+          element.setAttribute('property', property)
+          document.head.appendChild(element)
+        }
+        element.content = content
+      }
+
+      const updateNameMetaTag = (name: string, content: string) => {
+        let element = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement
+        if (!element) {
+          element = document.createElement('meta')
+          element.setAttribute('name', name)
+          document.head.appendChild(element)
+        }
+        element.content = content
+      }
+
+      // Open Graph tags
+      updateMetaTag('og:title', title)
+      updateMetaTag('og:description', description)
+      updateMetaTag('og:image', imageUrl)
+      updateMetaTag('og:url', url)
+      updateMetaTag('og:type', 'article')
+      
+      // Twitter Card tags
+      updateNameMetaTag('twitter:card', 'summary_large_image')
+      updateNameMetaTag('twitter:title', title)
+      updateNameMetaTag('twitter:description', description)
+      updateNameMetaTag('twitter:image', imageUrl)
+
+      // Update page title
+      document.title = `${title} - Hello Madurai`
+    }
+  }, [article])
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-4 sm:py-8">
       <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-8">
