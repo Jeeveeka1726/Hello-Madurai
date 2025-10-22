@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   Bars3Icon,
   XMarkIcon,
@@ -12,12 +13,16 @@ import { useLanguage } from '@/contexts/LanguageContext'
 export default function NewHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { language, setLanguage, t } = useLanguage()
+  const pathname = usePathname()
+  
+  // Check if we're on a news page
+  const isNewsPage = pathname?.startsWith('/news')
 
   const navigation = [
-    { 
+    ...(isNewsPage ? [] : [{ 
       name: t('nav.home', 'Home', 'முகப்பு'),
       href: '/' 
-    },
+    }]),
     { 
       name: t('nav.news', 'News', 'செய்திகள்'),
       href: '/news' 
@@ -60,7 +65,22 @@ export default function NewHeader() {
                 alt="Hello Madurai Logo" 
                 className="h-10 w-10 rounded-full object-cover"
               />
+              {!isNewsPage && (
+                <div className="hidden sm:block">
+                  <h1 className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                    Hello Madurai
+                  </h1>
+                </div>
+              )}
             </Link>
+            {isNewsPage && (
+              <Link 
+                href="/" 
+                className="ml-3 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors duration-200 hover-lift"
+              >
+                {t('nav.home', 'Home', 'முகப்பு')}
+              </Link>
+            )}
           </div>
 
           {/* Desktop Navigation */}
