@@ -33,25 +33,40 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'audio')
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true })
+    // Check if we're in production (Vercel) - use base64 data URLs
+    const isProduction = process.env.NODE_ENV === 'production'
+    
+    let url: string
+    let filename: string
+    
+    if (isProduction) {
+      // In production, use base64 data URLs (Vercel has read-only file system)
+      const bytes = await file.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      const base64 = buffer.toString('base64')
+      url = `data:${file.type};base64,${base64}`
+      filename = `base64_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+    } else {
+      // In development, save as files
+      const uploadsDir = join(process.cwd(), 'public', 'uploads', 'audio')
+      if (!existsSync(uploadsDir)) {
+        await mkdir(uploadsDir, { recursive: true })
+      }
+
+      // Generate unique filename
+      const timestamp = Date.now()
+      const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+      filename = `${timestamp}_${originalName}`
+      const filepath = join(uploadsDir, filename)
+
+      // Convert file to buffer and save
+      const bytes = await file.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      await writeFile(filepath, buffer)
+
+      // Return the public URL
+      url = `/uploads/audio/${filename}`
     }
-
-    // Generate unique filename
-    const timestamp = Date.now()
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-    const filename = `${timestamp}_${originalName}`
-    const filepath = join(uploadsDir, filename)
-
-    // Convert file to buffer and save
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    await writeFile(filepath, buffer)
-
-    // Return the public URL
-    const url = `/uploads/audio/${filename}`
     
     return NextResponse.json({ 
       url,
