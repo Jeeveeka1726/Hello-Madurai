@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/contexts/LanguageContext'
+import { useState, useEffect } from 'react'
 
 interface NewspaperHeaderProps {
   className?: string
@@ -8,6 +9,22 @@ interface NewspaperHeaderProps {
 
 export default function NewspaperHeader({ className = '' }: NewspaperHeaderProps) {
   const { t } = useLanguage()
+  const [currentDate, setCurrentDate] = useState('')
+
+  useEffect(() => {
+    const updateDate = () => {
+      const options: Intl.DateTimeFormatOptions = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }
+      setCurrentDate(new Date().toLocaleDateString('en-IN', options))
+    }
+    updateDate()
+    const intervalId = setInterval(updateDate, 60000) // Update every minute
+    return () => clearInterval(intervalId)
+  }, [])
 
   return (
     <div className={`w-full bg-white dark:bg-gray-800 border-b-4 border-blue-600 dark:border-blue-400 shadow-lg ${className}`}>
@@ -25,17 +42,7 @@ export default function NewspaperHeader({ className = '' }: NewspaperHeaderProps
                 Hello Madurai
               </h1>
               <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium mt-1">
-                {t('newspaper.date', new Date().toLocaleDateString('en-IN', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                }), new Date().toLocaleDateString('ta-IN', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                }))}
+                {currentDate || 'Loading...'}
               </div>
             </div>
           </div>
