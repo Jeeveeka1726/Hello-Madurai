@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import sharp from 'sharp'
+import { join } from 'path'
+import { existsSync, mkdirSync } from 'fs'
+import { writeFile } from 'fs/promises'
 import { IMAGE_CONFIG } from '@/lib/utils/imageResize'
 
 const allowedFileTypes = {
@@ -79,15 +82,27 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Convert to base64 data URL (works on Vercel)
-    const base64 = processedBuffer.toString('base64')
+    // Save as file instead of base64 data URL
+    const timestamp = Date.now()
+    const fileExtension = resized ? 'webp' : file.name.split('.').pop() || 'jpg'
+    const filename = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}.${fileExtension}`
+    
+    // Ensure uploads directory exists
+    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'image')
+    if (!existsSync(uploadsDir)) {
+      mkdirSync(uploadsDir, { recursive: true })
+    }
+    
+    const filePath = join(uploadsDir, filename)
+    await writeFile(filePath, processedBuffer)
+    
+    const publicUrl = `/uploads/image/${filename}`
     const mimeType = resized ? 'image/webp' : file.type
-    const dataUrl = `data:${mimeType};base64,${base64}`
 
     return NextResponse.json({
       success: true,
-      url: dataUrl,
-      filename: file.name,
+      url: publicUrl,
+      filename: filename,
       size: processedBuffer.length,
       type: mimeType,
       category: fileType,
@@ -100,7 +115,7 @@ export async function POST(request: NextRequest) {
         height: IMAGE_CONFIG.news.height,
       } : undefined,
       resized,
-      isBase64: true,
+      isBase64: false,
     })
 
   } catch (error) {

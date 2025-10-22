@@ -7,7 +7,8 @@ import {
   XMarkIcon, 
   ArrowPathIcon, 
   CloudArrowUpIcon,
-  LinkIcon
+  LinkIcon,
+  SpeakerWaveIcon
 } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
 import Button from '@/components/ui/Button'
@@ -39,7 +40,7 @@ const fileTypeConfig = {
     label: 'PDF'
   },
   audio: {
-    icon: VideoCameraIcon,
+    icon: SpeakerWaveIcon,
     accept: 'audio/*',
     maxSize: 50,
     label: 'Audio'
