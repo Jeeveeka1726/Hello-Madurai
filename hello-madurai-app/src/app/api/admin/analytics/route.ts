@@ -14,14 +14,12 @@ export async function GET(request: Request) {
     // Get content counts from Hostinger MySQL
     const [
       newsCount,
-      videoCount,
       radioCount,
       businessCount,
       eventCount,
       magazineCount
     ] = await Promise.all([
       prisma.news.count(),
-      prisma.video.count(),
       prisma.radioShow.count(),
       prisma.business.count(),
       prisma.event.count(),
@@ -31,14 +29,10 @@ export async function GET(request: Request) {
     // Get recent content counts
     const [
       recentNewsCount,
-      recentVideoCount,
       recentRadioCount,
       recentBusinessCount
     ] = await Promise.all([
       prisma.news.count({
-        where: { createdAt: { gte: startDate } }
-      }),
-      prisma.video.count({
         where: { createdAt: { gte: startDate } }
       }),
       prisma.radioShow.count({
@@ -50,14 +44,10 @@ export async function GET(request: Request) {
     ])
 
     // Get total views and interactions
-    const [newsData, videoData, radioData] = await Promise.all([
+    const [newsData, radioData] = await Promise.all([
       prisma.news.findMany({
         where: { createdAt: { gte: startDate } },
         select: { views: true, likes: true, dislikes: true }
-      }),
-      prisma.video.findMany({
-        where: { createdAt: { gte: startDate } },
-        select: { views: true }
       }),
       prisma.radioShow.findMany({
         where: { createdAt: { gte: startDate } },
@@ -68,7 +58,6 @@ export async function GET(request: Request) {
     // Calculate totals
     const totalViews = 
       newsData.reduce((sum, item) => sum + (item.views || 0), 0) +
-      videoData.reduce((sum, item) => sum + (item.views || 0), 0) +
       radioData.reduce((sum, item) => sum + (item.plays || 0), 0)
 
     const totalLikes = newsData.reduce((sum, item) => sum + (item.likes || 0), 0)
@@ -91,7 +80,6 @@ export async function GET(request: Request) {
       content: {
         total: {
           news: newsCount,
-          videos: videoCount,
           radio: radioCount,
           businesses: businessCount,
           events: eventCount,
@@ -99,7 +87,6 @@ export async function GET(request: Request) {
         },
         recent: {
           news: recentNewsCount,
-          videos: recentVideoCount,
           radio: recentRadioCount,
           businesses: recentBusinessCount
         }
@@ -112,9 +99,9 @@ export async function GET(request: Request) {
         totalSubscriptions: subscriptionsCount
       },
       summary: {
-        totalContent: newsCount + videoCount + radioCount + businessCount + eventCount + magazineCount,
+        totalContent: newsCount + radioCount + businessCount + eventCount + magazineCount,
         totalEngagement: totalViews + totalLikes + commentsCount,
-        averageViewsPerContent: totalViews / Math.max(1, newsCount + videoCount + radioCount)
+        averageViewsPerContent: totalViews / Math.max(1, newsCount + radioCount)
       }
     })
 

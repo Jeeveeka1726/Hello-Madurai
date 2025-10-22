@@ -193,8 +193,6 @@ export default function AdminDashboard() {
   const handleEdit = (type: string, id: number) => {
     if (type === 'news') {
       window.open('/admin/news', '_blank')
-    } else if (type === 'videos') {
-      window.open('/admin/videos', '_blank')
     } else if (type === 'magazines') {
       window.open('/admin/magazines', '_blank')
     } else {
@@ -206,8 +204,6 @@ export default function AdminDashboard() {
     if (confirm(t('admin.confirmDelete', 'Are you sure you want to delete this item?', 'இந்த உருப்படியை நீக்க விரும்புகிறீர்களா?'))) {
       if (type === 'news') {
         window.open('/admin/news', '_blank')
-      } else if (type === 'videos') {
-        window.open('/admin/videos', '_blank')
       } else if (type === 'magazines') {
         window.open('/admin/magazines', '_blank')
       } else {
@@ -219,8 +215,6 @@ export default function AdminDashboard() {
   const handleAdd = (type: string) => {
     if (type === 'news') {
       window.open('/admin/news', '_blank')
-    } else if (type === 'videos') {
-      window.open('/admin/videos', '_blank')
     } else if (type === 'magazines') {
       window.open('/admin/magazines', '_blank')
     } else {
@@ -334,16 +328,6 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
               </Link>
-              <Link href="/admin/videos">
-                <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900 dark:to-red-800 border-red-200 dark:border-red-700 hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-4 text-center">
-                    <DocumentIcon className="h-8 w-8 text-red-600 dark:text-red-400 mx-auto mb-2" />
-                    <p className="font-medium text-red-900 dark:text-red-100">
-                      {t('admin.addVideo', 'Add Video', 'வீடியோ சேர்க்க')}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
               <Link href="/admin/events">
                 <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 border-green-200 dark:border-green-700 hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4 text-center">
@@ -426,16 +410,6 @@ export default function AdminDashboard() {
           <p className="text-gray-600 dark:text-gray-400 mb-4">Manage your events and schedules</p>
           <Link href="/admin/events">
             <Button>Go to Events Management</Button>
-          </Link>
-        </div>
-      )}
-      {activeTab === 'videos' && (
-        <div className="text-center py-12">
-          <DocumentIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Videos Management</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">Manage your video content</p>
-          <Link href="/admin/videos">
-            <Button>Go to Videos Management</Button>
           </Link>
         </div>
       )}

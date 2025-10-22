@@ -7,14 +7,12 @@ export async function GET() {
     const [
       newsCount,
       eventsCount,
-      videosCount,
       businessesCount,
       radioCount,
       magazinesCount
     ] = await Promise.all([
       prisma.news.count(),
       prisma.event.count(),
-      prisma.video.count(),
       prisma.business.count(),
       prisma.radioShow.count(),
       prisma.magazine.count()
@@ -23,11 +21,10 @@ export async function GET() {
     return NextResponse.json({
       newsCount,
       eventsCount,
-      videosCount,
       businessesCount,
       podcastsCount: radioCount,
       magazinesCount,
-      total: newsCount + eventsCount + videosCount + businessesCount + radioCount + magazinesCount
+      total: newsCount + eventsCount + businessesCount + radioCount + magazinesCount
     })
 
   } catch (error) {
