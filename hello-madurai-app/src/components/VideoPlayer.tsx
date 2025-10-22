@@ -22,17 +22,66 @@ export default function VideoPlayer({ url, title }: VideoPlayerProps) {
     return () => clearTimeout(timer)
   }, [])
 
+  // Force video to be large on laptop screens
+  useEffect(() => {
+    const forceLargeVideo = () => {
+      const videoContainer = document.querySelector('.video-container')
+      if (videoContainer && window.innerWidth >= 1024) {
+        // Force large size for laptop screens
+        videoContainer.style.height = '90vh'
+        videoContainer.style.minHeight = '800px'
+        videoContainer.style.maxHeight = '1400px'
+        console.log('🎥 FORCED LARGE VIDEO:', {
+          height: videoContainer.style.height,
+          minHeight: videoContainer.style.minHeight,
+          maxHeight: videoContainer.style.maxHeight
+        })
+      }
+    }
+
+    // Run on mount and resize
+    forceLargeVideo()
+    window.addEventListener('resize', forceLargeVideo)
+    
+    return () => {
+      window.removeEventListener('resize', forceLargeVideo)
+    }
+  }, [])
+
   return (
     <div className="w-full">
       {/* Clean, Responsive Video Container */}
+      <style jsx>{`
+        .video-container {
+          width: 100% !important;
+          height: 80vh !important;
+          min-height: 600px !important;
+          max-height: 1200px !important;
+        }
+        
+        @media (min-width: 1024px) {
+          .video-container {
+            height: 90vh !important;
+            min-height: 800px !important;
+            max-height: 1400px !important;
+          }
+        }
+        
+        @media (min-width: 1200px) {
+          .video-container {
+            height: 95vh !important;
+            min-height: 1000px !important;
+            max-height: 1600px !important;
+          }
+        }
+      `}</style>
       <div 
-        className="relative w-full bg-black rounded-lg overflow-hidden 
-                   sm:min-h-[400px] md:min-h-[500px] lg:min-h-[600px] xl:min-h-[700px]
-                   sm:max-h-[500px] md:max-h-[600px] lg:max-h-[700px] xl:max-h-[800px]" 
+        className="video-container relative w-full bg-black rounded-lg overflow-hidden" 
         style={{ 
           aspectRatio: '16/9',
-          minHeight: '300px',
-          maxHeight: '900px'
+          minHeight: '600px',
+          maxHeight: '1200px',
+          height: '80vh'
         }}
       >
         {videoLoaded ? (
