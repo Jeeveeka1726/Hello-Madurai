@@ -65,7 +65,7 @@ export default function GoogleAdsense({
         data-ad-client={ADSENSE_CONFIG.publisherId}
         data-ad-slot={adSlot}
         data-ad-format={adFormat}
-        data-full-width-responsive={fullWidthResponsive.toString()}
+        data-full-width-responsive={fullWidthResponsive?.toString() || 'true'}
       />
     </div>
   )

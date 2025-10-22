@@ -76,7 +76,7 @@ export default function AdminDashboard() {
   const statsData = [
     {
       name: t('admin.stats.totalNews', 'Total News', 'மொத்த செய்திகள்'),
-      value: stats.totalNews.toString(),
+      value: (stats.totalNews || 0).toString(),
       icon: NewspaperIcon,
       change: '',
       changeType: 'neutral',
@@ -84,23 +84,15 @@ export default function AdminDashboard() {
     },
     {
       name: t('admin.stats.totalEvents', 'Total Events', 'மொத்த நிகழ்வுகள்'),
-      value: stats.totalEvents.toString(),
+      value: (stats.totalEvents || 0).toString(),
       icon: CalendarIcon,
       change: '',
       changeType: 'neutral',
       href: '/admin/events'
     },
     {
-      name: t('admin.stats.totalVideos', 'Total Videos', 'மொத்த வீடியோக்கள்'),
-      value: stats.totalVideos.toString(),
-      icon: VideoCameraIcon,
-      change: '',
-      changeType: 'neutral',
-      href: '/admin/videos'
-    },
-    {
       name: t('admin.stats.totalBusinesses', 'Total Businesses', 'மொத்த வணிகங்கள்'),
-      value: stats.totalBusinesses.toString(),
+      value: (stats.totalBusinesses || 0).toString(),
       icon: BuildingOfficeIcon,
       change: '',
       changeType: 'neutral',

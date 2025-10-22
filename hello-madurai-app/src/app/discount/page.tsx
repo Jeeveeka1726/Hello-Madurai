@@ -224,7 +224,7 @@ export default function DiscountPage() {
                   ))}
                 </div>
                 <p className="text-sm text-gray-600 mt-4">
-                  {t('discount.totalUsage', 'Total uses: {{count}}', 'மொத்த பயன்பாடுகள்: {{count}}').replace('{{count}}', card.usages.length.toString())}
+                  {t('discount.totalUsage', 'Total uses: {{count}}', 'மொத்த பயன்பாடுகள்: {{count}}').replace('{{count}}', (card.usages?.length || 0).toString())}
                 </p>
               </div>
             )}
