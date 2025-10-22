@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import '@/styles/video.css'
 
 // Dynamically import ReactPlayer to avoid SSR issues
 const ReactPlayer = dynamic(() => import('react-player'), { ssr: false })
@@ -22,68 +23,36 @@ export default function VideoPlayer({ url, title }: VideoPlayerProps) {
     return () => clearTimeout(timer)
   }, [])
 
-  // Force video to be large on laptop screens
+  // Force video to be large
   useEffect(() => {
     const forceLargeVideo = () => {
-      const videoContainer = document.querySelector('.video-container')
-      if (videoContainer && window.innerWidth >= 1024) {
-        // Force large size for laptop screens
-        videoContainer.style.height = '90vh'
-        videoContainer.style.minHeight = '800px'
-        videoContainer.style.maxHeight = '1400px'
+      const videoContainer = document.querySelector('.video-player-container')
+      if (videoContainer) {
+        // Force large size
+        videoContainer.style.height = '700px'
+        videoContainer.style.minHeight = '700px'
+        videoContainer.style.maxHeight = '900px'
+        videoContainer.style.width = '100%'
+        
         console.log('🎥 FORCED LARGE VIDEO:', {
           height: videoContainer.style.height,
-          minHeight: videoContainer.style.minHeight,
-          maxHeight: videoContainer.style.maxHeight
+          width: videoContainer.style.width
         })
       }
     }
 
-    // Run on mount and resize
+    // Run on mount and after video loads
     forceLargeVideo()
-    window.addEventListener('resize', forceLargeVideo)
+    setTimeout(forceLargeVideo, 500)
+    setTimeout(forceLargeVideo, 1000)
     
-    return () => {
-      window.removeEventListener('resize', forceLargeVideo)
-    }
-  }, [])
+    return () => {}
+  }, [videoLoaded])
 
   return (
     <div className="w-full">
-      {/* Clean, Responsive Video Container */}
-      <style jsx>{`
-        .video-container {
-          width: 100% !important;
-          height: 80vh !important;
-          min-height: 600px !important;
-          max-height: 1200px !important;
-        }
-        
-        @media (min-width: 1024px) {
-          .video-container {
-            height: 90vh !important;
-            min-height: 800px !important;
-            max-height: 1400px !important;
-          }
-        }
-        
-        @media (min-width: 1200px) {
-          .video-container {
-            height: 95vh !important;
-            min-height: 1000px !important;
-            max-height: 1600px !important;
-          }
-        }
-      `}</style>
-      <div 
-        className="video-container relative w-full bg-black rounded-lg overflow-hidden" 
-        style={{ 
-          aspectRatio: '16/9',
-          minHeight: '600px',
-          maxHeight: '1200px',
-          height: '80vh'
-        }}
-      >
+      {/* Simple, Large Video Container */}
+      <div className="video-player-container">
         {videoLoaded ? (
           <ReactPlayer
             url={url}
