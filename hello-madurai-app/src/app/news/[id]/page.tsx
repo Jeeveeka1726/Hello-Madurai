@@ -142,16 +142,19 @@ function NewsDetailPageContent() {
         const containerWidth = videoContainer.offsetWidth || window.innerWidth
         const viewportWidth = window.innerWidth
         
-        // For laptop screens (1024px+), ensure proper aspect ratio
+        // For laptop screens (1024px+), make video larger
         if (viewportWidth >= 1024) {
+          // Use a larger height for laptop screens
+          const laptopHeight = Math.min(600, viewportWidth * 0.4) // 40% of viewport width, max 600px
           videoContainer.style.width = '100%'
           videoContainer.style.maxWidth = '100%'
           videoContainer.style.marginLeft = '0'
           videoContainer.style.marginRight = '0'
           videoContainer.style.left = '0'
           videoContainer.style.right = '0'
-          videoContainer.style.height = '0'
-          videoContainer.style.paddingBottom = '56.25%'
+          videoContainer.style.height = laptopHeight + 'px'
+          videoContainer.style.maxHeight = laptopHeight + 'px'
+          videoContainer.style.paddingBottom = '0'
           videoContainer.style.position = 'relative'
           videoContainer.style.overflow = 'hidden'
         } else {
@@ -618,19 +621,17 @@ function NewsDetailPageContent() {
                         box-sizing: border-box !important;
                       }
                       
-                      /* LAPTOP VIEW - ENSURE FULL VIDEO DISPLAY */
+                      /* LAPTOP VIEW - LARGER VIDEO DISPLAY */
                       @media (min-width: 1024px) {
                         #video-ultimate-container {
                           width: 100% !important;
                           max-width: 100% !important;
-                          height: 0 !important;
-                          padding-bottom: 56.25% !important;
+                          height: 500px !important;
+                          max-height: 600px !important;
                           position: relative !important;
                           overflow: hidden !important;
                           margin: 0 !important;
-                          padding-left: 0 !important;
-                          padding-right: 0 !important;
-                          padding-top: 0 !important;
+                          padding: 0 !important;
                         }
                         
                         #video-ultimate-player {
@@ -676,8 +677,7 @@ function NewsDetailPageContent() {
                     className="bg-black rounded-t-xl relative w-full"
                     style={{
                       width: '100%',
-                      height: '0',
-                      paddingBottom: '56.25%',
+                      height: '400px',
                       position: 'relative'
                     }}
                   >
