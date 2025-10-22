@@ -92,8 +92,10 @@ export default function ContactPage() {
               return (
                 <Card key={index} className="bg-blue-600 border-blue-500 hover:bg-blue-500 transition-colors h-full">
                   <CardContent className="p-6 text-center h-full flex flex-col">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-500 rounded-lg mb-4">
-                      <Icon className="h-6 w-6 text-white" />
+                    <div className="flex justify-center mb-4">
+                      <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-500 rounded-lg">
+                        <Icon className="h-6 w-6 text-white" />
+                      </div>
                     </div>
                     <h3 className="text-lg font-semibold text-white mb-2">
                       {info.title}
@@ -115,14 +117,14 @@ export default function ContactPage() {
             <h2 className="text-2xl font-bold text-white mb-8">
               {t('contact.followUs', 'Follow Us', 'எங்களைப் பின்தொடருங்கள்')}
             </h2>
-            <div className="flex justify-center space-x-6">
+            <div className="flex justify-center items-center space-x-6">
               {socialLinks.map((social, index) => (
                 <a
                   key={index}
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors group"
+                  className="flex items-center justify-center w-14 h-14 bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors group"
                   title={`Follow us on ${social.name}`}
                 >
                   <div className="text-white group-hover:scale-110 transition-transform">
