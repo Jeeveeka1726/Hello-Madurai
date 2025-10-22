@@ -82,22 +82,34 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Save as file instead of base64 data URL
-    const timestamp = Date.now()
-    const fileExtension = resized ? 'webp' : file.name.split('.').pop() || 'jpg'
-    const filename = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}.${fileExtension}`
+    // Check if we're in production (Vercel) - use base64 data URLs
+    const isProduction = process.env.NODE_ENV === 'production'
     
-    // Ensure uploads directory exists
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'image')
-    if (!existsSync(uploadsDir)) {
-      mkdirSync(uploadsDir, { recursive: true })
+    let publicUrl: string
+    let filename: string
+    let mimeType = resized ? 'image/webp' : file.type
+    
+    if (isProduction) {
+      // In production, use base64 data URLs (Vercel has read-only file system)
+      const base64 = processedBuffer.toString('base64')
+      publicUrl = `data:${mimeType};base64,${base64}`
+      filename = `base64_${Date.now()}.${resized ? 'webp' : file.name.split('.').pop() || 'jpg'}`
+    } else {
+      // In development, save as files
+      const timestamp = Date.now()
+      const fileExtension = resized ? 'webp' : file.name.split('.').pop() || 'jpg'
+      filename = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}.${fileExtension}`
+      
+      // Ensure uploads directory exists
+      const uploadsDir = join(process.cwd(), 'public', 'uploads', 'image')
+      if (!existsSync(uploadsDir)) {
+        mkdirSync(uploadsDir, { recursive: true })
+      }
+      
+      const filePath = join(uploadsDir, filename)
+      await writeFile(filePath, processedBuffer)
+      publicUrl = `/uploads/image/${filename}`
     }
-    
-    const filePath = join(uploadsDir, filename)
-    await writeFile(filePath, processedBuffer)
-    
-    const publicUrl = `/uploads/image/${filename}`
-    const mimeType = resized ? 'image/webp' : file.type
 
     return NextResponse.json({
       success: true,
@@ -115,7 +127,7 @@ export async function POST(request: NextRequest) {
         height: IMAGE_CONFIG.news.height,
       } : undefined,
       resized,
-      isBase64: false,
+      isBase64: isProduction, // true in production, false in development
     })
 
   } catch (error) {
