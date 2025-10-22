@@ -142,24 +142,18 @@ function NewsDetailPageContent() {
         const containerWidth = videoContainer.offsetWidth || window.innerWidth
         const viewportWidth = window.innerWidth
         
-        // For laptop screens (1024px+), make video much larger
+        // For laptop screens (1024px+), let CSS handle the sizing
         if (viewportWidth >= 1024) {
-          // Use a much larger height for laptop screens
-          const laptopHeight = Math.min(800, viewportWidth * 0.6) // 60% of viewport width, max 800px
+          // CSS will handle laptop sizing - just ensure proper positioning
           videoContainer.style.width = '100%'
           videoContainer.style.maxWidth = '100%'
           videoContainer.style.marginLeft = '0'
           videoContainer.style.marginRight = '0'
           videoContainer.style.left = '0'
           videoContainer.style.right = '0'
-          videoContainer.style.height = laptopHeight + 'px'
-          videoContainer.style.maxHeight = laptopHeight + 'px'
-          videoContainer.style.paddingBottom = '0'
           videoContainer.style.position = 'relative'
           videoContainer.style.overflow = 'hidden'
           // Don't override CSS height for laptop - let CSS handle it
-          videoContainer.style.height = '700px'
-          videoContainer.style.maxHeight = '800px'
         } else {
           // For mobile/tablet, use viewport width
           videoContainer.style.width = '100vw'
@@ -377,13 +371,13 @@ function NewsDetailPageContent() {
                         box-sizing: border-box !important;
                       }
                       
-                      /* VIDEO CONTAINER - VIEWPORT UNITS */
+                      /* VIDEO CONTAINER - DEFAULT LARGE SIZE */
                       #video-ultimate-container {
                         position: relative !important;
                         width: 100% !important;
                         max-width: 100% !important;
-                        height: 0 !important;
-                        padding-bottom: 56.25% !important;
+                        height: 700px !important;
+                        max-height: 800px !important;
                         overflow: hidden !important;
                         margin: 0 !important;
                         padding: 0 !important;
@@ -391,23 +385,7 @@ function NewsDetailPageContent() {
                         box-sizing: border-box !important;
                       }
                       
-                      /* LAPTOP VIEW - FIX CUTTING ISSUE */
-                      @media (min-width: 1024px) {
-                        #video-ultimate-container {
-                          width: 100% !important;
-                          max-width: 100% !important;
-                          height: 700px !important;
-                          max-height: 800px !important;
-                          position: relative !important;
-                          overflow: hidden !important;
-                          margin: 0 !important;
-                          padding: 0 !important;
-                          left: 0 !important;
-                          right: 0 !important;
-                          margin-left: 0 !important;
-                          margin-right: 0 !important;
-                        }
-                      }
+                      /* LAPTOP VIEW - ALREADY HANDLED BY DEFAULT CSS */
                       
                       /* VIDEO PLAYER WRAPPER */
                       #video-ultimate-player {
@@ -627,54 +605,7 @@ function NewsDetailPageContent() {
                         box-sizing: border-box !important;
                       }
                       
-                      /* LAPTOP VIEW - MUCH LARGER VIDEO DISPLAY */
-                      @media (min-width: 1024px) {
-                        #video-ultimate-container {
-                          width: 100% !important;
-                          max-width: 100% !important;
-                          height: 700px !important;
-                          max-height: 800px !important;
-                          position: relative !important;
-                          overflow: hidden !important;
-                          margin: 0 !important;
-                          padding: 0 !important;
-                        }
-                        
-                        #video-ultimate-player {
-                          position: absolute !important;
-                          top: 0 !important;
-                          left: 0 !important;
-                          width: 100% !important;
-                          height: 100% !important;
-                          max-width: 100% !important;
-                          max-height: 100% !important;
-                          margin: 0 !important;
-                          padding: 0 !important;
-                        }
-                        
-                        #video-ultimate-player > div {
-                          width: 100% !important;
-                          height: 100% !important;
-                          max-width: 100% !important;
-                          max-height: 100% !important;
-                          position: absolute !important;
-                          top: 0 !important;
-                          left: 0 !important;
-                        }
-                        
-                        /* Force all video elements to fill container */
-                        #video-ultimate-player iframe,
-                        #video-ultimate-player video,
-                        #video-ultimate-player [class*="player"] {
-                          width: 100% !important;
-                          height: 100% !important;
-                          max-width: 100% !important;
-                          max-height: 100% !important;
-                          position: absolute !important;
-                          top: 0 !important;
-                          left: 0 !important;
-                        }
-                      }
+                      /* LAPTOP VIEW - ALREADY HANDLED BY DEFAULT CSS */
                     `
                   }} />
                   
