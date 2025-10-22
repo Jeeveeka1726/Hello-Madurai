@@ -93,6 +93,31 @@ function NewsPageContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+      <style jsx>{`
+        .news-card {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+        .news-card-content {
+          display: flex;
+          flex-direction: column;
+          flex-grow: 1;
+          justify-content: flex-start;
+        }
+        .news-card-content > div:first-child {
+          flex-grow: 0;
+        }
+        .news-card-content > div:last-child {
+          margin-top: auto;
+        }
+        .news-card-content .content-section {
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+      `}</style>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
 
@@ -135,7 +160,7 @@ function NewsPageContent() {
             </h2>
             <div className="grid gap-8 lg:grid-cols-2">
               {featuredNews.map((article) => (
-                <Card key={article.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full flex flex-col">
+                <Card key={article.id} className="news-card overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full flex flex-col">
                   {article.featuredImage ? (
                     <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                       <img
@@ -153,7 +178,7 @@ function NewsPageContent() {
                       </div>
                     </div>
                   )}
-                  <CardContent className="p-6 flex flex-col flex-grow">
+                  <CardContent className="news-card-content p-6 flex flex-col flex-grow">
                     <div className="flex items-center justify-between mb-2">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                         {t('news.featured', 'Featured', 'சிறப்பு')}
@@ -165,7 +190,7 @@ function NewsPageContent() {
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                       {t(`news.${article.id}.title`, article.title, article.title_ta)}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow">
                       {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
                     </p>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -206,7 +231,7 @@ function NewsPageContent() {
           </h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {(selectedCategory === 'all' ? regularNews : filteredArticles.filter(a => !a.featured)).map((article) => (
-              <Card key={article.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full flex flex-col">
+              <Card key={article.id} className="news-card hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full flex flex-col">
                 {article.featuredImage ? (
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                     <img
@@ -224,7 +249,7 @@ function NewsPageContent() {
                     </div>
                   </div>
                 )}
-                <CardContent className="p-4 flex flex-col flex-grow">
+                <CardContent className="news-card-content p-4 flex flex-col flex-grow">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                       {article.category}
@@ -236,7 +261,7 @@ function NewsPageContent() {
                   <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
                     {t(`news.${article.id}.title`, article.title, article.title_ta)}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2 flex-grow">
                     {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
                   </p>
                   <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">

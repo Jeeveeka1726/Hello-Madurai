@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import Link from 'next/link'
 import { 
   NewspaperIcon, 
-  VideoCameraIcon, 
+  // VideoCameraIcon removed 
   MicrophoneIcon, 
   DocumentIcon, 
   PhoneIcon,
@@ -31,7 +31,7 @@ export default function RootPage() {
       name: t('nav.videos', 'Videos', 'வீடியோக்கள்'),
       description: t('home.videosDesc', 'Watch local videos and content', 'உள்ளூர் வீடியோக்கள் மற்றும் உள்ளடக்கத்தைப் பார்க்கவும்'),
       href: '/videos',
-      icon: VideoCameraIcon,
+      icon: DocumentIcon, // Using DocumentIcon instead of VideoCameraIcon
       color: 'bg-blue-500'
     },
     {
@@ -97,7 +97,7 @@ export default function RootPage() {
                 {t('home.title', 'Hello Madurai', 'ஹலோ மதுரை')}
               </h1>
               <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-                {t('home.subtitle', 'Your gateway to Madurai - News, Videos, Radio & More', 'மதுரைக்கான உங்கள் நுழைவாயில் - செய்திகள், வீடியோக்கள், வானொலி மற்றும் பலவும்')}
+                {t('home.subtitle', 'Your gateway to Madurai - News, Radio & More', 'மதுரைக்கான உங்கள் நுழைவாயில் - செய்திகள், வானொலி மற்றும் பலவும்')}
               </p>
               <Link
                 href="/news"
@@ -150,7 +150,7 @@ export default function RootPage() {
                 {t('home.ctaTitle', 'Stay Updated', 'புதுப்பித்த நிலையில் இருங்கள்')}
               </h2>
               <p className="text-lg text-blue-200 mb-8 max-w-2xl mx-auto">
-                {t('home.ctaSubtitle', 'Get the latest news, videos, and content from Madurai delivered to you', 'மதுரையின் சமீபத்திய செய்திகள், வீடியோக்கள் மற்றும் உள்ளடக்கத்தை உங்களுக்கு வழங்கப்படும்')}
+                {t('home.ctaSubtitle', 'Get the latest news and content from Madurai delivered to you', 'மதுரையின் சமீபத்திய செய்திகள் மற்றும் உள்ளடக்கத்தை உங்களுக்கு வழங்கப்படும்')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <SubscriptionButton className="text-lg px-8 py-3" />

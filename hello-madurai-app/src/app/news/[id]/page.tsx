@@ -15,9 +15,9 @@ import InteractionButtons from '@/components/InteractionButtons'
 import CommentsSection from '@/components/news/CommentsSection'
 import ContentWithAds from '@/components/news/ContentWithAds'
 import { BannerAd, ResponsiveAd } from '@/components/ads/GoogleAdsense'
-import VideoPlayer from '@/components/VideoPlayer'
+// Using featured images only
 
-// VideoPlayer component handles all video functionality
+// Video functionality removed - using featured images only
 
 interface NewsArticle {
   id: string
@@ -35,8 +35,6 @@ interface NewsArticle {
   dislikes: number
   featured: boolean
   featuredImage?: string
-  videoUrl?: string
-  videoType?: string
   allowDownload: boolean
   comments: Comment[]
   shares: Share[]
@@ -62,7 +60,7 @@ function NewsDetailPageContent() {
   const [article, setArticle] = useState<NewsArticle | null>(null)
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([])
   const [loading, setLoading] = useState(true)
-  // VideoPlayer component handles video loading state
+  // Using featured images only
 
   // Fetch article and related articles from database
   useEffect(() => {
@@ -100,10 +98,7 @@ function NewsDetailPageContent() {
     }
   }, [newsId])
 
-  // Intersection Observer for video lazy loading
-  // VideoPlayer component handles lazy loading
-
-  // VideoPlayer component handles all video functionality
+  // Using featured images only
 
   const handleDownload = async () => {
     if (!article) return
@@ -203,10 +198,8 @@ function NewsDetailPageContent() {
           {/* Article Card */}
           <div className="flex-1 w-full">
             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-              {/* Featured Image or Video */}
-              {article.videoUrl ? (
-                <VideoPlayer url={article.videoUrl} title={article.title} />
-              ) : article.featuredImage ? (
+              {/* Featured Image */}
+              {article.featuredImage ? (
                 <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                   <img
                     src={article.featuredImage}
