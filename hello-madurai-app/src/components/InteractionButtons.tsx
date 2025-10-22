@@ -61,8 +61,6 @@ export default function InteractionButtons({
   const [localShares, setLocalShares] = useState(Math.max(0, shares))
   const [isLoading, setIsLoading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false) // New state to prevent multiple clicks
-  const [isLikeLoading, setIsLikeLoading] = useState(false) // Separate loading state for like
-  const [isDislikeLoading, setIsDislikeLoading] = useState(false) // Separate loading state for dislike
 
   // Check localStorage on mount to see if user has already liked/disliked
   useEffect(() => {
@@ -81,19 +79,37 @@ export default function InteractionButtons({
     e?.stopPropagation()
     
     // Prevent multiple simultaneous clicks
-    if (isProcessing || isLikeLoading) {
-      console.log('🚫 Like action already in progress, ignoring click')
+    if (isProcessing) {
       return
     }
     
     setIsProcessing(true)
-    setIsLikeLoading(true)
+    
+    // Immediate UI update for better UX
+    const newLikedState = !isLiked
+    setIsLiked(newLikedState)
+    setLocalLikes(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1))
+    
+    // Update localStorage immediately
+    const likeKey = `${itemType}_${itemId}_liked`
+    if (newLikedState) {
+      localStorage.setItem(likeKey, 'true')
+    } else {
+      localStorage.removeItem(likeKey)
+    }
+    
+    // Handle dislike removal if switching from dislike to like
+    if (newLikedState && isDisliked) {
+      setIsDisliked(false)
+      setLocalDislikes(prev => Math.max(0, prev - 1))
+      const dislikeKey = `${itemType}_${itemId}_disliked`
+      localStorage.removeItem(dislikeKey)
+    }
     
     try {
-      const action = isLiked ? 'unlike' : 'like'
-      console.log(`👍 Processing ${action} for ${itemType} ${itemId}`)
+      const action = newLikedState ? 'like' : 'unlike'
       
-      // Make API call first
+      // Make API call in background (no loading state needed)
       const response = await fetch(`/api/${itemType}/${itemId}/like`, {
         method: 'POST',
         headers: {
@@ -104,29 +120,11 @@ export default function InteractionButtons({
       
       if (response.ok) {
         const data = await response.json()
-        
-        // Update state with server response
-        setIsLiked(!isLiked)
+        // Update with server response
         setLocalLikes(Math.max(0, data.likes || 0))
         
-        // Update localStorage
-        const likeKey = `${itemType}_${itemId}_liked`
-        if (!isLiked) {
-          localStorage.setItem(likeKey, 'true')
-        } else {
-          localStorage.removeItem(likeKey)
-        }
-        
-        // If switching from dislike to like, handle dislike removal
-        if (!isLiked && isDisliked) {
-          setIsDisliked(false)
-          setLocalDislikes(prev => Math.max(0, prev - 1))
-          
-          // Remove dislike from localStorage
-          const dislikeKey = `${itemType}_${itemId}_disliked`
-          localStorage.removeItem(dislikeKey)
-          
-          // Call dislike API to remove dislike
+        // Handle dislike removal API call
+        if (newLikedState && isDisliked) {
           fetch(`/api/${itemType}/${itemId}/dislike`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -135,33 +133,63 @@ export default function InteractionButtons({
         }
         
         onLike?.()
-        console.log(`✅ ${action} successful: ${data.likes} likes`)
       } else {
-        console.error('❌ Like API failed:', response.status)
+        // Revert on error
+        setIsLiked(!newLikedState)
+        setLocalLikes(prev => newLikedState ? Math.max(0, prev - 1) : prev + 1)
+        if (newLikedState) {
+          localStorage.removeItem(likeKey)
+        } else {
+          localStorage.setItem(likeKey, 'true')
+        }
       }
     } catch (error) {
-      console.error('❌ Error in handleLike:', error)
+      // Revert on error
+      setIsLiked(!newLikedState)
+      setLocalLikes(prev => newLikedState ? Math.max(0, prev - 1) : prev + 1)
+      if (newLikedState) {
+        localStorage.removeItem(likeKey)
+      } else {
+        localStorage.setItem(likeKey, 'true')
+      }
     } finally {
-      setIsLikeLoading(false)
       setIsProcessing(false)
     }
   }
 
   const handleDislike = async () => {
     // Prevent multiple simultaneous clicks
-    if (isProcessing || isDislikeLoading) {
-      console.log('🚫 Dislike action already in progress, ignoring click')
+    if (isProcessing) {
       return
     }
     
     setIsProcessing(true)
-    setIsDislikeLoading(true)
+    
+    // Immediate UI update for better UX
+    const newDislikedState = !isDisliked
+    setIsDisliked(newDislikedState)
+    setLocalDislikes(prev => newDislikedState ? prev + 1 : Math.max(0, prev - 1))
+    
+    // Update localStorage immediately
+    const dislikeKey = `${itemType}_${itemId}_disliked`
+    if (newDislikedState) {
+      localStorage.setItem(dislikeKey, 'true')
+    } else {
+      localStorage.removeItem(dislikeKey)
+    }
+    
+    // Handle like removal if switching from like to dislike
+    if (newDislikedState && isLiked) {
+      setIsLiked(false)
+      setLocalLikes(prev => Math.max(0, prev - 1))
+      const likeKey = `${itemType}_${itemId}_liked`
+      localStorage.removeItem(likeKey)
+    }
     
     try {
-      const action = isDisliked ? 'undislike' : 'dislike'
-      console.log(`👎 Processing ${action} for ${itemType} ${itemId}`)
+      const action = newDislikedState ? 'dislike' : 'undislike'
       
-      // Make API call first
+      // Make API call in background (no loading state needed)
       const response = await fetch(`/api/${itemType}/${itemId}/dislike`, {
         method: 'POST',
         headers: {
@@ -172,29 +200,11 @@ export default function InteractionButtons({
       
       if (response.ok) {
         const data = await response.json()
-        
-        // Update state with server response
-        setIsDisliked(!isDisliked)
+        // Update with server response
         setLocalDislikes(Math.max(0, data.dislikes || 0))
         
-        // Update localStorage
-        const dislikeKey = `${itemType}_${itemId}_disliked`
-        if (!isDisliked) {
-          localStorage.setItem(dislikeKey, 'true')
-        } else {
-          localStorage.removeItem(dislikeKey)
-        }
-        
-        // If switching from like to dislike, handle like removal
-        if (!isDisliked && isLiked) {
-          setIsLiked(false)
-          setLocalLikes(prev => Math.max(0, prev - 1))
-          
-          // Remove like from localStorage
-          const likeKey = `${itemType}_${itemId}_liked`
-          localStorage.removeItem(likeKey)
-          
-          // Call like API to remove like
+        // Handle like removal API call
+        if (newDislikedState && isLiked) {
           fetch(`/api/${itemType}/${itemId}/like`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -203,14 +213,26 @@ export default function InteractionButtons({
         }
         
         onDislike?.()
-        console.log(`✅ ${action} successful: ${data.dislikes} dislikes`)
       } else {
-        console.error('❌ Dislike API failed:', response.status)
+        // Revert on error
+        setIsDisliked(!newDislikedState)
+        setLocalDislikes(prev => newDislikedState ? Math.max(0, prev - 1) : prev + 1)
+        if (newDislikedState) {
+          localStorage.removeItem(dislikeKey)
+        } else {
+          localStorage.setItem(dislikeKey, 'true')
+        }
       }
     } catch (error) {
-      console.error('❌ Error in handleDislike:', error)
+      // Revert on error
+      setIsDisliked(!newDislikedState)
+      setLocalDislikes(prev => newDislikedState ? Math.max(0, prev - 1) : prev + 1)
+      if (newDislikedState) {
+        localStorage.removeItem(dislikeKey)
+      } else {
+        localStorage.setItem(dislikeKey, 'true')
+      }
     } finally {
-      setIsDislikeLoading(false)
       setIsProcessing(false)
     }
   }
@@ -238,9 +260,9 @@ export default function InteractionButtons({
       <button
         type="button"
         onClick={(e) => handleLike(e)}
-        disabled={isLikeLoading || isProcessing}
+        disabled={isProcessing}
         className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-          (isLikeLoading || isProcessing)
+          isProcessing
             ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
             : isLiked 
               ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800' 
@@ -248,9 +270,7 @@ export default function InteractionButtons({
         }`}
         aria-label={isLiked ? 'Unlike' : 'Like'}
       >
-        {(isLikeLoading || isProcessing) ? (
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-        ) : isLiked ? (
+        {isLiked ? (
           <HandThumbUpSolid className="h-4 w-4" />
         ) : (
           <HandThumbUpIcon className="h-4 w-4" />
@@ -262,18 +282,16 @@ export default function InteractionButtons({
       {itemType === 'news' && (
         <button
           onClick={handleDislike}
-          disabled={isDislikeLoading || isProcessing}
+          disabled={isProcessing}
           className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-            (isDislikeLoading || isProcessing)
+            isProcessing
               ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
               : isDisliked 
                 ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800' 
                 : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
           }`}
         >
-          {(isDislikeLoading || isProcessing) ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-          ) : isDisliked ? (
+          {isDisliked ? (
             <HandThumbDownSolid className="h-4 w-4" />
           ) : (
             <HandThumbDownIcon className="h-4 w-4" />

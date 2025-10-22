@@ -92,13 +92,13 @@ export async function POST(request: NextRequest) {
     const isProduction = process.env.NODE_ENV === 'production'
     let publicUrl: string
     
-    if (isProduction) {
-      // In production, use a simple URL that works
-      // This creates a short, manageable URL instead of long base64
-      publicUrl = `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1280&h=720&fit=crop&crop=center&auto=format&q=80`
-    } else {
-      // In development, save as files
-      const uploadsDir = join(process.cwd(), 'public', 'uploads', 'image')
+    // For both production and development, use a simple approach
+    // Store the image data and return a clean URL
+    const mimeType = resized ? 'image/webp' : file.type
+    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'image')
+    
+    // Try to create directory and save file
+    try {
       if (!existsSync(uploadsDir)) {
         mkdirSync(uploadsDir, { recursive: true })
       }
@@ -106,9 +106,12 @@ export async function POST(request: NextRequest) {
       const filePath = join(uploadsDir, filename)
       await writeFile(filePath, processedBuffer)
       publicUrl = `/uploads/image/${filename}`
+    } catch (error) {
+      // If file system write fails (production), use a data URL
+      console.log('File system write failed, using data URL:', error)
+      const base64 = processedBuffer.toString('base64')
+      publicUrl = `data:${mimeType};base64,${base64}`
     }
-    
-    const mimeType = resized ? 'image/webp' : file.type
 
     return NextResponse.json({
       success: true,
