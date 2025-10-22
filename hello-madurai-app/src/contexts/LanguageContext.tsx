@@ -12,12 +12,29 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
+// Declare global type for pre-loaded language
+declare global {
+  interface Window {
+    __HELLO_MADURAI_LANG__?: Language
+  }
+}
+
 // Initialize language from localStorage before first render
 const getInitialLanguage = (): Language => {
   if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('hello-madurai-language')
-    if (saved === 'ta' || saved === 'en') {
-      return saved
+    try {
+      // First check if we have a pre-loaded language from the inline script
+      if (window.__HELLO_MADURAI_LANG__) {
+        return window.__HELLO_MADURAI_LANG__
+      }
+      
+      // Fallback to reading from localStorage directly
+      const saved = localStorage.getItem('hello-madurai-language')
+      if (saved === 'ta' || saved === 'en') {
+        return saved
+      }
+    } catch (error) {
+      console.error('Error reading language from localStorage:', error)
     }
   }
   return 'en'
@@ -25,11 +42,28 @@ const getInitialLanguage = (): Language => {
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>(getInitialLanguage)
+  const [mounted, setMounted] = useState(false)
+
+  // Ensure we're mounted on client side
+  useEffect(() => {
+    setMounted(true)
+    // Re-check localStorage after mount to ensure consistency
+    const saved = localStorage.getItem('hello-madurai-language')
+    if (saved === 'ta' || saved === 'en') {
+      if (saved !== language) {
+        setLanguageState(saved)
+      }
+    }
+  }, [])
 
   // Custom setLanguage that also updates localStorage
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)
-    localStorage.setItem('hello-madurai-language', lang)
+    try {
+      localStorage.setItem('hello-madurai-language', lang)
+    } catch (error) {
+      console.error('Error saving language to localStorage:', error)
+    }
   }
 
   // Simple translation function - returns appropriate language text

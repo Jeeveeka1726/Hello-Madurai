@@ -29,6 +29,24 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
         {/* Disable browser auto-translate */}
         <meta name="google" content="notranslate" />
+        {/* Pre-load language setting BEFORE React hydrates to prevent flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var savedLang = localStorage.getItem('hello-madurai-language');
+                  if (savedLang === 'ta' || savedLang === 'en') {
+                    // Store in a global variable that React can access
+                    window.__HELLO_MADURAI_LANG__ = savedLang;
+                  }
+                } catch (e) {
+                  console.error('Error loading language:', e);
+                }
+              })();
+            `,
+          }}
+        />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXXX"

@@ -239,9 +239,9 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
         }
         @media (min-width: 1024px) {
           .news-content iframe {
-            width: 1280px !important;
+            width: 100% !important;
+            max-width: 1280px !important;
             height: 720px !important;
-            max-width: 100% !important;
             margin: 2rem auto !important;
           }
         }
