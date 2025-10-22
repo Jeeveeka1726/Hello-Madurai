@@ -125,8 +125,17 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
         </div>
       `
     } else if (ad.imageUrl) {
+      // Validate and clean image URL
+      let imageUrl = ad.imageUrl
+      
+      // Skip broken base64 URLs (too long or malformed)
+      if (imageUrl.startsWith('data:image/') && imageUrl.length > 100000) {
+        console.warn('Skipping broken base64 ad image:', ad.id)
+        return '' // Skip this ad
+      }
+      
       // Image ad with optional link
-      const img = `<img src="${ad.imageUrl}" alt="${ad.title}" class="ad-image w-full h-auto rounded-lg shadow-md" />`
+      const img = `<img src="${imageUrl}" alt="${ad.title}" class="ad-image w-full h-auto rounded-lg shadow-md" onerror="this.parentElement.style.display='none'" />`
       const clickHandler = ad.link ? `onclick="handleAdClick('${ad.id}', '${ad.link}')"` : ''
       
       return `
