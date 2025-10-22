@@ -98,49 +98,42 @@ export async function POST(request: NextRequest) {
     const mimeType = resized ? 'image/webp' : file.type
     const uploadsDir = join(process.cwd(), 'public', 'uploads', 'image')
     
-    // Try to save file locally first (development)
-    let savedToFileSystem = false
+    // Always try to save to Hostinger database first
     try {
-      if (!existsSync(uploadsDir)) {
-        mkdirSync(uploadsDir, { recursive: true })
-      }
+      // Save image to Hostinger MySQL database
+      const imageRecord = await prisma.image.create({
+        data: {
+          filename: filename,
+          data: processedBuffer,
+          mimeType: mimeType,
+          size: processedBuffer.length,
+          width: IMAGE_CONFIG.news.width,
+          height: IMAGE_CONFIG.news.height,
+        }
+      })
       
-      const filePath = join(uploadsDir, filename)
-      await writeFile(filePath, processedBuffer)
-      publicUrl = `/uploads/image/${filename}`
-      savedToFileSystem = true
-    } catch (error) {
-      console.log('File system write failed, saving to Hostinger database:', error)
-    }
-    
-    // For production or if file system fails, save to Hostinger database
-    if (!savedToFileSystem) {
+      // Return API route to serve the image
+      publicUrl = `/api/image/${imageRecord.id}`
+      console.log('✅ Image saved to Hostinger database:', imageRecord.id)
+    } catch (dbError) {
+      console.error('Database save error:', dbError)
+      
+      // Fallback to local file system (development only)
       try {
-        // Save image to Hostinger MySQL database
-        const imageRecord = await prisma.image.create({
-          data: {
-            filename: filename,
-            data: processedBuffer,
-            mimeType: mimeType,
-            size: processedBuffer.length,
-            width: IMAGE_CONFIG.news.width,
-            height: IMAGE_CONFIG.news.height,
-          }
-        })
+        if (!existsSync(uploadsDir)) {
+          mkdirSync(uploadsDir, { recursive: true })
+        }
         
-        // Return API route to serve the image
-        publicUrl = `/api/image/${imageRecord.id}`
-        console.log('✅ Image saved to Hostinger database:', imageRecord.id)
-      } catch (dbError) {
-        console.error('Database save error:', dbError)
-        // Final fallback: use a very small compressed data URL
-        const tinyBuffer = await sharp(processedBuffer)
-          .resize(400, 225, { fit: 'cover' })
-          .webp({ quality: 60 })
-          .toBuffer()
-        
-        const base64 = tinyBuffer.toString('base64')
-        publicUrl = `data:image/webp;base64,${base64}`
+        const filePath = join(uploadsDir, filename)
+        await writeFile(filePath, processedBuffer)
+        publicUrl = `/uploads/image/${filename}`
+        console.log('✅ Image saved to local file system:', filename)
+      } catch (fileError) {
+        console.error('File system write also failed:', fileError)
+        return NextResponse.json(
+          { error: 'Failed to save image. Please try again.' },
+          { status: 500 }
+        )
       }
     }
 
