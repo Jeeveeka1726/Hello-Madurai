@@ -600,7 +600,7 @@ function NewsDetailPageContent() {
                         box-sizing: border-box !important;
                       }
                       
-                      /* FORCE ALL VIDEO ELEMENTS */
+                      /* FORCE ALL VIDEO ELEMENTS - NO BLACK BARS */
                       #video-ultimate-player [class*="video"],
                       #video-ultimate-player [class*="player"],
                       #video-ultimate-player [class*="preview"] {
@@ -612,11 +612,30 @@ function NewsDetailPageContent() {
                         max-width: 100% !important;
                         max-height: 100% !important;
                         object-fit: cover !important;
+                        object-position: center !important;
                         overflow: hidden !important;
                         margin: 0 !important;
                         padding: 0 !important;
                         transform: none !important;
                         box-sizing: border-box !important;
+                        /* Force full coverage - no black bars */
+                        min-width: 100% !important;
+                        min-height: 100% !important;
+                      }
+                      
+                      /* FORCE VIDEO CONTENT TO FILL CONTAINER */
+                      #video-ultimate-player .react-player__preview,
+                      #video-ultimate-player .react-player__preview img,
+                      #video-ultimate-player .react-player__preview > div {
+                        width: 100% !important;
+                        height: 100% !important;
+                        object-fit: cover !important;
+                        object-position: center !important;
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        min-width: 100% !important;
+                        min-height: 100% !important;
                       }
                       
                       /* LAPTOP VIEW - ALREADY HANDLED BY DEFAULT CSS */
