@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import "../styles/video-mobile.css";
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import { AdminProvider } from '@/contexts/AdminContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'

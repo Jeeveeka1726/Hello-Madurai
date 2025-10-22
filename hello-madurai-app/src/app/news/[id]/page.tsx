@@ -371,13 +371,13 @@ function NewsDetailPageContent() {
                         box-sizing: border-box !important;
                       }
                       
-                      /* VIDEO CONTAINER - DEFAULT LARGE SIZE */
+                      /* VIDEO CONTAINER - FULL SIZE LIKE REFERENCE */
                       #video-ultimate-container {
                         position: relative !important;
                         width: 100% !important;
                         max-width: 100% !important;
-                        height: 700px !important;
-                        max-height: 800px !important;
+                        height: 1200px !important;
+                        max-height: 1400px !important;
                         overflow: hidden !important;
                         margin: 0 !important;
                         padding: 0 !important;
@@ -385,7 +385,21 @@ function NewsDetailPageContent() {
                         box-sizing: border-box !important;
                       }
                       
-                      /* LAPTOP VIEW - ALREADY HANDLED BY DEFAULT CSS */
+                      /* DESKTOP VIEW - MAXIMUM SIZE */
+                      @media (min-width: 1200px) {
+                        #video-ultimate-container {
+                          height: 1400px !important;
+                          max-height: 1600px !important;
+                        }
+                      }
+                      
+                      /* LAPTOP VIEW - FULL SIZE */
+                      @media (min-width: 1024px) {
+                        #video-ultimate-container {
+                          height: 1200px !important;
+                          max-height: 1400px !important;
+                        }
+                      }
                       
                       /* VIDEO PLAYER WRAPPER */
                       #video-ultimate-player {
@@ -614,7 +628,7 @@ function NewsDetailPageContent() {
                     className="bg-black rounded-t-xl relative w-full"
                     style={{
                       width: '100%',
-                      height: '700px',
+                      height: '1200px',
                       position: 'relative'
                     }}
                   >
