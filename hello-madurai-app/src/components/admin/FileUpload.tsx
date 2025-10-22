@@ -4,7 +4,6 @@ import { useState, useRef } from 'react'
 import { 
   PhotoIcon, 
   DocumentIcon, 
-  VideoCameraIcon,
   XMarkIcon, 
   ArrowPathIcon, 
   CloudArrowUpIcon,
@@ -15,7 +14,7 @@ import Button from '@/components/ui/Button'
 
 interface FileUploadProps {
   label: string
-  fileType: 'image' | 'pdf' | 'video' | 'audio' | 'document'
+  fileType: 'image' | 'pdf' | 'audio' | 'document'
   currentFile?: string
   currentUrl?: string
   onFileUpload: (url: string) => void
@@ -38,12 +37,6 @@ const fileTypeConfig = {
     accept: 'application/pdf',
     maxSize: 10,
     label: 'PDF'
-  },
-  video: {
-    icon: VideoCameraIcon,
-    accept: 'video/*',
-    maxSize: 100,
-    label: 'Video'
   },
   audio: {
     icon: VideoCameraIcon,

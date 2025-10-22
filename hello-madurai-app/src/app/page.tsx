@@ -28,13 +28,6 @@ export default function RootPage() {
       color: 'bg-red-500'
     },
     {
-      name: t('nav.videos', 'Videos', 'வீடியோக்கள்'),
-      description: t('home.videosDesc', 'Watch local videos and content', 'உள்ளூர் வீடியோக்கள் மற்றும் உள்ளடக்கத்தைப் பார்க்கவும்'),
-      href: '/videos',
-      icon: DocumentIcon, // Using DocumentIcon instead of VideoCameraIcon
-      color: 'bg-blue-500'
-    },
-    {
       name: t('nav.radio', 'Radio', 'வானொலி'),
       description: t('home.radioDesc', 'Listen to Hello Madurai Radio', 'ஹலோ மதுரை வானொலியைக் கேளுங்கள்'),
       href: '/radio',

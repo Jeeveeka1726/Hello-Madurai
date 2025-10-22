@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation'
 import {
   HomeIcon,
   NewspaperIcon,
-  VideoCameraIcon,
   CalendarIcon,
   BuildingOfficeIcon,
   DocumentIcon,
@@ -34,12 +33,6 @@ const navigation = [
     href: '/admin/news',
     icon: NewspaperIcon,
     badge: 'new'
-  },
-  {
-    name: 'Videos',
-    name_ta: 'வீடியோக்கள்',
-    href: '/admin/videos',
-    icon: VideoCameraIcon
   },
   {
     name: 'Events',

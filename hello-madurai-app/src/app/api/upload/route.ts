@@ -5,7 +5,6 @@ import { IMAGE_CONFIG } from '@/lib/utils/imageResize'
 const allowedFileTypes = {
   image: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'],
   pdf: ['application/pdf'],
-  video: ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/webm'],
   audio: ['audio/mp3', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/m4a'],
   document: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']
 }
@@ -13,7 +12,6 @@ const allowedFileTypes = {
 const maxFileSizes = {
   image: 5 * 1024 * 1024, // 5MB
   pdf: 10 * 1024 * 1024, // 10MB
-  video: 100 * 1024 * 1024, // 100MB
   audio: 50 * 1024 * 1024, // 50MB
   document: 10 * 1024 * 1024 // 10MB
 }

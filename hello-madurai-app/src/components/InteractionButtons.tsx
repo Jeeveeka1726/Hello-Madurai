@@ -26,7 +26,7 @@ import {
 
 interface InteractionButtonsProps {
   itemId: string
-  itemType: 'news' | 'video' | 'radio'
+  itemType: 'news' | 'radio'
   title: string
   url: string
   likes?: number

@@ -343,7 +343,6 @@ img {
   height: auto;
 }
 
-/* Video responsiveness now handled directly in components */
 
 /* Print styles */
 @media print {
