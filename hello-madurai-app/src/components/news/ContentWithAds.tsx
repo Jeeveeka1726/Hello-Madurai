@@ -221,17 +221,29 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
           object-fit: contain !important;
         }
         .news-content iframe {
-          max-width: 100% !important;
-          height: auto !important;
-          min-height: 200px !important;
+          width: 100% !important;
+          aspect-ratio: 16 / 9 !important;
           border-radius: 0.5rem !important;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-          margin: 1rem auto !important;
+          margin: 1.5rem auto !important;
+          display: block !important;
         }
-        @media (max-width: 640px) {
+        @media (min-width: 1024px) {
           .news-content iframe {
-            min-height: 180px !important;
-            margin: 0.75rem auto !important;
+            max-width: 1280px !important;
+            height: 720px !important;
+            margin: 2rem auto !important;
+          }
+        }
+        @media (min-width: 768px) and (max-width: 1023px) {
+          .news-content iframe {
+            height: 500px !important;
+          }
+        }
+        @media (max-width: 767px) {
+          .news-content iframe {
+            height: 250px !important;
+            margin: 1rem auto !important;
           }
         }
         .news-content blockquote {

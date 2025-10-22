@@ -74,9 +74,10 @@ export default function AdminAdsPage() {
     setUploading(true)
     const formDataUpload = new FormData()
     formDataUpload.append('file', file)
+    formDataUpload.append('type', 'image')
 
     try {
-      const response = await fetch('/api/upload/image', {
+      const response = await fetch('/api/upload', {
         method: 'POST',
         body: formDataUpload,
       })
@@ -84,9 +85,10 @@ export default function AdminAdsPage() {
       if (response.ok) {
         const data = await response.json()
         setFormData({ ...formData, imageUrl: data.url })
-        toast.success('✅ Image uploaded!')
+        toast.success('✅ Image uploaded and saved to database!')
       } else {
-        toast.error('Failed to upload image')
+        const errorData = await response.json()
+        toast.error(errorData.error || 'Failed to upload image')
       }
     } catch (error) {
       console.error('Error uploading image:', error)
@@ -350,6 +352,11 @@ export default function AdminAdsPage() {
                         min="0"
                         className="w-full px-3 py-2 border border-gray-300 dark:border-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-800 dark:text-white"
                       />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {language === 'ta' 
+                          ? 'குறைந்த எண் = அதிக முன்னுரிமை (0 = முதல் விளம்பரம்)' 
+                          : 'Lower number = Higher priority (0 = First ad)'}
+                      </p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -424,7 +431,7 @@ export default function AdminAdsPage() {
                       </span>
                       <span>👁️ {ad.impressions} {language === 'ta' ? 'பார்வைகள்' : 'views'}</span>
                       <span>🖱️ {ad.clicks} {language === 'ta' ? 'கிளிக்குகள்' : 'clicks'}</span>
-                      <span>📍 Position: {ad.position}</span>
+                      <span>📍 {language === 'ta' ? 'நிலை' : 'Priority'}: {ad.position === 0 ? (language === 'ta' ? 'முதல்' : 'First') : ad.position}</span>
                     </div>
                     {ad.link && (
                       <p className="mt-2 text-sm text-blue-600 dark:text-blue-400">
