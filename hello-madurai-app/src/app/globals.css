@@ -27,6 +27,16 @@ body {
   color: #eff6ff !important;
 }
 
+/* Hide scrollbar for better mobile UX */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
 /* Beautiful Blue and White theme - Light mode */
 :root,
 .light {

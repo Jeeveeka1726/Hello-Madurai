@@ -249,24 +249,24 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="mb-8">
+      {/* Tab Navigation - Mobile Responsive */}
+      <div className="mb-4 sm:mb-6 md:mb-8">
         <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="-mb-px flex space-x-8 overflow-x-auto">
+          <nav className="-mb-px flex space-x-4 sm:space-x-6 md:space-x-8 overflow-x-auto scrollbar-hide px-4 sm:px-0 -mx-4 sm:mx-0">
             {tabs.map((tab) => {
               const Icon = tab.icon
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 sm:gap-2 py-2 sm:py-3 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  <Icon className="h-5 w-5" />
-                  {tab.name}
+                  <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span>{tab.name}</span>
                 </button>
               )
             })}
