@@ -371,13 +371,13 @@ function NewsDetailPageContent() {
                         box-sizing: border-box !important;
                       }
                       
-                      /* VIDEO CONTAINER - FULL SIZE LIKE REFERENCE */
+                      /* VIDEO CONTAINER - MAXIMUM SIZE */
                       #video-ultimate-container {
                         position: relative !important;
                         width: 100% !important;
                         max-width: 100% !important;
-                        height: 1200px !important;
-                        max-height: 1400px !important;
+                        height: 1600px !important;
+                        max-height: 2000px !important;
                         overflow: hidden !important;
                         margin: 0 !important;
                         padding: 0 !important;
@@ -385,19 +385,19 @@ function NewsDetailPageContent() {
                         box-sizing: border-box !important;
                       }
                       
-                      /* DESKTOP VIEW - MAXIMUM SIZE */
+                      /* DESKTOP VIEW - ULTRA MAXIMUM SIZE */
                       @media (min-width: 1200px) {
                         #video-ultimate-container {
-                          height: 1400px !important;
-                          max-height: 1600px !important;
+                          height: 2000px !important;
+                          max-height: 2400px !important;
                         }
                       }
                       
-                      /* LAPTOP VIEW - FULL SIZE */
+                      /* LAPTOP VIEW - MAXIMUM SIZE */
                       @media (min-width: 1024px) {
                         #video-ultimate-container {
-                          height: 1200px !important;
-                          max-height: 1400px !important;
+                          height: 1600px !important;
+                          max-height: 2000px !important;
                         }
                       }
                       
@@ -647,7 +647,7 @@ function NewsDetailPageContent() {
                     className="bg-black rounded-t-xl relative w-full"
                     style={{
                       width: '100%',
-                      height: '1200px',
+                      height: '1600px',
                       position: 'relative'
                     }}
                   >
