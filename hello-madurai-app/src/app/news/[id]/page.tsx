@@ -142,7 +142,7 @@ function NewsDetailPageContent() {
         const containerWidth = videoContainer.offsetWidth || window.innerWidth
         const viewportWidth = window.innerWidth
         
-        // For laptop screens (1024px+), use container width instead of viewport width
+        // For laptop screens (1024px+), ensure proper aspect ratio
         if (viewportWidth >= 1024) {
           videoContainer.style.width = '100%'
           videoContainer.style.maxWidth = '100%'
@@ -152,6 +152,8 @@ function NewsDetailPageContent() {
           videoContainer.style.right = '0'
           videoContainer.style.height = '0'
           videoContainer.style.paddingBottom = '56.25%'
+          videoContainer.style.position = 'relative'
+          videoContainer.style.overflow = 'hidden'
         } else {
           // For mobile/tablet, use viewport width
           videoContainer.style.width = '100vw'
@@ -625,6 +627,10 @@ function NewsDetailPageContent() {
                           padding-bottom: 56.25% !important;
                           position: relative !important;
                           overflow: hidden !important;
+                          margin: 0 !important;
+                          padding-left: 0 !important;
+                          padding-right: 0 !important;
+                          padding-top: 0 !important;
                         }
                         
                         #video-ultimate-player {
@@ -635,6 +641,8 @@ function NewsDetailPageContent() {
                           height: 100% !important;
                           max-width: 100% !important;
                           max-height: 100% !important;
+                          margin: 0 !important;
+                          padding: 0 !important;
                         }
                         
                         #video-ultimate-player > div {
@@ -642,6 +650,22 @@ function NewsDetailPageContent() {
                           height: 100% !important;
                           max-width: 100% !important;
                           max-height: 100% !important;
+                          position: absolute !important;
+                          top: 0 !important;
+                          left: 0 !important;
+                        }
+                        
+                        /* Force all video elements to fill container */
+                        #video-ultimate-player iframe,
+                        #video-ultimate-player video,
+                        #video-ultimate-player [class*="player"] {
+                          width: 100% !important;
+                          height: 100% !important;
+                          max-width: 100% !important;
+                          max-height: 100% !important;
+                          position: absolute !important;
+                          top: 0 !important;
+                          left: 0 !important;
                         }
                       }
                     `
@@ -649,13 +673,25 @@ function NewsDetailPageContent() {
                   
                   <div 
                     id="video-ultimate-container" 
-                    className="bg-black rounded-t-xl relative w-full aspect-video"
+                    className="bg-black rounded-t-xl relative w-full"
                     style={{
-                      width: '100%'
+                      width: '100%',
+                      height: '0',
+                      paddingBottom: '56.25%',
+                      position: 'relative'
                     }}
                   >
                     {videoLoaded ? (
-                      <div id="video-ultimate-player">
+                      <div 
+                        id="video-ultimate-player"
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%'
+                        }}
+                      >
                   <ReactPlayer
                     url={article.videoUrl}
                     width="100%"
@@ -670,7 +706,9 @@ function NewsDetailPageContent() {
                       top: 0,
                       left: 0,
                       width: '100%',
-                      height: '100%'
+                      height: '100%',
+                      maxWidth: '100%',
+                      maxHeight: '100%'
                     }}
                     config={{
                       youtube: {
