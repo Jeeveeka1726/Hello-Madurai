@@ -26,11 +26,13 @@ export default function VideoPlayer({ url, title }: VideoPlayerProps) {
     <div className="w-full">
       {/* Clean, Responsive Video Container */}
       <div 
-        className="relative w-full bg-black rounded-lg overflow-hidden" 
+        className="relative w-full bg-black rounded-lg overflow-hidden 
+                   sm:min-h-[400px] md:min-h-[500px] lg:min-h-[600px] xl:min-h-[700px]
+                   sm:max-h-[500px] md:max-h-[600px] lg:max-h-[700px] xl:max-h-[800px]" 
         style={{ 
           aspectRatio: '16/9',
-          minHeight: '400px',
-          maxHeight: '800px'
+          minHeight: '300px',
+          maxHeight: '900px'
         }}
       >
         {videoLoaded ? (
@@ -55,11 +57,29 @@ export default function VideoPlayer({ url, title }: VideoPlayerProps) {
                 playerVars: { 
                   rel: 0,
                   modestbranding: 1,
+                  playsinline: 1,
+                  controls: 1,
+                  fs: 1,
+                  cc_load_policy: 0,
+                  iv_load_policy: 3,
+                  autohide: 0,
+                  autoplay: 0,
+                  disablekb: 0,
+                  enablejsapi: 1,
+                  end: 0,
+                  hl: 'en',
+                  loop: 0,
+                  origin: typeof window !== 'undefined' ? window.location.origin : '',
+                  playlist: '',
+                  start: 0
                 }
               }
             }}
             onReady={() => {
               console.log('✅ News video ready:', title)
+            }}
+            onError={(error) => {
+              console.error('❌ Video error:', error)
             }}
           />
         ) : (
