@@ -12,32 +12,29 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>('en')
-  const [isLoading, setIsLoading] = useState(true)
-
-  // Load language from localStorage on mount
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('hello-madurai-language') as Language
-    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'ta')) {
-      setLanguage(savedLanguage)
+// Initialize language from localStorage before first render
+const getInitialLanguage = (): Language => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('hello-madurai-language')
+    if (saved === 'ta' || saved === 'en') {
+      return saved
     }
-    setIsLoading(false)
-  }, [])
+  }
+  return 'en'
+}
 
-  // Save language to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('hello-madurai-language', language)
-  }, [language])
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const [language, setLanguageState] = useState<Language>(getInitialLanguage)
+
+  // Custom setLanguage that also updates localStorage
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang)
+    localStorage.setItem('hello-madurai-language', lang)
+  }
 
   // Simple translation function - returns appropriate language text
   const t = (key: string, enText: string, taText: string) => {
     return language === 'ta' ? taText : enText
-  }
-
-  // Don't render children until language is loaded from localStorage
-  if (isLoading) {
-    return null
   }
 
   return (
