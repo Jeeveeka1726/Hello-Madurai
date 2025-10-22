@@ -165,6 +165,31 @@ export default function RichTextEditor({
     }
   }
 
+  const addYouTubeVideo = () => {
+    const url = prompt('Enter YouTube URL:')
+    if (url) {
+      const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/
+      if (!youtubeRegex.test(url)) {
+        toast.error('Please enter a valid YouTube URL')
+        return
+      }
+      editor.commands.setYoutubeVideo({ src: url })
+      toast.success('✅ YouTube video embedded!')
+    }
+  }
+
+  const addVideoFromURL = () => {
+    const url = prompt('Enter video URL (MP4, WebM, etc.):')
+    if (url) {
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        toast.error('URL must start with http:// or https://')
+        return
+      }
+      editor.commands.setVideo({ src: url })
+      toast.success('✅ Video added!')
+    }
+  }
+
   return (
     <div className={`border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden ${className}`}>
       {label && (
@@ -278,6 +303,26 @@ export default function RichTextEditor({
           🖼️ URL
         </button>
 
+        {/* YouTube Video */}
+        <button
+          type="button"
+          onClick={addYouTubeVideo}
+          className="px-2 py-1 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors text-gray-700 dark:text-gray-300"
+          title="Embed YouTube Video"
+        >
+          ▶️ YouTube
+        </button>
+
+        {/* Video from URL */}
+        <button
+          type="button"
+          onClick={addVideoFromURL}
+          className="px-2 py-1 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors text-gray-700 dark:text-gray-300"
+          title="Insert Video from URL"
+        >
+          🎥 Video
+        </button>
+
 
         {uploading && (
           <div className="flex items-center px-2">
@@ -298,6 +343,7 @@ export default function RichTextEditor({
         <ul className="space-y-1 ml-4">
           <li>• <strong>Type freely</strong> - ALL content saves! No truncation!</li>
           <li>• <strong>Images:</strong> Click 📷 to upload or 🖼️ URL for links</li>
+          <li>• <strong>Videos:</strong> Click ▶️ YouTube for YouTube links or 🎥 Video for direct video URLs</li>
           <li>• <strong>Format:</strong> Use toolbar buttons or Ctrl+B (bold), Ctrl+I (italic)</li>
         </ul>
       </div>
