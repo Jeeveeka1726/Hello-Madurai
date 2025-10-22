@@ -348,382 +348,6 @@ function NewsDetailPageContent() {
           </Link>
         </div>
 
-        {/* Video Section - OUTSIDE ALL CONTAINERS */}
-        {article.videoUrl ? (
-          <>
-            {/* ULTIMATE NUCLEAR CSS - VIEWPORT UNITS */}
-            <style dangerouslySetInnerHTML={{
-              __html: `
-                /* RESET EVERYTHING */
-                * {
-                  box-sizing: border-box !important;
-                }
-                
-                /* VIDEO CONTAINER - BREAK OUT OF PARENT CONSTRAINTS */
-                #video-ultimate-container {
-                  position: relative !important;
-                  width: 100vw !important;
-                  max-width: 100vw !important;
-                  height: 1600px !important;
-                  max-height: 2000px !important;
-                  overflow: hidden !important;
-                  margin: 0 !important;
-                  margin-left: -50vw !important;
-                  margin-right: -50vw !important;
-                  left: 50% !important;
-                  right: 50% !important;
-                  transform: translateX(-50%) !important;
-                  box-sizing: border-box !important;
-                }
-                
-                /* DESKTOP VIEW - ULTRA MAXIMUM SIZE */
-                @media (min-width: 1200px) {
-                  #video-ultimate-container {
-                    width: 100vw !important;
-                    max-width: 100vw !important;
-                    height: 2000px !important;
-                    max-height: 2400px !important;
-                    margin-left: -50vw !important;
-                    margin-right: -50vw !important;
-                    left: 50% !important;
-                    right: 50% !important;
-                    transform: translateX(-50%) !important;
-                  }
-                }
-                
-                /* LAPTOP VIEW - MAXIMUM SIZE */
-                @media (min-width: 1024px) {
-                  #video-ultimate-container {
-                    width: 100vw !important;
-                    max-width: 100vw !important;
-                    height: 1600px !important;
-                    max-height: 2000px !important;
-                    margin-left: -50vw !important;
-                    margin-right: -50vw !important;
-                    left: 50% !important;
-                    right: 50% !important;
-                    transform: translateX(-50%) !important;
-                  }
-                }
-                
-                /* VIDEO PLAYER WRAPPER */
-                #video-ultimate-player {
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  max-width: 100% !important;
-                  max-height: 100% !important;
-                  overflow: hidden !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                  transform: none !important;
-                  box-sizing: border-box !important;
-                }
-                
-                /* REACT PLAYER */
-                #video-ultimate-player > div {
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  max-width: 100% !important;
-                  max-height: 100% !important;
-                  overflow: hidden !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                  transform: none !important;
-                  box-sizing: border-box !important;
-                  object-fit: cover !important;
-                }
-                
-                /* VIDEO THUMBNAIL/COVER */
-                #video-ultimate-player > div > div {
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  max-width: 100% !important;
-                  max-height: 100% !important;
-                  overflow: hidden !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                  transform: none !important;
-                  box-sizing: border-box !important;
-                  object-fit: cover !important;
-                }
-                
-                /* VIDEO THUMBNAIL IMAGE */
-                #video-ultimate-player img,
-                #video-ultimate-player > div img,
-                #video-ultimate-player > div > div img {
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  max-width: 100% !important;
-                  max-height: 100% !important;
-                  object-fit: cover !important;
-                  overflow: hidden !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                  transform: none !important;
-                  box-sizing: border-box !important;
-                }
-                
-                /* IFRAME OVERRIDE */
-                #video-ultimate-player iframe,
-                #video-ultimate-player > div iframe {
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  max-width: 100% !important;
-                  max-height: 100% !important;
-                  overflow: hidden !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                  transform: none !important;
-                  box-sizing: border-box !important;
-                  border: none !important;
-                }
-                
-                /* MOBILE OVERRIDES */
-                @media (max-width: 768px) {
-                  #video-ultimate-container {
-                    width: 100vw !important;
-                    max-width: 100vw !important;
-                    height: 50vh !important;
-                    max-height: 50vh !important;
-                    margin-left: -50vw !important;
-                    margin-right: -50vw !important;
-                    left: 50% !important;
-                    right: 50% !important;
-                    transform: translateX(-50%) !important;
-                  }
-                }
-                
-                @media (max-width: 480px) {
-                  #video-ultimate-container {
-                    width: 100vw !important;
-                    max-width: 100vw !important;
-                    height: 40vh !important;
-                    max-height: 40vh !important;
-                    margin-left: -50vw !important;
-                    margin-right: -50vw !important;
-                    left: 50% !important;
-                    right: 50% !important;
-                    transform: translateX(-50%) !important;
-                  }
-                }
-                
-                /* EXTRA SMALL MOBILE */
-                @media (max-width: 360px) {
-                  #video-ultimate-container {
-                    width: 100vw !important;
-                    max-width: 100vw !important;
-                    height: 35vh !important;
-                    max-height: 35vh !important;
-                    margin-left: -50vw !important;
-                    margin-right: -50vw !important;
-                    left: 50% !important;
-                    right: 50% !important;
-                    transform: translateX(-50%) !important;
-                  }
-                }
-                
-                /* FORCE ALL ELEMENTS TO BEHAVE */
-                #video-ultimate-container *,
-                #video-ultimate-player *,
-                #video-ultimate-player > div *,
-                #video-ultimate-player iframe,
-                #video-ultimate-player > div iframe {
-                  max-width: 100% !important;
-                  max-height: 100% !important;
-                  overflow: hidden !important;
-                  box-sizing: border-box !important;
-                  transform: none !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                }
-                
-                /* VIDEO THUMBNAIL FULL COVERAGE */
-                #video-ultimate-player .react-player__preview,
-                #video-ultimate-player .react-player__preview img,
-                #video-ultimate-player .react-player__preview > div {
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  max-width: 100% !important;
-                  max-height: 100% !important;
-                  object-fit: cover !important;
-                  overflow: hidden !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                  transform: none !important;
-                  box-sizing: border-box !important;
-                }
-                
-                /* YOUTUBE THUMBNAIL OVERRIDE */
-                #video-ultimate-player .ytp-cued-thumbnail-overlay,
-                #video-ultimate-player .ytp-cued-thumbnail-overlay img {
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  max-width: 100% !important;
-                  max-height: 100% !important;
-                  object-fit: cover !important;
-                  overflow: hidden !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                  transform: none !important;
-                  box-sizing: border-box !important;
-                }
-                
-                /* FORCE VIDEO TO FILL CONTAINER */
-                #video-ultimate-player video,
-                #video-ultimate-player > div video,
-                #video-ultimate-player > div > div video {
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  max-width: 100% !important;
-                  max-height: 100% !important;
-                  object-fit: cover !important;
-                  overflow: hidden !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                  transform: none !important;
-                  box-sizing: border-box !important;
-                }
-                
-                /* FORCE ALL VIDEO ELEMENTS */
-                #video-ultimate-player [class*="video"],
-                #video-ultimate-player [class*="player"],
-                #video-ultimate-player [class*="preview"] {
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  max-width: 100% !important;
-                  max-height: 100% !important;
-                  object-fit: cover !important;
-                  object-position: center !important;
-                  overflow: hidden !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                  transform: none !important;
-                  box-sizing: border-box !important;
-                  /* Force full coverage - no black bars */
-                  min-width: 100% !important;
-                  min-height: 100% !important;
-                }
-                
-                /* FORCE VIDEO CONTENT TO FILL CONTAINER */
-                #video-ultimate-player .react-player__preview,
-                #video-ultimate-player .react-player__preview img,
-                #video-ultimate-player .react-player__preview > div {
-                  width: 100% !important;
-                  height: 100% !important;
-                  object-fit: cover !important;
-                  object-position: center !important;
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  min-width: 100% !important;
-                  min-height: 100% !important;
-                }
-                
-                /* LAPTOP VIEW - ALREADY HANDLED BY DEFAULT CSS */
-              `
-            }} />
-            
-            <div 
-              id="video-ultimate-container" 
-              className="bg-black rounded-t-xl relative w-full"
-              style={{
-                width: '100%',
-                height: '1600px',
-                position: 'relative'
-              }}
-            >
-              {videoLoaded ? (
-                <div 
-                  id="video-ultimate-player"
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%'
-                  }}
-                >
-                  <ReactPlayer
-                    url={article.videoUrl}
-                    width="100%"
-                    height="100%"
-                    controls={true}
-                    playing={false}
-                    playsinline={true}
-                    light={false}
-                    pip={false}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                      maxWidth: '100%',
-                      maxHeight: '100%'
-                    }}
-                    config={{
-                      youtube: {
-                        playerVars: { 
-                          rel: 0,
-                          modestbranding: 1,
-                        }
-                      }
-                    }}
-                    onReady={() => {
-                      console.log('✅ News video ready:', article.title)
-                    }}
-                  />
-                </div>
-              ) : (
-                <div 
-                  className="absolute inset-0 flex items-center justify-center"
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    maxWidth: '100%',
-                    boxSizing: 'border-box'
-                  }}
-                >
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Loading video...</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </>
-        ) : null}
-
         {/* Article Layout with External Sidebar Ads */}
         <div className="flex flex-col xl:flex-row gap-4 xl:gap-6">
           {/* Left Sidebar Ad - Outside Article */}
@@ -737,7 +361,7 @@ function NewsDetailPageContent() {
           <div className="flex-1 w-full">
             <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               {/* Featured Image or Video */}
-              {article.featuredImage && !article.videoUrl ? (
+              {article.videoUrl ? (
                 <>
                   {/* ULTIMATE NUCLEAR CSS - VIEWPORT UNITS */}
                   <style dangerouslySetInnerHTML={{
@@ -747,50 +371,33 @@ function NewsDetailPageContent() {
                         box-sizing: border-box !important;
                       }
                       
-                      /* VIDEO CONTAINER - BREAK OUT OF PARENT CONSTRAINTS */
+                      /* VIDEO CONTAINER - MUCH LARGER */
                       #video-ultimate-container {
                         position: relative !important;
-                        width: 100vw !important;
-                        max-width: 100vw !important;
-                        height: 1600px !important;
-                        max-height: 2000px !important;
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        height: 1200px !important;
+                        max-height: 1500px !important;
                         overflow: hidden !important;
                         margin: 0 !important;
-                        margin-left: -50vw !important;
-                        margin-right: -50vw !important;
-                        left: 50% !important;
-                        right: 50% !important;
-                        transform: translateX(-50%) !important;
+                        padding: 0 !important;
+                        transform: none !important;
                         box-sizing: border-box !important;
                       }
                       
-                      /* DESKTOP VIEW - ULTRA MAXIMUM SIZE */
+                      /* DESKTOP VIEW - ULTRA LARGE SIZE */
                       @media (min-width: 1200px) {
                         #video-ultimate-container {
-                          width: 100vw !important;
-                          max-width: 100vw !important;
-                          height: 2000px !important;
-                          max-height: 2400px !important;
-                          margin-left: -50vw !important;
-                          margin-right: -50vw !important;
-                          left: 50% !important;
-                          right: 50% !important;
-                          transform: translateX(-50%) !important;
+                          height: 1500px !important;
+                          max-height: 1800px !important;
                         }
                       }
                       
-                      /* LAPTOP VIEW - MAXIMUM SIZE */
+                      /* LAPTOP VIEW - ULTRA LARGE SIZE */
                       @media (min-width: 1024px) {
                         #video-ultimate-container {
-                          width: 100vw !important;
-                          max-width: 100vw !important;
-                          height: 1600px !important;
-                          max-height: 2000px !important;
-                          margin-left: -50vw !important;
-                          margin-right: -50vw !important;
-                          left: 50% !important;
-                          right: 50% !important;
-                          transform: translateX(-50%) !important;
+                          height: 1300px !important;
+                          max-height: 1500px !important;
                         }
                       }
                       
@@ -1040,7 +647,7 @@ function NewsDetailPageContent() {
                     className="bg-black rounded-t-xl relative w-full"
                     style={{
                       width: '100%',
-                      height: '1600px',
+                      height: '1200px',
                       position: 'relative'
                     }}
                   >
