@@ -29,6 +29,7 @@ interface InteractionButtonsProps {
   itemType: 'news' | 'radio'
   title: string
   url: string
+  imageUrl?: string  // Featured image URL for sharing
   likes?: number
   dislikes?: number
   comments?: number
@@ -44,6 +45,7 @@ export default function InteractionButtons({
   itemType,
   title,
   url,
+  imageUrl,
   likes = 0,
   dislikes = 0,
   comments = 0,
@@ -254,6 +256,67 @@ export default function InteractionButtons({
     }
   }
 
+  // Native share with image support
+  const handleNativeShare = async () => {
+    try {
+      // Check if Web Share API is supported
+      if (!navigator.share) {
+        // Fallback to showing share menu
+        setShowShareMenu(!showShareMenu)
+        return
+      }
+
+      const shareData: any = {
+        title: title,
+        text: title,
+        url: url,
+      }
+
+      // Try to fetch and share image if available
+      if (imageUrl) {
+        try {
+          // Convert image URL to absolute URL if needed
+          const absoluteImageUrl = imageUrl.startsWith('http') 
+            ? imageUrl 
+            : `${window.location.origin}${imageUrl}`
+
+          // Fetch the image
+          const response = await fetch(absoluteImageUrl)
+          const blob = await response.blob()
+          const file = new File([blob], 'news-image.jpg', { type: blob.type })
+
+          // Check if files can be shared
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            shareData.files = [file]
+          }
+        } catch (imgError) {
+          console.log('Could not fetch image for sharing:', imgError)
+          // Continue without image
+        }
+      }
+
+      // Share
+      await navigator.share(shareData)
+      
+      // Track the share
+      await fetch(`/api/${itemType}/${itemId}/share`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ platform: 'native' })
+      })
+      
+      setLocalShares(prev => prev + 1)
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') {
+        console.error('Error sharing:', error)
+        // Fallback to showing share menu
+        setShowShareMenu(!showShareMenu)
+      }
+    }
+  }
+
   return (
     <div className={`flex items-center gap-4 ${className}`}>
       {/* Like Button */}
@@ -303,8 +366,8 @@ export default function InteractionButtons({
       {/* Share Button */}
       <div className="relative">
         <button
-          onClick={() => setShowShareMenu(!showShareMenu)}
-          className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+          onClick={handleNativeShare}
+          className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
         >
           <ShareIcon className="h-4 w-4" />
           <span className="text-sm font-medium">{localShares}</span>

@@ -273,6 +273,7 @@ function NewsDetailPageContent() {
                     itemType="news"
                     title={article.title}
                     url={typeof window !== 'undefined' ? window.location.href : ''}
+                    imageUrl={article.featuredImage}
                     likes={article.likes}
                     dislikes={article.dislikes}
                     comments={article.comments?.length || 0}
