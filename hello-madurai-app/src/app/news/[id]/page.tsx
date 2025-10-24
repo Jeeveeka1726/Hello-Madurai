@@ -55,7 +55,7 @@ interface Share {
 
 function NewsDetailPageContent() {
   const params = useParams()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const newsId = params.id as string
   const [article, setArticle] = useState<NewsArticle | null>(null)
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([])
@@ -271,7 +271,7 @@ function NewsDetailPageContent() {
                   <InteractionButtons
                     itemId={article.id}
                     itemType="news"
-                    title={article.title}
+                    title={language === 'ta' && article.title_ta ? article.title_ta : article.title}
                     url={typeof window !== 'undefined' ? window.location.href : ''}
                     imageUrl={article.featuredImage}
                     likes={article.likes}
