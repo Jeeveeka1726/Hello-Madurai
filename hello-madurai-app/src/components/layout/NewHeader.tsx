@@ -6,12 +6,14 @@ import { usePathname } from 'next/navigation'
 import {
   Bars3Icon,
   XMarkIcon,
-  LanguageIcon
+  LanguageIcon,
+  ChevronDownIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function NewHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isOthersOpen, setIsOthersOpen] = useState(false)
   const { language, setLanguage, t } = useLanguage()
   const pathname = usePathname()
   
@@ -28,7 +30,7 @@ export default function NewHeader() {
       href: '/news' 
     },
     { 
-      name: t('nav.events', 'Events', 'நிகழ்வுகள்'),
+      name: t('nav.events', 'Events', 'நிகழ்ச்சி'),
       href: '/events' 
     },
     {
@@ -36,12 +38,23 @@ export default function NewHeader() {
       href: '/radio'
     },
     { 
-      name: t('nav.magazine', 'Magazine', 'பத்திரிகை'),
+      name: t('nav.magazine', 'Magazine', 'மின்னிதழ்'),
       href: '/magazine' 
     },
     {
-      name: t('nav.directory', 'Directory', 'முகவரி நூல்'),
+      name: t('nav.directory', 'Directory', 'முகவரி'),
       href: '/directory'
+    },
+  ]
+
+  const othersDropdown = [
+    {
+      name: t('nav.discount', 'Discount Card', 'தள்ளுபடி அட்டை'),
+      href: '/discount'
+    },
+    {
+      name: t('nav.helpline', 'Help Line', 'உதவி எண்'),
+      href: '/helpline'
     },
     {
       name: t('nav.contact', 'Contact', 'தொடர்பு'),
@@ -84,16 +97,43 @@ export default function NewHeader() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors duration-200 hover-lift"
+                className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-2 py-2 text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
               >
                 {item.name}
               </Link>
             ))}
+            
+            {/* Others Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsOthersOpen(!isOthersOpen)}
+                onBlur={() => setTimeout(() => setIsOthersOpen(false), 200)}
+                className="flex items-center gap-1 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-2 py-2 text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
+              >
+                {t('nav.others', 'Others', 'மேலும்')}
+                <ChevronDownIcon className="h-4 w-4" />
+              </button>
+              
+              {isOthersOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                  {othersDropdown.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-300 first:rounded-t-md last:rounded-b-md transition-colors"
+                      onClick={() => setIsOthersOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Controls */}
@@ -141,6 +181,23 @@ export default function NewHeader() {
                   {item.name}
                 </Link>
               ))}
+              
+              {/* Others Section in Mobile */}
+              <div className="pt-2 border-t border-blue-200 dark:border-blue-700">
+                <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {t('nav.others', 'Others', 'மேலும்')}
+                </div>
+                {othersDropdown.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="block px-3 py-2 pl-6 text-base font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-md transition-colors duration-200"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         )}
