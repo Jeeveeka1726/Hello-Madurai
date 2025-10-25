@@ -37,6 +37,10 @@ export default function NewHeader() {
       name: t('nav.radio', 'Radio', 'வானொலி'),
       href: '/radio'
     },
+    {
+      name: t('nav.videos', 'Videos', 'வீடியோ'),
+      href: '/videos'
+    },
     { 
       name: t('nav.magazine', 'Magazine', 'மின்னிதழ்'),
       href: '/magazine' 
