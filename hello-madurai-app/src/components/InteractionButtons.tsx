@@ -401,16 +401,53 @@ export default function InteractionButtons({
       <div className="relative">
         <button
           id={`share-btn-${itemId}`}
-          onClick={handleNativeShare}
+          onClick={() => setShowShareMenu(!showShareMenu)}
           className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
         >
           <ShareIcon className="h-4 w-4" />
           <span className="text-sm font-medium">{localShares}</span>
         </button>
 
-        {/* Share Menu (Fallback for desktop or when native share not available) */}
+        {/* Share Menu with Facebook & WhatsApp prominently */}
         {showShareMenu && (
-          <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-3 z-10 min-w-[240px]">
+          <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-10 min-w-[280px]">
+            {/* Main Share Options - Facebook & WhatsApp */}
+            <div className="mb-3">
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                {t('share.shareTo', 'Share to:', 'இதில் பகிரவும்:')}
+              </p>
+              <div className="flex gap-3 justify-center">
+                {/* WhatsApp - Large Button */}
+                <WhatsappShareButton
+                  url={url}
+                  title={title}
+                  onClick={() => handleShare('whatsapp')}
+                  className="transform hover:scale-110 transition-transform"
+                >
+                  <div className="flex flex-col items-center gap-1">
+                    <WhatsappIcon size={48} round />
+                    <span className="text-xs text-gray-600 dark:text-gray-400">WhatsApp</span>
+                  </div>
+                </WhatsappShareButton>
+
+                {/* Facebook - Large Button */}
+                <FacebookShareButton
+                  url={url}
+                  quote={title}
+                  onClick={() => handleShare('facebook')}
+                  className="transform hover:scale-110 transition-transform"
+                >
+                  <div className="flex flex-col items-center gap-1">
+                    <FacebookIcon size={48} round />
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Facebook</span>
+                  </div>
+                </FacebookShareButton>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-200 dark:border-gray-700 my-3"></div>
+
             {/* Copy Link Button */}
             <button
               onClick={handleCopyLink}
@@ -422,54 +459,27 @@ export default function InteractionButtons({
               {t('share.copyLink', 'Copy Link', 'இணைப்பை நகலெடுக்கவும்')}
             </button>
             
-            {/* Social Share Buttons */}
+            {/* Other Share Options */}
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 px-1">
-              {t('share.orShareTo', 'Or share to:', 'அல்லது இதில் பகிரவும்:')}
+              {t('share.moreOptions', 'More options:', 'மேலும் விருப்பங்கள்:')}
             </p>
-            <div className="flex gap-2">
-              <FacebookShareButton
-                url={url}
-                quote={title}
-                onShareWindowClose={() => handleShare('facebook')}
-              >
-                <FacebookIcon size={32} round />
-              </FacebookShareButton>
-
+            <div className="flex gap-2 justify-center">
               <TwitterShareButton
                 url={url}
                 title={title}
-                onShareWindowClose={() => handleShare('twitter')}
+                onClick={() => handleShare('twitter')}
               >
                 <TwitterIcon size={32} round />
               </TwitterShareButton>
 
-              <WhatsappShareButton
-                url={url}
-                title={title}
-                onShareWindowClose={() => handleShare('whatsapp')}
-              >
-                <WhatsappIcon size={32} round />
-              </WhatsappShareButton>
-
               <TelegramShareButton
                 url={url}
                 title={title}
-                onShareWindowClose={() => handleShare('telegram')}
+                onClick={() => handleShare('telegram')}
               >
                 <TelegramIcon size={32} round />
               </TelegramShareButton>
             </div>
-            
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(url)
-                handleShare('copy')
-                setShowShareMenu(false)
-              }}
-              className="w-full mt-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded"
-            >
-              Copy Link
-            </button>
           </div>
         )}
       </div>
