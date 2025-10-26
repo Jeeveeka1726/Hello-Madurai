@@ -420,9 +420,11 @@ export default function InteractionButtons({
                 {/* WhatsApp - Opens directly in WhatsApp */}
                 <button
                   onClick={() => {
-                    // WhatsApp share - opens WhatsApp directly
+                    // WhatsApp share - opens WhatsApp directly with title and URL
+                    // WhatsApp will fetch the link preview and show thumbnail automatically
                     const text = encodeURIComponent(`${title}\n\n${url}`)
                     const whatsappUrl = `https://wa.me/?text=${text}`
+                    console.log('WhatsApp sharing:', title, url)
                     window.open(whatsappUrl, '_blank')
                     handleShare('whatsapp')
                     setShowShareMenu(false)
