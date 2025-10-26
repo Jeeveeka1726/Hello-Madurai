@@ -131,13 +131,27 @@ export default function AdminEventsPage() {
 
   const handleEdit = (event: Event) => {
     setEditingEvent(event)
+    
+    // Convert ISO date strings to datetime-local format (YYYY-MM-DDTHH:mm)
+    const formatDateForInput = (dateString: string) => {
+      if (!dateString) return ''
+      const date = new Date(dateString)
+      // Get local time in YYYY-MM-DDTHH:mm format
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      return `${year}-${month}-${day}T${hours}:${minutes}`
+    }
+    
     setFormData({
       title: event.title,
       title_ta: event.title_ta,
       description: event.description,
       description_ta: event.description_ta,
-      startDate: event.startDate,
-      endDate: event.endDate || '',
+      startDate: formatDateForInput(event.startDate),
+      endDate: event.endDate ? formatDateForInput(event.endDate) : '',
       duration: event.duration || '',
       location: event.location,
       location_ta: event.location_ta,

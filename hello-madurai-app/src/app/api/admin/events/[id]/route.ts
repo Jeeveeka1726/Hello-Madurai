@@ -9,6 +9,17 @@ export async function PUT(
     const { id } = await params
     const data = await request.json()
     
+    console.log('Updating event with ID:', id)
+    console.log('Update data:', data)
+    
+    // Validate required fields
+    if (!data.title || !data.description || !data.startDate || !data.location) {
+      return NextResponse.json(
+        { error: 'Missing required fields: title, description, startDate, or location' },
+        { status: 400 }
+      )
+    }
+    
     const event = await prisma.event.update({
       where: { id },
       data: {
@@ -28,10 +39,15 @@ export async function PUT(
       }
     })
     
+    console.log('Event updated successfully:', event.id)
     return NextResponse.json(event)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating event:', error)
-    return NextResponse.json({ error: 'Failed to update event' }, { status: 500 })
+    console.error('Error details:', error.message, error.code)
+    return NextResponse.json(
+      { error: 'Failed to update event', details: error.message },
+      { status: 500 }
+    )
   }
 }
 
