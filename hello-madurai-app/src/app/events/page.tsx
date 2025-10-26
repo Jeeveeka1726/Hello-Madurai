@@ -28,7 +28,6 @@ interface Event {
 
 function EventsPageContent() {
   const { t } = useLanguage()
-  const [selectedCategory, setSelectedCategory] = useState('all')
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -39,7 +38,21 @@ function EventsPageContent() {
         const response = await fetch('/api/admin/events')
         if (response.ok) {
           const data = await response.json()
-          setEvents(data)
+          
+          // Filter to show only upcoming events (not ended)
+          const now = new Date()
+          const upcomingEvents = data.filter((event: Event) => {
+            const eventEndDate = event.endDate ? new Date(event.endDate) : new Date(event.startDate)
+            // Show event if end date hasn't passed yet
+            return eventEndDate >= now
+          })
+          
+          // Sort by start date (soonest first)
+          upcomingEvents.sort((a: Event, b: Event) => 
+            new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+          )
+          
+          setEvents(upcomingEvents)
         } else {
           console.error('Failed to fetch events')
         }
@@ -53,22 +66,9 @@ function EventsPageContent() {
     fetchEvents()
   }, [])
 
-  const categories = [
-    { id: 'all', name: t('events.categories.all', 'All Events', 'அனைத்து நிகழ்வுகள்') },
-    { id: 'festival', name: t('events.categories.festival', 'Festivals', 'திருவிழாக்கள்') },
-    { id: 'exhibition', name: t('events.categories.exhibition', 'Exhibitions', 'கண்காட்சிகள்') },
-    { id: 'cultural', name: t('events.categories.cultural', 'Cultural', 'கலாச்சாரம்') },
-    { id: 'education', name: t('events.categories.education', 'Education', 'கல்வி') },
-    { id: 'sports', name: t('events.categories.sports', 'Sports', 'விளையாட்டு') },
-    { id: 'business', name: t('events.categories.business', 'Business', 'வணிகம்') }
-  ]
-
-  const filteredEvents = selectedCategory === 'all' 
-    ? events 
-    : events.filter(event => event.category === selectedCategory)
-
-  const featuredEvents = filteredEvents.filter(event => event.featured)
-  const regularEvents = filteredEvents.filter(event => !event.featured)
+  // Separate featured and regular events
+  const featuredEvents = events.filter(event => event.featured)
+  const regularEvents = events.filter(event => !event.featured)
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -117,7 +117,7 @@ function EventsPageContent() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-            {t('events.title', 'Events', 'நிகழ்வுகள்')}
+            {t('events.title', 'Upcoming Events', 'வரவிருக்கும் நிகழ்வுகள்')}
           </h1>
           <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
             {t('events.subtitle', 'Discover upcoming festivals, exhibitions, and cultural events in Madurai', 'மதுரையில் வரவிருக்கும் திருவிழாக்கள், கண்காட்சிகள் மற்றும் கலாச்சார நிகழ்வுகளைக் கண்டறியுங்கள்')}
@@ -131,27 +131,6 @@ function EventsPageContent() {
             <p className="mt-4 text-gray-600 dark:text-gray-300">
               {t('events.loading', 'Loading events...', 'நிகழ்வுகள் ஏற்றப்படுகின்றன...')}
             </p>
-          </div>
-        )}
-
-        {/* Category Filter */}
-        {!loading && (
-          <div className="mb-8">
-            <div className="flex flex-wrap gap-2 justify-center">
-              {categories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant={selectedCategory === category.id ? "primary" : "outline"}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={selectedCategory === category.id 
-                    ? "bg-primary-600 text-white" 
-                    : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  }
-                >
-                  {category.name}
-                </Button>
-              ))}
-            </div>
           </div>
         )}
 
@@ -248,16 +227,13 @@ function EventsPageContent() {
         )}
 
         {/* All Events */}
-        {!loading && (
+        {!loading && regularEvents.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            {selectedCategory === 'all' 
-              ? t('events.allEvents', 'All Events', 'அனைத்து நிகழ்வுகள்')
-              : categories.find(cat => cat.id === selectedCategory)?.name
-            }
+            {t('events.allEvents', 'All Upcoming Events', 'அனைத்து வரவிருக்கும் நிகழ்வுகள்')}
           </h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {(selectedCategory === 'all' ? regularEvents : filteredEvents.filter(e => !e.featured)).map((event) => {
+            {regularEvents.map((event) => {
               const status = getEventStatus(event.startDate, event.endDate)
               return (
                 <Card key={event.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
@@ -334,10 +310,10 @@ function EventsPageContent() {
         )}
 
         {/* No events message */}
-        {!loading && filteredEvents.length === 0 && (
+        {!loading && events.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400">
-              {t('events.noEvents', 'No events found in this category', 'இந்த வகையில் நிகழ்வுகள் எதுவும் கிடைக்கவில்லை')}
+              {t('events.noEvents', 'No upcoming events at the moment. Check back soon!', 'இப்போது வரவிருக்கும் நிகழ்வுகள் எதுவும் இல்லை. விரைவில் சரிபார்க்கவும்!')}
             </p>
           </div>
         )}
