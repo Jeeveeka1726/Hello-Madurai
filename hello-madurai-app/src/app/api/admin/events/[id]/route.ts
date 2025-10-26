@@ -10,18 +10,21 @@ export async function PUT(
     const data = await request.json()
     
     const event = await prisma.event.update({
-      where: { id: parseInt(id) },
+      where: { id },
       data: {
         title: data.title,
         title_ta: data.title_ta || undefined,
         description: data.description,
         description_ta: data.description_ta || undefined,
-        date: new Date(data.date),
+        startDate: new Date(data.startDate),
+        endDate: data.endDate ? new Date(data.endDate) : null,
+        duration: data.duration || undefined,
         location: data.location,
         location_ta: data.location_ta || undefined,
         category: data.category,
         featured: data.featured || false,
-        featuredImage: data.featuredImage || undefined
+        featuredImage: data.featuredImage || undefined,
+        bookingUrl: data.bookingUrl || undefined
       }
     })
     
@@ -40,7 +43,7 @@ export async function DELETE(
     const { id } = await params
     
     await prisma.event.delete({
-      where: { id: parseInt(id) }
+      where: { id }
     })
     
     return NextResponse.json({ success: true })

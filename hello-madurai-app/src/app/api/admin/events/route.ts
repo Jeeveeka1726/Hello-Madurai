@@ -46,9 +46,11 @@ export async function POST(request: NextRequest) {
         featuredImage: body.featuredImage,
         startDate: new Date(body.startDate),
         endDate: body.endDate ? new Date(body.endDate) : undefined,
+        duration: body.duration,
         category: body.category,
         status: body.status || 'upcoming',
-        featured: body.featured || false
+        featured: body.featured || false,
+        bookingUrl: body.bookingUrl
       }
     })
 

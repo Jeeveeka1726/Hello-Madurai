@@ -24,11 +24,13 @@ interface Event {
   description_ta: string
   startDate: string
   endDate?: string
+  duration?: string
   location: string
   location_ta: string
   category: string
   featured: boolean
   featuredImage?: string
+  bookingUrl?: string
   status: string
   registrations: number
   createdAt: string
@@ -57,11 +59,13 @@ export default function AdminEventsPage() {
     description_ta: '',
     startDate: '',
     endDate: '',
+    duration: '',
     location: '',
     location_ta: '',
     category: 'festival',
     featured: false,
-    featuredImage: ''
+    featuredImage: '',
+    bookingUrl: ''
   })
 
   useEffect(() => {
@@ -109,11 +113,13 @@ export default function AdminEventsPage() {
           description_ta: '',
           startDate: '',
           endDate: '',
+          duration: '',
           location: '',
           location_ta: '',
           category: 'festival',
           featured: false,
-          featuredImage: ''
+          featuredImage: '',
+          bookingUrl: ''
         })
       }
     } catch (error) {
@@ -132,11 +138,13 @@ export default function AdminEventsPage() {
       description_ta: event.description_ta,
       startDate: event.startDate,
       endDate: event.endDate || '',
+      duration: event.duration || '',
       location: event.location,
       location_ta: event.location_ta,
       category: event.category,
       featured: event.featured,
-      featuredImage: event.featuredImage || ''
+      featuredImage: event.featuredImage || '',
+      bookingUrl: event.bookingUrl || ''
     })
     setShowForm(true)
   }
@@ -324,6 +332,33 @@ export default function AdminEventsPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <TranslatedText>End Date & Time</TranslatedText> (Optional)
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={formData.endDate}
+                        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Duration and Category */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <TranslatedText>Duration</TranslatedText> (e.g., "3 Days", "1 Week")
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.duration}
+                        onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        placeholder="e.g., 3 Days, 5 Days, 1 Week"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         <TranslatedText>Category</TranslatedText>
                       </label>
                       <select
@@ -365,6 +400,23 @@ export default function AdminEventsPage() {
                         placeholder="Event location in Tamil"
                       />
                     </div>
+                  </div>
+
+                  {/* Booking URL */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <TranslatedText>Booking URL</TranslatedText> (Optional)
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.bookingUrl}
+                      onChange={(e) => setFormData({ ...formData, bookingUrl: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                      placeholder="https://example.com/booking"
+                    />
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      Link where users can book/register for this event
+                    </p>
                   </div>
 
                   {/* Description */}

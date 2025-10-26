@@ -15,11 +15,13 @@ interface Event {
   description_ta?: string
   startDate: string
   endDate?: string
+  duration?: string
   location: string
   location_ta?: string
   category: string
   featured: boolean
   featuredImage?: string
+  bookingUrl?: string
   status: string
   registrations: number
   createdAt: string
@@ -101,9 +103,14 @@ function EventsPageContent() {
     return 'completed'
   }
 
-  const handleRegister = (eventId: string) => {
-    // In a real app, this would handle event registration
-    alert(t('events.registerSuccess', 'Registration successful! You will receive confirmation details.', 'பதிவு வெற்றிகரமாக முடிந்தது! உறுதிப்படுத்தல் விவரங்களைப் பெறுவீர்கள்.'))
+  const handleBookNow = (event: Event) => {
+    if (event.bookingUrl) {
+      // Open booking URL in new tab
+      window.open(event.bookingUrl, '_blank', 'noopener,noreferrer')
+    } else {
+      // Fallback message if no booking URL
+      alert(t('events.bookingInfo', 'Please contact the organizers for booking details.', 'முன்பதிவு விவரங்களுக்கு நிகழ்வு ஏற்பாளர்களைத் தொடர்பு கொள்ளவும்.'))
+    }
   }
 
   const handleReminder = (eventId: string) => {
@@ -145,16 +152,27 @@ function EventsPageContent() {
                 const status = getEventStatus(event.startDate, event.endDate)
                 return (
                   <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                    <div className="aspect-w-16 aspect-h-9 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900 dark:to-secondary-900">
-                      <div className="flex items-center justify-center">
-                        <div className="text-center">
-                          <CalendarIcon className="h-16 w-16 text-primary-600 dark:text-primary-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
-                            {t(`events.categories.${event.category}`, event.category, event.category)}
-                          </p>
+                    {/* Featured Image */}
+                    {event.featuredImage ? (
+                      <div className="w-full h-64 overflow-hidden">
+                        <img 
+                          src={event.featuredImage} 
+                          alt={event.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="aspect-w-16 aspect-h-9 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900 dark:to-secondary-900">
+                        <div className="flex items-center justify-center">
+                          <div className="text-center">
+                            <CalendarIcon className="h-16 w-16 text-primary-600 dark:text-primary-400 mx-auto mb-2" />
+                            <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
+                              {t(`events.categories.${event.category}`, event.category, event.category)}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between mb-2">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
@@ -171,13 +189,15 @@ function EventsPageContent() {
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                         {t(`events.${event.id}.title`, event.title, event.title_ta)}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300 mb-4">
-                        {t(`events.${event.id}.description`, event.description, event.description_ta)}
-                      </p>
+                      <div 
+                        className="text-gray-600 dark:text-gray-300 mb-4"
+                        dangerouslySetInnerHTML={{ __html: t(`events.${event.id}.description`, event.description, event.description_ta) }}
+                      />
                       <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
                         <div className="flex items-center">
                           <CalendarIcon className="h-4 w-4 mr-2 text-gray-400" />
                           {formatDate(event.startDate)}{event.endDate && ` - ${formatDate(event.endDate)}`}
+                          {event.duration && <span className="ml-2 text-xs text-gray-500">({event.duration})</span>}
                         </div>
                         <div className="flex items-center">
                           <ClockIcon className="h-4 w-4 mr-2 text-gray-400" />
@@ -187,16 +207,12 @@ function EventsPageContent() {
                           <MapPinIcon className="h-4 w-4 mr-2 text-gray-400" />
                           {t(`events.${event.id}.location`, event.location, event.location_ta)}
                         </div>
-                        <div className="flex items-center">
-                          <UserGroupIcon className="h-4 w-4 mr-2 text-gray-400" />
-                          {event.registrations.toLocaleString()} {t('events.registrations', 'registered', 'பதிவு செய்யப்பட்டவர்கள்')}
-                        </div>
                       </div>
                       <div className="flex space-x-3">
                         {status === 'upcoming' && (
                           <>
-                            <Button onClick={() => handleRegister(event.id)} className="flex-1">
-                              {t('events.register', 'Register', 'பதிவு செய்க')}
+                            <Button onClick={() => handleBookNow(event)} className="flex-1">
+                              {t('events.bookNow', 'Book Now', 'இப்போது பதிவு செய்க')}
                             </Button>
                             <Button 
                               variant="outline" 
@@ -208,7 +224,7 @@ function EventsPageContent() {
                           </>
                         )}
                         {status === 'ongoing' && (
-                          <Button className="w-full">
+                          <Button onClick={() => handleBookNow(event)} className="w-full">
                             {t('events.joinNow', 'Join Now', 'இப்போது சேரவும்')}
                           </Button>
                         )}
@@ -236,17 +252,28 @@ function EventsPageContent() {
             {regularEvents.map((event) => {
               const status = getEventStatus(event.startDate, event.endDate)
               return (
-                <Card key={event.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                  <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
-                    <div className="flex items-center justify-center">
-                      <div className="text-center">
-                        <CalendarIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-1" />
-                        <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                          {t(`events.categories.${event.category}`, event.category, event.category)}
-                        </p>
+                <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                  {/* Featured Image */}
+                  {event.featuredImage ? (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img 
+                        src={event.featuredImage} 
+                        alt={event.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
+                      <div className="flex items-center justify-center">
+                        <div className="text-center">
+                          <CalendarIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-1" />
+                          <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                            {t(`events.categories.${event.category}`, event.category, event.category)}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className={`text-xs px-2 py-1 rounded-full ${
@@ -263,13 +290,15 @@ function EventsPageContent() {
                     <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
                       {t(`events.${event.id}.title`, event.title, event.title_ta)}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
-                      {t(`events.${event.id}.description`, event.description, event.description_ta)}
-                    </p>
+                    <div 
+                      className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-3"
+                      dangerouslySetInnerHTML={{ __html: t(`events.${event.id}.description`, event.description, event.description_ta) }}
+                    />
                     <div className="space-y-1 mb-3 text-xs text-gray-600 dark:text-gray-300">
                       <div className="flex items-center">
                         <ClockIcon className="h-3 w-3 mr-1 text-gray-400" />
                         {formatTime(event.startDate)}
+                        {event.duration && <span className="ml-1">({event.duration})</span>}
                       </div>
                       <div className="flex items-center">
                         <MapPinIcon className="h-3 w-3 mr-1 text-gray-400" />
@@ -278,8 +307,8 @@ function EventsPageContent() {
                     </div>
                     {status === 'upcoming' && (
                       <div className="flex space-x-2">
-                        <Button size="sm" onClick={() => handleRegister(event.id)} className="flex-1 text-xs">
-                          {t('events.register', 'Register', 'பதிவு')}
+                        <Button size="sm" onClick={() => handleBookNow(event)} className="flex-1 text-xs">
+                          {t('events.bookNow', 'Book Now', 'பதிவு செய்க')}
                         </Button>
                         <Button 
                           size="sm" 
@@ -292,7 +321,7 @@ function EventsPageContent() {
                       </div>
                     )}
                     {status === 'ongoing' && (
-                      <Button size="sm" className="w-full text-xs">
+                      <Button size="sm" onClick={() => handleBookNow(event)} className="w-full text-xs">
                         {t('events.joinNow', 'Join Now', 'இப்போது சேரவும்')}
                       </Button>
                     )}
