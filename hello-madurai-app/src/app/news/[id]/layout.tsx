@@ -26,16 +26,20 @@ export async function generateMetadata({
       }
     }
 
-    const title = news.title
-    const description = news.excerpt || news.content.substring(0, 160).replace(/<[^>]*>/g, '')
+    // Prefer Tamil title and description if available
+    const title = news.title_ta || news.title
+    const description = news.excerpt_ta || news.excerpt || news.content.substring(0, 160).replace(/<[^>]*>/g, '')
     
     // Generate absolute URL for featured image
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hello-madurai.vercel.app'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hello-madurai-c5xr.vercel.app'
     const imageUrl = news.featuredImage 
       ? (news.featuredImage.startsWith('http') 
         ? news.featuredImage 
         : `${baseUrl}${news.featuredImage}`)
       : `${baseUrl}/logo.jpg`
+
+    console.log('Metadata - Title:', title)
+    console.log('Metadata - Image URL:', imageUrl)
 
     return {
       title: `${title} - Hello Madurai`,
@@ -53,6 +57,7 @@ export async function generateMetadata({
         ],
         type: 'article',
         siteName: 'Hello Madurai',
+        url: `${baseUrl}/news/${params.id}`,
       },
       twitter: {
         card: 'summary_large_image',
