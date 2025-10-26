@@ -42,7 +42,7 @@ export default function NewHeader() {
       href: '/videos'
     },
     { 
-      name: t('nav.magazine', 'Magazine', 'மின்னிதழ்'),
+      name: t('nav.magazine', 'E-Paper', 'பத்திரிகை'),
       href: '/magazine' 
     },
     {

@@ -35,8 +35,8 @@ export default function RootPage() {
       color: 'bg-green-500'
     },
     {
-      name: t('nav.magazine', 'Magazine', 'பத்திரிகை'),
-      description: t('home.magazineDesc', 'Read digital magazines', 'டிஜிட்டல் பத்திரிகைகளைப் படியுங்கள்'),
+      name: t('nav.magazine', 'E-Paper', 'பத்திரிகை'),
+      description: t('home.magazineDesc', 'Read digital newspapers', 'டிஜிட்டல் பத்திரிகைகளைப் படியுங்கள்'),
       href: '/magazine',
       icon: DocumentIcon,
       color: 'bg-blue-500'

@@ -47,7 +47,7 @@ const navigation = [
     icon: BuildingOfficeIcon
   },
   {
-    name: 'Magazines',
+    name: 'E-Papers',
     name_ta: 'பத்திரிகைகள்',
     href: '/admin/magazines',
     icon: DocumentIcon

@@ -33,7 +33,7 @@ export default function SubscriptionModal({ isOpen, onClose, onSubscribe }: Subs
     { id: 'events', name: t('subscription.categories.events', 'Events', 'நிகழ்வுகள்') },
     { id: 'videos', name: t('subscription.categories.videos', 'Videos', 'வீடியோக்கள்') },
     { id: 'radio', name: t('subscription.categories.radio', 'Radio', 'வானொலி') },
-    { id: 'magazine', name: t('subscription.categories.magazine', 'Magazine', 'பத்திரிகை') },
+    { id: 'magazine', name: t('subscription.categories.magazine', 'E-Paper', 'பத்திரிகை') },
     { id: 'directory', name: t('subscription.categories.directory', 'Directory', 'அடைவு') },
     { id: 'offers', name: t('subscription.categories.offers', 'Special Offers', 'சிறப்பு வாய்ப்புகள்') }
   ]

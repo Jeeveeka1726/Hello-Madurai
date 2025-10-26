@@ -100,7 +100,7 @@ function MagazinePageContent() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-            {t('magazine.title', 'Hello Madurai E-Magazine', 'ஹலோ மதுரை மின்-பத்திரிகை')}
+            {t('magazine.title', 'Hello Madurai E-Paper', 'ஹலோ மதுரை பத்திரிகை')}
           </h1>
           <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
             {t('magazine.subtitle', 'Download and read our digital magazine issues', 'எங்கள் டிஜிட்டல் பத்திரிகை இதழ்களை பதிவிறக்கம் செய்து படியுங்கள்')}
@@ -111,7 +111,7 @@ function MagazinePageContent() {
         {!loading && collections.length > 0 && (
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              {t('magazine.collections', 'Magazine Collections', 'பத்திரிகை தொகுப்புகள்')}
+              {t('magazine.collections', 'E-Paper Collections', 'பத்திரிகை தொகுப்புகள்')}
             </h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {collections.map((collection) => (
