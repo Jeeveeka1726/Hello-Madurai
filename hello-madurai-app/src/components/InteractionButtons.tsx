@@ -417,44 +417,15 @@ export default function InteractionButtons({
                 {t('share.shareTo', 'Share to:', 'இதில் பகிரவும்:')}
               </p>
               <div className="flex gap-3 justify-center">
-                {/* WhatsApp - Large Button with Native Share (includes image) */}
+                {/* WhatsApp - Opens directly in WhatsApp */}
                 <button
-                  onClick={async () => {
-                    try {
-                      // Native share with image for WhatsApp
-                      if (navigator.share && imageUrl) {
-                        const absoluteImageUrl = imageUrl.startsWith('http') 
-                          ? imageUrl 
-                          : `${window.location.origin}${imageUrl}`
-
-                        const response = await fetch(absoluteImageUrl)
-                        const blob = await response.blob()
-                        const file = new File([blob], 'news-image.jpg', { type: blob.type })
-
-                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                          await navigator.share({
-                            title: title,
-                            text: title,
-                            url: url,
-                            files: [file]
-                          })
-                          handleShare('whatsapp')
-                          setShowShareMenu(false)
-                          return
-                        }
-                      }
-                      
-                      // Fallback to URL only
-                      window.open(`https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`, '_blank')
-                      handleShare('whatsapp')
-                      setShowShareMenu(false)
-                    } catch (error) {
-                      console.error('WhatsApp share error:', error)
-                      // Fallback
-                      window.open(`https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`, '_blank')
-                      handleShare('whatsapp')
-                      setShowShareMenu(false)
-                    }
+                  onClick={() => {
+                    // WhatsApp share - opens WhatsApp directly
+                    const text = encodeURIComponent(`${title}\n\n${url}`)
+                    const whatsappUrl = `https://wa.me/?text=${text}`
+                    window.open(whatsappUrl, '_blank')
+                    handleShare('whatsapp')
+                    setShowShareMenu(false)
                   }}
                   className="transform hover:scale-110 transition-transform cursor-pointer"
                 >
