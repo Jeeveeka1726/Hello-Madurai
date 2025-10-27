@@ -184,25 +184,44 @@ function EventsPageContent() {
                       </div>
                     )}
                     
-                    {/* Date/Time Details Above Description */}
-                    <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
-                      <div className="flex items-center">
-                        <CalendarIcon className="h-4 w-4 mr-2 text-gray-400" />
-                        <span className="font-medium">
-                          {formatDate(event.startDate)}
-                          {event.endDate && ` - ${formatDate(event.endDate)}`}
-                          {event.duration && <span className="ml-2 text-xs text-gray-500">({event.duration})</span>}
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        <ClockIcon className="h-4 w-4 mr-2 text-gray-400" />
-                        <span>{formatTime(event.startDate)}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <MapPinIcon className="h-4 w-4 mr-2 text-gray-400" />
-                        <span className="line-clamp-1">
-                          {language === 'ta' && event.location_ta ? event.location_ta : event.location}
-                        </span>
+                    {/* Date/Time Details Above Description - Highlighted */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg p-4 mb-4 border-l-4 border-blue-500">
+                      <div className="space-y-2">
+                        <div className="flex items-center">
+                          <CalendarIcon className="h-5 w-5 mr-3 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                              {t('events.date', 'Date', 'தேதி')}
+                            </p>
+                            <p className="font-semibold text-gray-900 dark:text-white">
+                              {formatDate(event.startDate)}
+                              {event.endDate && ` - ${formatDate(event.endDate)}`}
+                              {event.duration && <span className="ml-2 text-xs font-normal text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded">({event.duration})</span>}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <ClockIcon className="h-5 w-5 mr-3 text-green-600 dark:text-green-400 flex-shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                              {t('events.time', 'Time', 'நேரம்')}
+                            </p>
+                            <p className="font-semibold text-gray-900 dark:text-white">
+                              {formatTime(event.startDate)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <MapPinIcon className="h-5 w-5 mr-3 text-red-600 dark:text-red-400 flex-shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                              {t('events.location', 'Location', 'இடம்')}
+                            </p>
+                            <p className="font-semibold text-gray-900 dark:text-white line-clamp-2">
+                              {language === 'ta' && event.location_ta ? event.location_ta : event.location}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     
