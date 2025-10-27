@@ -42,7 +42,6 @@ export async function PUT(
       description: data.description,
       location: data.location,
       category: data.category,
-      featured: data.featured || false,
       startDate: startDate, // Use the validated startDate
     }
     
@@ -52,7 +51,8 @@ export async function PUT(
     if (data.location_ta) updateData.location_ta = data.location_ta
     if (data.duration) updateData.duration = data.duration
     if (data.featuredImage) updateData.featuredImage = data.featuredImage
-    if (data.bookingUrl) updateData.bookingUrl = data.bookingUrl
+    if (data.website) updateData.website = data.website
+    if (data.phone) updateData.phone = data.phone
     
     // Handle endDate specially - could be empty string, null, or a valid date
     if (data.endDate && data.endDate !== '') {

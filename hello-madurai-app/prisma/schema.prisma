@@ -46,15 +46,15 @@ model Event {
   description_ta String?  @db.Text
   location      String
   location_ta   String?
-  featuredImage String?
+  featuredImage String?  @db.Text  // Store image data
   startDate     DateTime
   endDate       DateTime?
   duration      String?  // e.g., "3 Days", "1 Week"
   category      String
   status        String   @default("upcoming") // upcoming, ongoing, completed
-  featured      Boolean  @default(false)
-  bookingUrl    String?  // URL for booking/registration
-  registrations Int      @default(0)
+  website       String?  // Website URL for booking
+  phone         String?  // Phone number for booking
+  views         Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

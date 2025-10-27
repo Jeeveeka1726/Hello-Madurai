@@ -28,11 +28,11 @@ interface Event {
   location: string
   location_ta: string
   category: string
-  featured: boolean
   featuredImage?: string
-  bookingUrl?: string
+  website?: string
+  phone?: string
   status: string
-  registrations: number
+  views: number
   createdAt: string
   updatedAt: string
 }
@@ -63,9 +63,9 @@ export default function AdminEventsPage() {
     location: '',
     location_ta: '',
     category: 'festival',
-    featured: false,
     featuredImage: '',
-    bookingUrl: ''
+    website: '',
+    phone: ''
   })
 
   useEffect(() => {
@@ -117,9 +117,9 @@ export default function AdminEventsPage() {
           location: '',
           location_ta: '',
           category: 'festival',
-          featured: false,
           featuredImage: '',
-          bookingUrl: ''
+          website: '',
+          phone: ''
         })
       }
     } catch (error) {
@@ -156,9 +156,9 @@ export default function AdminEventsPage() {
       location: event.location,
       location_ta: event.location_ta,
       category: event.category,
-      featured: event.featured,
       featuredImage: event.featuredImage || '',
-      bookingUrl: event.bookingUrl || ''
+      website: event.website || '',
+      phone: event.phone || ''
     })
     setShowForm(true)
   }
@@ -228,7 +228,7 @@ export default function AdminEventsPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center">
@@ -245,22 +245,7 @@ export default function AdminEventsPage() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center">
-                <MapPinIcon className="h-8 w-8 text-green-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                    <TranslatedText>Featured Events</TranslatedText>
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {events.filter(e => e.featured).length}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <ClockIcon className="h-8 w-8 text-blue-600" />
+                <ClockIcon className="h-8 w-8 text-green-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                     <TranslatedText>Upcoming Events</TranslatedText>
@@ -416,22 +401,42 @@ export default function AdminEventsPage() {
                     </div>
                   </div>
 
-                  {/* Booking URL */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      <TranslatedText>Booking URL</TranslatedText> (Optional)
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.bookingUrl}
-                      onChange={(e) => setFormData({ ...formData, bookingUrl: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
-                      placeholder="https://example.com/booking"
-                    />
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                      Link where users can book/register for this event
-                    </p>
+                  {/* Website and Phone */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <TranslatedText>Website</TranslatedText> (Optional)
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.website}
+                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        placeholder="https://example.com"
+                      />
+                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Website URL for booking
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <TranslatedText>Phone Number</TranslatedText> (Optional)
+                      </label>
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        placeholder="+91 98765 43210"
+                      />
+                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Phone number for booking
+                      </p>
+                    </div>
                   </div>
+                  <p className="text-sm text-amber-600 dark:text-amber-400">
+                    <TranslatedText>Note: At least one booking option (Website OR Phone) should be provided</TranslatedText>
+                  </p>
 
                   {/* Description */}
                   <div>
@@ -456,20 +461,6 @@ export default function AdminEventsPage() {
                       showTranslate={true}
                       targetLanguage="en"
                     />
-                  </div>
-
-                  {/* Featured */}
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="featured"
-                      checked={formData.featured}
-                      onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="featured" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                      <TranslatedText>Featured Event</TranslatedText>
-                    </label>
                   </div>
 
                   {/* Actions */}

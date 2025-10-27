@@ -1,11 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { CalendarIcon, MapPinIcon, ClockIcon, UserGroupIcon } from '@heroicons/react/24/outline'
+import { CalendarIcon, MapPinIcon, ClockIcon, PhoneIcon, GlobeAltIcon, EyeIcon, ShareIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
-import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
+import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import { 
+  FacebookShareButton,
+  WhatsappShareButton,
+  FacebookIcon,
+  WhatsappIcon
+} from 'react-share'
 
 interface Event {
   id: string
@@ -19,19 +25,20 @@ interface Event {
   location: string
   location_ta?: string
   category: string
-  featured: boolean
   featuredImage?: string
-  bookingUrl?: string
+  website?: string
+  phone?: string
   status: string
-  registrations: number
+  views: number
   createdAt: string
   updatedAt: string
 }
 
 function EventsPageContent() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
+  const [shareMenuOpen, setShareMenuOpen] = useState<string | null>(null)
 
   // Fetch events from database
   useEffect(() => {
@@ -68,10 +75,6 @@ function EventsPageContent() {
     fetchEvents()
   }, [])
 
-  // Separate featured and regular events
-  const featuredEvents = events.filter(event => event.featured)
-  const regularEvents = events.filter(event => !event.featured)
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-IN', {
@@ -89,34 +92,47 @@ function EventsPageContent() {
     })
   }
 
-  const isUpcoming = (dateString: string) => {
-    return new Date(dateString) > new Date()
-  }
-
-  const getEventStatus = (startDate: string, endDate?: string) => {
-    const now = new Date()
-    const start = new Date(startDate)
-    const end = endDate ? new Date(endDate) : new Date(startDate)
-    
-    if (now < start) return 'upcoming'
-    if (now >= start && now <= end) return 'ongoing'
-    return 'completed'
-  }
-
   const handleBookNow = (event: Event) => {
-    if (event.bookingUrl) {
-      // Open booking URL in new tab
-      window.open(event.bookingUrl, '_blank', 'noopener,noreferrer')
+    // If has both, show options
+    if (event.website && event.phone) {
+      const choice = confirm(
+        `${t('events.bookingOptions', 'Choose booking method:', 'முன்பதிவு முறையைத் தேர்ந்தெடுக்கவும்:')}\n\n` +
+        `1. ${t('events.website', 'Website', 'வலைத்தளம்')}\n` +
+        `2. ${t('events.phone', 'Phone', 'தொலைபேசி')}\n\n` +
+        `${t('events.clickOk', 'Click OK for Website, Cancel for Phone', 'வலைத்தளத்திற்கு OK, தொலைபேசிக்கு Cancel')}`
+      )
+      if (choice) {
+        window.open(event.website, '_blank', 'noopener,noreferrer')
+      } else {
+        window.location.href = `tel:${event.phone}`
+      }
+    } else if (event.website) {
+      window.open(event.website, '_blank', 'noopener,noreferrer')
+    } else if (event.phone) {
+      window.location.href = `tel:${event.phone}`
     } else {
-      // Fallback message if no booking URL
-      alert(t('events.bookingInfo', 'Please contact the organizers for booking details.', 'முன்பதிவு விவரங்களுக்கு நிகழ்வு ஏற்பாளர்களைத் தொடர்பு கொள்ளவும்.'))
+      alert(t('events.noBooking', 'No booking information available', 'முன்பதிவு தகவல் இல்லை'))
     }
   }
 
-  const handleReminder = (eventId: string) => {
-    // In a real app, this would set up a reminder
-    alert(t('events.reminderSet', 'Reminder set! You will be notified before the event.', 'நினைவூட்டல் அமைக்கப்பட்டது! நிகழ்வுக்கு முன் உங்களுக்கு அறிவிப்பு வரும்.'))
+  const handleShare = (eventId: string) => {
+    setShareMenuOpen(shareMenuOpen === eventId ? null : eventId)
   }
+
+  const incrementView = async (eventId: string) => {
+    try {
+      await fetch(`/api/admin/events/${eventId}/view`, { method: 'POST' })
+    } catch (error) {
+      console.error('Error incrementing view:', error)
+    }
+  }
+
+  // Call incrementView when component mounts for each visible event
+  useEffect(() => {
+    events.forEach(event => {
+      incrementView(event.id)
+    })
+  }, [events])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
@@ -141,195 +157,136 @@ function EventsPageContent() {
           </div>
         )}
 
-        {/* Featured Events */}
-        {!loading && featuredEvents.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              {t('events.featured', 'Featured Events', 'சிறப்பு நிகழ்வுகள்')}
-            </h2>
-            <div className="grid gap-8 lg:grid-cols-2">
-              {featuredEvents.map((event) => {
-                const status = getEventStatus(event.startDate, event.endDate)
-                return (
-                  <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+        {/* All Events */}
+        {!loading && events.length > 0 && (
+        <div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {events.map((event) => {
+              const eventUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/events/${event.id}`
+              const eventTitle = language === 'ta' && event.title_ta ? event.title_ta : event.title
+              
+              return (
+                <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                  <CardContent className="p-6">
+                    {/* Title First */}
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                      {eventTitle}
+                    </h3>
+                    
                     {/* Featured Image */}
-                    {event.featuredImage ? (
-                      <div className="w-full h-64 overflow-hidden">
+                    {event.featuredImage && (
+                      <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
                         <img 
                           src={event.featuredImage} 
-                          alt={event.title}
+                          alt={eventTitle}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                    ) : (
-                      <div className="aspect-w-16 aspect-h-9 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900 dark:to-secondary-900">
-                        <div className="flex items-center justify-center">
-                          <div className="text-center">
-                            <CalendarIcon className="h-16 w-16 text-primary-600 dark:text-primary-400 mx-auto mb-2" />
-                            <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
-                              {t(`events.categories.${event.category}`, event.category, event.category)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
                     )}
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
-                          {t('events.featured', 'Featured', 'சிறப்பு')}
-                        </span>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          status === 'upcoming' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                          status === 'ongoing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                          'bg-gray-100 text-gray-800 dark:bg-blue-900 dark:text-blue-200'
-                        }`}>
-                          {t(`events.status.${status}`, status, status)}
-                        </span>
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                        {t(`events.${event.id}.title`, event.title, event.title_ta)}
-                      </h3>
-                      <div 
-                        className="text-gray-600 dark:text-gray-300 mb-4"
-                        dangerouslySetInnerHTML={{ __html: t(`events.${event.id}.description`, event.description, event.description_ta) }}
-                      />
-                      <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
-                        <div className="flex items-center">
-                          <CalendarIcon className="h-4 w-4 mr-2 text-gray-400" />
-                          {formatDate(event.startDate)}{event.endDate && ` - ${formatDate(event.endDate)}`}
+                    
+                    {/* Date/Time Details Above Description */}
+                    <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
+                      <div className="flex items-center">
+                        <CalendarIcon className="h-4 w-4 mr-2 text-gray-400" />
+                        <span className="font-medium">
+                          {formatDate(event.startDate)}
+                          {event.endDate && ` - ${formatDate(event.endDate)}`}
                           {event.duration && <span className="ml-2 text-xs text-gray-500">({event.duration})</span>}
-                        </div>
-                        <div className="flex items-center">
-                          <ClockIcon className="h-4 w-4 mr-2 text-gray-400" />
-                          {formatTime(event.startDate)}{event.endDate && ` - ${formatTime(event.endDate)}`}
-                        </div>
-                        <div className="flex items-center">
-                          <MapPinIcon className="h-4 w-4 mr-2 text-gray-400" />
-                          {t(`events.${event.id}.location`, event.location, event.location_ta)}
-                        </div>
+                        </span>
                       </div>
-                      <div className="flex space-x-3">
-                        {status === 'upcoming' && (
-                          <>
-                            <Button onClick={() => handleBookNow(event)} className="flex-1">
-                              {t('events.bookNow', 'Book Now', 'இப்போது பதிவு செய்க')}
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              onClick={() => handleReminder(event.id)}
-                              className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                            >
-                              {t('events.remind', 'Remind Me', 'நினைவூட்டு')}
-                            </Button>
-                          </>
-                        )}
-                        {status === 'ongoing' && (
-                          <Button onClick={() => handleBookNow(event)} className="w-full">
-                            {t('events.joinNow', 'Join Now', 'இப்போது சேரவும்')}
-                          </Button>
-                        )}
-                        {status === 'completed' && (
-                          <Button variant="outline" disabled className="w-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
-                            {t('events.completed', 'Event Completed', 'நிகழ்வு முடிந்தது')}
-                          </Button>
-                        )}
+                      <div className="flex items-center">
+                        <ClockIcon className="h-4 w-4 mr-2 text-gray-400" />
+                        <span>{formatTime(event.startDate)}</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* All Events */}
-        {!loading && regularEvents.length > 0 && (
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            {t('events.allEvents', 'All Upcoming Events', 'அனைத்து வரவிருக்கும் நிகழ்வுகள்')}
-          </h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {regularEvents.map((event) => {
-              const status = getEventStatus(event.startDate, event.endDate)
-              return (
-                <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                  {/* Featured Image */}
-                  {event.featuredImage ? (
-                    <div className="w-full h-48 overflow-hidden">
-                      <img 
-                        src={event.featuredImage} 
-                        alt={event.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
-                      <div className="flex items-center justify-center">
-                        <div className="text-center">
-                          <CalendarIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-1" />
-                          <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                            {t(`events.categories.${event.category}`, event.category, event.category)}
-                          </p>
-                        </div>
+                      <div className="flex items-center">
+                        <MapPinIcon className="h-4 w-4 mr-2 text-gray-400" />
+                        <span className="line-clamp-1">
+                          {language === 'ta' && event.location_ta ? event.location_ta : event.location}
+                        </span>
                       </div>
                     </div>
-                  )}
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        status === 'upcoming' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                        status === 'ongoing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                        'bg-gray-100 text-gray-800 dark:bg-blue-900 dark:text-blue-200'
-                      }`}>
-                        {t(`events.status.${status}`, status, status)}
-                      </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatDate(event.startDate)}
-                      </span>
-                    </div>
-                    <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                      {t(`events.${event.id}.title`, event.title, event.title_ta)}
-                    </h3>
+                    
+                    {/* Description */}
                     <div 
-                      className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-3"
-                      dangerouslySetInnerHTML={{ __html: t(`events.${event.id}.description`, event.description, event.description_ta) }}
+                      className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3"
+                      dangerouslySetInnerHTML={{ 
+                        __html: language === 'ta' && event.description_ta ? event.description_ta : event.description 
+                      }}
                     />
-                    <div className="space-y-1 mb-3 text-xs text-gray-600 dark:text-gray-300">
+                    
+                    {/* Posted Date and Views at Bottom */}
+                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4 pt-2 border-t border-gray-200 dark:border-gray-700">
+                      <span>{formatDate(event.createdAt)}</span>
                       <div className="flex items-center">
-                        <ClockIcon className="h-3 w-3 mr-1 text-gray-400" />
-                        {formatTime(event.startDate)}
-                        {event.duration && <span className="ml-1">({event.duration})</span>}
-                      </div>
-                      <div className="flex items-center">
-                        <MapPinIcon className="h-3 w-3 mr-1 text-gray-400" />
-                        <span className="line-clamp-1">{t(`events.${event.id}.location`, event.location, event.location_ta)}</span>
+                        <EyeIcon className="h-4 w-4 mr-1" />
+                        <span>{event.views}</span>
                       </div>
                     </div>
-                    {status === 'upcoming' && (
-                      <div className="flex space-x-2">
-                        <Button size="sm" onClick={() => handleBookNow(event)} className="flex-1 text-xs">
-                          {t('events.bookNow', 'Book Now', 'பதிவு செய்க')}
-                        </Button>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex space-x-2">
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleBookNow(event)} 
+                        className="flex-1 text-xs"
+                      >
+                        {t('events.bookNow', 'Book Now', 'இப்போது பதிவு செய்க')}
+                      </Button>
+                      
+                      {/* Share Button */}
+                      <div className="relative">
                         <Button 
                           size="sm" 
-                          variant="outline" 
-                          onClick={() => handleReminder(event.id)}
+                          variant="outline"
+                          onClick={() => handleShare(event.id)}
                           className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-xs"
                         >
-                          {t('events.remind', 'Remind', 'நினைவூட்டு')}
+                          <ShareIcon className="h-4 w-4" />
                         </Button>
+                        
+                        {/* Share Menu */}
+                        {shareMenuOpen === event.id && (
+                          <div className="absolute bottom-full mb-2 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-10 min-w-[200px]">
+                            <div className="flex flex-col gap-3">
+                              {/* WhatsApp */}
+                              <button
+                                onClick={() => {
+                                  const text = encodeURIComponent(`${eventTitle}\n\n${eventUrl}`)
+                                  window.open(`https://wa.me/?text=${text}`, '_blank')
+                                  setShareMenuOpen(null)
+                                }}
+                                className="transform hover:scale-110 transition-transform cursor-pointer"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <WhatsappIcon size={32} round />
+                                  <span className="text-sm text-gray-600 dark:text-gray-400">WhatsApp</span>
+                                </div>
+                              </button>
+                              
+                              {/* Facebook */}
+                              <FacebookShareButton url={eventUrl} title={eventTitle}>
+                                <div className="flex items-center gap-2 transform hover:scale-110 transition-transform">
+                                  <FacebookIcon size={32} round />
+                                  <span className="text-sm text-gray-600 dark:text-gray-400">Facebook</span>
+                                </div>
+                              </FacebookShareButton>
+                              
+                              {/* Copy Link */}
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(eventUrl)
+                                  alert(t('share.copied', '✅ Copied!', '✅ நகலெடுக்கப்பட்டது!'))
+                                  setShareMenuOpen(null)
+                                }}
+                                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                              >
+                                {t('share.copyLink', 'Copy Link', 'இணைப்பை நகலெடுக்கவும்')}
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-                    {status === 'ongoing' && (
-                      <Button size="sm" onClick={() => handleBookNow(event)} className="w-full text-xs">
-                        {t('events.joinNow', 'Join Now', 'இப்போது சேரவும்')}
-                      </Button>
-                    )}
-                    {status === 'completed' && (
-                      <Button size="sm" variant="outline" disabled className="w-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-xs">
-                        {t('events.completed', 'Completed', 'முடிந்தது')}
-                      </Button>
-                    )}
+                    </div>
                   </CardContent>
                 </Card>
               )

@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
         duration: body.duration,
         category: body.category,
         status: body.status || 'upcoming',
-        featured: body.featured || false,
-        bookingUrl: body.bookingUrl
+        website: body.website,
+        phone: body.phone
       }
     })
 
