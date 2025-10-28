@@ -57,10 +57,19 @@ function EventsPageContent() {
             return eventEndDate >= now
           })
           
-          // Sort by start date (soonest first)
-          upcomingEvents.sort((a: Event, b: Event) => 
-            new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-          )
+          // Sort by start date and time (soonest first, morning to evening)
+          upcomingEvents.sort((a: Event, b: Event) => {
+            const dateA = new Date(a.startDate)
+            const dateB = new Date(b.startDate)
+            
+            // First sort by date
+            const dateDiff = dateA.getTime() - dateB.getTime()
+            if (dateDiff !== 0) return dateDiff
+            
+            // If same date, sort by time (morning to evening)
+            // This ensures events are ordered chronologically throughout the day
+            return dateA.getHours() * 60 + dateA.getMinutes() - (dateB.getHours() * 60 + dateB.getMinutes())
+          })
           
           setEvents(upcomingEvents)
         } else {
