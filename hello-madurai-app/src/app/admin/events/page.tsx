@@ -444,10 +444,9 @@ export default function AdminEventsPage() {
                       <TranslatedText>Description (English)</TranslatedText>
                     </label>
                     <RichTextEditor
-                      content={formData.description}
+                      value={formData.description}
                       onChange={(content) => setFormData({ ...formData, description: content })}
-                      showTranslate={true}
-                      targetLanguage="ta"
+                      placeholder="Enter event description in English..."
                     />
                   </div>
 
@@ -456,10 +455,9 @@ export default function AdminEventsPage() {
                       <TranslatedText>Description (Tamil)</TranslatedText>
                     </label>
                     <RichTextEditor
-                      content={formData.description_ta}
+                      value={formData.description_ta}
                       onChange={(content) => setFormData({ ...formData, description_ta: content })}
-                      showTranslate={true}
-                      targetLanguage="en"
+                      placeholder="Enter event description in Tamil..."
                     />
                   </div>
 
