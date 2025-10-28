@@ -171,7 +171,7 @@ function EventsPageContent() {
         {/* All Events */}
         {!loading && events.length > 0 && (
         <div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-col gap-6 max-w-4xl mx-auto">
             {events.map((event) => {
               const eventUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/events/${event.id}`
               const eventTitle = language === 'ta' && event.title_ta ? event.title_ta : event.title
@@ -186,7 +186,7 @@ function EventsPageContent() {
                     
                     {/* Featured Image */}
                     {event.featuredImage && (
-                      <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
+                      <div className="w-full h-64 md:h-96 overflow-hidden rounded-lg mb-4">
                         <img 
                           src={event.featuredImage} 
                           alt={eventTitle}
