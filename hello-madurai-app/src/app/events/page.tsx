@@ -188,8 +188,8 @@ function EventsPageContent() {
               return (
                 <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                   <CardContent className="p-6">
-                    {/* Title First */}
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                    {/* Title First - Centered */}
+                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">
                       {eventTitle}
                     </h3>
                     
@@ -245,24 +245,82 @@ function EventsPageContent() {
                       </div>
                     </div>
                     
-                    {/* Description with Read More */}
-                    <div className="mb-4">
+                    {/* Description with Read More - Enhanced styling */}
+                    <div className="mb-6">
+                      <style dangerouslySetInnerHTML={{ __html: `
+                        .event-description {
+                          font-size: 1.0625rem !important;
+                          line-height: 1.8 !important;
+                          letter-spacing: 0.01em !important;
+                        }
+                        .event-description p {
+                          margin: 1rem 0 !important;
+                          line-height: 1.8 !important;
+                        }
+                        .event-description h1, .event-description h2, .event-description h3 {
+                          margin: 1.5rem 0 0.75rem 0 !important;
+                          line-height: 1.4 !important;
+                        }
+                        .event-description ul, .event-description ol {
+                          padding-left: 1.5rem !important;
+                          margin: 1rem 0 !important;
+                          list-style-position: outside !important;
+                        }
+                        .event-description li {
+                          display: list-item !important;
+                          margin: 0.5rem 0 !important;
+                        }
+                        .event-description img {
+                          max-width: 100% !important;
+                          height: auto !important;
+                          margin: 1.5rem auto !important;
+                          display: block !important;
+                          border-radius: 0.5rem !important;
+                        }
+                        .event-description iframe {
+                          width: 100% !important;
+                          aspect-ratio: 16 / 9 !important;
+                          border-radius: 0.5rem !important;
+                          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+                          margin: 1.5rem auto !important;
+                          display: block !important;
+                        }
+                        @media (min-width: 1024px) {
+                          .event-description iframe {
+                            width: 100% !important;
+                            max-width: 1280px !important;
+                            height: 720px !important;
+                            margin: 2rem auto !important;
+                          }
+                        }
+                        @media (min-width: 768px) and (max-width: 1023px) {
+                          .event-description iframe {
+                            height: 500px !important;
+                          }
+                        }
+                        @media (max-width: 767px) {
+                          .event-description iframe {
+                            height: 250px !important;
+                            margin: 1rem auto !important;
+                          }
+                        }
+                      `}} />
                       <div 
-                        className={`text-gray-600 dark:text-gray-300 text-sm ${!expandedDescriptions.has(event.id) ? 'line-clamp-3' : ''}`}
+                        className={`event-description text-gray-700 dark:text-gray-200 ${!expandedDescriptions.has(event.id) ? 'line-clamp-3' : ''}`}
                         dangerouslySetInnerHTML={{ 
                           __html: language === 'ta' && event.description_ta ? event.description_ta : event.description 
                         }}
                       />
                       <button
                         onClick={() => toggleDescription(event.id)}
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium mt-2 flex items-center"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-base font-medium mt-3 flex items-center"
                       >
                         {expandedDescriptions.has(event.id) 
                           ? t('events.readLess', 'Read Less', 'குறைவாக படிக்கவும்')
                           : t('events.readMore', 'Read More', 'மேலும் படிக்கவும்')
                         }
                         <svg 
-                          className={`ml-1 h-4 w-4 transform transition-transform ${expandedDescriptions.has(event.id) ? 'rotate-180' : ''}`}
+                          className={`ml-1 h-5 w-5 transform transition-transform ${expandedDescriptions.has(event.id) ? 'rotate-180' : ''}`}
                           fill="none" 
                           viewBox="0 0 24 24" 
                           stroke="currentColor"
@@ -282,11 +340,10 @@ function EventsPageContent() {
                     </div>
                     
                     {/* Action Buttons */}
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-3">
                       <Button 
-                        size="sm" 
                         onClick={() => handleBookNow(event)} 
-                        className="flex-1 text-xs"
+                        className="flex-1 text-base md:text-lg font-semibold py-3 px-6 h-auto"
                       >
                         {t('events.bookNow', 'Book Now', 'இப்போது பதிவு செய்க')}
                       </Button>
@@ -294,12 +351,11 @@ function EventsPageContent() {
                       {/* Share Button */}
                       <div className="relative">
                         <Button 
-                          size="sm" 
                           variant="outline"
                           onClick={() => handleShare(event.id)}
-                          className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-xs"
+                          className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 py-3 px-4 h-auto"
                         >
-                          <ShareIcon className="h-4 w-4" />
+                          <ShareIcon className="h-5 w-5" />
                         </Button>
                         
                         {/* Share Menu */}
