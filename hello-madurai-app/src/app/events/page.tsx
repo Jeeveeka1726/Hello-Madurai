@@ -39,6 +39,7 @@ function EventsPageContent() {
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [shareMenuOpen, setShareMenuOpen] = useState<string | null>(null)
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set())
 
   // Fetch events from database
   useEffect(() => {
@@ -117,6 +118,16 @@ function EventsPageContent() {
 
   const handleShare = (eventId: string) => {
     setShareMenuOpen(shareMenuOpen === eventId ? null : eventId)
+  }
+
+  const toggleDescription = (eventId: string) => {
+    const newExpanded = new Set(expandedDescriptions)
+    if (newExpanded.has(eventId)) {
+      newExpanded.delete(eventId)
+    } else {
+      newExpanded.add(eventId)
+    }
+    setExpandedDescriptions(newExpanded)
   }
 
   const incrementView = async (eventId: string) => {
@@ -225,13 +236,32 @@ function EventsPageContent() {
                       </div>
                     </div>
                     
-                    {/* Description */}
-                    <div 
-                      className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3"
-                      dangerouslySetInnerHTML={{ 
-                        __html: language === 'ta' && event.description_ta ? event.description_ta : event.description 
-                      }}
-                    />
+                    {/* Description with Read More */}
+                    <div className="mb-4">
+                      <div 
+                        className={`text-gray-600 dark:text-gray-300 text-sm ${!expandedDescriptions.has(event.id) ? 'line-clamp-3' : ''}`}
+                        dangerouslySetInnerHTML={{ 
+                          __html: language === 'ta' && event.description_ta ? event.description_ta : event.description 
+                        }}
+                      />
+                      <button
+                        onClick={() => toggleDescription(event.id)}
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium mt-2 flex items-center"
+                      >
+                        {expandedDescriptions.has(event.id) 
+                          ? t('events.readLess', 'Read Less', 'குறைவாக படிக்கவும்')
+                          : t('events.readMore', 'Read More', 'மேலும் படிக்கவும்')
+                        }
+                        <svg 
+                          className={`ml-1 h-4 w-4 transform transition-transform ${expandedDescriptions.has(event.id) ? 'rotate-180' : ''}`}
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    </div>
                     
                     {/* Posted Date and Views at Bottom */}
                     <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4 pt-2 border-t border-gray-200 dark:border-gray-700">
