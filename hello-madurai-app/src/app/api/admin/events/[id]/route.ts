@@ -13,38 +13,40 @@ export async function PUT(
     console.log('Update data received:', JSON.stringify(data, null, 2))
     
     // Validate required fields
-    if (!data.title || !data.description || !data.startDate || !data.location) {
+    if (!data.title || !data.description || !data.startDate || !data.startTime || !data.location) {
       console.error('Missing required fields:', {
         title: !!data.title,
         description: !!data.description,
         startDate: !!data.startDate,
+        startTime: !!data.startTime,
         location: !!data.location
       })
       return NextResponse.json(
-        { error: 'Missing required fields: title, description, startDate, or location' },
+        { error: 'Missing required fields: title, description, startDate, startTime, or location' },
         { status: 400 }
       )
     }
-    
-    // Validate startDate can be converted to Date
-    const startDate = new Date(data.startDate)
-    if (isNaN(startDate.getTime())) {
-      console.error('Invalid startDate:', data.startDate)
+
+    // Combine date and time into a single DateTime
+    const startDateTime = new Date(`${data.startDate}T${data.startTime}:00`)
+    if (isNaN(startDateTime.getTime())) {
+      console.error('Invalid startDate or startTime:', data.startDate, data.startTime)
       return NextResponse.json(
-        { error: 'Invalid startDate format' },
+        { error: 'Invalid startDate or startTime format' },
         { status: 400 }
       )
     }
-    
+
     // Prepare update data, filtering out empty strings
     const updateData: any = {
       title: data.title,
       description: data.description,
       location: data.location,
       category: data.category,
-      startDate: startDate, // Use the validated startDate
+      startDate: startDateTime,
+      startTime: data.startTime, // Store time separately for easy editing
     }
-    
+
     // Only add optional fields if they have values
     if (data.title_ta) updateData.title_ta = data.title_ta
     if (data.description_ta) updateData.description_ta = data.description_ta
@@ -53,20 +55,35 @@ export async function PUT(
     if (data.featuredImage) updateData.featuredImage = data.featuredImage
     if (data.website) updateData.website = data.website
     if (data.phone) updateData.phone = data.phone
-    
-    // Handle endDate specially - could be empty string, null, or a valid date
+
+    // Handle endDate and endTime specially - could be empty string, null, or a valid date
     if (data.endDate && data.endDate !== '') {
-      const endDate = new Date(data.endDate)
-      if (isNaN(endDate.getTime())) {
-        console.error('Invalid endDate:', data.endDate)
-        return NextResponse.json(
-          { error: 'Invalid endDate format' },
-          { status: 400 }
-        )
+      if (data.endTime && data.endTime !== '') {
+        const endDateTime = new Date(`${data.endDate}T${data.endTime}:00`)
+        if (isNaN(endDateTime.getTime())) {
+          console.error('Invalid endDate or endTime:', data.endDate, data.endTime)
+          return NextResponse.json(
+            { error: 'Invalid endDate or endTime format' },
+            { status: 400 }
+          )
+        }
+        updateData.endDate = endDateTime
+        updateData.endTime = data.endTime
+      } else {
+        const endDate = new Date(`${data.endDate}T00:00:00`)
+        if (isNaN(endDate.getTime())) {
+          console.error('Invalid endDate:', data.endDate)
+          return NextResponse.json(
+            { error: 'Invalid endDate format' },
+            { status: 400 }
+          )
+        }
+        updateData.endDate = endDate
+        updateData.endTime = null
       }
-      updateData.endDate = endDate
     } else {
       updateData.endDate = null
+      updateData.endTime = null
     }
     
     console.log('Prepared update data:', JSON.stringify(updateData, null, 2))

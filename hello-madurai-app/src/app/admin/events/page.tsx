@@ -23,7 +23,9 @@ interface Event {
   description: string
   description_ta: string
   startDate: string
+  startTime?: string
   endDate?: string
+  endTime?: string
   duration?: string
   location: string
   location_ta: string
@@ -58,7 +60,9 @@ export default function AdminEventsPage() {
     description: '',
     description_ta: '',
     startDate: '',
+    startTime: '',
     endDate: '',
+    endTime: '',
     duration: '',
     location: '',
     location_ta: '',
@@ -112,7 +116,9 @@ export default function AdminEventsPage() {
           description: '',
           description_ta: '',
           startDate: '',
+          startTime: '',
           endDate: '',
+          endTime: '',
           duration: '',
           location: '',
           location_ta: '',
@@ -131,27 +137,26 @@ export default function AdminEventsPage() {
 
   const handleEdit = (event: Event) => {
     setEditingEvent(event)
-    
-    // Convert ISO date strings to datetime-local format (YYYY-MM-DDTHH:mm)
-    const formatDateForInput = (dateString: string) => {
+
+    // Convert ISO date strings to date format (YYYY-MM-DD)
+    const formatDateOnly = (dateString: string) => {
       if (!dateString) return ''
       const date = new Date(dateString)
-      // Get local time in YYYY-MM-DDTHH:mm format
       const year = date.getFullYear()
       const month = String(date.getMonth() + 1).padStart(2, '0')
       const day = String(date.getDate()).padStart(2, '0')
-      const hours = String(date.getHours()).padStart(2, '0')
-      const minutes = String(date.getMinutes()).padStart(2, '0')
-      return `${year}-${month}-${day}T${hours}:${minutes}`
+      return `${year}-${month}-${day}`
     }
-    
+
     setFormData({
       title: event.title,
       title_ta: event.title_ta,
       description: event.description,
       description_ta: event.description_ta,
-      startDate: formatDateForInput(event.startDate),
-      endDate: event.endDate ? formatDateForInput(event.endDate) : '',
+      startDate: formatDateOnly(event.startDate),
+      startTime: event.startTime || '',
+      endDate: event.endDate ? formatDateOnly(event.endDate) : '',
+      endTime: event.endTime || '',
       duration: event.duration || '',
       location: event.location,
       location_ta: event.location_ta,
@@ -315,14 +320,14 @@ export default function AdminEventsPage() {
                     </div>
                   </div>
 
-                  {/* Date and Category */}
+                  {/* Start Date and Time */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        <TranslatedText>Start Date & Time</TranslatedText> *
+                        <TranslatedText>Start Date</TranslatedText> *
                       </label>
                       <input
-                        type="datetime-local"
+                        type="date"
                         required
                         value={formData.startDate}
                         onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
@@ -331,12 +336,39 @@ export default function AdminEventsPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        <TranslatedText>End Date & Time</TranslatedText> (Optional)
+                        <TranslatedText>Start Time</TranslatedText> *
                       </label>
                       <input
-                        type="datetime-local"
+                        type="time"
+                        required
+                        value={formData.startTime}
+                        onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  {/* End Date and Time */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <TranslatedText>End Date</TranslatedText> (Optional)
+                      </label>
+                      <input
+                        type="date"
                         value={formData.endDate}
                         onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <TranslatedText>End Time</TranslatedText> (Optional)
+                      </label>
+                      <input
+                        type="time"
+                        value={formData.endTime}
+                        onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
                       />
                     </div>

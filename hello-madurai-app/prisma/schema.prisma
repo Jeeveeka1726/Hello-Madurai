@@ -48,7 +48,9 @@ model Event {
   location_ta   String?
   featuredImage String?  @db.Text  // Store image data
   startDate     DateTime
+  startTime     String?  // Time in HH:mm format (e.g., "14:30")
   endDate       DateTime?
+  endTime       String?  // Time in HH:mm format (e.g., "18:00")
   duration      String?  // e.g., "3 Days", "1 Week"
   category      String
   status        String   @default("upcoming") // upcoming, ongoing, completed

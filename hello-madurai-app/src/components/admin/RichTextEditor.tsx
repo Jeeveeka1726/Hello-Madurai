@@ -57,8 +57,13 @@ export default function RichTextEditor({
       Youtube.configure({
         width: 640,
         height: 360,
+        controls: true,
+        nocookie: false, // Use regular youtube.com for better compatibility
+        modestBranding: true,
         HTMLAttributes: {
           class: 'rounded-lg shadow-md my-4',
+          allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+          allowfullscreen: 'allowfullscreen',
         },
       }),
     ],

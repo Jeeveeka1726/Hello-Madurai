@@ -20,7 +20,9 @@ interface Event {
   description: string
   description_ta?: string
   startDate: string
+  startTime?: string
   endDate?: string
+  endTime?: string
   duration?: string
   location: string
   location_ta?: string
@@ -227,7 +229,8 @@ function EventsPageContent() {
                               {t('events.time', 'Time', 'நேரம்')}
                             </p>
                             <p className="font-semibold text-gray-900 dark:text-white">
-                              {formatTime(event.startDate)}
+                              {event.startTime || formatTime(event.startDate)}
+                              {event.endTime && ` - ${event.endTime}`}
                             </p>
                           </div>
                         </div>
