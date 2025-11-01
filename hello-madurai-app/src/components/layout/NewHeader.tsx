@@ -108,7 +108,7 @@ export default function NewHeader() {
                 href={item.href}
                 className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-2 py-2 text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
               >
-                {item.name}
+                <span suppressHydrationWarning>{item.name}</span>
               </Link>
             ))}
             
@@ -119,10 +119,10 @@ export default function NewHeader() {
                 onBlur={() => setTimeout(() => setIsOthersOpen(false), 200)}
                 className="flex items-center gap-1 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-2 py-2 text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
               >
-                {t('nav.others', 'Others', 'மேலும்')}
+                <span suppressHydrationWarning>{t('nav.others', 'Others', 'மேலும்')}</span>
                 <ChevronDownIcon className="h-4 w-4" />
               </button>
-              
+
               {isOthersOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
                   {othersDropdown.map((item) => (
@@ -132,7 +132,7 @@ export default function NewHeader() {
                       className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-300 first:rounded-t-md last:rounded-b-md transition-colors"
                       onClick={() => setIsOthersOpen(false)}
                     >
-                      {item.name}
+                      <span suppressHydrationWarning>{item.name}</span>
                     </Link>
                   ))}
                 </div>
@@ -182,14 +182,14 @@ export default function NewHeader() {
                   className="block px-3 py-2 text-base font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-md transition-colors duration-200"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {item.name}
+                  <span suppressHydrationWarning>{item.name}</span>
                 </Link>
               ))}
-              
+
               {/* Others Section in Mobile */}
               <div className="pt-2 border-t border-blue-200 dark:border-blue-700">
                 <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {t('nav.others', 'Others', 'மேலும்')}
+                  <span suppressHydrationWarning>{t('nav.others', 'Others', 'மேலும்')}</span>
                 </div>
                 {othersDropdown.map((item) => (
                   <Link
@@ -198,7 +198,7 @@ export default function NewHeader() {
                     className="block px-3 py-2 pl-6 text-base font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-md transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    {item.name}
+                    <span suppressHydrationWarning>{item.name}</span>
                   </Link>
                 ))}
               </div>

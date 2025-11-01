@@ -41,7 +41,6 @@ function EventsPageContent() {
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [shareMenuOpen, setShareMenuOpen] = useState<string | null>(null)
-  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set())
 
   // Fetch events from database
   useEffect(() => {
@@ -104,6 +103,14 @@ function EventsPageContent() {
     })
   }
 
+  // Convert 24-hour time (HH:mm) to 12-hour format with AM/PM
+  const formatTime12Hour = (time24: string) => {
+    const [hours, minutes] = time24.split(':').map(Number)
+    const period = hours >= 12 ? 'PM' : 'AM'
+    const hours12 = hours % 12 || 12 // Convert 0 to 12 for midnight
+    return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`
+  }
+
   const handleBookNow = (event: Event) => {
     // If has both, show options
     if (event.website && event.phone) {
@@ -129,16 +136,6 @@ function EventsPageContent() {
 
   const handleShare = (eventId: string) => {
     setShareMenuOpen(shareMenuOpen === eventId ? null : eventId)
-  }
-
-  const toggleDescription = (eventId: string) => {
-    const newExpanded = new Set(expandedDescriptions)
-    if (newExpanded.has(eventId)) {
-      newExpanded.delete(eventId)
-    } else {
-      newExpanded.add(eventId)
-    }
-    setExpandedDescriptions(newExpanded)
   }
 
   const incrementView = async (eventId: string) => {
@@ -229,8 +226,8 @@ function EventsPageContent() {
                               {t('events.time', 'Time', 'நேரம்')}
                             </p>
                             <p className="font-semibold text-gray-900 dark:text-white">
-                              {event.startTime || formatTime(event.startDate)}
-                              {event.endTime && ` - ${event.endTime}`}
+                              {event.startTime ? formatTime12Hour(event.startTime) : formatTime(event.startDate)}
+                              {event.endTime && ` - ${formatTime12Hour(event.endTime)}`}
                             </p>
                           </div>
                         </div>
@@ -280,57 +277,30 @@ function EventsPageContent() {
                           display: block !important;
                           border-radius: 0.5rem !important;
                         }
-                        .event-description iframe {
+                        .event-description iframe,
+                        .event-description iframe[src*="youtube"] {
                           width: 100% !important;
+                          max-width: 1280px !important;
+                          height: auto !important;
                           aspect-ratio: 16 / 9 !important;
                           border-radius: 0.5rem !important;
                           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
                           margin: 1.5rem auto !important;
                           display: block !important;
                         }
-                        @media (min-width: 1024px) {
-                          .event-description iframe {
-                            width: 100% !important;
-                            max-width: 1280px !important;
-                            height: 720px !important;
-                            margin: 2rem auto !important;
-                          }
-                        }
-                        @media (min-width: 768px) and (max-width: 1023px) {
-                          .event-description iframe {
-                            height: 500px !important;
-                          }
-                        }
-                        @media (max-width: 767px) {
-                          .event-description iframe {
-                            height: 250px !important;
-                            margin: 1rem auto !important;
-                          }
+                        .event-description div[data-youtube-video] {
+                          width: 100% !important;
+                          max-width: 1280px !important;
+                          margin: 1.5rem auto !important;
+                          display: block !important;
                         }
                       `}} />
-                      <div 
-                        className={`event-description text-gray-700 dark:text-gray-200 ${!expandedDescriptions.has(event.id) ? 'line-clamp-3' : ''}`}
-                        dangerouslySetInnerHTML={{ 
-                          __html: language === 'ta' && event.description_ta ? event.description_ta : event.description 
+                      <div
+                        className="event-description text-gray-700 dark:text-gray-200"
+                        dangerouslySetInnerHTML={{
+                          __html: language === 'ta' && event.description_ta ? event.description_ta : event.description
                         }}
                       />
-                      <button
-                        onClick={() => toggleDescription(event.id)}
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-base font-medium mt-3 flex items-center"
-                      >
-                        {expandedDescriptions.has(event.id) 
-                          ? t('events.readLess', 'Read Less', 'குறைவாக படிக்கவும்')
-                          : t('events.readMore', 'Read More', 'மேலும் படிக்கவும்')
-                        }
-                        <svg 
-                          className={`ml-1 h-5 w-5 transform transition-transform ${expandedDescriptions.has(event.id) ? 'rotate-180' : ''}`}
-                          fill="none" 
-                          viewBox="0 0 24 24" 
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
                     </div>
                     
                     {/* Posted Date and Views at Bottom */}

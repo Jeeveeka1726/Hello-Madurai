@@ -55,15 +55,21 @@ export default function RichTextEditor({
         },
       }),
       Youtube.configure({
-        width: 640,
-        height: 360,
+        width: 1280,
+        height: 720,
         controls: true,
-        nocookie: false, // Use regular youtube.com for better compatibility
-        modestBranding: true,
+        nocookie: false, // Use regular youtube.com - nocookie can cause playback issues
+        modestBranding: false,
+        enableIFrameApi: false,
+        origin: typeof window !== 'undefined' ? window.location.origin : '',
         HTMLAttributes: {
-          class: 'rounded-lg shadow-md my-4',
+          class: 'youtube-video',
+          style: 'width: 1280px; height: 720px; max-width: 100%; display: block; margin: 1.5rem auto;',
           allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
           allowfullscreen: 'allowfullscreen',
+          frameborder: '0',
+          loading: 'lazy',
+          referrerpolicy: 'strict-origin-when-cross-origin',
         },
       }),
     ],
@@ -171,29 +177,51 @@ export default function RichTextEditor({
   }
 
   const addYouTubeVideo = () => {
-    const url = prompt('Enter YouTube URL:')
+    const url = prompt('Enter YouTube URL (e.g., https://www.youtube.com/watch?v=VIDEO_ID):')
     if (url) {
       const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/
       if (!youtubeRegex.test(url)) {
         toast.error('Please enter a valid YouTube URL')
         return
       }
-      editor.commands.setYoutubeVideo({ src: url })
-      toast.success('✅ YouTube video embedded!')
+
+      // Extract video ID and create proper embed URL
+      let videoId = ''
+
+      // Handle youtube.com/watch?v=VIDEO_ID format
+      const watchMatch = url.match(/[?&]v=([^&]+)/)
+      if (watchMatch) {
+        videoId = watchMatch[1]
+      }
+
+      // Handle youtu.be/VIDEO_ID format
+      const shortMatch = url.match(/youtu\.be\/([^?]+)/)
+      if (shortMatch) {
+        videoId = shortMatch[1]
+      }
+
+      // Handle youtube.com/embed/VIDEO_ID format
+      const embedMatch = url.match(/youtube\.com\/embed\/([^?]+)/)
+      if (embedMatch) {
+        videoId = embedMatch[1]
+      }
+
+      if (!videoId) {
+        toast.error('Could not extract video ID from URL')
+        return
+      }
+
+      // Use the video ID with TipTap's YouTube extension
+      editor.commands.setYoutubeVideo({
+        src: `https://www.youtube.com/watch?v=${videoId}`,
+        width: 1280,
+        height: 720
+      })
+      toast.success('✅ YouTube video embedded at 1280×720!')
     }
   }
 
-  const addVideoFromURL = () => {
-    const url = prompt('Enter video URL (MP4, WebM, etc.):')
-    if (url) {
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        toast.error('URL must start with http:// or https://')
-        return
-      }
-      editor.commands.setVideo({ src: url })
-      toast.success('✅ Video added!')
-    }
-  }
+
 
   return (
     <div className={`border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden ${className}`}>
@@ -203,7 +231,7 @@ export default function RichTextEditor({
             {label}
           </label>
           <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-            ✅ Images auto-resize to 1280×720 px | 📺 YouTube/Vimeo links auto-embed
+            ✅ Images auto-resize to 1280×720 px | 📺 YouTube videos embed at 1280×720 px
           </p>
         </div>
       )}
@@ -313,19 +341,9 @@ export default function RichTextEditor({
           type="button"
           onClick={addYouTubeVideo}
           className="px-2 py-1 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors text-gray-700 dark:text-gray-300"
-          title="Embed YouTube Video"
+          title="Embed YouTube Video (1280x720)"
         >
           ▶️ YouTube
-        </button>
-
-        {/* Video from URL */}
-        <button
-          type="button"
-          onClick={addVideoFromURL}
-          className="px-2 py-1 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors text-gray-700 dark:text-gray-300"
-          title="Insert Video from URL"
-        >
-          🎥 Video
         </button>
 
 
@@ -348,7 +366,8 @@ export default function RichTextEditor({
         <ul className="space-y-1 ml-4">
           <li>• <strong>Type freely</strong> - ALL content saves! No truncation!</li>
           <li>• <strong>Images:</strong> Click 📷 to upload or 🖼️ URL for links</li>
-          <li>• <strong>Videos:</strong> Click ▶️ YouTube for YouTube links or 🎥 Video for direct video URLs</li>
+          <li>• <strong>YouTube Videos:</strong> Click ▶️ YouTube and paste full YouTube URL (embeds at 1280×720 px)</li>
+          <li className="text-amber-600 dark:text-amber-400">⚠️ <strong>Note:</strong> Only public YouTube videos with embedding enabled will play</li>
           <li>• <strong>Format:</strong> Use toolbar buttons or Ctrl+B (bold), Ctrl+I (italic)</li>
         </ul>
       </div>
@@ -456,10 +475,13 @@ export default function RichTextEditor({
           cursor: pointer;
         }
         .ProseMirror iframe {
+          width: 1280px;
+          height: 720px;
           max-width: 100%;
           border-radius: 0.75rem;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          margin: 1.5rem 0;
+          margin: 1.5rem auto;
+          display: block;
         }
         .dark .ProseMirror {
           color: #F9FAFB;

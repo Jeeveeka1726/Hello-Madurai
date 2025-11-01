@@ -19,22 +19,16 @@ declare global {
   }
 }
 
-// Initialize language from localStorage before first render
+// Initialize language from pre-loaded value or default to 'en'
 const getInitialLanguage = (): Language => {
   if (typeof window !== 'undefined') {
     try {
-      // First check if we have a pre-loaded language from the inline script
+      // Check if we have a pre-loaded language from the inline script
       if (window.__HELLO_MADURAI_LANG__) {
         return window.__HELLO_MADURAI_LANG__
       }
-      
-      // Fallback to reading from localStorage directly
-      const saved = localStorage.getItem('hello-madurai-language')
-      if (saved === 'ta' || saved === 'en') {
-        return saved
-      }
     } catch (error) {
-      console.error('Error reading language from localStorage:', error)
+      console.error('Error reading language:', error)
     }
   }
   return 'en'
@@ -47,13 +41,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // Ensure we're mounted on client side
   useEffect(() => {
     setMounted(true)
-    // Re-check localStorage after mount to ensure consistency
-    const saved = localStorage.getItem('hello-madurai-language')
-    if (saved === 'ta' || saved === 'en') {
-      if (saved !== language) {
-        setLanguageState(saved)
-      }
-    }
   }, [])
 
   // Custom setLanguage that also updates localStorage
