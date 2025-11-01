@@ -48,7 +48,7 @@ export default function NewspaperHeader({ className = '' }: NewspaperHeaderProps
           </div>
           
           {/* Tagline */}
-          <p className="text-sm sm:text-base lg:text-lg text-gray-700 dark:text-gray-300 font-medium">
+          <p className="text-sm sm:text-base lg:text-lg text-gray-700 dark:text-gray-300 font-medium" suppressHydrationWarning>
             {t('news.newspaperTagline', 'Your Local News & Information Center', 'உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம்')}
           </p>
           

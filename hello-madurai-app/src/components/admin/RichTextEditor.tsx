@@ -58,18 +58,15 @@ export default function RichTextEditor({
         width: 1280,
         height: 720,
         controls: true,
-        nocookie: false, // Use regular youtube.com - nocookie can cause playback issues
-        modestBranding: false,
+        nocookie: true, // Use youtube-nocookie.com to avoid embedding restrictions
+        modestBranding: true,
         enableIFrameApi: false,
-        origin: typeof window !== 'undefined' ? window.location.origin : '',
         HTMLAttributes: {
           class: 'youtube-video',
           style: 'width: 1280px; height: 720px; max-width: 100%; display: block; margin: 1.5rem auto;',
           allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
-          allowfullscreen: 'allowfullscreen',
+          allowfullscreen: 'true',
           frameborder: '0',
-          loading: 'lazy',
-          referrerpolicy: 'strict-origin-when-cross-origin',
         },
       }),
     ],
@@ -217,7 +214,7 @@ export default function RichTextEditor({
         width: 1280,
         height: 720
       })
-      toast.success('✅ YouTube video embedded at 1280×720!')
+      toast.success('✅ YouTube video embedded at 1280×720! (Using youtube-nocookie.com for better compatibility)')
     }
   }
 
@@ -232,6 +229,9 @@ export default function RichTextEditor({
           </label>
           <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
             ✅ Images auto-resize to 1280×720 px | 📺 YouTube videos embed at 1280×720 px
+          </p>
+          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+            ⚠️ Important: Only use YouTube videos that allow embedding (public videos with embedding enabled)
           </p>
         </div>
       )}

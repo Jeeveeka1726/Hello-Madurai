@@ -147,12 +147,13 @@ export default function NewHeader() {
               onClick={toggleLanguage}
               className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-neutral-700 dark:text-white hover:text-primary-600 dark:hover:text-primary-300 hover:bg-white-600 dark:hover:bg-primary-800 transition-colors duration-200"
               title={language === 'en' ? 'தமிழுக்கு மாற்று' : 'Switch to English'}
+              suppressHydrationWarning
             >
               <LanguageIcon className="h-5 w-5" />
-              <span className="hidden sm:block">
+              <span className="hidden sm:block" suppressHydrationWarning>
                 {language === 'en' ? 'தமிழ்' : 'English'}
               </span>
-              <span className="sm:hidden">
+              <span className="sm:hidden" suppressHydrationWarning>
                 {language === 'en' ? 'த' : 'En'}
               </span>
             </button>

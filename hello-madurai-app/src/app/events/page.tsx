@@ -49,7 +49,7 @@ function EventsPageContent() {
         const response = await fetch('/api/admin/events')
         if (response.ok) {
           const data = await response.json()
-          
+
           // Filter to show only upcoming events (not ended)
           const now = new Date()
           const upcomingEvents = data.filter((event: Event) => {
@@ -57,21 +57,21 @@ function EventsPageContent() {
             // Show event if end date hasn't passed yet
             return eventEndDate >= now
           })
-          
+
           // Sort by start date and time (soonest first, morning to evening)
           upcomingEvents.sort((a: Event, b: Event) => {
             const dateA = new Date(a.startDate)
             const dateB = new Date(b.startDate)
-            
+
             // First sort by date
             const dateDiff = dateA.getTime() - dateB.getTime()
             if (dateDiff !== 0) return dateDiff
-            
+
             // If same date, sort by time (morning to evening)
             // This ensures events are ordered chronologically throughout the day
             return dateA.getHours() * 60 + dateA.getMinutes() - (dateB.getHours() * 60 + dateB.getMinutes())
           })
-          
+
           setEvents(upcomingEvents)
         } else {
           console.error('Failed to fetch events')
@@ -85,6 +85,24 @@ function EventsPageContent() {
 
     fetchEvents()
   }, [])
+
+  // Fix YouTube iframes to use youtube-nocookie.com domain
+  useEffect(() => {
+    if (!loading && events.length > 0) {
+      // Wait for DOM to render
+      setTimeout(() => {
+        const iframes = document.querySelectorAll('iframe[src*="youtube.com"]')
+        iframes.forEach((iframe) => {
+          const src = iframe.getAttribute('src')
+          if (src && src.includes('youtube.com') && !src.includes('youtube-nocookie.com')) {
+            // Replace youtube.com with youtube-nocookie.com
+            const newSrc = src.replace('youtube.com', 'youtube-nocookie.com')
+            iframe.setAttribute('src', newSrc)
+          }
+        })
+      }, 100)
+    }
+  }, [loading, events])
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -158,10 +176,10 @@ function EventsPageContent() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl" suppressHydrationWarning>
             {t('events.title', 'Upcoming Events', 'வரவிருக்கும் நிகழ்வுகள்')}
           </h1>
-          <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-lg text-gray-600 dark:text-gray-300" suppressHydrationWarning>
             {t('events.subtitle', 'Discover upcoming festivals, exhibitions, and cultural events in Madurai', 'மதுரையில் வரவிருக்கும் திருவிழாக்கள், கண்காட்சிகள் மற்றும் கலாச்சார நிகழ்வுகளைக் கண்டறியுங்கள்')}
           </p>
         </div>
@@ -170,7 +188,7 @@ function EventsPageContent() {
         {loading && (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">
+            <p className="mt-4 text-gray-600 dark:text-gray-300" suppressHydrationWarning>
               {t('events.loading', 'Loading events...', 'நிகழ்வுகள் ஏற்றப்படுகின்றன...')}
             </p>
           </div>
@@ -209,7 +227,7 @@ function EventsPageContent() {
                         <div className="flex items-center">
                           <CalendarIcon className="h-5 w-5 mr-3 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                           <div className="flex-1">
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1" suppressHydrationWarning>
                               {t('events.date', 'Date', 'தேதி')}
                             </p>
                             <p className="font-semibold text-gray-900 dark:text-white">
@@ -222,7 +240,7 @@ function EventsPageContent() {
                         <div className="flex items-center">
                           <ClockIcon className="h-5 w-5 mr-3 text-green-600 dark:text-green-400 flex-shrink-0" />
                           <div className="flex-1">
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1" suppressHydrationWarning>
                               {t('events.time', 'Time', 'நேரம்')}
                             </p>
                             <p className="font-semibold text-gray-900 dark:text-white">
@@ -234,7 +252,7 @@ function EventsPageContent() {
                         <div className="flex items-center">
                           <MapPinIcon className="h-5 w-5 mr-3 text-red-600 dark:text-red-400 flex-shrink-0" />
                           <div className="flex-1">
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1" suppressHydrationWarning>
                               {t('events.location', 'Location', 'இடம்')}
                             </p>
                             <p className="font-semibold text-gray-900 dark:text-white line-clamp-2">
@@ -314,9 +332,10 @@ function EventsPageContent() {
                     
                     {/* Action Buttons */}
                     <div className="flex space-x-3">
-                      <Button 
-                        onClick={() => handleBookNow(event)} 
+                      <Button
+                        onClick={() => handleBookNow(event)}
                         className="flex-1 text-base md:text-lg font-semibold py-3 px-6 h-auto"
+                        suppressHydrationWarning
                       >
                         {t('events.bookNow', 'Book Now', 'இப்போது பதிவு செய்க')}
                       </Button>
@@ -366,6 +385,7 @@ function EventsPageContent() {
                                   setShareMenuOpen(null)
                                 }}
                                 className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                                suppressHydrationWarning
                               >
                                 {t('share.copyLink', 'Copy Link', 'இணைப்பை நகலெடுக்கவும்')}
                               </button>
@@ -385,7 +405,7 @@ function EventsPageContent() {
         {/* No events message */}
         {!loading && events.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-gray-500 dark:text-gray-400" suppressHydrationWarning>
               {t('events.noEvents', 'No upcoming events at the moment. Check back soon!', 'இப்போது வரவிருக்கும் நிகழ்வுகள் எதுவும் இல்லை. விரைவில் சரிபார்க்கவும்!')}
             </p>
           </div>
