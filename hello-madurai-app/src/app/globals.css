@@ -20,6 +20,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #1d4ed8 !important; /* Beautiful dark blue background - blue-700 */
+  color: #ffffff !important; /* Pure white text */
   overflow-x: hidden; /* Prevent horizontal scroll */
   max-width: 100vw; /* Never exceed viewport width */
 }
@@ -29,7 +30,19 @@ html.dark,
 html,
 body {
   background-color: #1d4ed8 !important;
-  color: #eff6ff !important;
+  color: #ffffff !important;
+}
+
+/* Force all direct children of body to have dark blue background */
+body > * {
+  background-color: #1d4ed8;
+}
+
+/* Ensure main content area is always dark blue */
+main,
+#__next {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
 }
 
 /* Hide scrollbar for better mobile UX */

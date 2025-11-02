@@ -102,6 +102,7 @@ export default function RootPage() {
               <Link
                 href="/news"
                 className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-800 bg-white hover:bg-gray-50 transition-colors duration-200"
+                suppressHydrationWarning
               >
                 {t('home.exploreNews', 'Explore Latest News', 'சமீபத்திய செய்திகளை ஆராயுங்கள்')}
               </Link>
@@ -112,10 +113,10 @@ export default function RootPage() {
         {/* Features Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl font-bold text-white mb-4" suppressHydrationWarning>
               {t('home.featuresTitle', 'Discover Madurai', 'மதுரையை கண்டறியுங்கள்')}
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            <p className="text-lg text-blue-100 max-w-2xl mx-auto" suppressHydrationWarning>
               {t('home.featuresSubtitle', 'Everything you need to stay connected with your city', 'உங்கள் நகரத்துடன் இணைந்திருக்க தேவையான அனைத்தும்')}
             </p>
           </div>
@@ -143,13 +144,13 @@ export default function RootPage() {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-blue-50 dark:bg-blue-900/20">
+        <div className="bg-blue-900/20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-white mb-4">
+              <h2 className="text-3xl font-bold text-white mb-4" suppressHydrationWarning>
                 {t('home.ctaTitle', 'Stay Updated', 'புதுப்பித்த நிலையில் இருங்கள்')}
               </h2>
-              <p className="text-lg text-blue-200 mb-8 max-w-2xl mx-auto">
+              <p className="text-lg text-blue-200 mb-8 max-w-2xl mx-auto" suppressHydrationWarning>
                 {t('home.ctaSubtitle', 'Get the latest news and content from Madurai delivered to you', 'மதுரையின் சமீபத்திய செய்திகள் மற்றும் உள்ளடக்கத்தை உங்களுக்கு வழங்கப்படும்')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -157,12 +158,14 @@ export default function RootPage() {
                 <Link
                   href="/news"
                   className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
+                  suppressHydrationWarning
                 >
                   {t('home.readNews', 'Read News', 'செய்திகளைப் படியுங்கள்')}
                 </Link>
                 <Link
                   href="/contact"
                   className="inline-flex items-center px-6 py-3 border border-blue-600 text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 transition-colors duration-200"
+                  suppressHydrationWarning
                 >
                   {t('home.contactUs', 'Contact Us', 'எங்களை தொடர்பு கொள்ளுங்கள்')}
                 </Link>

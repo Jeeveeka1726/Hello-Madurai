@@ -13,35 +13,32 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('dark') // Default to dark theme
+  const [theme, setThemeState] = useState<Theme>('dark') // Always dark theme
 
   useEffect(() => {
-    // Check for saved theme preference or default to 'dark'
-    const savedTheme = localStorage.getItem('theme') as Theme
-    if (savedTheme) {
-      setThemeState(savedTheme)
-    } else {
-      // Check system preference
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      setThemeState(systemPrefersDark ? 'dark' : 'dark') // Always default to dark for Hello Madurai
-    }
+    // ALWAYS force dark theme - Hello Madurai is dark blue themed
+    setThemeState('dark')
+    // Clear any saved light theme preference
+    localStorage.setItem('theme', 'dark')
   }, [])
 
   useEffect(() => {
-    // Apply theme to document
-    document.documentElement.classList.remove('light', 'dark')
-    document.documentElement.classList.add(theme)
-    
-    // Save to localStorage
-    localStorage.setItem('theme', theme)
+    // Apply dark theme to document - ALWAYS
+    document.documentElement.classList.remove('light')
+    document.documentElement.classList.add('dark')
+
+    // Save to localStorage - ALWAYS dark
+    localStorage.setItem('theme', 'dark')
   }, [theme])
 
   const toggleTheme = () => {
-    setThemeState(prev => prev === 'light' ? 'dark' : 'light')
+    // Do nothing - always stay dark
+    setThemeState('dark')
   }
 
   const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme)
+    // Always force dark theme regardless of input
+    setThemeState('dark')
   }
 
   return (
