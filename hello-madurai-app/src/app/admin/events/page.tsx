@@ -139,13 +139,12 @@ export default function AdminEventsPage() {
     setEditingEvent(event)
 
     // Convert ISO date strings to date format (YYYY-MM-DD)
+    // Use UTC to avoid timezone conversion issues
     const formatDateOnly = (dateString: string) => {
       if (!dateString) return ''
-      const date = new Date(dateString)
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      const day = String(date.getDate()).padStart(2, '0')
-      return `${year}-${month}-${day}`
+      // Extract just the date part (YYYY-MM-DD) from ISO string to avoid timezone issues
+      const datePart = dateString.split('T')[0]
+      return datePart
     }
 
     setFormData({

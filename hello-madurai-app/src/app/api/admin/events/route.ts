@@ -50,7 +50,8 @@ export async function POST(request: NextRequest) {
 
     // Combine date and time into a single DateTime
     // startDate is in format "YYYY-MM-DD" and startTime is in format "HH:mm"
-    const startDateTime = new Date(`${body.startDate}T${body.startTime}:00`)
+    // Use local timezone by appending timezone offset to prevent date shifting
+    const startDateTime = new Date(`${body.startDate}T${body.startTime}:00.000+05:30`)
 
     const eventData: any = {
       title: body.title,
@@ -68,10 +69,10 @@ export async function POST(request: NextRequest) {
     if (body.location_ta) eventData.location_ta = body.location_ta
     if (body.featuredImage) eventData.featuredImage = body.featuredImage
     if (body.endDate && body.endTime) {
-      eventData.endDate = new Date(`${body.endDate}T${body.endTime}:00`)
+      eventData.endDate = new Date(`${body.endDate}T${body.endTime}:00.000+05:30`)
       eventData.endTime = body.endTime
     } else if (body.endDate) {
-      eventData.endDate = new Date(`${body.endDate}T00:00:00`)
+      eventData.endDate = new Date(`${body.endDate}T00:00:00.000+05:30`)
     }
     if (body.duration) eventData.duration = body.duration
     if (body.website) eventData.website = body.website

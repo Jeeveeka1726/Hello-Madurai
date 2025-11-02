@@ -28,7 +28,8 @@ export async function PUT(
     }
 
     // Combine date and time into a single DateTime
-    const startDateTime = new Date(`${data.startDate}T${data.startTime}:00`)
+    // Use Indian timezone (+05:30) to prevent date shifting
+    const startDateTime = new Date(`${data.startDate}T${data.startTime}:00.000+05:30`)
     if (isNaN(startDateTime.getTime())) {
       console.error('Invalid startDate or startTime:', data.startDate, data.startTime)
       return NextResponse.json(
@@ -59,7 +60,7 @@ export async function PUT(
     // Handle endDate and endTime specially - could be empty string, null, or a valid date
     if (data.endDate && data.endDate !== '') {
       if (data.endTime && data.endTime !== '') {
-        const endDateTime = new Date(`${data.endDate}T${data.endTime}:00`)
+        const endDateTime = new Date(`${data.endDate}T${data.endTime}:00.000+05:30`)
         if (isNaN(endDateTime.getTime())) {
           console.error('Invalid endDate or endTime:', data.endDate, data.endTime)
           return NextResponse.json(
@@ -70,7 +71,7 @@ export async function PUT(
         updateData.endDate = endDateTime
         updateData.endTime = data.endTime
       } else {
-        const endDate = new Date(`${data.endDate}T00:00:00`)
+        const endDate = new Date(`${data.endDate}T00:00:00.000+05:30`)
         if (isNaN(endDate.getTime())) {
           console.error('Invalid endDate:', data.endDate)
           return NextResponse.json(
