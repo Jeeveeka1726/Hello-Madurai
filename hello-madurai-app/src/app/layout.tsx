@@ -33,7 +33,7 @@ export default function RootLayout({
         <script
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var savedLang=localStorage.getItem('hello-madurai-language');if(savedLang==='ta'||savedLang==='en'){window.__HELLO_MADURAI_LANG__=savedLang;}}catch(e){console.error('Error loading language:',e);}})();`,
+            __html: `(function(){try{var savedLang=localStorage.getItem('hello-madurai-language');console.log('🔧 Pre-load script - savedLang:',savedLang);if(savedLang==='ta'||savedLang==='en'){window.__HELLO_MADURAI_LANG__=savedLang;console.log('🔧 Pre-load script - set window.__HELLO_MADURAI_LANG__ to:',savedLang);}else{console.log('🔧 Pre-load script - no valid language found');}}catch(e){console.error('Error loading language:',e);}})();`,
           }}
         />
         <script
@@ -42,7 +42,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         ></script>
       </head>
-      <body className={`${inter.className} dark`}>
+      <body className={inter.className} suppressHydrationWarning>
         <ThemeProvider>
           <LanguageProvider>
             <AdminProvider>

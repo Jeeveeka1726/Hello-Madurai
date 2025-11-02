@@ -164,7 +164,7 @@ export default function AdminDirectoryPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     )
@@ -175,15 +175,15 @@ export default function AdminDirectoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-gray-900">
               <TranslatedText>Directory Management</TranslatedText>
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-300">
+            <p className="mt-2 text-gray-600">
               <TranslatedText>Manage local businesses and services</TranslatedText>
             </p>
           </div>
@@ -214,9 +214,9 @@ export default function AdminDirectoryPage() {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white dark:bg-blue-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">
                   <TranslatedText>{editingBusiness ? 'Edit Business' : 'Add Business'}</TranslatedText>
                 </h2>
                 
@@ -262,13 +262,13 @@ export default function AdminDirectoryPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Category */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Category</TranslatedText>
                       </label>
                       <select
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         required
                       >
                         {businessCategories.map((category) => (
@@ -281,14 +281,14 @@ export default function AdminDirectoryPage() {
 
                     {/* Phone */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Phone</TranslatedText>
                       </label>
                       <input
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="+91 98765 43210"
                         required
                       />
@@ -298,28 +298,28 @@ export default function AdminDirectoryPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Email */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Email</TranslatedText> (Optional)
                       </label>
                       <input
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="business@example.com"
                       />
                     </div>
 
                     {/* Website */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Website</TranslatedText> (Optional)
                       </label>
                       <input
                         type="url"
                         value={formData.website}
                         onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="https://example.com"
                       />
                     </div>
@@ -334,7 +334,7 @@ export default function AdminDirectoryPage() {
                       onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="featured" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                    <label htmlFor="featured" className="ml-2 block text-sm text-gray-700">
                       <TranslatedText>Featured Business</TranslatedText>
                     </label>
                   </div>
@@ -348,7 +348,7 @@ export default function AdminDirectoryPage() {
                         setShowForm(false)
                         setEditingBusiness(null)
                       }}
-                      className="flex-1 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="flex-1 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
                       <TranslatedText>Cancel</TranslatedText>
                     </Button>
@@ -364,15 +364,15 @@ export default function AdminDirectoryPage() {
 
         {/* Stats */}
         <div className="grid gap-6 md:grid-cols-3 mb-8">
-          <Card className="bg-white dark:bg-blue-900 border-gray-200 dark:border-gray-700">
+          <Card className="bg-white border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <BuildingOfficeIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                <BuildingOfficeIcon className="h-8 w-8 text-blue-600" />
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  <p className="text-sm font-medium text-gray-600">
                     <TranslatedText>Total Businesses</TranslatedText>
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-2xl font-bold text-gray-900">
                     {businesses.length}
                   </p>
                 </div>
@@ -380,15 +380,15 @@ export default function AdminDirectoryPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-blue-900 border-gray-200 dark:border-gray-700">
+          <Card className="bg-white border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <BuildingOfficeIcon className="h-8 w-8 text-blue-600 dark:text-yellow-400" />
+                <BuildingOfficeIcon className="h-8 w-8 text-blue-600" />
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  <p className="text-sm font-medium text-gray-600">
                     <TranslatedText>Featured</TranslatedText>
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-2xl font-bold text-gray-900">
                     {businesses.filter(b => b.featured).length}
                   </p>
                 </div>
@@ -396,15 +396,15 @@ export default function AdminDirectoryPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-blue-900 border-gray-200 dark:border-gray-700">
+          <Card className="bg-white border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <BuildingOfficeIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
+                <BuildingOfficeIcon className="h-8 w-8 text-green-600" />
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  <p className="text-sm font-medium text-gray-600">
                     <TranslatedText>Verified</TranslatedText>
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-2xl font-bold text-gray-900">
                     {businesses.filter(b => b.verified).length}
                   </p>
                 </div>
@@ -414,9 +414,9 @@ export default function AdminDirectoryPage() {
         </div>
 
         {/* Business List */}
-        <Card className="bg-white dark:bg-blue-900 border-gray-200 dark:border-gray-700">
+        <Card className="bg-white border-gray-200">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">
+            <CardTitle className="text-gray-900">
               <TranslatedText>All Businesses</TranslatedText>
             </CardTitle>
           </CardHeader>
@@ -424,39 +424,39 @@ export default function AdminDirectoryPage() {
             {loading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-                <p className="mt-2 text-gray-600 dark:text-gray-300">Loading...</p>
+                <p className="mt-2 text-gray-600">Loading...</p>
               </div>
             ) : businesses.length === 0 ? (
               <div className="text-center py-8">
                 <BuildingOfficeIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-300">No businesses found. Add your first business!</p>
+                <p className="text-gray-600">No businesses found. Add your first business!</p>
               </div>
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {businesses.map((business) => (
-                  <Card key={business.id} className="bg-gray-50 dark:bg-blue-800 border-gray-200 dark:border-yellow-700">
+                  <Card key={business.id} className="bg-gray-50 border-gray-200">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                          <h3 className="font-semibold text-gray-900 mb-1">
                             {business.name}
                           </h3>
                           {business.name_ta && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                            <p className="text-sm text-gray-600 mb-2">
                               {business.name_ta}
                             </p>
                           )}
                           <div className="flex items-center space-x-2 mb-2">
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                               {businessCategories.find(cat => cat.id === business.category)?.name || business.category}
                             </span>
                             {business.featured && (
-                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800">
                                 Featured
                               </span>
                             )}
                             {business.verified && (
-                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 Verified
                               </span>
                             )}
@@ -464,11 +464,11 @@ export default function AdminDirectoryPage() {
                         </div>
                       </div>
 
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                         {business.description}
                       </p>
 
-                      <div className="space-y-1 text-xs text-gray-600 dark:text-gray-300 mb-4">
+                      <div className="space-y-1 text-xs text-gray-600 mb-4">
                         <div className="flex items-center">
                           <MapPinIcon className="h-3 w-3 mr-1" />
                           <span className="line-clamp-1">{business.address}</span>
@@ -490,7 +490,7 @@ export default function AdminDirectoryPage() {
                           size="sm"
                           variant="outline"
                           onClick={() => handleEdit(business)}
-                          className="flex-1 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                          className="flex-1 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
                           <PencilIcon className="h-3 w-3 mr-1" />
                           Edit
@@ -499,7 +499,7 @@ export default function AdminDirectoryPage() {
                           size="sm"
                           variant="outline"
                           onClick={() => handleDelete(business.id)}
-                          className="bg-red-50 dark:bg-red-900 border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-800"
+                          className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
                         >
                           <TrashIcon className="h-3 w-3" />
                         </Button>

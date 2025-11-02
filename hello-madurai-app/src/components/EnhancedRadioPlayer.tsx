@@ -239,7 +239,7 @@ export default function EnhancedRadioPlayer({
   if (!currentShow) return null
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-white rounded-lg shadow-lg border border-gray-200 ${className}`}>
       {/* Main Player */}
       <div className="p-6">
         {/* Show Info */}
@@ -248,19 +248,19 @@ export default function EnhancedRadioPlayer({
             <SpeakerWaveIcon className="h-8 w-8 text-white" />
           </div>
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-gray-900">
               {language === 'ta' && currentShow.title_ta ? currentShow.title_ta : currentShow.title}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600">
               {t('radio.host', 'Host:', 'தொகுப்பாளர்:')} {currentShow.host}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-500">
+            <p className="text-xs text-gray-500">
               {currentShow.duration} • {currentShow.plays.toLocaleString()} {t('radio.plays', 'plays', 'ஒலிப்பு')}
             </p>
           </div>
           <button
             onClick={() => setIsLiked(!isLiked)}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
           >
             {isLiked ? (
               <HeartSolid className="h-6 w-6 text-red-500" />
@@ -272,12 +272,12 @@ export default function EnhancedRadioPlayer({
 
         {/* Progress Bar */}
         <div className="mb-6">
-          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
+          <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
           </div>
           <div 
-            className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 cursor-pointer"
+            className="w-full bg-gray-200 rounded-full h-2 cursor-pointer"
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect()
               const percent = (e.clientX - rect.left) / rect.width
@@ -295,16 +295,16 @@ export default function EnhancedRadioPlayer({
         <div className="flex items-center justify-center gap-4 mb-6">
           <button
             onClick={handlePrevious}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
           >
-            <BackwardIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+            <BackwardIcon className="h-6 w-6 text-gray-600" />
           </button>
 
           <button
             onClick={() => handleSeek(currentTime - 10)}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
           >
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">-10s</span>
+            <span className="text-sm font-medium text-gray-600">-10s</span>
           </button>
 
           <button
@@ -323,16 +323,16 @@ export default function EnhancedRadioPlayer({
 
           <button
             onClick={() => handleSeek(currentTime + 10)}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
           >
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">+10s</span>
+            <span className="text-sm font-medium text-gray-600">+10s</span>
           </button>
 
           <button
             onClick={handleNext}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
           >
-            <ForwardIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+            <ForwardIcon className="h-6 w-6 text-gray-600" />
           </button>
         </div>
 
@@ -342,9 +342,9 @@ export default function EnhancedRadioPlayer({
           <div className="flex items-center gap-2">
             <button onClick={toggleMute} className="p-1">
               {isMuted ? (
-                <SpeakerXMarkIcon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <SpeakerXMarkIcon className="h-5 w-5 text-gray-600" />
               ) : (
-                <SpeakerWaveIcon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <SpeakerWaveIcon className="h-5 w-5 text-gray-600" />
               )}
             </button>
             <input
@@ -354,17 +354,17 @@ export default function EnhancedRadioPlayer({
               step="0.1"
               value={isMuted ? 0 : volume}
               onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-              className="w-20 h-1 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              className="w-20 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
           {/* Playback Speed */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Speed:</span>
+            <span className="text-sm text-gray-600">Speed:</span>
             <select
               value={playbackRate}
               onChange={(e) => handlePlaybackRateChange(parseFloat(e.target.value))}
-              className="text-sm bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
+              className="text-sm bg-gray-100 border border-gray-300 rounded px-2 py-1"
             >
               <option value={0.5}>0.5x</option>
               <option value={0.75}>0.75x</option>
@@ -378,23 +378,23 @@ export default function EnhancedRadioPlayer({
           {/* Playlist Toggle */}
           <button
             onClick={() => setShowPlaylist(!showPlaylist)}
-            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-1 rounded hover:bg-gray-100 transition-colors"
           >
-            <QueueListIcon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            <QueueListIcon className="h-5 w-5 text-gray-600" />
           </button>
         </div>
 
         {/* Background Play Indicator */}
         {isBackgroundPlay && isPlaying && (
-          <div className="mt-4 p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-            <p className="text-sm text-blue-700 dark:text-blue-300 text-center">
+          <div className="mt-4 p-2 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-700 text-center">
               🎵 {t('radio.backgroundPlay', 'Playing in background', 'பின்னணியில் ஒலிக்கிறது')}
             </p>
           </div>
         )}
 
         {/* Interaction Buttons */}
-        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="mt-6 pt-4 border-t border-gray-200">
           <InteractionButtons
             itemId={currentShow.id}
             itemType="radio"
@@ -410,9 +410,9 @@ export default function EnhancedRadioPlayer({
 
       {/* Playlist */}
       {showPlaylist && (
-        <div className="border-t border-gray-200 dark:border-gray-700 max-h-64 overflow-y-auto">
+        <div className="border-t border-gray-200 max-h-64 overflow-y-auto">
           <div className="p-4">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
+            <h4 className="font-semibold text-gray-900 mb-3">
               {t('radio.playlist', 'Playlist', 'பட்டியல்')} ({shows.length})
             </h4>
             <div className="space-y-2">
@@ -422,8 +422,8 @@ export default function EnhancedRadioPlayer({
                   onClick={() => onShowChange(index)}
                   className={`w-full text-left p-2 rounded-lg transition-colors ${
                     index === currentShowIndex
-                      ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-900 dark:text-blue-100'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'bg-blue-100 text-blue-900
+                      : 'hover:bg-gray-100
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -431,7 +431,7 @@ export default function EnhancedRadioPlayer({
                       <p className="font-medium text-sm">
                         {language === 'ta' && show.title_ta ? show.title_ta : show.title}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-500">
                         {show.host} • {show.duration}
                       </p>
                     </div>

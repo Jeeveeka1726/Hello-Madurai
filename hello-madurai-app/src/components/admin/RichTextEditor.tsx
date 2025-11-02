@@ -42,8 +42,11 @@ export default function RichTextEditor({
         }
       }),
       Image.configure({
+        inline: false,
+        allowBase64: true,
         HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-lg shadow-md my-4',
+          class: 'editor-image',
+          style: 'display: block !important; max-width: 100% !important; height: auto !important; margin: 1rem auto !important; opacity: 1 !important; visibility: visible !important;',
         },
       }),
       Link.configure({
@@ -73,7 +76,7 @@ export default function RichTextEditor({
     content: value || '',
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none max-w-none min-h-[400px] p-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100',
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none max-w-none min-h-[400px] p-4 bg-white text-gray-900'
       },
     },
     onUpdate: ({ editor }) => {
@@ -103,45 +106,59 @@ export default function RichTextEditor({
   }
 
   const handleImageUpload = async (file: File) => {
+    console.log('🖼️ Image upload started:', file.name, file.type, file.size)
+
     const maxSize = 5 * 1024 * 1024
     if (file.size > maxSize) {
+      console.error('❌ File too large:', file.size, 'bytes')
       toast.error('File too large. Maximum size is 5MB.')
       return
     }
 
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     if (!allowedTypes.includes(file.type)) {
+      console.error('❌ Invalid file type:', file.type)
       toast.error('Invalid file type. Only JPEG, PNG, and WebP are allowed.')
       return
     }
 
     setUploading(true)
+    toast.loading('Uploading image...', { id: 'image-upload' })
     const formData = new FormData()
     formData.append('file', file)
 
     try {
+      console.log('📤 Sending upload request to /api/upload/news-image')
       const response = await fetch('/api/upload/news-image', {
         method: 'POST',
         body: formData,
       })
 
+      console.log('📥 Upload response status:', response.status, response.statusText)
+
       if (response.ok) {
         const data = await response.json()
-        
+        console.log('✅ Upload successful! Image URL:', data.url)
+
+        toast.dismiss('image-upload')
         if (data.resized) {
           toast.success('✅ Image uploaded and resized to 1280x720!')
         } else {
           toast.success('✅ Image uploaded successfully!')
         }
 
+        console.log('🖼️ Inserting image into editor:', data.url)
         editor.chain().focus().setImage({ src: data.url }).run()
+        console.log('✅ Image inserted into editor')
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        console.error('Upload failed:', errorData)
+        console.error('❌ Upload failed:', response.status, errorData)
+        toast.dismiss('image-upload')
         toast.error(`Failed to upload: ${errorData.error || 'Unknown error'}`)
       }
     } catch (error) {
-      console.error('Error uploading image:', error)
+      console.error('❌ Error uploading image:', error)
+      toast.dismiss('image-upload')
       toast.error(`Error uploading image: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setUploading(false)
@@ -241,53 +258,53 @@ export default function RichTextEditor({
 
 
   return (
-    <div className={`border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden ${className}`}>
+    <div className={`border border-gray-300 rounded-lg overflow-hidden ${className}`}>
       {label && (
         <div className="mb-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-gray-700">
             {label}
           </label>
-          <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+          <p className="text-xs text-blue-600 mt-1">
             ✅ Images auto-resize to 1280×720 px | 📺 YouTube videos/Shorts embed at 1280×720 px | 📱 Instagram Reels supported
           </p>
-          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+          <p className="text-xs text-amber-600 mt-1">
             ⚠️ Important: Only use public videos/reels with embedding enabled
           </p>
         </div>
       )}
       
       {/* Toolbar */}
-      <div className="flex flex-wrap gap-1 p-2 border-b border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
+      <div className="flex flex-wrap gap-1 p-2 border-b border-gray-300 bg-gray-50 sticky top-0 z-10">
         {/* Text Formatting */}
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
-            editor.isActive('bold') ? 'bg-blue-200 dark:bg-blue-800' : ''
+          className={`p-2 hover:bg-blue-100 rounded transition-colors ${
+            editor.isActive('bold') ? 'bg-blue-200' : ''
           }`}
           title="Bold (Ctrl+B)"
         >
-          <BoldIcon className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+          <BoldIcon className="h-4 w-4 text-gray-700" />
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
-            editor.isActive('italic') ? 'bg-blue-200 dark:bg-blue-800' : ''
+          className={`p-2 hover:bg-blue-100 rounded transition-colors ${
+            editor.isActive('italic') ? 'bg-blue-200' : ''
           }`}
           title="Italic (Ctrl+I)"
         >
-          <ItalicIcon className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+          <ItalicIcon className="h-4 w-4 text-gray-700" />
         </button>
 
-        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div className="w-px h-6 bg-gray-300 mx-1"></div>
 
         {/* Headings */}
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
-            editor.isActive('heading', { level: 1 }) ? 'bg-blue-200 dark:bg-blue-800' : ''
+          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 rounded transition-colors ${
+            editor.isActive('heading', { level: 1 }) ? 'bg-blue-200' : ''
           }`}
           title="Heading 1"
         >
@@ -296,8 +313,8 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
-            editor.isActive('heading', { level: 2 }) ? 'bg-blue-200 dark:bg-blue-800' : ''
+          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 rounded transition-colors ${
+            editor.isActive('heading', { level: 2 }) ? 'bg-blue-200' : ''
           }`}
           title="Heading 2"
         >
@@ -306,8 +323,8 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
-            editor.isActive('heading', { level: 3 }) ? 'bg-blue-200 dark:bg-blue-800' : ''
+          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 rounded transition-colors ${
+            editor.isActive('heading', { level: 3 }) ? 'bg-blue-200' : ''
           }`}
           title="Heading 3"
         >
@@ -316,8 +333,8 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
-            editor.isActive('heading', { level: 4 }) ? 'bg-blue-200 dark:bg-blue-800' : ''
+          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 rounded transition-colors ${
+            editor.isActive('heading', { level: 4 }) ? 'bg-blue-200' : ''
           }`}
           title="Heading 4"
         >
@@ -326,8 +343,8 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
-          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
-            editor.isActive('heading', { level: 5 }) ? 'bg-blue-200 dark:bg-blue-800' : ''
+          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 rounded transition-colors ${
+            editor.isActive('heading', { level: 5 }) ? 'bg-blue-200' : ''
           }`}
           title="Heading 5"
         >
@@ -336,43 +353,52 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
-          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
-            editor.isActive('heading', { level: 6 }) ? 'bg-blue-200 dark:bg-blue-800' : ''
+          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 rounded transition-colors ${
+            editor.isActive('heading', { level: 6 }) ? 'bg-blue-200' : ''
           }`}
           title="Heading 6"
         >
           H6
         </button>
 
-        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div className="w-px h-6 bg-gray-300 mx-1"></div>
 
         {/* Lists */}
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
-            editor.isActive('bulletList') ? 'bg-blue-200 dark:bg-blue-800' : ''
+          className={`p-2 hover:bg-blue-100 rounded transition-colors ${
+            editor.isActive('bulletList') ? 'bg-blue-200' : ''
           }`}
           title="Bullet List"
         >
-          <ListBulletIcon className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+          <ListBulletIcon className="h-4 w-4 text-gray-700" />
         </button>
 
-        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div className="w-px h-6 bg-gray-300 mx-1"></div>
 
         {/* Link */}
         <button
           type="button"
           onClick={addLink}
-          className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors"
+          className="p-2 hover:bg-blue-100 rounded transition-colors"
           title="Add Link"
         >
-          <LinkIcon className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+          <LinkIcon className="h-4 w-4 text-gray-700" />
         </button>
 
+        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+
         {/* Image Upload */}
-        <label className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded cursor-pointer transition-colors" title="Upload Image">
-          <PhotoIcon className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+        <label
+          className="p-2 hover:bg-blue-100 rounded cursor-pointer transition-colors inline-flex items-center"
+          title="Upload Image (Click to select file)"
+          style={{
+            backgroundColor: uploading ? '#dbeafe' : 'transparent',
+            cursor: uploading ? 'not-allowed' : 'pointer'
+          }}
+        >
+          <PhotoIcon className="h-4 w-4" style={{ color: '#374151' }} />
           <input
             type="file"
             accept="image/*"
@@ -390,8 +416,9 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={addImageFromURL}
-          className="px-2 py-1 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors text-gray-700 dark:text-gray-300"
-          title="Insert Image from URL"
+          className="px-2 py-1 text-xs font-medium hover:bg-blue-100 rounded transition-colors"
+          title="Insert Image from URL (Paste image link)"
+          style={{ color: '#374151' }}
         >
           🖼️ URL
         </button>
@@ -400,7 +427,7 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={addYouTubeVideo}
-          className="px-2 py-1 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors text-gray-700 dark:text-gray-300"
+          className="px-2 py-1 text-xs font-medium hover:bg-blue-100 rounded transition-colors text-gray-700"
           title="Embed YouTube Video/Shorts or Instagram Reel"
         >
           ▶️ Video
@@ -410,18 +437,18 @@ export default function RichTextEditor({
         {uploading && (
           <div className="flex items-center px-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-            <span className="text-sm text-blue-600 dark:text-blue-400 ml-2">Uploading...</span>
+            <span className="text-sm text-blue-600 ml-2">Uploading...</span>
           </div>
         )}
       </div>
 
       {/* Editor Content */}
-      <div className="max-h-[400px] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md">
+      <div className="max-h-[400px] overflow-y-auto bg-white border border-gray-200 rounded-md">
         <EditorContent editor={editor} />
       </div>
 
       {/* Helper Text */}
-      <div className="p-3 bg-blue-50 dark:bg-blue-900 text-xs text-blue-700 dark:text-blue-300 border-t border-blue-200 dark:border-blue-700">
+      <div className="p-3 bg-blue-50 text-xs text-blue-700 border-t border-blue-200">
         <p className="font-medium mb-1">💡 TipTap Pro Editor:</p>
         <ul className="space-y-1 ml-4">
           <li>• <strong>Type freely</strong> - ALL content saves! No truncation!</li>
@@ -433,7 +460,7 @@ export default function RichTextEditor({
               <li>- Instagram Reels (instagram.com/reel/...)</li>
             </ul>
           </li>
-          <li className="text-amber-600 dark:text-amber-400">⚠️ <strong>Note:</strong> Only public videos/reels with embedding enabled will play</li>
+          <li className="text-amber-600">⚠️ <strong>Note:</strong> Only public videos/reels with embedding enabled will play</li>
           <li>• <strong>Format:</strong> Use toolbar buttons or Ctrl+B (bold), Ctrl+I (italic)</li>
         </ul>
       </div>
@@ -528,12 +555,20 @@ export default function RichTextEditor({
         .dark .ProseMirror li {
           color: #F9FAFB;
         }
-        .ProseMirror img {
-          max-width: 100%;
-          height: auto;
-          border-radius: 0.5rem;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          margin: 1rem 0;
+        .ProseMirror img,
+        .ProseMirror .editor-image,
+        img.editor-image {
+          display: block !important;
+          max-width: 100% !important;
+          height: auto !important;
+          border-radius: 0.5rem !important;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+          margin: 1rem auto !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          background-color: transparent !important;
+          border: 2px solid #e5e7eb !important;
+          padding: 4px !important;
         }
         .ProseMirror a {
           color: #3B82F6;

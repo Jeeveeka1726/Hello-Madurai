@@ -193,14 +193,14 @@ function EventsPageContent() {
   }, [events])
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl" suppressHydrationWarning>
+          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl" suppressHydrationWarning>
             {t('events.title', 'Upcoming Events', 'வரவிருக்கும் நிகழ்வுகள்')}
           </h1>
-          <p className="mt-2 text-lg text-gray-600 dark:text-gray-300" suppressHydrationWarning>
+          <p className="mt-2 text-lg text-gray-600" suppressHydrationWarning>
             {t('events.subtitle', 'Discover upcoming festivals, exhibitions, and cultural events in Madurai', 'மதுரையில் வரவிருக்கும் திருவிழாக்கள், கண்காட்சிகள் மற்றும் கலாச்சார நிகழ்வுகளைக் கண்டறியுங்கள்')}
           </p>
         </div>
@@ -209,7 +209,7 @@ function EventsPageContent() {
         {loading && (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300" suppressHydrationWarning>
+            <p className="mt-4 text-gray-600" suppressHydrationWarning>
               {t('events.loading', 'Loading events...', 'நிகழ்வுகள் ஏற்றப்படுகின்றன...')}
             </p>
           </div>
@@ -224,10 +224,10 @@ function EventsPageContent() {
               const eventTitle = language === 'ta' && event.title_ta ? event.title_ta : event.title
               
               return (
-                <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                <Card key={event.id} className="event-card overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200">
                   <CardContent className="p-6">
                     {/* Title First - Centered */}
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center" suppressHydrationWarning>
                       {eventTitle}
                     </h3>
                     
@@ -243,40 +243,44 @@ function EventsPageContent() {
                     )}
                     
                     {/* Date/Time Details Above Description - Highlighted */}
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg p-4 mb-4 border-l-4 border-blue-500">
-                      <div className="space-y-2">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-4 border-l-4 border-blue-500">
+                      <div className="space-y-3">
                         <div className="flex items-center">
-                          <CalendarIcon className="h-5 w-5 mr-3 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                          <CalendarIcon className="h-5 w-5 mr-3 text-blue-600 flex-shrink-0" />
                           <div className="flex-1">
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1" suppressHydrationWarning>
+                            <p className="text-xs text-gray-700 font-medium mb-1" suppressHydrationWarning>
                               {t('events.date', 'Date', 'தேதி')}
                             </p>
-                            <p className="font-semibold text-gray-900 dark:text-white">
+                            <p className="font-bold text-gray-900 text-base">
                               {formatDate(event.startDate)}
                               {event.endDate && ` - ${formatDate(event.endDate)}`}
-                              {event.duration && <span className="ml-2 text-xs font-normal text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded">({event.duration})</span>}
                             </p>
+                            {event.duration && (
+                              <span className="inline-block mt-1 text-sm font-semibold text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
+                                {event.duration}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="flex items-center">
-                          <ClockIcon className="h-5 w-5 mr-3 text-green-600 dark:text-green-400 flex-shrink-0" />
+                          <ClockIcon className="h-5 w-5 mr-3 text-green-600 flex-shrink-0" />
                           <div className="flex-1">
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1" suppressHydrationWarning>
+                            <p className="text-xs text-gray-700 font-medium mb-1" suppressHydrationWarning>
                               {t('events.time', 'Time', 'நேரம்')}
                             </p>
-                            <p className="font-semibold text-gray-900 dark:text-white">
+                            <p className="font-bold text-gray-900 text-base">
                               {event.startTime ? formatTime12Hour(event.startTime) : formatTime(event.startDate)}
                               {event.endTime && ` - ${formatTime12Hour(event.endTime)}`}
                             </p>
                           </div>
                         </div>
                         <div className="flex items-center">
-                          <MapPinIcon className="h-5 w-5 mr-3 text-red-600 dark:text-red-400 flex-shrink-0" />
+                          <MapPinIcon className="h-5 w-5 mr-3 text-red-600 flex-shrink-0" />
                           <div className="flex-1">
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1" suppressHydrationWarning>
+                            <p className="text-xs text-gray-500 mb-1" suppressHydrationWarning>
                               {t('events.location', 'Location', 'இடம்')}
                             </p>
-                            <p className="font-semibold text-gray-900 dark:text-white line-clamp-2">
+                            <p className="font-semibold text-gray-900 line-clamp-2">
                               {language === 'ta' && event.location_ta ? event.location_ta : event.location}
                             </p>
                           </div>
@@ -310,11 +314,15 @@ function EventsPageContent() {
                           margin: 0.5rem 0 !important;
                         }
                         .event-description img {
+                          display: block !important;
                           max-width: 100% !important;
                           height: auto !important;
                           margin: 1.5rem auto !important;
-                          display: block !important;
                           border-radius: 0.5rem !important;
+                          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+                          opacity: 1 !important;
+                          visibility: visible !important;
+                          background-color: transparent !important;
                         }
                         /* Base styles for all iframes */
                         .event-description iframe {
@@ -366,7 +374,7 @@ function EventsPageContent() {
                         }
                       `}} />
                       <div
-                        className={`event-description text-gray-700 dark:text-gray-200 ${
+                        className={`event-description text-gray-700 ${
                           !expandedEvents.has(event.id) ? 'event-description-collapsed' : ''
                         }`}
                         dangerouslySetInnerHTML={{
@@ -378,7 +386,7 @@ function EventsPageContent() {
                         (language !== 'ta' && event.description && event.description.length > 500)) && (
                         <button
                           onClick={() => toggleReadMore(event.id)}
-                          className="mt-3 text-blue-600 dark:text-yellow-400 hover:underline font-medium text-sm"
+                          className="mt-3 text-blue-600 hover:underline font-medium text-sm"
                           suppressHydrationWarning
                         >
                           {expandedEvents.has(event.id)
@@ -389,7 +397,7 @@ function EventsPageContent() {
                     </div>
                     
                     {/* Posted Date and Views at Bottom */}
-                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4 pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between text-xs text-gray-500 mb-4 pt-2 border-t border-gray-200">
                       <span>{formatDate(event.createdAt)}</span>
                       <div className="flex items-center">
                         <EyeIcon className="h-4 w-4 mr-1" />
@@ -412,14 +420,14 @@ function EventsPageContent() {
                         <Button 
                           variant="outline"
                           onClick={() => handleShare(event.id)}
-                          className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 py-3 px-4 h-auto"
+                          className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 py-3 px-4 h-auto"
                         >
                           <ShareIcon className="h-5 w-5" />
                         </Button>
                         
                         {/* Share Menu */}
                         {shareMenuOpen === event.id && (
-                          <div className="absolute bottom-full mb-2 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-10 min-w-[200px]">
+                          <div className="absolute bottom-full mb-2 right-0 bg-white rounded-lg shadow-lg p-4 z-10 min-w-[200px]">
                             <div className="flex flex-col gap-3">
                               {/* WhatsApp */}
                               <button
@@ -432,7 +440,7 @@ function EventsPageContent() {
                               >
                                 <div className="flex items-center gap-2">
                                   <WhatsappIcon size={32} round />
-                                  <span className="text-sm text-gray-600 dark:text-gray-400">WhatsApp</span>
+                                  <span className="text-sm text-gray-600">WhatsApp</span>
                                 </div>
                               </button>
                               
@@ -440,7 +448,7 @@ function EventsPageContent() {
                               <FacebookShareButton url={eventUrl} title={eventTitle}>
                                 <div className="flex items-center gap-2 transform hover:scale-110 transition-transform">
                                   <FacebookIcon size={32} round />
-                                  <span className="text-sm text-gray-600 dark:text-gray-400">Facebook</span>
+                                  <span className="text-sm text-gray-600">Facebook</span>
                                 </div>
                               </FacebookShareButton>
                               
@@ -451,7 +459,7 @@ function EventsPageContent() {
                                   alert(t('share.copied', '✅ Copied!', '✅ நகலெடுக்கப்பட்டது!'))
                                   setShareMenuOpen(null)
                                 }}
-                                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                                className="text-sm text-gray-600 hover:text-gray-900"
                                 suppressHydrationWarning
                               >
                                 {t('share.copyLink', 'Copy Link', 'இணைப்பை நகலெடுக்கவும்')}
@@ -472,7 +480,7 @@ function EventsPageContent() {
         {/* No events message */}
         {!loading && events.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400" suppressHydrationWarning>
+            <p className="text-gray-500" suppressHydrationWarning>
               {t('events.noEvents', 'No upcoming events at the moment. Check back soon!', 'இப்போது வரவிருக்கும் நிகழ்வுகள் எதுவும் இல்லை. விரைவில் சரிபார்க்கவும்!')}
             </p>
           </div>

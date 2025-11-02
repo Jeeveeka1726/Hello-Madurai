@@ -178,14 +178,14 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
   }
 
   return (
-    <div className="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8">
+    <div className="mt-12 border-t border-gray-200 pt-8">
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+        <h2 className="text-2xl font-bold text-gray-900 flex items-center">
           <ChatBubbleLeftIcon className="h-6 w-6 mr-2" />
           {language === 'ta' ? 'கருத்துகள்' : 'Comments'}
           {comments.length > 0 && (
-            <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
+            <span className="ml-2 text-sm font-normal text-gray-500">
               ({comments.length})
             </span>
           )}
@@ -193,14 +193,14 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
       </div>
 
       {/* Comment Form */}
-      <div className="mb-8 bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="mb-8 bg-gray-50 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
           {language === 'ta' ? 'உங்கள் கருத்தைப் பகிருங்கள்' : 'Leave a Comment'}
         </h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 {language === 'ta' ? 'பெயர்' : 'Name'} *
               </label>
               <input
@@ -208,12 +208,12 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
                 value={formData.author}
                 onChange={(e) => setFormData({ ...formData, author: e.target.value })}
                 placeholder={language === 'ta' ? 'உங்கள் பெயரை உள்ளிடவும்' : 'Enter your name'}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 {language === 'ta' ? 'மின்னஞ்சல்' : 'Email'} ({language === 'ta' ? 'விருப்பம்' : 'Optional'})
               </label>
               <input
@@ -221,12 +221,12 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder={language === 'ta' ? 'உங்கள் மின்னஞ்சல்' : 'Your email (optional)'}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               {language === 'ta' ? 'கருத்து' : 'Comment'} *
             </label>
             <textarea
@@ -234,7 +234,7 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               placeholder={language === 'ta' ? 'உங்கள் கருத்தை எழுதுங்கள்...' : 'Write your comment...'}
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -251,12 +251,12 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
       {loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
+          <p className="mt-4 text-gray-600">
             {language === 'ta' ? 'ஏற்றுகிறது...' : 'Loading comments...'}
           </p>
         </div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-8 text-gray-500">
           {language === 'ta' 
             ? 'இதுவரை கருத்துகள் எதுவும் இல்லை. முதல் கருத்தை நீங்கள் இடுங்கள்!'
             : 'No comments yet. Be the first to comment!'
@@ -265,7 +265,7 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
       ) : (
         <div className="space-y-6">
           {comments.map((comment) => (
-            <div key={comment.id} className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <div key={comment.id} className="bg-white rounded-lg p-6 shadow-sm">
               {/* Comment Header */}
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
@@ -273,21 +273,21 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2">
-                    <span className="font-semibold text-gray-900 dark:text-white">
+                    <span className="font-semibold text-gray-900">
                       {comment.author}
                     </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-sm text-gray-500">
                       {formatDate(comment.createdAt)}
                     </span>
                   </div>
-                  <p className="mt-2 text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                  <p className="mt-2 text-gray-700 whitespace-pre-wrap">
                     {comment.content}
                   </p>
                   
                   {/* Reply Button */}
                   <button
                     onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                    className="mt-2 flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                    className="mt-2 flex items-center text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
                     <ArrowUturnLeftIcon className="h-4 w-4 mr-1" />
                     {language === 'ta' ? 'பதிலளிக்க' : 'Reply'}
@@ -297,8 +297,8 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
 
               {/* Reply Form */}
               {replyingTo === comment.id && (
-                <div className="mt-4 ml-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                <div className="mt-4 ml-10 bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">
                     {language === 'ta' ? `${comment.author} க்கு பதிலளிக்கவும்` : `Reply to ${comment.author}`}
                   </h4>
                   <form onSubmit={(e) => handleReplySubmit(e, comment.id)} className="space-y-3">
@@ -308,7 +308,7 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
                         value={replyFormData.author}
                         onChange={(e) => setReplyFormData({ ...replyFormData, author: e.target.value })}
                         placeholder={language === 'ta' ? 'உங்கள் பெயர்' : 'Your name'}
-                        className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
                       />
                       <input
@@ -316,7 +316,7 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
                         value={replyFormData.email}
                         onChange={(e) => setReplyFormData({ ...replyFormData, email: e.target.value })}
                         placeholder={language === 'ta' ? 'மின்னஞ்சல் (விருப்பம்)' : 'Email (optional)'}
-                        className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                     <textarea
@@ -324,7 +324,7 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
                       onChange={(e) => setReplyFormData({ ...replyFormData, content: e.target.value })}
                       placeholder={language === 'ta' ? 'உங்கள் பதிலை எழுதுங்கள்...' : 'Write your reply...'}
                       rows={3}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
                     <div className="flex gap-2">
@@ -341,7 +341,7 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
                           setReplyingTo(null)
                           setReplyFormData({ author: '', email: '', content: '' })
                         }}
-                        className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                        className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
                       >
                         {language === 'ta' ? 'ரத்து செய்' : 'Cancel'}
                       </button>
@@ -352,14 +352,14 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
 
               {/* Replies */}
               {comment.replies && comment.replies.length > 0 && (
-                <div className="mt-4 ml-10 space-y-4 border-l-2 border-blue-200 dark:border-blue-800 pl-4">
+                <div className="mt-4 ml-10 space-y-4 border-l-2 border-blue-200 pl-4">
                   {comment.replies.map((reply) => (
-                    <div 
-                      key={reply.id} 
+                    <div
+                      key={reply.id}
                       className={`p-4 rounded-lg ${
-                        reply.isAdminReply 
-                          ? 'bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800'
-                          : 'bg-gray-50 dark:bg-gray-700'
+                        reply.isAdminReply
+                          ? 'bg-blue-50 border border-blue-200'
+                          : 'bg-gray-50'
                       }`}
                     >
                       <div className="flex items-start space-x-3">
@@ -370,7 +370,7 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2">
-                            <span className="font-semibold text-gray-900 dark:text-white">
+                            <span className="font-semibold text-gray-900">
                               {reply.author}
                             </span>
                             {reply.isAdminReply && (
@@ -378,11 +378,11 @@ export default function CommentsSection({ newsId }: CommentsSectionProps) {
                                 {language === 'ta' ? 'நிர்வாகி' : 'Admin'}
                               </span>
                             )}
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-gray-500">
                               {formatDate(reply.createdAt)}
                             </span>
                           </div>
-                          <p className="mt-1 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                          <p className="mt-1 text-sm text-gray-700 whitespace-pre-wrap">
                             {reply.content}
                           </p>
                         </div>

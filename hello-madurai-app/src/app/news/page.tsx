@@ -92,7 +92,7 @@ function NewsPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <style jsx>{`
         .news-card {
           display: flex;
@@ -125,7 +125,7 @@ function NewsPageContent() {
         {loading && (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300" suppressHydrationWarning>
+            <p className="mt-4 text-gray-600" suppressHydrationWarning>
               {t('news.loading', 'Loading news...', 'செய்திகள் ஏற்றப்படுகின்றன...')}
             </p>
           </div>
@@ -143,7 +143,7 @@ function NewsPageContent() {
                     onClick={() => setSelectedCategory(category.id)}
                     className={selectedCategory === category.id
                       ? "text-sm bg-primary-600 text-white"
-                      : "text-sm bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      : "text-sm bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                     }
                   >
                     {category.name}
@@ -155,12 +155,12 @@ function NewsPageContent() {
             {/* Featured News */}
         {featuredNews.length > 0 && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t('news.featured', 'Featured News', 'சிறப்பு செய்திகள்')}
             </h2>
             <div className="grid gap-8 lg:grid-cols-2">
               {featuredNews.map((article) => (
-                <Card key={article.id} className="news-card overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full flex flex-col">
+                <Card key={article.id} className="news-card overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200 h-full flex flex-col">
                   {article.featuredImage ? (
                     <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                       <img
@@ -170,8 +170,8 @@ function NewsPageContent() {
                       />
                     </div>
                   ) : (
-                    <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
-                      <div className="flex items-center justify-center text-gray-400 dark:text-gray-500">
+                    <div className="aspect-w-16 aspect-h-9 bg-gray-200">
+                      <div className="flex items-center justify-center text-gray-400">
                         <span className="text-sm">
                           {t('news.imageComingSoon', 'Image Coming Soon', 'படம் விரைவில்')}
                         </span>
@@ -180,20 +180,20 @@ function NewsPageContent() {
                   )}
                   <CardContent className="news-card-content p-6 flex flex-col flex-grow">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
                         {t('news.featured', 'Featured', 'சிறப்பு')}
                       </span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 capitalize">
+                      <span className="text-sm text-gray-500 capitalize">
                         {article.category}
                       </span>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">
                       {t(`news.${article.id}.title`, article.title, article.title_ta)}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow">
+                    <p className="text-gray-600 mb-4 flex-grow">
                       {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
                     </p>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 text-sm text-gray-500 mb-4">
                       <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                         <div className="flex items-center">
                           <UserIcon className="h-4 w-4 mr-1" />
@@ -223,7 +223,7 @@ function NewsPageContent() {
 
         {/* Regular News */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
             {selectedCategory === 'all'
               ? t('news.allNews', 'All News', 'அனைத்து செய்திகள்')
               : categories.find(cat => cat.id === selectedCategory)?.name
@@ -231,7 +231,7 @@ function NewsPageContent() {
           </h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {(selectedCategory === 'all' ? regularNews : filteredArticles.filter(a => !a.featured)).map((article) => (
-              <Card key={article.id} className="news-card hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full flex flex-col">
+              <Card key={article.id} className="news-card hover:shadow-lg transition-shadow bg-white border-gray-200 h-full flex flex-col">
                 {article.featuredImage ? (
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                     <img
@@ -241,8 +241,8 @@ function NewsPageContent() {
                     />
                   </div>
                 ) : (
-                  <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
-                    <div className="flex items-center justify-center text-gray-400 dark:text-gray-500">
+                  <div className="aspect-w-16 aspect-h-9 bg-gray-200">
+                    <div className="flex items-center justify-center text-gray-400">
                       <span className="text-sm">
                         {t('news.imageComingSoon', 'Image Coming Soon', 'படம் விரைவில்')}
                       </span>
@@ -251,20 +251,20 @@ function NewsPageContent() {
                 )}
                 <CardContent className="news-card-content p-4 flex flex-col flex-grow">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                    <span className="text-xs text-gray-500 capitalize">
                       {article.category}
                     </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className="text-xs text-gray-500">
                       {formatDate(article.publishedAt)}
                     </span>
                   </div>
-                  <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                  <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
                     {t(`news.${article.id}.title`, article.title, article.title_ta)}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2 flex-grow">
+                  <p className="text-gray-600 text-sm mb-3 line-clamp-2 flex-grow">
                     {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
                   </p>
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
                     <span>{article.author}</span>
                     <div className="flex items-center">
                       <EyeIcon className="h-3 w-3 mr-1" />
@@ -284,7 +284,7 @@ function NewsPageContent() {
           {/* No results message */}
           {filteredArticles.length === 0 && newsArticles.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
+              <p className="text-gray-500 mb-4">
                 {t('news.noData', 'No news articles found. Add some articles via the admin panel!', 'செய்தி கட்டுரைகள் எதுவும் கிடைக்கவில்லை. நிர்வாக பேனல் வழியாக சில கட்டுரைகளைச் சேர்க்கவும்!')}
               </p>
               <a
@@ -298,7 +298,7 @@ function NewsPageContent() {
 
           {filteredArticles.length === 0 && newsArticles.length > 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-500">
                 {t('news.noResults', 'No news articles found in this category', 'இந்த வகையில் செய்தி கட்டுரைகள் எதுவும் கிடைக்கவில்லை')}
               </p>
             </div>

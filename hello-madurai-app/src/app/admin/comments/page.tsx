@@ -125,10 +125,10 @@ export default function AdminCommentsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+      <div className="min-h-screen bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-gray-600">
               {language === 'ta' ? 'ஏற்றுகிறது...' : 'Loading...'}
             </p>
           </div>
@@ -138,14 +138,14 @@ export default function AdminCommentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-gray-900">
             {language === 'ta' ? 'கருத்துகள் மேலாண்மை' : 'Comments Management'}
           </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-gray-600">
             {language === 'ta' ? 'கருத்துகளை பதிலளிக்கவும், நிர்வகிக்கவும்' : 'Reply to and manage comments'}
           </p>
         </div>
@@ -153,14 +153,14 @@ export default function AdminCommentsPage() {
         {/* Comments List */}
         <div className="space-y-4">
           {comments.map((comment) => (
-            <Card key={comment.id} className="bg-white dark:bg-blue-900 border-gray-200 dark:border-blue-800">
+            <Card key={comment.id} className="bg-white border-gray-200">
               <CardContent className="p-6">
                 {/* News Article Title */}
-                <div className="mb-4 pb-4 border-b border-gray-200 dark:border-blue-700">
+                <div className="mb-4 pb-4 border-b border-gray-200">
                   <a
                     href={`/news/${comment.news.id}`}
                     target="_blank"
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-sm text-blue-600 hover:underline"
                   >
                     {language === 'ta' && comment.news.title_ta ? comment.news.title_ta : comment.news.title}
                   </a>
@@ -170,33 +170,33 @@ export default function AdminCommentsPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <span className="font-semibold text-gray-900 dark:text-white">
+                      <span className="font-semibold text-gray-900">
                         {comment.author}
                       </span>
                       {comment.email && (
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                        <span className="text-sm text-gray-500">
                           ({comment.email})
                         </span>
                       )}
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      <span className="text-sm text-gray-500">
                         {formatDate(comment.createdAt)}
                       </span>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 mb-3">
+                    <p className="text-gray-700 mb-3">
                       {comment.content}
                     </p>
 
                     {/* Replies */}
                     {comment.replies && comment.replies.length > 0 && (
-                      <div className="mt-4 ml-6 space-y-3 border-l-2 border-blue-200 dark:border-blue-800 pl-4">
+                      <div className="mt-4 ml-6 space-y-3 border-l-2 border-blue-200 pl-4">
                         {comment.replies.map((reply) => (
                           <div key={reply.id} className={`p-3 rounded-lg ${
-                            reply.isAdminReply 
-                              ? 'bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800'
-                              : 'bg-gray-50 dark:bg-blue-800/50'
+                            reply.isAdminReply
+                              ? 'bg-blue-50 border border-blue-200'
+                              : 'bg-gray-50'
                           }`}>
                             <div className="flex items-center space-x-2 mb-1">
-                              <span className="font-semibold text-sm text-gray-900 dark:text-white">
+                              <span className="font-semibold text-sm text-gray-900">
                                 {reply.author}
                               </span>
                               {reply.isAdminReply && (
@@ -204,11 +204,11 @@ export default function AdminCommentsPage() {
                                   {language === 'ta' ? 'நிர்வாகி' : 'Admin'}
                                 </span>
                               )}
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                              <span className="text-xs text-gray-500">
                                 {formatDate(reply.createdAt)}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-700 dark:text-gray-300">
+                            <p className="text-sm text-gray-700">
                               {reply.content}
                             </p>
                           </div>
@@ -223,7 +223,7 @@ export default function AdminCommentsPage() {
                           value={replyContent[comment.id] || ''}
                           onChange={(e) => setReplyContent({ ...replyContent, [comment.id]: e.target.value })}
                           placeholder={language === 'ta' ? 'உங்கள் பதிலை இங்கே எழுதுங்கள்...' : 'Type your reply here...'}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-800 dark:text-white"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                           rows={3}
                         />
                         <div className="mt-2 flex space-x-2">
@@ -276,7 +276,7 @@ export default function AdminCommentsPage() {
 
           {comments.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-500">
                 {language === 'ta' ? 'கருத்துகள் எதுவும் இல்லை' : 'No comments found'}
               </p>
             </div>

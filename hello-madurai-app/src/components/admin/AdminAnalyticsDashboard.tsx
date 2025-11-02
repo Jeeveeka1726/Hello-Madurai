@@ -142,12 +142,12 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
         <div className="animate-pulse">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-gray-200 dark:bg-gray-700 h-32 rounded-lg" />
+              <div key={i} className="bg-gray-200 h-32 rounded-lg" />
             ))}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-gray-200 dark:bg-gray-700 h-64 rounded-lg" />
-            <div className="bg-gray-200 dark:bg-gray-700 h-64 rounded-lg" />
+            <div className="bg-gray-200 h-64 rounded-lg" />
+            <div className="bg-gray-200 h-64 rounded-lg" />
           </div>
         </div>
       </div>
@@ -158,7 +158,7 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
     return (
       <div className={`p-8 text-center ${className}`}>
         <ChartBarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600">
           {t('admin.analytics.noData', 'No analytics data available', 'பகுப்பாய்வு தரவு எதுவும் கிடைக்கவில்லை')}
         </p>
       </div>
@@ -170,24 +170,24 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-gray-900">
             {t('admin.analytics.title', 'Analytics Dashboard', 'பகுப்பாய்வு டாஷ்போர்டு')}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             {t('admin.analytics.subtitle', 'Track your content performance and user engagement', 'உங்கள் உள்ளடக்க செயல்திறன் மற்றும் பயனர் ஈடுபாட்டைக் கண்காணிக்கவும்')}
           </p>
         </div>
         
         {/* Time Range Selector */}
-        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+        <div className="flex bg-gray-100 rounded-lg p-1">
           {(['7d', '30d', '90d'] as const).map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 timeRange === range
-                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               {range === '7d' && t('admin.analytics.7days', '7 Days', '7 நாட்கள்')}
@@ -200,18 +200,18 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600">
                 {t('admin.analytics?.totalViews || 0', 'Total Views', 'மொத்த பார்வைகள்')}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-gray-900">
                 {formatNumber(analytics?.totalViews || 0)}
               </p>
             </div>
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <EyeIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <div className="p-3 bg-blue-100 rounded-lg">
+              <EyeIcon className="h-6 w-6 text-blue-600" />
             </div>
           </div>
           <div className="flex items-center mt-2">
@@ -221,18 +221,18 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600">
                 {t('admin.analytics?.totalLikes || 0', 'Total Likes', 'மொத்த விருப்பங்கள்')}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-gray-900">
                 {formatNumber(analytics?.totalLikes || 0)}
               </p>
             </div>
-            <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
-              <HeartIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
+            <div className="p-3 bg-red-100 rounded-lg">
+              <HeartIcon className="h-6 w-6 text-red-600" />
             </div>
           </div>
           <div className="flex items-center mt-2">
@@ -242,18 +242,18 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600">
                 {t('admin.analytics?.totalComments || 0', 'Total Comments', 'மொத்த கருத்துகள்')}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-gray-900">
                 {formatNumber(analytics?.totalComments || 0)}
               </p>
             </div>
-            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <ChatBubbleLeftIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <div className="p-3 bg-green-100 rounded-lg">
+              <ChatBubbleLeftIcon className="h-6 w-6 text-green-600" />
             </div>
           </div>
           <div className="flex items-center mt-2">
@@ -263,18 +263,18 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600">
                 {t('admin.analytics.totalSubscriptions', 'Subscriptions', 'சந்தாக்கள்')}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-gray-900">
                 {formatNumber(analytics?.totalSubscriptions)}
               </p>
             </div>
-            <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-              <UserGroupIcon className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+            <div className="p-3 bg-yellow-100 rounded-lg">
+              <UserGroupIcon className="h-6 w-6 text-yellow-600" />
             </div>
           </div>
           <div className="flex items-center mt-2">
@@ -287,63 +287,63 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Content Statistics */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
             {t('admin.analytics?.contentStats', 'Content Statistics', 'உள்ளடக்க புள்ளிவிவரங்கள்')}
           </h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                  <NewspaperIcon className="h-5 w-5 text-red-600 dark:text-red-400" />
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <NewspaperIcon className="h-5 w-5 text-red-600" />
                 </div>
-                <span className="text-gray-900 dark:text-white">
+                <span className="text-gray-900">
                   {t('admin.analytics.news', 'News Articles', 'செய்தி கட்டுரைகள்')}
                 </span>
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">
+              <span className="text-xl font-bold text-gray-900">
                 {analytics?.contentStats?.news || 0}
               </span>
             </div>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <DocumentIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <DocumentIcon className="h-5 w-5 text-blue-600" />
                 </div>
-                <span className="text-gray-900 dark:text-white">
+                <span className="text-gray-900">
                   {t('admin.analytics.videos', 'Videos', 'வீடியோக்கள்')}
                 </span>
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">
+              <span className="text-xl font-bold text-gray-900">
                 {analytics?.contentStats?.videos || 0}
               </span>
             </div>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                  <MicrophoneIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <MicrophoneIcon className="h-5 w-5 text-green-600" />
                 </div>
-                <span className="text-gray-900 dark:text-white">
+                <span className="text-gray-900">
                   {t('admin.analytics.radio', 'Radio Shows', 'வானொலி நிகழ்ச்சிகள்')}
                 </span>
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">
+              <span className="text-xl font-bold text-gray-900">
                 {analytics?.contentStats?.radio || 0}
               </span>
             </div>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <BuildingOfficeIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <BuildingOfficeIcon className="h-5 w-5 text-blue-600" />
                 </div>
-                <span className="text-gray-900 dark:text-white">
+                <span className="text-gray-900">
                   {t('admin.analytics.businesses', 'Businesses', 'வணிகங்கள்')}
                 </span>
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">
+              <span className="text-xl font-bold text-gray-900">
                 {analytics?.contentStats?.businesses || 0}
               </span>
             </div>
@@ -351,8 +351,8 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
         </div>
 
         {/* Top Performing Content */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
             {t('admin.analytics.topContent', 'Top Performing Content', 'சிறந்த செயல்திறன் உள்ளடக்கம்')}
           </h3>
           <div className="space-y-4">
@@ -367,10 +367,10 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
                   {index + 1}
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900 dark:text-white text-sm line-clamp-1">
+                  <p className="font-medium text-gray-900 text-sm line-clamp-1">
                     {item.title}
                   </p>
-                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
                     <span className="flex items-center gap-1">
                       <EyeIcon className="h-3 w-3" />
                       {formatNumber(item.views)}
@@ -395,8 +395,8 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
           {t('admin.analytics.recentActivity', 'Recent Activity', 'சமீபத்திய செயல்பாடு')}
         </h3>
         <div className="space-y-4">
@@ -408,10 +408,10 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
                   <IconComponent className="h-4 w-4" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-900 dark:text-white">
+                  <p className="text-sm text-gray-900">
                     <span className="font-medium">{activity.action}</span> {activity.title}
                   </p>
-                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
                     {activity.user && <span>by {activity.user}</span>}
                     <span>•</span>
                     <span>{formatDate(activity.timestamp)}</span>

@@ -169,7 +169,7 @@ export default function FileUpload({
 
   return (
     <div className={`space-y-4 ${className}`}>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label className="block text-sm font-medium text-gray-700">
         {label}
       </label>
 
@@ -202,10 +202,10 @@ export default function FileUpload({
         <div>
           {!currentFileUrl ? (
             <div
-              className={`relative border-2 border-dashed rounded-lg p-6 text-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
+              className={`relative border-2 border-dashed rounded-lg p-6 text-center hover:bg-gray-50 transition-colors ${
                 isDragging
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                  : 'border-gray-300 dark:border-gray-600'
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-300'
               }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -223,7 +223,7 @@ export default function FileUpload({
               
               <div className="flex flex-col items-center space-y-2">
                 <IconComponent className="h-12 w-12 text-gray-400" />
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-sm text-gray-600">
                   {uploading ? (
                     <div className="flex items-center space-x-2">
                       <ArrowPathIcon className="h-4 w-4 animate-spin" />
@@ -249,15 +249,15 @@ export default function FileUpload({
             </div>
           ) : (
             /* File Preview */
-            <div className="relative border border-gray-300 dark:border-gray-600 rounded-lg p-4">
+            <div className="relative border border-gray-300 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <IconComponent className="h-8 w-8 text-blue-600" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-sm font-medium text-gray-900">
                       {config.label} uploaded
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500">
                       {currentFileUrl}
                     </p>
                   </div>
@@ -294,7 +294,7 @@ export default function FileUpload({
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               placeholder={`Enter ${config.label.toLowerCase()} URL...`}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
             <Button
               type="button"
@@ -306,10 +306,10 @@ export default function FileUpload({
           </div>
           
           {currentUrl && (
-            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
               <div className="flex items-center space-x-2">
                 <LinkIcon className="h-4 w-4 text-blue-600" />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-sm text-gray-700">
                   {currentUrl}
                 </span>
               </div>

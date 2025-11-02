@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir, readFile } from 'fs/promises'
-import path from 'path'
+import { writeFile, mkdir } from 'fs/promises'
+import { join } from 'path'
+import { existsSync, mkdirSync } from 'fs'
 import sharp from 'sharp'
 import { IMAGE_CONFIG } from '@/lib/utils/imageResize'
+import prisma from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,8 +43,8 @@ export async function POST(request: NextRequest) {
     const originalHeight = metadata.height || 0
 
     // Check if resize is needed
-    const needsResize = 
-      originalWidth !== IMAGE_CONFIG.news.width || 
+    const needsResize =
+      originalWidth !== IMAGE_CONFIG.news.width ||
       originalHeight !== IMAGE_CONFIG.news.height
 
     let processedBuffer = buffer
@@ -60,13 +62,54 @@ export async function POST(request: NextRequest) {
       resized = true
     }
 
-    // Convert to base64 data URL
-    const base64 = processedBuffer.toString('base64')
+    // Save to database and return proper URL (same as /api/upload)
+    const timestamp = Date.now()
+    const fileExtension = resized ? 'webp' : file.name.split('.').pop() || 'jpg'
+    const filename = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}.${fileExtension}`
     const mimeType = resized ? 'image/webp' : file.type
-    const dataUrl = `data:${mimeType};base64,${base64}`
+
+    let publicUrl: string
+
+    try {
+      // Try to save to Hostinger database
+      const imageRecord = await prisma.image.create({
+        data: {
+          filename: filename,
+          data: processedBuffer,
+          mimeType: mimeType,
+          size: processedBuffer.length,
+          category: 'image'
+        }
+      })
+
+      // Return API route to serve the image
+      publicUrl = `/api/image/${imageRecord.id}`
+      console.log('✅ Image saved to Hostinger database:', imageRecord.id)
+    } catch (dbError) {
+      console.error('Database save error:', dbError)
+
+      // Fallback to local file system (development only)
+      try {
+        const uploadsDir = join(process.cwd(), 'public', 'uploads', 'image')
+        if (!existsSync(uploadsDir)) {
+          mkdirSync(uploadsDir, { recursive: true })
+        }
+
+        const filePath = join(uploadsDir, filename)
+        await writeFile(filePath, processedBuffer)
+        publicUrl = `/uploads/image/${filename}`
+        console.log('✅ Image saved to local file system:', filename)
+      } catch (fileError) {
+        console.error('File system write also failed:', fileError)
+        return NextResponse.json(
+          { error: 'Failed to save image. Please try again.' },
+          { status: 500 }
+        )
+      }
+    }
 
     return NextResponse.json({
-      url: dataUrl,
+      url: publicUrl,
       originalDimensions: {
         width: originalWidth,
         height: originalHeight,
@@ -76,13 +119,13 @@ export async function POST(request: NextRequest) {
         height: IMAGE_CONFIG.news.height,
       },
       resized,
-      isBase64: true,
+      isBase64: false,
     })
   } catch (error) {
     console.error('Error uploading image:', error)
     const errorMessage = error instanceof Error ? error.message : 'Failed to upload image'
     return NextResponse.json(
-      { error: errorMessage, details: error instanceof Error ? error.stack : undefined }, 
+      { error: errorMessage, details: error instanceof Error ? error.stack : undefined },
       { status: 500 }
     )
   }

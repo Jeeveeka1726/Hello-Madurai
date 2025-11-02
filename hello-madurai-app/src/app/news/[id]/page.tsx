@@ -126,11 +126,11 @@ function NewsDetailPageContent() {
   // Show loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+      <div className="min-h-screen bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300" suppressHydrationWarning>
+            <p className="mt-4 text-gray-600" suppressHydrationWarning>
               {t('news.loading', 'Loading article...', 'கட்டுரை ஏற்றப்படுகிறது...')}
             </p>
           </div>
@@ -141,14 +141,14 @@ function NewsDetailPageContent() {
 
   if (!article) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+      <div className="min-h-screen bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Card className="text-center py-12 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <Card className="text-center py-12 bg-white border-gray-200">
             <CardContent>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
                 {t('news.notFound', 'Article Not Found', 'கட்டுரை கிடைக்கவில்லை')}
               </h1>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
+              <p className="text-gray-600 mb-6">
                 {t('news.notFoundDesc', 'The article you are looking for does not exist or has been removed.', 'நீங்கள் தேடும் கட்டுரை இல்லை அல்லது அகற்றப்பட்டுள்ளது.')}
               </p>
               <Link href="/news">
@@ -174,12 +174,12 @@ function NewsDetailPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-4 sm:py-8">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
       <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-8">
         {/* Back Button */}
         <div className="mb-4 sm:mb-6">
           <Link href="/news">
-            <Button variant="outline" className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 touch-target">
+            <Button variant="outline" className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 touch-target">
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
               {t('news.backToNews', 'Back to News', 'செய்திகளுக்கு திரும்பு')}
             </Button>
@@ -197,7 +197,7 @@ function NewsDetailPageContent() {
 
           {/* Article Card */}
           <div className="flex-1 w-full">
-            <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <Card className="bg-white border-gray-200">
               {/* Featured Image */}
               {article.featuredImage ? (
                 <div className="aspect-w-16 aspect-h-9 overflow-hidden">
@@ -209,9 +209,9 @@ function NewsDetailPageContent() {
                   />
                 </div>
               ) : (
-                <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
+                <div className="aspect-w-16 aspect-h-9 bg-gray-200">
                   <div className="flex items-center justify-center">
-                    <span className="text-gray-400 dark:text-gray-500">
+                    <span className="text-gray-400">
                       {t('news.imageComingSoon', 'Featured Image Coming Soon', 'சிறப்பு படம் விரைவில்')}
                     </span>
                   </div>
@@ -222,11 +222,11 @@ function NewsDetailPageContent() {
                 {/* Article Header */}
                 <div className="mb-4 sm:mb-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 w-fit">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800 w-fit">
                       {article.category}
                     </span>
                     {article.allowDownload && (
-                      <Button variant="outline" onClick={handleDownload} className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 touch-target w-full sm:w-auto">
+                      <Button variant="outline" onClick={handleDownload} className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 touch-target w-full sm:w-auto">
                         <DownloadIcon className="h-4 w-4 mr-2" />
                         {t('news.download', 'Download', 'பதிவிறக்கம்')}
                       </Button>
@@ -234,15 +234,15 @@ function NewsDetailPageContent() {
                   </div>
                   
                   
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">
                     {t(`news.${article.id}.title`, article.title, article.title_ta)}
                   </h1>
                   
-                  <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 leading-relaxed">
+                  <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-4 sm:mb-6 leading-relaxed">
                     {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
                   </p>
 
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-sm text-gray-500">
                     <div className="flex items-center">
                       <UserIcon className="h-4 w-4 mr-2" />
                       <span className="truncate">{article.author}</span>
@@ -267,7 +267,7 @@ function NewsDetailPageContent() {
                 </div>
 
                 {/* Interaction Buttons */}
-                <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
                   <InteractionButtons
                     itemId={article.id}
                     itemType="news"
@@ -305,13 +305,13 @@ function NewsDetailPageContent() {
 
         {/* Related Articles */}
         <div className="mt-8 sm:mt-12">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
             {t('news.relatedArticles', 'Related Articles', 'தொடர்புடைய கட்டுரைகள்')}
           </h2>
           <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
             {relatedArticles.map((relatedArticle) => (
                 <Link key={relatedArticle.id} href={`/news/${relatedArticle.id}`}>
-                  <Card className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                  <Card className="hover:shadow-lg transition-shadow bg-white border-gray-200">
                     {relatedArticle.featuredImage ? (
                       <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                         <img
@@ -321,22 +321,22 @@ function NewsDetailPageContent() {
                         />
                       </div>
                     ) : (
-                      <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
+                      <div className="aspect-w-16 aspect-h-9 bg-gray-200">
                         <div className="flex items-center justify-center">
-                          <span className="text-sm text-gray-400 dark:text-gray-500">
+                          <span className="text-sm text-gray-400">
                             {t('news.imageComingSoon', 'Image Coming Soon', 'படம் விரைவில்')}
                           </span>
                         </div>
                       </div>
                     )}
                     <CardContent className="p-4">
-                      <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                      <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
                         {t(`news.${relatedArticle.id}.title`, relatedArticle.title, relatedArticle.title_ta)}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2">
+                      <p className="text-gray-600 text-sm line-clamp-2">
                         {t(`news.${relatedArticle.id}.excerpt`, relatedArticle.excerpt, relatedArticle.excerpt_ta)}
                       </p>
-                      <div className="flex items-center justify-between mt-3 text-xs text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
                         <span>{formatDate(relatedArticle.publishedAt)}</span>
                         <span>{relatedArticle.views.toLocaleString()} {t('news.views', 'views', 'பார்வைகள்')}</span>
                       </div>

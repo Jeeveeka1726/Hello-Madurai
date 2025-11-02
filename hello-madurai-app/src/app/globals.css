@@ -7,7 +7,7 @@
 
 html {
   scroll-behavior: smooth;
-  color-scheme: dark;
+  color-scheme: light;
   overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
@@ -19,30 +19,307 @@ body {
   letter-spacing: 0.02em; /* Better letter spacing especially for Tamil */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #1d4ed8 !important; /* Beautiful dark blue background - blue-700 */
-  color: #ffffff !important; /* Pure white text */
+  background-color: #ffffff !important; /* Pure white background */
+  /* REMOVED: color: #000000 !important; - This was forcing ALL text to black! */
   overflow-x: hidden; /* Prevent horizontal scroll */
   max-width: 100vw; /* Never exceed viewport width */
 }
 
-/* Force dark theme globally */
-html.dark,
+/* Force light theme globally */
+html.light,
 html,
 body {
-  background-color: #1d4ed8 !important;
+  background-color: #ffffff !important;
+  /* Removed global black color - let components control their own colors */
+}
+
+/* REMOVED: Force all direct children of body to have white background */
+/* This was causing white overlay on admin pages */
+/* body > * {
+  background-color: #ffffff;
+} */
+
+/* REMOVED: Default text color rules that were forcing header navigation to black */
+/* Let components control their own text colors using Tailwind classes */
+
+/* Ensure main content area is white for PUBLIC pages only (not admin) */
+/* Use :not() selector to exclude admin pages */
+body:not(.admin-page) main,
+body:not(.admin-page) #__next {
+  background-color: #ffffff;
+}
+
+/* REMOVED: Global dark mode overrides were breaking admin pages */
+/* Dark mode is disabled in tailwind.config.js anyway */
+/* If needed, add specific overrides for individual pages below */
+
+/* CRITICAL: Text color rules based on background */
+/* White text on ALL blue/gradient backgrounds - MAXIMUM PRIORITY */
+.bg-blue-500,
+.bg-blue-500 *,
+.bg-blue-500 h1,
+.bg-blue-500 h2,
+.bg-blue-500 h3,
+.bg-blue-500 h4,
+.bg-blue-500 h5,
+.bg-blue-500 h6,
+.bg-blue-500 p,
+.bg-blue-500 span,
+.bg-blue-500 a,
+.bg-blue-500 div,
+.bg-blue-600,
+.bg-blue-600 *,
+.bg-blue-600 h1,
+.bg-blue-600 h2,
+.bg-blue-600 h3,
+.bg-blue-600 h4,
+.bg-blue-600 h5,
+.bg-blue-600 h6,
+.bg-blue-600 p,
+.bg-blue-600 span,
+.bg-blue-600 a,
+.bg-blue-600 div,
+.bg-blue-700,
+.bg-blue-700 *,
+.bg-blue-700 h1,
+.bg-blue-700 h2,
+.bg-blue-700 h3,
+.bg-blue-700 h4,
+.bg-blue-700 h5,
+.bg-blue-700 h6,
+.bg-blue-700 p,
+.bg-blue-700 span,
+.bg-blue-700 a,
+.bg-blue-700 div,
+.bg-gradient-to-r,
+.bg-gradient-to-r *,
+.bg-gradient-to-r h1,
+.bg-gradient-to-r h2,
+.bg-gradient-to-r h3,
+.bg-gradient-to-r h4,
+.bg-gradient-to-r h5,
+.bg-gradient-to-r h6,
+.bg-gradient-to-r p,
+.bg-gradient-to-r span,
+.bg-gradient-to-r a,
+.bg-gradient-to-r div,
+[class*="from-blue"],
+[class*="from-blue"] *,
+[class*="from-blue"] h1,
+[class*="from-blue"] h2,
+[class*="from-blue"] h3,
+[class*="from-blue"] h4,
+[class*="from-blue"] h5,
+[class*="from-blue"] h6,
+[class*="from-blue"] p,
+[class*="from-blue"] span,
+[class*="from-blue"] a,
+[class*="from-blue"] div,
+[class*="to-blue"],
+[class*="to-blue"] *,
+[class*="to-blue"] h1,
+[class*="to-blue"] h2,
+[class*="to-blue"] h3,
+[class*="to-blue"] h4,
+[class*="to-blue"] h5,
+[class*="to-blue"] h6,
+[class*="to-blue"] p,
+[class*="to-blue"] span,
+[class*="to-blue"] a,
+[class*="to-blue"] div {
   color: #ffffff !important;
 }
 
-/* Force all direct children of body to have dark blue background */
-body > * {
-  background-color: #1d4ed8;
+/* Black text on white/light backgrounds - ONLY for specific content elements, NOT navigation */
+/* Removed global rules that were forcing header navigation to black */
+/* Navigation links will use their own text-blue-600 classes */
+
+/* Exception: Buttons and links on white backgrounds should keep their colors */
+.bg-white button,
+.bg-gray-50 button,
+.bg-gray-100 button,
+.bg-white a.inline-flex,
+.bg-gray-50 a.inline-flex,
+.bg-gray-100 a.inline-flex {
+  color: inherit !important;
 }
 
-/* Ensure main content area is always dark blue */
-main,
-#__next {
-  background-color: #1d4ed8 !important;
+/* Exception: White buttons on blue backgrounds should have blue text */
+.bg-blue-500 button.bg-white,
+.bg-blue-600 button.bg-white,
+.bg-blue-700 button.bg-white,
+.bg-gradient-to-r button.bg-white,
+[class*="from-blue"] button.bg-white,
+[class*="to-blue"] button.bg-white {
+  color: #2563eb !important;
+}
+
+/* FORCE white text on blue backgrounds - MAXIMUM PRIORITY */
+.text-white,
+.text-white * {
   color: #ffffff !important;
+}
+
+a .text-white,
+a .text-white *,
+div.bg-blue-600 *,
+div.bg-blue-600 h3,
+div.bg-blue-600 p,
+div.bg-blue-600 span {
+  color: #ffffff !important;
+}
+
+/* Force white color on all elements inside blue boxes */
+a div.bg-blue-600,
+a div.bg-blue-600 *,
+a div.bg-blue-600 h1,
+a div.bg-blue-600 h2,
+a div.bg-blue-600 h3,
+a div.bg-blue-600 h4,
+a div.bg-blue-600 h5,
+a div.bg-blue-600 h6,
+a div.bg-blue-600 p,
+a div.bg-blue-600 span,
+a div.bg-blue-600 div {
+  color: #ffffff !important;
+}
+
+/* Force white text on blue gradient backgrounds */
+.bg-gradient-to-r.from-blue-500,
+.bg-gradient-to-r.from-blue-500 *,
+.bg-gradient-to-r.from-blue-500 h1,
+.bg-gradient-to-r.from-blue-500 h2,
+.bg-gradient-to-r.from-blue-500 h3,
+.bg-gradient-to-r.from-blue-500 p,
+.bg-gradient-to-r.from-blue-500 span,
+.bg-gradient-to-r.from-blue-500 div {
+  color: #ffffff !important;
+}
+
+/* Exception: White buttons on blue backgrounds should have blue text */
+.bg-gradient-to-r.from-blue-500 a.bg-white,
+.bg-gradient-to-r.from-blue-500 button.bg-white,
+.bg-gradient-to-r.from-blue-500 a.bg-white *,
+.bg-gradient-to-r.from-blue-500 button.bg-white * {
+  color: #2563eb !important;
+}
+
+/* FORCE blue color on all navigation links - MAXIMUM PRIORITY */
+header nav a,
+header nav button,
+header button,
+header a.text-blue-600,
+header button.text-blue-600,
+nav .text-blue-600,
+.text-blue-600 {
+  color: #2563eb !important;
+}
+
+/* Force blue on hover states */
+header nav a:hover,
+header nav button:hover,
+header button:hover {
+  color: #1d4ed8 !important;
+}
+
+/* FORCE black text for article content - MAXIMUM PRIORITY */
+.news-content,
+.news-content *,
+.news-content p,
+.news-content div,
+.news-content span,
+.news-content h1,
+.news-content h2,
+.news-content h3,
+.news-content h4,
+.news-content h5,
+.news-content h6,
+.news-content li,
+.news-content ul,
+.news-content ol,
+.news-content strong,
+.news-content em,
+.news-content b,
+.news-content i,
+.prose,
+.prose *,
+.prose p,
+.prose div,
+.prose span,
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6,
+.prose li,
+.prose strong,
+.prose em,
+.dark .news-content,
+.dark .news-content *,
+.dark .news-content p,
+.dark .news-content div,
+.dark .news-content span,
+.dark .news-content h1,
+.dark .news-content h2,
+.dark .news-content h3,
+.dark .news-content li,
+.dark .prose,
+.dark .prose *,
+.dark .prose p,
+.dark .prose div,
+.dark .prose span,
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose li,
+.prose-invert,
+.prose-invert *,
+.dark\:prose-invert,
+.dark\:prose-invert * {
+  color: #000000 !important;
+}
+
+/* Exception: Keep links blue in article content */
+.news-content a,
+.prose a,
+.dark .news-content a,
+.dark .prose a {
+  color: #2563eb !important;
+  text-decoration: underline !important;
+}
+
+/* Exception: Keep headings black but bold */
+.news-content h1,
+.news-content h2,
+.news-content h3,
+.prose h1,
+.prose h2,
+.prose h3,
+.dark .news-content h1,
+.dark .news-content h2,
+.dark .news-content h3,
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3 {
+  color: #000000 !important;
+  font-weight: bold !important;
+}
+
+/* Removed global text-gray overrides - let Tailwind classes work naturally */
+/* This was forcing navigation links to black even when they had text-blue-600 */
+
+/* Add blue borders to cards for better look */
+.news-card,
+.event-card {
+  border: 2px solid #3b82f6 !important;
+  border-radius: 0.75rem !important;
+}
+
+.news-card:hover,
+.event-card:hover {
+  border-color: #2563eb !important;
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15) !important;
 }
 
 /* Hide scrollbar for better mobile UX */
@@ -55,7 +332,7 @@ main,
   display: none;  /* Chrome, Safari and Opera */
 }
 
-/* Beautiful Blue and White theme - Light mode */
+/* Beautiful Blue and White theme - Light mode ONLY */
 :root,
 .light {
   --background: #ffffff;
@@ -77,25 +354,25 @@ main,
   --gradient-to: #2563eb;
 }
 
-/* Dark Blue theme */
+/* Dark theme DISABLED - using light theme variables */
 .dark {
-  --background: #1d4ed8;
-  --foreground: #eff6ff;
-  --card: #2563eb;
-  --card-foreground: #eff6ff;
-  --primary: #93c5fd;
-  --primary-foreground: #1d4ed8;
-  --secondary: #2563eb;
-  --secondary-foreground: #dbeafe;
-  --muted: #2563eb;
-  --muted-foreground: #93c5fd;
-  --accent: #3b82f6;
-  --accent-foreground: #dbeafe;
-  --border: #2563eb;
-  --input: #2563eb;
-  --ring: #93c5fd;
-  --gradient-from: #93c5fd;
-  --gradient-to: #3b82f6;
+  --background: #ffffff;
+  --foreground: #1f2937;
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #eff6ff;
+  --secondary-foreground: #374151;
+  --muted: #dbeafe;
+  --muted-foreground: #78716c;
+  --accent: #dbeafe;
+  --accent-foreground: #2563eb;
+  --border: #93c5fd;
+  --input: #ffffff;
+  --ring: #3b82f6;
+  --gradient-from: #3b82f6;
+  --gradient-to: #2563eb;
 }
 
 /* Tamil font support */
@@ -291,161 +568,11 @@ p {
 }
 
 /* Mobile-first responsive typography */
-.prose {
-  font-size: 1rem !important; /* 16px - comfortable size */
-  font-weight: 500 !important; /* Medium weight - not too bold */
-  line-height: 1.75 !important;
-  letter-spacing: 0.02em !important; /* Better letter spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
-}
+/* REMOVED: Global .prose white color rules - these were breaking admin editor */
+/* Typography rules are now only in .news-content and .event-description sections below */
 
-.prose p {
-  font-size: 1rem !important; /* 16px */
-  font-weight: 500 !important; /* Medium weight */
-  line-height: 1.75 !important;
-  margin-bottom: 1.5rem !important;
-  letter-spacing: 0.02em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
-}
-
-.prose h1 {
-  font-size: 2rem !important; /* 32px */
-  font-weight: 700 !important; /* Bold but not extra bold */
-  line-height: 1.3 !important;
-  margin-bottom: 1rem !important;
-  letter-spacing: 0.01em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
-}
-
-.prose h2 {
-  font-size: 1.75rem !important; /* 28px */
-  font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.4 !important;
-  margin-bottom: 0.875rem !important;
-  letter-spacing: 0.015em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
-}
-
-.prose h3 {
-  font-size: 1.5rem !important; /* 24px */
-  font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.4 !important;
-  margin-bottom: 0.75rem !important;
-  letter-spacing: 0.02em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
-}
-
-.prose h4 {
-  font-size: 1.25rem !important; /* 20px */
-  font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.5 !important;
-  letter-spacing: 0.02em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
-}
-
-.prose h5 {
-  font-size: 1.125rem !important; /* 18px */
-  font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.5 !important;
-  letter-spacing: 0.02em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
-}
-
-.prose h6 {
-  font-size: 1rem !important; /* 16px */
-  font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.5 !important;
-  letter-spacing: 0.02em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
-}
-
-@media (min-width: 640px) {
-  .prose {
-    font-size: 1.0625rem !important; /* 17px */
-    line-height: 1.8 !important;
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose p {
-    font-size: 1.0625rem !important; /* 17px */
-    line-height: 1.8 !important;
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose h1 {
-    font-size: 2.25rem !important; /* 36px */
-    letter-spacing: 0.015em !important;
-  }
-
-  .prose h2 {
-    font-size: 1.875rem !important; /* 30px */
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose h3 {
-    font-size: 1.625rem !important; /* 26px */
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose h4 {
-    font-size: 1.375rem !important; /* 22px */
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose h5 {
-    font-size: 1.1875rem !important; /* 19px */
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose h6 {
-    font-size: 1.0625rem !important; /* 17px */
-    letter-spacing: 0.02em !important;
-  }
-}
-
-@media (min-width: 1024px) {
-  .prose {
-    font-size: 1.125rem !important; /* 18px */
-    line-height: 1.85 !important;
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose p {
-    font-size: 1.125rem !important; /* 18px */
-    line-height: 1.85 !important;
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose h1 {
-    font-size: 2.5rem !important; /* 40px */
-    letter-spacing: 0.015em !important;
-  }
-
-  .prose h2 {
-    font-size: 2rem !important; /* 32px */
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose h3 {
-    font-size: 1.75rem !important; /* 28px */
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose h4 {
-    font-size: 1.5rem !important; /* 24px */
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose h5 {
-    font-size: 1.25rem !important; /* 20px */
-    letter-spacing: 0.02em !important;
-  }
-
-  .prose h6 {
-    font-size: 1.125rem !important; /* 18px */
-    letter-spacing: 0.02em !important;
-  }
-}
+/* REMOVED: Responsive .prose typography rules */
+/* These were breaking admin editor - typography is now only in .news-content and .event-description */
 
 /* Mobile-optimized spacing */
 .mobile-padding {
@@ -508,30 +635,21 @@ p {
   background-clip: text;
 }
 
-/* Glass morphism effect */
+/* Glass morphism effect - Light theme only */
 .glass {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.dark .glass {
-  background: rgba(120, 53, 15, 0.3);
-  border: 1px solid rgba(251, 191, 36, 0.2);
-}
-
-/* Hover effects */
+/* Hover effects - Light theme only */
 .hover-lift {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15);
-}
-
-.dark .hover-lift:hover {
-  box-shadow: 0 10px 25px rgba(251, 191, 36, 0.25);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
 }
 
 /* Optimize for performance */
@@ -543,21 +661,21 @@ p {
   will-change: opacity;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - Light theme only */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-gray-100;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  @apply bg-gray-300 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
+  @apply bg-gray-400;
 }
 
 /* Line clamp utilities */
@@ -788,13 +906,25 @@ img {
   color: #ffffff !important; /* Pure white */
 }
 
+/* Event Details Wrapper - Force black text for all event details */
+.event-details-wrapper,
+.event-details-wrapper *,
+.event-details-wrapper p,
+.event-details-wrapper div,
+.event-details-wrapper span,
+.event-details-wrapper h1,
+.event-details-wrapper h2,
+.event-details-wrapper h3 {
+  color: #000000 !important;
+}
+
 /* Event Description Typography - Enhanced Readability */
 .event-description {
   font-size: 1rem !important; /* 16px - comfortable size */
   font-weight: 500 !important; /* Medium weight - not too bold */
   line-height: 1.8 !important; /* Good line height for better readability */
   letter-spacing: 0.025em !important; /* Better letter spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
+  color: #000000 !important; /* Black text for readability */
 }
 
 .event-description p {
@@ -803,7 +933,7 @@ img {
   line-height: 1.8 !important;
   margin-bottom: 1.5rem !important; /* Good space between paragraphs */
   letter-spacing: 0.025em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
+  color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h1 {
@@ -813,7 +943,7 @@ img {
   margin-bottom: 1.25rem !important;
   margin-top: 2rem !important;
   letter-spacing: 0.015em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
+  color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h2 {
@@ -823,7 +953,7 @@ img {
   margin-bottom: 1rem !important;
   margin-top: 1.75rem !important;
   letter-spacing: 0.02em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
+  color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h3 {
@@ -833,7 +963,7 @@ img {
   margin-bottom: 0.875rem !important;
   margin-top: 1.5rem !important;
   letter-spacing: 0.02em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
+  color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h4 {
@@ -843,7 +973,7 @@ img {
   margin-bottom: 0.75rem !important;
   margin-top: 1.25rem !important;
   letter-spacing: 0.02em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
+  color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h5 {
@@ -853,7 +983,7 @@ img {
   margin-bottom: 0.625rem !important;
   margin-top: 1rem !important;
   letter-spacing: 0.02em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
+  color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h6 {
@@ -863,7 +993,7 @@ img {
   margin-bottom: 0.5rem !important;
   margin-top: 0.875rem !important;
   letter-spacing: 0.02em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
+  color: #000000 !important; /* Black text for readability */
 }
 
 .event-description ul,
@@ -874,18 +1004,18 @@ img {
   margin-bottom: 1.5rem !important;
   padding-left: 2rem !important;
   letter-spacing: 0.025em !important; /* Better spacing for Tamil */
-  color: #ffffff !important; /* Pure white */
+  color: #000000 !important; /* Black text for readability */
 }
 
 .event-description li {
   margin-bottom: 0.75rem !important; /* Good space between list items */
-  color: #ffffff !important; /* Pure white */
+  color: #000000 !important; /* Black text for readability */
 }
 
 .event-description strong,
 .event-description b {
   font-weight: 700 !important; /* Bold for emphasis, not extra bold */
-  color: #ffffff !important; /* Pure white */
+  color: #000000 !important; /* Black text for readability */
 }
 
 /* Responsive typography for mobile - News & Events */
@@ -1037,3 +1167,77 @@ img {
     letter-spacing: 0.02em !important;
   }
 }
+
+/* Admin page specific styles */
+/* Ensure admin editor text is always black, never white */
+.ProseMirror,
+.ProseMirror *,
+.ProseMirror p,
+.ProseMirror div,
+.ProseMirror span,
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6,
+.ProseMirror li,
+.ProseMirror ul,
+.ProseMirror ol {
+  color: #374151 !important; /* Dark gray text for editor */
+}
+
+/* Ensure admin sidebar is visible */
+.admin-sidebar {
+  background-color: #ffffff !important;
+}
+
+/* Ensure images are visible in event descriptions */
+.event-description img {
+  display: block !important;
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 1.5rem auto !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  background-color: transparent !important;
+  border: 3px solid #3b82f6 !important; /* Blue border to make images obvious */
+}
+
+/* Ensure images are visible in news content */
+.news-content img {
+  display: block !important;
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 1.5rem auto !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Force white text on primary and danger buttons */
+button.gradient-bg,
+button.gradient-bg *,
+button.bg-red-600,
+button.bg-red-600 * {
+  color: #ffffff !important;
+}
+
+/* Ensure images are visible in ProseMirror editor */
+.ProseMirror img {
+  display: block !important;
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 1rem auto !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ========================================
+   END OF STYLES
+   ======================================== */

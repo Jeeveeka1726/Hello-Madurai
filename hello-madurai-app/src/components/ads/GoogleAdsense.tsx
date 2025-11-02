@@ -49,8 +49,8 @@ export default function GoogleAdsense({
   // Don't render ads in development unless explicitly enabled
   if (!shouldShowAds()) {
     return (
-      <div className={`adsense-placeholder ${className} border-2 border-dashed border-gray-300 dark:border-gray-600 p-4 text-center`}>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">
+      <div className={`adsense-placeholder ${className} border-2 border-dashed border-gray-300 p-4 text-center`}>
+        <p className="text-gray-500 text-sm">
           📢 Ad Space - Will show after AdSense approval
         </p>
       </div>

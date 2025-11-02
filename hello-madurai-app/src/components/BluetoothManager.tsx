@@ -242,13 +242,13 @@ export default function BluetoothManager({
 
   if (!isSupported) {
     return (
-      <div className={`p-4 bg-gray-100 dark:bg-gray-800 rounded-lg ${className}`}>
+      <div className={`p-4 bg-gray-100 rounded-lg ${className}`}>
         <div className="text-center">
           <XCircleIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
             {t('bluetooth.notSupported', 'Bluetooth Not Supported', 'புளூடூத் ஆதரிக்கப்படவில்லை')}
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 text-sm">
+          <p className="text-gray-600 text-sm">
             {t('bluetooth.notSupportedDesc', 'Your browser or device does not support Bluetooth connectivity.', 'உங்கள் உலாவி அல்லது சாதனம் புளூடூத் இணைப்பை ஆதரிக்கவில்லை.')}
           </p>
         </div>
@@ -257,13 +257,13 @@ export default function BluetoothManager({
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-white rounded-lg border border-gray-200 ${className}`}>
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <WifiIcon className="h-6 w-6 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-gray-900">
               {t('bluetooth.title', 'Bluetooth Devices', 'புளூடூத் சாதனங்கள்')}
             </h3>
           </div>
@@ -287,7 +287,7 @@ export default function BluetoothManager({
 
       {/* Connected Device */}
       {connectedDevice && (
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/30 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 bg-blue-50 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-600 rounded-lg">
@@ -297,10 +297,10 @@ export default function BluetoothManager({
                 })()}
               </div>
               <div>
-                <p className="font-medium text-blue-900 dark:text-blue-100">
+                <p className="font-medium text-blue-900">
                   {connectedDevice.name}
                 </p>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
+                <p className="text-sm text-blue-700">
                   {t('bluetooth.connected', 'Connected', 'இணைக்கப்பட்டது')}
                   {connectedDevice.battery && ` • ${connectedDevice.battery}% battery`}
                 </p>
@@ -308,7 +308,7 @@ export default function BluetoothManager({
             </div>
             <button
               onClick={() => disconnectDevice(connectedDevice)}
-              className="text-sm text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100"
+              className="text-sm text-blue-700 hover:text-blue-900"
             >
               {t('bluetooth.disconnect', 'Disconnect', 'துண்டிக்கவும்')}
             </button>
@@ -318,8 +318,8 @@ export default function BluetoothManager({
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/30 border-b border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+        <div className="p-4 bg-red-50 border-b border-gray-200">
+          <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
 
@@ -328,7 +328,7 @@ export default function BluetoothManager({
         {devices.length === 0 ? (
           <div className="text-center py-8">
             <WifiIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600">
               {t('bluetooth.noDevices', 'No Bluetooth devices found. Tap scan to discover devices.', 'புளூடூத் சாதனங்கள் எதுவும் கிடைக்கவில்லை. சாதனங்களைக் கண்டறிய ஸ்கேன் என்பதைத் தட்டவும்.')}
             </p>
           </div>
@@ -339,17 +339,17 @@ export default function BluetoothManager({
               return (
                 <div
                   key={device.id}
-                  className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${device.connected ? 'bg-green-100 dark:bg-green-900/30' : 'bg-gray-100 dark:bg-gray-700'}`}>
-                      <IconComponent className={`h-5 w-5 ${device.connected ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'}`} />
+                    <div className={`p-2 rounded-lg ${device.connected ? 'bg-green-100' : 'bg-gray-100'}`}>
+                      <IconComponent className={`h-5 w-5 ${device.connected ? 'text-green-600' : 'text-gray-600'}`} />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">
+                      <p className="font-medium text-gray-900">
                         {device.name}
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-gray-600">
                         {device.connected 
                           ? t('bluetooth.connected', 'Connected', 'இணைக்கப்பட்டது')
                           : t('bluetooth.available', 'Available', 'கிடைக்கிறது')
@@ -364,7 +364,7 @@ export default function BluetoothManager({
                         <CheckCircleIcon className="h-5 w-5 text-green-500" />
                         <button
                           onClick={() => disconnectDevice(device)}
-                          className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                          className="text-sm text-red-600 hover:text-red-800"
                         >
                           {t('bluetooth.disconnect', 'Disconnect', 'துண்டிக்கவும்')}
                         </button>
@@ -372,7 +372,7 @@ export default function BluetoothManager({
                     ) : (
                       <button
                         onClick={() => connectToDevice(device)}
-                        className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        className="text-sm text-blue-600 hover:text-blue-800"
                       >
                         {t('bluetooth.connect', 'Connect', 'இணைக்கவும்')}
                       </button>
@@ -387,8 +387,8 @@ export default function BluetoothManager({
 
       {/* Audio Streaming Info */}
       {connectedDevice && (
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="p-4 border-t border-gray-200 bg-gray-50">
+          <p className="text-sm text-gray-600">
             <SpeakerWaveIcon className="h-4 w-4 inline mr-1" />
             {t('bluetooth.audioStreaming', 'Audio will stream to connected Bluetooth device', 'ஆடியோ இணைக்கப்பட்ட புளூடூத் சாதனத்திற்கு ஸ்ட்ரீம் செய்யப்படும்')}
           </p>

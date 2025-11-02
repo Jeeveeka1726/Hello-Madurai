@@ -161,10 +161,10 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-gray-900">
             {t('admin.notifications.title', 'Notification Manager', 'அறிவிப்பு மேலாளர்')}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             {t('admin.notifications.subtitle', 'Send push notifications, emails, and SMS to your users', 'உங்கள் பயனர்களுக்கு புஷ் அறிவிப்புகள், மின்னஞ்சல்கள் மற்றும் SMS அனுப்பவும்')}
           </p>
         </div>
@@ -180,11 +180,11 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
 
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Sent</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-600">Total Sent</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {notifications.filter(n => n.status === 'sent').length}
               </p>
             </div>
@@ -192,11 +192,11 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Scheduled</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-600">Scheduled</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {notifications.filter(n => n.status === 'scheduled').length}
               </p>
             </div>
@@ -204,11 +204,11 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Drafts</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-600">Drafts</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {notifications.filter(n => n.status === 'draft').length}
               </p>
             </div>
@@ -216,11 +216,11 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Failed</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-600">Failed</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {notifications.filter(n => n.status === 'failed').length}
               </p>
             </div>
@@ -230,9 +230,9 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
       </div>
 
       {/* Notifications List */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="p-6 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">
             {t('admin.notifications.allNotifications', 'All Notifications', 'அனைத்து அறிவிப்புகள்')}
           </h3>
         </div>
@@ -240,23 +240,23 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">Loading notifications...</p>
+            <p className="text-gray-600 mt-2">Loading notifications...</p>
           </div>
         ) : notifications.length === 0 ? (
           <div className="p-8 text-center">
             <BellIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">No notifications created yet.</p>
+            <p className="text-gray-600">No notifications created yet.</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          <div className="divide-y divide-gray-200">
             {notifications.map((notification) => {
               const StatusIcon = getStatusIcon(notification.status)
               return (
-                <div key={notification.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <div key={notification.id} className="p-6 hover:bg-gray-50 transition-colors">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h4 className="text-lg font-semibold text-gray-900">
                           {notification.title}
                         </h4>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(notification.status)}`}>
@@ -267,11 +267,11 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
                         </span>
                       </div>
                       
-                      <p className="text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                      <p className="text-gray-600 mb-3 line-clamp-2">
                         {notification.message}
                       </p>
 
-                      <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
                         <div className="flex items-center gap-1">
                           <UserGroupIcon className="h-4 w-4" />
                           <span>{notification.targetAudience}</span>
@@ -314,7 +314,7 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
                       
                       <button
                         onClick={() => setSelectedNotification(notification)}
-                        className="px-3 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded transition-colors"
+                        className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded transition-colors"
                       >
                         View
                       </button>
@@ -330,9 +330,9 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
       {/* Create Notification Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">
                 {t('admin.notifications.createNew', 'Create New Notification', 'புதிய அறிவிப்பை உருவாக்கவும்')}
               </h3>
             </div>
@@ -340,41 +340,41 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
             <div className="p-6 space-y-6">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Title
                 </label>
                 <input
                   type="text"
                   value={newNotification.title}
                   onChange={(e) => setNewNotification(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
                   placeholder="Notification title..."
                 />
               </div>
 
               {/* Message */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Message
                 </label>
                 <textarea
                   value={newNotification.message}
                   onChange={(e) => setNewNotification(prev => ({ ...prev, message: e.target.value }))}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
                   placeholder="Notification message..."
                 />
               </div>
 
               {/* Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Type
                 </label>
                 <select
                   value={newNotification.type}
                   onChange={(e) => setNewNotification(prev => ({ ...prev, type: e.target.value as any }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
                 >
                   <option value="general">General</option>
                   <option value="news">News</option>
@@ -385,13 +385,13 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
 
               {/* Target Audience */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Target Audience
                 </label>
                 <select
                   value={newNotification.targetAudience}
                   onChange={(e) => setNewNotification(prev => ({ ...prev, targetAudience: e.target.value as any }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
                 >
                   <option value="all">All Users</option>
                   <option value="subscribers">Subscribers Only</option>
@@ -401,7 +401,7 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
 
               {/* Channels */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Delivery Channels
                 </label>
                 <div className="space-y-2">
@@ -426,7 +426,7 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
                         }}
                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 capitalize">
+                      <span className="ml-2 text-sm text-gray-700 capitalize">
                         {channel} Notification
                       </span>
                     </label>
@@ -435,10 +435,10 @@ export default function AdminNotificationManager({ className = '' }: AdminNotifi
               </div>
             </div>
 
-            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+            <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 Cancel
               </button>

@@ -95,14 +95,14 @@ function MagazinePageContent() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
             {t('magazine.title', 'Hello Madurai E-Paper', 'ஹலோ மதுரை பத்திரிகை')}
           </h1>
-          <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-lg text-gray-600">
             {t('magazine.subtitle', 'Download and read our digital magazine issues', 'எங்கள் டிஜிட்டல் பத்திரிகை இதழ்களை பதிவிறக்கம் செய்து படியுங்கள்')}
           </p>
         </div>
@@ -110,21 +110,21 @@ function MagazinePageContent() {
         {/* Magazine Collections */}
         {!loading && collections.length > 0 && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t('magazine.collections', 'E-Paper Collections', 'பத்திரிகை தொகுப்புகள்')}
             </h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {collections.map((collection) => (
-                <Card key={collection.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-blue-800">
+                <Card key={collection.id} className="hover:shadow-lg transition-shadow bg-white text-gray-900 border-gray-200">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <FolderIcon className="h-8 w-8 text-blue-600 dark:text-yellow-400 mr-3" />
+                      <FolderIcon className="h-8 w-8 text-blue-600 mr-3" />
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-lg font-semibold text-gray-900">
                           {collection.name}
                         </h3>
                         {collection.name_ta && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-gray-600">
                             {collection.name_ta}
                           </p>
                         )}
@@ -132,17 +132,17 @@ function MagazinePageContent() {
                     </div>
 
                     {collection.description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                      <p className="text-sm text-gray-600 mb-4">
                         {collection.description}
                       </p>
                     )}
 
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      <span className="text-sm text-gray-500">
                         {collection.magazines.length} {t('magazine.issues', 'issues', 'இதழ்கள்')}
                       </span>
                       {collection.featured && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800">
                           <StarIcon className="h-3 w-3 mr-1" />
                           {t('magazine.featured', 'Featured', 'சிறப்பு')}
                         </span>
@@ -166,17 +166,17 @@ function MagazinePageContent() {
         {/* Featured Issues from All Collections */}
         {!loading && featuredMagazines.length > 0 && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t('magazine.featured', 'Featured Issues', 'சிறப்பு இதழ்கள்')}
             </h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {featuredMagazines.map((magazine) => (
-                <Card key={magazine.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 border-gray-200 dark:border-blue-800">
-                  <div className="aspect-w-16 aspect-h-12 bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-800 dark:to-yellow-900">
+                <Card key={magazine.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200">
+                  <div className="aspect-w-16 aspect-h-12 bg-gradient-to-br from-yellow-100 to-yellow-200">
                     <div className="flex items-center justify-center">
                       <div className="text-center">
-                        <DocumentArrowDownIcon className="h-16 w-16 text-blue-600 dark:text-yellow-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <DocumentArrowDownIcon className="h-16 w-16 text-blue-600 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600">
                           {t('magazine.issue', 'Issue', 'இதழ்')} #{magazine.issueNumber}
                         </p>
                       </div>
@@ -184,28 +184,28 @@ function MagazinePageContent() {
                   </div>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-blue-800">
                         <StarIcon className="h-3 w-3 mr-1" />
                         {t('magazine.featured', 'Featured', 'சிறப்பு')}
                       </span>
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center text-sm text-gray-500">
                         <CalendarIcon className="h-4 w-4 mr-1" />
                         {formatDate(magazine.publishedAt || magazine.publicationDate)}
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">
                       {magazine.title}
                     </h3>
                     {magazine.title_ta && (
-                      <h4 className="text-lg text-gray-600 dark:text-gray-400 mb-3">
+                      <h4 className="text-lg text-gray-600 mb-3">
                         {magazine.title_ta}
                       </h4>
                     )}
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                    <p className="text-gray-600 mb-4 line-clamp-3">
                       {magazine.description}
                     </p>
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center text-sm text-gray-500">
                         <EyeIcon className="h-4 w-4 mr-1" />
                         {magazine.downloads} {t('magazine.downloads', 'downloads', 'பதிவிறக்கங்கள்')}
                       </div>

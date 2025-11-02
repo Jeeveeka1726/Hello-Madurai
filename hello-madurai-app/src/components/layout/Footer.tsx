@@ -52,16 +52,16 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="bg-blue-950 text-white">
+    <footer className="bg-gray-900 text-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="flex items-center mb-4">
               <span className="text-2xl font-bold text-white">Hello Madurai</span>
-              <span className="ml-2 text-lg text-blue-200">ஹலோ மதுரை</span>
+              <span className="ml-2 text-lg text-gray-300">ஹலோ மதுரை</span>
             </Link>
-            <p className="text-blue-200 mb-4 max-w-md" suppressHydrationWarning>
+            <p className="text-gray-300 mb-4 max-w-md" suppressHydrationWarning>
               {t('footer.description', 'Your local news and information hub. Stay connected with the latest news, events, and services from Madurai and surrounding areas.', 'உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம். மதுரை மற்றும் சுற்றுவட்டார பகுதிகளின் சமீபத்திய செய்திகள், நிகழ்வுகள் மற்றும் சேவைகளை அறிந்து கொள்ளுங்கள்.')}
             </p>
             <div className="flex space-x-4">
@@ -71,7 +71,7 @@ export default function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-300 hover:text-white transition-colors duration-200"
+                  className="text-gray-400 hover:text-white transition-colors duration-200"
                   title={`Follow us on ${social.name}`}
                 >
                   {social.icon}
@@ -90,7 +90,7 @@ export default function Footer() {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-blue-300 hover:text-white transition-colors duration-200"
+                    className="text-gray-400 hover:text-white transition-colors duration-200"
                     suppressHydrationWarning
                   >
                     {t(`nav.${link.name}`, link.name, link.name)}
@@ -110,7 +110,7 @@ export default function Footer() {
                 <li key={service.name}>
                   <Link
                     href={service.href}
-                    className="text-blue-300 hover:text-white transition-colors duration-200"
+                    className="text-gray-400 hover:text-white transition-colors duration-200"
                     suppressHydrationWarning
                   >
                     {t(`nav.${service.name}`, service.name, service.name)}
@@ -122,19 +122,19 @@ export default function Footer() {
         </div>
 
         {/* Bottom section */}
-        <div className="mt-8 pt-8 border-t border-blue-800">
+        <div className="mt-8 pt-8 border-t border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-blue-300 text-sm" suppressHydrationWarning>
+            <p className="text-gray-400 text-sm" suppressHydrationWarning>
               © {currentYear} Hello Madurai. {t('footer.copyright', 'All rights reserved.', 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.')}
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="/privacy" className="text-blue-300 hover:text-white text-sm transition-colors duration-200" suppressHydrationWarning>
+              <Link href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors duration-200" suppressHydrationWarning>
                 {t('footer.privacy', 'Privacy Policy', 'தனியுரிமை கொள்கை')}
               </Link>
-              <Link href="/terms" className="text-blue-300 hover:text-white text-sm transition-colors duration-200" suppressHydrationWarning>
+              <Link href="/terms" className="text-gray-400 hover:text-white text-sm transition-colors duration-200" suppressHydrationWarning>
                 {t('footer.terms', 'Terms of Service', 'விதிமுறைகள்')}
               </Link>
-              <Link href="/contact" className="text-blue-300 hover:text-white text-sm transition-colors duration-200" suppressHydrationWarning>
+              <Link href="/contact" className="text-gray-400 hover:text-white text-sm transition-colors duration-200" suppressHydrationWarning>
                 {t('footer.contact', 'Contact', 'தொடர்பு')}
               </Link>
             </div>

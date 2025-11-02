@@ -11,34 +11,56 @@ interface AppWrapperProps {
   children: React.ReactNode
   showHeader?: boolean
   showFooter?: boolean
+  noWrapper?: boolean
 }
 
-export default function AppWrapper({ 
-  children, 
-  showHeader = true, 
-  showFooter = true 
+export default function AppWrapper({
+  children,
+  showHeader = true,
+  showFooter = true,
+  noWrapper = false
 }: AppWrapperProps) {
   return (
     <ThemeProvider>
       <LanguageProvider>
         <AdminProvider>
-          <div className="min-h-screen bg-white dark:bg-blue-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-            {showHeader && <NewHeader />}
-            <main>
+          {noWrapper ? (
+            <>
+              {showHeader && <NewHeader />}
               {children}
-            </main>
-            {showFooter && <Footer />}
-          </div>
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#363636',
-                color: '#fff',
-              },
-            }}
-          />
+              {showFooter && <Footer />}
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    background: '#363636',
+                    color: '#fff',
+                  },
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <div className="min-h-screen bg-white text-gray-900 transition-colors duration-300">
+                {showHeader && <NewHeader />}
+                <main>
+                  {children}
+                </main>
+                {showFooter && <Footer />}
+              </div>
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    background: '#363636',
+                    color: '#fff',
+                  },
+                }}
+              />
+            </>
+          )}
         </AdminProvider>
       </LanguageProvider>
     </ThemeProvider>

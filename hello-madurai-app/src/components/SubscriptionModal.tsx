@@ -102,12 +102,12 @@ export default function SubscriptionModal({ isOpen, onClose, onSubscribe }: Subs
   if (isSuccess) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-8 text-center">
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8 text-center">
           <CheckCircleIcon className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
             {t('subscription.success.title', 'Successfully Subscribed!', 'வெற்றிகரமாக சந்தா செய்யப்பட்டது!')}
           </h3>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600">
             {t('subscription.success.message', 'You will receive notifications for your selected categories.', 'நீங்கள் தேர்ந்தெடுத்த வகைகளுக்கான அறிவிப்புகளைப் பெறுவீர்கள்.')}
           </p>
         </div>
@@ -117,12 +117,12 @@ export default function SubscriptionModal({ isOpen, onClose, onSubscribe }: Subs
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <BellIcon className="h-6 w-6 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-gray-900">
               {t('subscription.title', 'Subscribe for Updates', 'புதுப்பிப்புகளுக்கு சந்தா செய்யுங்கள்')}
             </h3>
           </div>
@@ -136,55 +136,55 @@ export default function SubscriptionModal({ isOpen, onClose, onSubscribe }: Subs
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
+          <p className="text-gray-600 mb-6">
             {t('subscription.description', 'Get notified about latest news, events, and updates from Hello Madurai.', 'ஹலோ மதுரையின் சமீபத்திய செய்திகள், நிகழ்வுகள் மற்றும் புதுப்பிப்புகள் பற்றி அறிவிப்பு பெறுங்கள்.')}
           </p>
 
           {/* Name */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               {t('subscription.form.name', 'Name', 'பெயர்')}
             </label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
               placeholder={t('subscription.form.namePlaceholder', 'Your name', 'உங்கள் பெயர்')}
             />
           </div>
 
           {/* Email */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               {t('subscription.form.email', 'Email', 'மின்னஞ்சல்')}
             </label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
               placeholder={t('subscription.form.emailPlaceholder', 'your@email.com', 'உங்கள்@மின்னஞ்சல்.com')}
             />
           </div>
 
           {/* Phone */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               {t('subscription.form.phone', 'Phone (Optional)', 'தொலைபேசி (விருப்பம்)')}
             </label>
             <input
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
               placeholder={t('subscription.form.phonePlaceholder', '+91 9876543210', '+91 9876543210')}
             />
           </div>
 
           {/* Categories */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
               {t('subscription.form.categories', 'Select Categories', 'வகைகளைத் தேர்ந்தெடுக்கவும்')} *
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -199,7 +199,7 @@ export default function SubscriptionModal({ isOpen, onClose, onSubscribe }: Subs
                     onChange={() => handleCategoryChange(category.id)}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="text-sm text-gray-700">
                     {category.name}
                   </span>
                 </label>
@@ -212,7 +212,7 @@ export default function SubscriptionModal({ isOpen, onClose, onSubscribe }: Subs
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               {t('subscription.form.cancel', 'Cancel', 'ரத்து')}
             </button>

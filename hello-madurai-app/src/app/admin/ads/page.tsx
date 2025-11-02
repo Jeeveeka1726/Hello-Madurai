@@ -196,10 +196,10 @@ export default function AdminAdsPage() {
 
   if (loading && !showForm) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+      <div className="min-h-screen bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-gray-600">
               {language === 'ta' ? 'ஏற்றுகிறது...' : 'Loading...'}
             </p>
           </div>
@@ -209,15 +209,15 @@ export default function AdminAdsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               {language === 'ta' ? 'விளம்பர மேலாண்மை' : 'Ads Management'}
             </h1>
-            <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
+            <p className="mt-2 text-sm sm:text-base text-gray-600">
               {language === 'ta' 
                 ? 'செய்தி கட்டுரைகளில் தானாக காண்பிக்க விளம்பரங்களை நிர்வகிக்கவும்'
                 : 'Manage ads that appear automatically in news articles'}
@@ -247,9 +247,9 @@ export default function AdminAdsPage() {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
-            <Card className="w-full max-w-2xl sm:max-w-3xl max-h-[95vh] overflow-y-auto bg-white dark:bg-blue-900">
+            <Card className="w-full max-w-2xl sm:max-w-3xl max-h-[95vh] overflow-y-auto bg-white">
               <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-white">
+                <CardTitle className="text-gray-900">
                   {editingAd ? (language === 'ta' ? 'விளம்பரத்தை திருத்து' : 'Edit Ad') : (language === 'ta' ? 'புதிய விளம்பரம்' : 'New Ad')}
                 </CardTitle>
               </CardHeader>
@@ -257,7 +257,7 @@ export default function AdminAdsPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Title */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       {language === 'ta' ? 'தலைப்பு' : 'Title'} *
                     </label>
                     <input
@@ -266,7 +266,7 @@ export default function AdminAdsPage() {
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                       placeholder={language === 'ta' ? 'விளம்பர தலைப்பு' : 'Ad title'}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-800 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -274,7 +274,7 @@ export default function AdminAdsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Image Option */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <PhotoIcon className="h-4 w-4 inline mr-1" />
                         {language === 'ta' ? 'படம் பதிவேற்றம்' : 'Image Upload'}
                       </label>
@@ -287,9 +287,9 @@ export default function AdminAdsPage() {
                             if (file) handleImageUpload(file)
                           }}
                           disabled={uploading}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-blue-700 rounded-md text-sm dark:bg-blue-800 dark:text-white"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                         />
-                        <p className="text-xs text-blue-600 dark:text-blue-400">
+                        <p className="text-xs text-blue-600">
                           ✅ {language === 'ta' 
                             ? 'படங்கள் தானாக 1280×720 px அளவுக்கு மாற்றப்படும்' 
                             : 'Images will be auto-resized to 1280×720 px'}
@@ -306,7 +306,7 @@ export default function AdminAdsPage() {
 
                     {/* HTML Code Option */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <CodeBracketIcon className="h-4 w-4 inline mr-1" />
                         {language === 'ta' ? 'HTML குறியீடு (AdSense)' : 'HTML Code (AdSense)'}
                       </label>
@@ -315,9 +315,9 @@ export default function AdminAdsPage() {
                         onChange={(e) => setFormData({ ...formData, htmlCode: e.target.value })}
                         placeholder="<script>...</script>"
                         rows={4}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-800 dark:text-white text-sm font-mono"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-mono"
                       />
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-xs text-gray-500 mt-1">
                         {language === 'ta' 
                           ? 'Google AdSense அல்லது HTML குறியீடு ஒட்டவும்'
                           : 'Paste Google AdSense or custom HTML code'}
@@ -327,7 +327,7 @@ export default function AdminAdsPage() {
 
                   {/* Link */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       {language === 'ta' ? 'இணைப்பு URL (விருப்பம்)' : 'Link URL (Optional)'}
                     </label>
                     <input
@@ -335,14 +335,14 @@ export default function AdminAdsPage() {
                       value={formData.link}
                       onChange={(e) => setFormData({ ...formData, link: e.target.value })}
                       placeholder="https://example.com"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-800 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
                   {/* Settings */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         {language === 'ta' ? 'நிலை' : 'Position'}
                       </label>
                       <input
@@ -350,22 +350,22 @@ export default function AdminAdsPage() {
                         value={formData.position}
                         onChange={(e) => setFormData({ ...formData, position: parseInt(e.target.value) })}
                         min="0"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-xs text-gray-500 mt-1">
                         {language === 'ta' 
                           ? 'குறைந்த எண் = அதிக முன்னுரிமை (0 = முதல் விளம்பரம்)' 
                           : 'Lower number = Higher priority (0 = First ad)'}
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         {language === 'ta' ? 'வகை' : 'Category'}
                       </label>
                       <select
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="news">{language === 'ta' ? 'செய்திகள்' : 'News'}</option>
                         <option value="all">{language === 'ta' ? 'அனைத்தும்' : 'All'}</option>
@@ -381,7 +381,7 @@ export default function AdminAdsPage() {
                       onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
                       className="mr-2"
                     />
-                    <label className="text-sm text-gray-700 dark:text-gray-300">
+                    <label className="text-sm text-gray-700">
                       {language === 'ta' ? 'செயலில்' : 'Active'}
                     </label>
                   </div>
@@ -411,7 +411,7 @@ export default function AdminAdsPage() {
         {/* Ads List */}
         <div className="space-y-4">
           {ads.map((ad) => (
-            <Card key={ad.id} className="bg-white dark:bg-blue-900 border-gray-200 dark:border-blue-800">
+            <Card key={ad.id} className="bg-white border-gray-200">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -422,11 +422,11 @@ export default function AdminAdsPage() {
                         className="w-full max-w-md h-32 object-cover rounded-lg mb-4"
                       />
                     )}
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       {ad.title}
                     </h3>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                      <span className={`px-2 py-1 rounded-full ${ad.active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <span className={`px-2 py-1 rounded-full ${ad.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                         {ad.active ? (language === 'ta' ? 'செயலில்' : 'Active') : (language === 'ta' ? 'செயலற்றது' : 'Inactive')}
                       </span>
                       <span>👁️ {ad.impressions} {language === 'ta' ? 'பார்வைகள்' : 'views'}</span>
@@ -434,7 +434,7 @@ export default function AdminAdsPage() {
                       <span>📍 {language === 'ta' ? 'நிலை' : 'Priority'}: {ad.position === 0 ? (language === 'ta' ? 'முதல்' : 'First') : ad.position}</span>
                     </div>
                     {ad.link && (
-                      <p className="mt-2 text-sm text-blue-600 dark:text-blue-400">
+                      <p className="mt-2 text-sm text-blue-600">
                         🔗 {ad.link}
                       </p>
                     )}
@@ -471,7 +471,7 @@ export default function AdminAdsPage() {
 
           {ads.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-500">
                 {language === 'ta' 
                   ? 'இதுவரை விளம்பரங்கள் எதுவும் இல்லை. முதல் விளம்பரத்தை உருவாக்குங்கள்!'
                   : 'No ads yet. Create your first ad!'}

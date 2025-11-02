@@ -185,13 +185,13 @@ export default function AdminRadioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-gray-900">
             {t('admin.radio.title', 'Radio Management', 'வானொலி மேலாண்மை')}
           </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-gray-600">
             {t('admin.radio.subtitle', 'Manage radio folders and shows', 'வானொலி கோப்புகள் மற்றும் நிகழ்ச்சிகளை நிர்வகிக்கவும்')}
           </p>
         </div>
@@ -217,9 +217,9 @@ export default function AdminRadioPage() {
 
         {/* Folder Form */}
         {showFolderForm && (
-          <Card className="mb-8 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <Card className="mb-8 bg-white border-gray-200">
             <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white">
+              <CardTitle className="text-gray-900">
                 {t('admin.radio.addNewFolder', 'Add New Radio Folder', 'புதிய வானொலி கோப்பு சேர்க்கவும்')}
               </CardTitle>
             </CardHeader>
@@ -227,32 +227,32 @@ export default function AdminRadioPage() {
               <form onSubmit={handleFolderSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('admin.name', 'Name (English)', 'பெயர் (ஆங்கிலம்)')} *
                     </label>
                     <input
                       type="text"
                       value={folderFormData.name}
                       onChange={(e) => setFolderFormData({...folderFormData, name: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('admin.nameTa', 'Name (Tamil)', 'பெயர் (தமிழ்)')}
                     </label>
                     <input
                       type="text"
                       value={folderFormData.name_ta}
                       onChange={(e) => setFolderFormData({...folderFormData, name_ta: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.radio.coverImage', 'Cover Image URL', 'அட்டைப்படம் URL')}
                   </label>
                   <input
@@ -260,31 +260,31 @@ export default function AdminRadioPage() {
                     value={folderFormData.coverImage}
                     onChange={(e) => setFolderFormData({...folderFormData, coverImage: e.target.value})}
                     placeholder="https://example.com/image.jpg"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('admin.description', 'Description (English)', 'விளக்கம் (ஆங்கிலம்)')}
                     </label>
                     <textarea
                       value={folderFormData.description}
                       onChange={(e) => setFolderFormData({...folderFormData, description: e.target.value})}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('admin.descriptionTa', 'Description (Tamil)', 'விளக்கம் (தமிழ்)')}
                     </label>
                     <textarea
                       value={folderFormData.description_ta}
                       onChange={(e) => setFolderFormData({...folderFormData, description_ta: e.target.value})}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                     />
                   </div>
                 </div>
@@ -297,7 +297,7 @@ export default function AdminRadioPage() {
                       onChange={(e) => setFolderFormData({...folderFormData, featured: e.target.checked})}
                       className="mr-2"
                     />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-medium text-gray-700">
                       {t('admin.featured', 'Featured Folder', 'சிறப்பு கோப்பு')}
                     </span>
                   </label>
@@ -322,22 +322,22 @@ export default function AdminRadioPage() {
 
         {/* Show Form */}
         {showShowForm && (
-          <Card className="mb-8 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <Card className="mb-8 bg-white border-gray-200">
             <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white">
+              <CardTitle className="text-gray-900">
                 {t('admin.radio.addNewShow', 'Add New Radio Show', 'புதிய வானொலி நிகழ்ச்சி சேர்க்கவும்')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleShowSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.radio.selectFolder', 'Select Folder', 'கோப்பை தேர்ந்தெடுக்கவும்')} *
                   </label>
                   <select
                     value={showFormData.folderId}
                     onChange={(e) => setShowFormData({...showFormData, folderId: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                     required
                   >
                     <option value="">Select a folder...</option>
@@ -351,45 +351,45 @@ export default function AdminRadioPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('admin.title', 'Title (English)', 'தலைப்பு (ஆங்கிலம்)')} *
                     </label>
                     <input
                       type="text"
                       value={showFormData.title}
                       onChange={(e) => setShowFormData({...showFormData, title: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('admin.titleTa', 'Title (Tamil)', 'தலைப்பு (தமிழ்)')}
                     </label>
                     <input
                       type="text"
                       value={showFormData.title_ta}
                       onChange={(e) => setShowFormData({...showFormData, title_ta: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('admin.radio.host', 'Host', 'தொகுப்பாளர்')} *
                     </label>
                     <input
                       type="text"
                       value={showFormData.host}
                       onChange={(e) => setShowFormData({...showFormData, host: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('admin.radio.duration', 'Duration', 'கால அளவு')} *
                     </label>
                     <input
@@ -397,20 +397,20 @@ export default function AdminRadioPage() {
                       value={showFormData.duration}
                       onChange={(e) => setShowFormData({...showFormData, duration: e.target.value})}
                       placeholder="45:30"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.radio.audio', 'Audio', 'ஆடியோ')} *
                   </label>
                   <div className="space-y-3">
                     {/* File Upload Option */}
                     <div>
-                      <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      <label className="block text-sm text-gray-600 mb-1">
                         Upload Audio File (MP3, WAV, etc.)
                       </label>
                       <input
@@ -423,10 +423,10 @@ export default function AdminRadioPage() {
                             setShowFormData({...showFormData, audioUrl: ''}) // Clear URL when file is selected
                           }
                         }}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                       />
                       {audioFile && (
-                        <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                        <p className="text-sm text-green-600 mt-1">
                           Selected: {audioFile.name}
                         </p>
                       )}
@@ -434,14 +434,14 @@ export default function AdminRadioPage() {
 
                     {/* OR Divider */}
                     <div className="flex items-center">
-                      <div className="flex-1 border-t border-gray-300 dark:border-gray-600"></div>
-                      <span className="px-3 text-sm text-gray-500 dark:text-gray-400">OR</span>
-                      <div className="flex-1 border-t border-gray-300 dark:border-gray-600"></div>
+                      <div className="flex-1 border-t border-gray-300"></div>
+                      <span className="px-3 text-sm text-gray-500">OR</span>
+                      <div className="flex-1 border-t border-gray-300"></div>
                     </div>
 
                     {/* URL Option */}
                     <div>
-                      <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      <label className="block text-sm text-gray-600 mb-1">
                         Audio URL
                       </label>
                       <input
@@ -454,7 +454,7 @@ export default function AdminRadioPage() {
                           }
                         }}
                         placeholder="https://example.com/audio.mp3"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                         disabled={!!audioFile}
                       />
                     </div>
@@ -463,26 +463,26 @@ export default function AdminRadioPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('admin.description', 'Description (English)', 'விளக்கம் (ஆங்கிலம்)')} *
                     </label>
                     <textarea
                       value={showFormData.description}
                       onChange={(e) => setShowFormData({...showFormData, description: e.target.value})}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t('admin.descriptionTa', 'Description (Tamil)', 'விளக்கம் (தமிழ்)')}
                     </label>
                     <textarea
                       value={showFormData.description_ta}
                       onChange={(e) => setShowFormData({...showFormData, description_ta: e.target.value})}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900"
                     />
                   </div>
                 </div>
@@ -495,7 +495,7 @@ export default function AdminRadioPage() {
                       onChange={(e) => setShowFormData({...showFormData, featured: e.target.checked})}
                       className="mr-2"
                     />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-medium text-gray-700">
                       {t('admin.featured', 'Featured Show', 'சிறப்பு நிகழ்ச்சி')}
                     </span>
                   </label>
@@ -533,17 +533,17 @@ export default function AdminRadioPage() {
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading radio data...</p>
+            <p className="mt-4 text-gray-600">Loading radio data...</p>
           </div>
         ) : (
           <div className="space-y-8">
             {radioFolders.map((folder) => (
-              <Card key={folder.id} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <Card key={folder.id} className="bg-white border-gray-200">
                 <CardHeader>
-                  <CardTitle className="text-gray-900 dark:text-white flex items-center">
+                  <CardTitle className="text-gray-900 flex items-center">
                     <FolderIcon className="h-5 w-5 mr-2 text-blue-600" />
                     {folder.name}
-                    {folder.name_ta && <span className="ml-2 text-gray-600 dark:text-gray-400">({folder.name_ta})</span>}
+                    {folder.name_ta && <span className="ml-2 text-gray-600">({folder.name_ta})</span>}
                     {folder.featured && (
                       <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         Featured
@@ -553,18 +553,18 @@ export default function AdminRadioPage() {
                 </CardHeader>
                 <CardContent>
                   {folder.description && (
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">{folder.description}</p>
+                    <p className="text-gray-600 mb-4">{folder.description}</p>
                   )}
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {folder.radioShows.map((show) => (
-                      <div key={show.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 dark:text-white mb-2">{show.title}</h4>
+                      <div key={show.id} className="border border-gray-200 rounded-lg p-4">
+                        <h4 className="font-medium text-gray-900 mb-2">{show.title}</h4>
                         {show.title_ta && (
-                          <h5 className="text-sm text-gray-600 dark:text-gray-400 mb-2">{show.title_ta}</h5>
+                          <h5 className="text-sm text-gray-600 mb-2">{show.title_ta}</h5>
                         )}
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Host: {show.host}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Duration: {show.duration}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-500 line-clamp-2">{show.description}</p>
+                        <p className="text-sm text-gray-600 mb-2">Host: {show.host}</p>
+                        <p className="text-sm text-gray-600 mb-2">Duration: {show.duration}</p>
+                        <p className="text-xs text-gray-500 line-clamp-2">{show.description}</p>
                         {show.featured && (
                           <span className="mt-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                             Featured
@@ -580,7 +580,7 @@ export default function AdminRadioPage() {
                     ))}
                   </div>
                   {folder.radioShows.length === 0 && (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                    <p className="text-gray-500 text-center py-4">
                       No radio shows in this folder yet.
                     </p>
                   )}
@@ -593,7 +593,7 @@ export default function AdminRadioPage() {
         {!loading && radioFolders.length === 0 && (
           <div className="text-center py-12">
             <FolderIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-gray-500">
               No radio folders found. Create your first folder to get started!
             </p>
           </div>

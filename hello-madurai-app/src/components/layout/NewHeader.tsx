@@ -71,20 +71,20 @@ export default function NewHeader() {
   }
 
   return (
-    <header className="bg-white/95 dark:bg-blue-950/95 backdrop-blur-sm border-b border-blue-100 dark:border-blue-900/50 shadow-lg transition-all duration-300">
+    <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg transition-all duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3">
-              <img 
-                src="/logo.jpg" 
-                alt="Hello Madurai Logo" 
+              <img
+                src="/logo.jpg"
+                alt="Hello Madurai Logo"
                 className="h-10 w-10 rounded-full object-cover"
               />
               {!isNewsPage && (
                 <div className="hidden sm:block">
-                  <h1 className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                  <h1 className="text-xl font-bold text-blue-600">
                     Hello Madurai
                   </h1>
                 </div>
@@ -93,7 +93,7 @@ export default function NewHeader() {
             {isNewsPage && (
               <Link
                 href="/"
-                className="ml-3 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors duration-200 hover-lift"
+                className="ml-3 text-blue-600 hover:text-blue-700 px-3 py-2 text-sm font-medium transition-colors duration-200 hover-lift"
               >
                 <span suppressHydrationWarning>
                   {t('nav.home', 'Home', 'முகப்பு')}
@@ -108,30 +108,30 @@ export default function NewHeader() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-2 py-2 text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
+                className="text-blue-600 hover:text-blue-700 px-2 py-2 text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
               >
                 <span suppressHydrationWarning>{item.name}</span>
               </Link>
             ))}
-            
+
             {/* Others Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setIsOthersOpen(!isOthersOpen)}
                 onBlur={() => setTimeout(() => setIsOthersOpen(false), 200)}
-                className="flex items-center gap-1 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-2 py-2 text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-700 px-2 py-2 text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
               >
                 <span suppressHydrationWarning>{t('nav.others', 'Others', 'மேலும்')}</span>
                 <ChevronDownIcon className="h-4 w-4" />
               </button>
 
               {isOthersOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                   {othersDropdown.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-300 first:rounded-t-md last:rounded-b-md transition-colors"
+                      className="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-700 first:rounded-t-md last:rounded-b-md transition-colors"
                       onClick={() => setIsOthersOpen(false)}
                     >
                       <span suppressHydrationWarning>{item.name}</span>
@@ -147,7 +147,7 @@ export default function NewHeader() {
             {/* Language Toggle */}
             <button
               onClick={toggleLanguage}
-              className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-neutral-700 dark:text-white hover:text-primary-600 dark:hover:text-primary-300 hover:bg-white-600 dark:hover:bg-primary-800 transition-colors duration-200"
+              className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors duration-200"
               title={language === 'en' ? 'தமிழுக்கு மாற்று' : 'Switch to English'}
               suppressHydrationWarning
             >
@@ -163,7 +163,7 @@ export default function NewHeader() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 rounded-md text-neutral-700 dark:text-white hover:text-primary-600 dark:hover:text-primary-300 hover:bg-white-600 dark:hover:bg-primary-800 transition-colors duration-200"
+              className="lg:hidden p-2 rounded-md text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors duration-200"
             >
               {isMenuOpen ? (
                 <XMarkIcon className="h-6 w-6" />
@@ -177,12 +177,12 @@ export default function NewHeader() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="lg:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-blue-50 dark:bg-blue-900 border-t border-blue-200 dark:border-blue-700">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-50 border-t border-gray-200">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="block px-3 py-2 text-base font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-md transition-colors duration-200"
+                  className="block px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors duration-200"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span suppressHydrationWarning>{item.name}</span>
@@ -190,15 +190,15 @@ export default function NewHeader() {
               ))}
 
               {/* Others Section in Mobile */}
-              <div className="pt-2 border-t border-blue-200 dark:border-blue-700">
-                <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <div className="pt-2 border-t border-gray-200">
+                <div className="px-3 py-2 text-xs font-semibold text-blue-600 uppercase tracking-wider">
                   <span suppressHydrationWarning>{t('nav.others', 'Others', 'மேலும்')}</span>
                 </div>
                 {othersDropdown.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="block px-3 py-2 pl-6 text-base font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-md transition-colors duration-200"
+                    className="block px-3 py-2 pl-6 text-base font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <span suppressHydrationWarning>{item.name}</span>

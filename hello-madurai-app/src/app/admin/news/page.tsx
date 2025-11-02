@@ -180,10 +180,10 @@ export default function AdminNewsPage() {
 
   if (loading && !showForm) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+      <div className="min-h-screen bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-gray-600 dark:text-gray-300">{language === 'ta' ? 'ஏற்றுகிறது...' : 'Loading...'}</p>
+            <p className="text-gray-600">{language === 'ta' ? 'ஏற்றுகிறது...' : 'Loading...'}</p>
           </div>
         </div>
       </div>
@@ -191,15 +191,15 @@ export default function AdminNewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               {language === 'ta' ? 'செய்தி மேலாண்மை' : 'News Management'}
             </h1>
-            <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
+            <p className="mt-2 text-sm sm:text-base text-gray-600">
               {language === 'ta' ? 'செய்தி கட்டுரைகளை உருவாக்கவும், திருத்தவும், நிர்வகிக்கவும்' : 'Create, edit, and manage news articles'}
             </p>
           </div>
@@ -238,9 +238,9 @@ export default function AdminNewsPage() {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
-            <Card className="w-full max-w-2xl sm:max-w-3xl max-h-[95vh] overflow-y-auto bg-white dark:bg-blue-900">
+            <Card className="w-full max-w-2xl sm:max-w-3xl max-h-[95vh] overflow-y-auto bg-white">
               <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-white">
+                <CardTitle className="text-gray-900">
                   {editingNews ? (language === 'ta' ? 'செய்தி திருத்து' : 'Edit News') : (language === 'ta' ? 'செய்தி சேர்க்க' : 'Add News')}
                 </CardTitle>
               </CardHeader>
@@ -281,7 +281,7 @@ export default function AdminNewsPage() {
                   {/* Content - English & Tamil */}
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         Content (English) *
                       </label>
                       <RichTextEditor
@@ -292,7 +292,7 @@ export default function AdminNewsPage() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         உள்ளடக்கம் (Tamil) *
                       </label>
                       <RichTextEditor
@@ -316,14 +316,14 @@ export default function AdminNewsPage() {
 
                   <div className="grid gap-4 md:grid-cols-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         {language === 'ta' ? 'வகை' : 'Category'} *
                       </label>
                       <select
                         required
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         {categories.map((category) => (
                           <option key={category.id} value={category.id}>
@@ -333,7 +333,7 @@ export default function AdminNewsPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         {language === 'ta' ? 'ஆசிரியர்' : 'Author'} *
                       </label>
                       <input
@@ -342,11 +342,11 @@ export default function AdminNewsPage() {
                         value={formData.author}
                         onChange={(e) => setFormData({ ...formData, author: e.target.value })}
                         placeholder={language === 'ta' ? 'ஆசிரியர் பெயர்' : 'Author name'}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         {language === 'ta' ? 'குறிச்சொற்கள் (காற்புள்ளியால் பிரிக்கப்பட்ட)' : 'Tags (comma separated)'}
                       </label>
                       <input
@@ -354,7 +354,7 @@ export default function AdminNewsPage() {
                         value={formData.tags}
                         onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                         placeholder={language === 'ta' ? 'மதுரை, செய்திகள், உள்ளூர்' : 'madurai, news, local'}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                     <div className="flex items-center">
@@ -365,7 +365,7 @@ export default function AdminNewsPage() {
                           onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
                           className="mr-2"
                         />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <span className="text-sm font-medium text-gray-700">
                           {language === 'ta' ? 'சிறப்பு கட்டுரை' : 'Featured Article'}
                         </span>
                       </label>
@@ -393,7 +393,7 @@ export default function AdminNewsPage() {
         {/* News List */}
         <div className="space-y-4">
           {news.map((newsItem) => (
-            <Card key={newsItem.id} className="bg-white dark:bg-blue-900 border-gray-200 dark:border-blue-800">
+            <Card key={newsItem.id} className="bg-white border-gray-200">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   {/* Featured Image */}
@@ -410,29 +410,29 @@ export default function AdminNewsPage() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        newsItem.featured 
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' 
-                          : 'bg-gray-100 text-gray-800 dark:bg-blue-800 dark:text-blue-200'
+                        newsItem.featured
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
                       }`}>
                         {newsItem.featured ? (language === 'ta' ? 'சிறப்பு' : 'Featured') : (language === 'ta' ? 'வழக்கமான' : 'Regular')}
                       </span>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {newsItem.category}
                       </span>
                       {newsItem.featuredImage && (
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           <PhotoIcon className="h-3 w-3 inline mr-1" />
                           {language === 'ta' ? 'படம்' : 'Image'}
                         </span>
                       )}
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
                       {language === 'ta' && newsItem.title_ta ? newsItem.title_ta : newsItem.title}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+                    <p className="text-gray-600 mb-3 line-clamp-2">
                       {language === 'ta' && newsItem.excerpt_ta ? newsItem.excerpt_ta : newsItem.excerpt}
                     </p>
-                    <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
                       <span>{newsItem.author}</span>
                       <span>{formatDate(newsItem.publishedAt)}</span>
                       <div className="flex items-center">
@@ -465,7 +465,7 @@ export default function AdminNewsPage() {
 
           {news.length === 0 && !loading && (
             <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-500">
                 {language === 'ta' ? 'செய்தி கட்டுரைகள் இல்லை. உங்கள் முதல் கட்டுரையை உருவாக்குங்கள்!' : 'No news articles found. Create your first article!'}
               </p>
             </div>

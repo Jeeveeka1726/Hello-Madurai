@@ -360,10 +360,10 @@ export default function InteractionButtons({
         disabled={isProcessing}
         className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
           isProcessing
-            ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-            : isLiked 
-              ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800' 
-              : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
+            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            : isLiked
+              ? 'bg-green-100 text-green-600 hover:bg-green-200'
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
         }`}
         aria-label={isLiked ? 'Unlike' : 'Like'}
       >
@@ -382,10 +382,10 @@ export default function InteractionButtons({
           disabled={isProcessing}
           className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
             isProcessing
-              ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-              : isDisliked 
-                ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800' 
-                : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300'
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              : isDisliked
+                ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
           }`}
         >
           {isDisliked ? (
@@ -402,7 +402,7 @@ export default function InteractionButtons({
         <button
           id={`share-btn-${itemId}`}
           onClick={() => setShowShareMenu(!showShareMenu)}
-          className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
+          className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
         >
           <ShareIcon className="h-4 w-4" />
           <span className="text-sm font-medium">{localShares}</span>
@@ -410,10 +410,10 @@ export default function InteractionButtons({
 
         {/* Share Menu with Facebook & WhatsApp prominently */}
         {showShareMenu && (
-          <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-10 min-w-[280px]">
+          <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10 min-w-[280px]">
             {/* Main Share Options - Facebook & WhatsApp */}
             <div className="mb-3">
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+              <p className="text-sm font-semibold text-gray-700 mb-3">
                 {t('share.shareTo', 'Share to:', 'இதில் பகிரவும்:')}
               </p>
               <div className="flex gap-3 justify-center">
@@ -433,7 +433,7 @@ export default function InteractionButtons({
                 >
                   <div className="flex flex-col items-center gap-1">
                     <WhatsappIcon size={48} round />
-                    <span className="text-xs text-gray-600 dark:text-gray-400">WhatsApp</span>
+                    <span className="text-xs text-gray-600">WhatsApp</span>
                   </div>
                 </button>
 
@@ -446,19 +446,19 @@ export default function InteractionButtons({
                 >
                   <div className="flex flex-col items-center gap-1">
                     <FacebookIcon size={48} round />
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Facebook</span>
+                    <span className="text-xs text-gray-600">Facebook</span>
                   </div>
                 </FacebookShareButton>
               </div>
             </div>
 
             {/* Divider */}
-            <div className="border-t border-gray-200 dark:border-gray-700 my-3"></div>
+            <div className="border-t border-gray-200 my-3"></div>
 
             {/* Copy Link Button */}
             <button
               onClick={handleCopyLink}
-              className="w-full px-4 py-2 mb-2 text-left text-sm font-medium text-gray-700 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-md transition-colors flex items-center gap-2"
+              className="w-full px-4 py-2 mb-2 text-left text-sm font-medium text-gray-700 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors flex items-center gap-2"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -467,7 +467,7 @@ export default function InteractionButtons({
             </button>
             
             {/* Other Share Options */}
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 px-1">
+            <p className="text-xs text-gray-500 mb-2 px-1">
               {t('share.moreOptions', 'More options:', 'மேலும் விருப்பங்கள்:')}
             </p>
             <div className="flex gap-2 justify-center">

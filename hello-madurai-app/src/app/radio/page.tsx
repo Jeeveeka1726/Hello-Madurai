@@ -194,7 +194,7 @@ function RadioPageContent() {
   const regularShows = allShows.filter(show => !show.featured)
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -205,12 +205,12 @@ function RadioPageContent() {
               className="h-16 w-16 rounded-full object-cover mr-4"
             />
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+              <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
                 {t('radio.title', 'Hello Madurai Radio', 'ஹலோ மதுரை வானொலி')}
               </h1>
             </div>
           </div>
-          <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-lg text-gray-600">
             {t('radio.subtitle', 'Listen to local stories, interviews, and discussions', 'உள்ளூர் கதைகள், நேர்காணல்கள் மற்றும் விவாதங்களைக் கேளுங்கள்')}
           </p>
         </div>
@@ -249,7 +249,7 @@ function RadioPageContent() {
         {loading && (
           <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">
+            <p className="mt-4 text-gray-600">
               {t('podcast.loading', 'Loading podcasts...', 'பாட்காஸ்ட்கள் ஏற்றப்படுகின்றன...')}
             </p>
           </div>
@@ -258,21 +258,21 @@ function RadioPageContent() {
         {/* Radio Folders */}
         {!loading && radioFolders.length > 0 && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t('radio.folders', 'Radio Shows by Category', 'வகை வாரியாக வானொலி நிகழ்ச்சிகள்')}
             </h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {radioFolders.map((folder) => (
-                <Card key={folder.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-blue-800">
+                <Card key={folder.id} className="hover:shadow-lg transition-shadow bg-white text-gray-900 border-gray-200">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
-                      <FolderIcon className="h-8 w-8 text-blue-600 dark:text-yellow-400 mr-3" />
+                      <FolderIcon className="h-8 w-8 text-blue-600 mr-3" />
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-lg font-semibold text-gray-900">
                           {folder.name}
                         </h3>
                         {folder.name_ta && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-gray-600">
                             {folder.name_ta}
                           </p>
                         )}
@@ -280,17 +280,17 @@ function RadioPageContent() {
                     </div>
 
                     {folder.description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                      <p className="text-sm text-gray-600 mb-4">
                         {folder.description}
                       </p>
                     )}
 
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      <span className="text-sm text-gray-500">
                         {folder.radioShows.length} {t('radio.shows', 'shows', 'நிகழ்ச்சிகள்')}
                       </span>
                       {folder.featured && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800">
                           <StarIcon className="h-3 w-3 mr-1" />
                           {t('radio.featured', 'Featured', 'சிறப்பு')}
                         </span>
@@ -315,17 +315,17 @@ function RadioPageContent() {
         {/* Featured Radio Shows */}
         {!loading && featuredShows.length > 0 && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t('radio.featured', 'Featured Radio Shows', 'சிறப்பு வானொலி நிகழ்ச்சிகள்')}
             </h2>
             <div className="grid gap-8 lg:grid-cols-2">
               {featuredShows.map((show) => (
-                <Card key={show.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-blue-800">
-                  <div className="aspect-w-16 aspect-h-9 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900 dark:to-secondary-900">
+                <Card key={show.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white text-gray-900 border-gray-200">
+                  <div className="aspect-w-16 aspect-h-9 bg-gradient-to-br from-primary-100 to-secondary-100">
                     <div className="flex items-center justify-center">
                       <div className="text-center">
-                        <SpeakerWaveIcon className="h-16 w-16 text-primary-600 dark:text-primary-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <SpeakerWaveIcon className="h-16 w-16 text-primary-600 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600">
                           {show.duration}
                         </p>
                       </div>
@@ -333,21 +333,21 @@ function RadioPageContent() {
                   </div>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
                         {t('radio.featured', 'Featured', 'சிறப்பு')}
                       </span>
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center text-sm text-gray-500">
                         <CalendarIcon className="h-4 w-4 mr-1" />
                         {formatDate(show.publishedAt)}
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">
                       {t(`radio.${show.id}.title`, show.title, show.title_ta || '')}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    <p className="text-gray-600 mb-4">
                       {t(`radio.${show.id}.description`, show.description, show.description_ta || '')}
                     </p>
-                    <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                       <div className="flex items-center space-x-4">
                         <span>{t('radio.host', 'Host:', 'தொகுப்பாளர்:')} {show.host}</span>
                         <div className="flex items-center">
@@ -374,12 +374,12 @@ function RadioPageContent() {
                       )}
                     </Button>
                     {currentlyPlaying === show.id && (
-                      <div className="mt-4 bg-gray-50 dark:bg-blue-800 rounded-lg p-3">
-                        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
+                      <div className="mt-4 bg-gray-50 rounded-lg p-3">
+                        <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
                           <span>{formatTime(currentTime)}</span>
                           <span>{formatTime(duration)}</span>
                         </div>
-                        <div className="w-full bg-gray-200 dark:bg-blue-700 rounded-full h-2">
+                        <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
                             className="bg-primary-600 h-2 rounded-full transition-all duration-300"
                             style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
@@ -411,17 +411,17 @@ function RadioPageContent() {
         {/* All Podcasts */}
         {!loading && (
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
             {t('radio.allShows', 'All Radio Shows', 'அனைத்து வானொலி நிகழ்ச்சிகள்')}
           </h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {regularShows.map((show) => (
-              <Card key={show.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-blue-800">
-                <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
+              <Card key={show.id} className="hover:shadow-lg transition-shadow bg-white text-gray-900 border-gray-200">
+                <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200">
                   <div className="flex items-center justify-center">
                     <div className="text-center">
-                      <SpeakerWaveIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-1" />
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <SpeakerWaveIcon className="h-12 w-12 text-gray-400 mx-auto mb-1" />
+                      <p className="text-xs text-gray-500">
                         {show.duration}
                       </p>
                     </div>
@@ -429,20 +429,20 @@ function RadioPageContent() {
                 </div>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className="text-xs text-gray-500">
                       {formatDate(show.publishedAt)}
                     </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className="text-xs text-gray-500">
                       {show.plays.toLocaleString()} {t('radio.plays', 'plays', 'ஒலிப்பு')}
                     </span>
                   </div>
-                  <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                  <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
                     {t(`radio.${show.id}.title`, show.title, show.title_ta || '')}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
+                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                     {t(`radio.${show.id}.description`, show.description, show.description_ta || '')}
                   </p>
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
                     <span>{t('radio.host', 'Host:', 'தொகுப்பாளர்:')} {show.host}</span>
                     <div className="flex items-center">
                       <ClockIcon className="h-3 w-3 mr-1" />
@@ -467,12 +467,12 @@ function RadioPageContent() {
                     )}
                   </Button>
                   {currentlyPlaying === show.id && (
-                    <div className="mt-3 bg-gray-50 dark:bg-blue-800 rounded-lg p-2">
-                      <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mb-1">
+                    <div className="mt-3 bg-gray-50 rounded-lg p-2">
+                      <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
                         <span>{formatTime(currentTime)}</span>
                         <span>{formatTime(duration)}</span>
                       </div>
-                      <div className="w-full bg-gray-200 dark:bg-blue-700 rounded-full h-1">
+                      <div className="w-full bg-gray-200 rounded-full h-1">
                         <div
                           className="bg-primary-600 h-1 rounded-full transition-all duration-300"
                           style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
@@ -515,9 +515,9 @@ function RadioPageContent() {
         {/* Enhanced Radio Player Modal */}
         {showEnhancedPlayer && allShows.length > 0 && (
           <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">
                   {t('radio.enhancedPlayer', 'Enhanced Radio Player', 'மேம்பட்ட வானொலி பிளேயர்')}
                 </h3>
                 <button
@@ -540,9 +540,9 @@ function RadioPageContent() {
         {/* Bluetooth Manager Modal */}
         {showBluetoothManager && (
           <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">
                   {t('radio.bluetoothManager', 'Bluetooth Manager', 'புளூடூத் மேலாளர்')}
                 </h3>
                 <button

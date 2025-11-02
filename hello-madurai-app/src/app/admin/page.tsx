@@ -226,10 +226,10 @@ export default function AdminDashboard() {
     return (
       <div className="p-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 dark:bg-blue-800 rounded w-1/4"></div>
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {Array(6).fill(0).map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 dark:bg-blue-800 rounded"></div>
+              <div key={i} className="h-32 bg-gray-200 rounded"></div>
             ))}
           </div>
         </div>
@@ -241,17 +241,17 @@ export default function AdminDashboard() {
     <div className="p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-3xl font-bold text-gray-900">
           {t('admin.dashboard', 'Dashboard', 'டாஷ்போர்டு')}
         </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-300">
+        <p className="mt-2 text-gray-600">
           {t('admin.welcome', 'Welcome to Hello Madurai CMS', 'ஹலோ மதுரை CMS க்கு வரவேற்கிறோம்')}
         </p>
       </div>
 
       {/* Tab Navigation - Mobile Responsive */}
       <div className="mb-4 sm:mb-6 md:mb-8">
-        <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-4 sm:space-x-6 md:space-x-8 overflow-x-auto scrollbar-hide px-4 sm:px-0 -mx-4 sm:mx-0">
             {tabs.map((tab) => {
               const Icon = tab.icon
@@ -261,8 +261,8 @@ export default function AdminDashboard() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-1.5 sm:gap-2 py-2 sm:py-3 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
                   <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -283,22 +283,22 @@ export default function AdminDashboard() {
               const Icon = stat.icon
               return (
                 <Link key={stat.name} href={stat.href}>
-                  <Card className="bg-white dark:bg-blue-900 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200 cursor-pointer group">
+                  <Card className="bg-white border-gray-200 hover:shadow-lg transition-all duration-200 cursor-pointer group">
                     <CardContent className="p-6">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="p-3 bg-primary-100 dark:bg-primary-900 rounded-lg group-hover:bg-primary-200 dark:group-hover:bg-primary-800 transition-colors">
-                            <Icon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+                          <div className="p-3 bg-primary-100 rounded-lg group-hover:bg-primary-200 transition-colors">
+                            <Icon className="h-6 w-6 text-primary-600" />
                           </div>
                         </div>
                         <div className="ml-4 flex-1">
-                          <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{stat.name}</p>
+                          <p className="text-sm font-medium text-gray-600">{stat.name}</p>
                           <div className="flex items-baseline">
-                            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                            <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                             <p className={`ml-2 text-sm font-medium ${
                               stat.changeType === 'positive'
-                                ? 'text-green-600 dark:text-green-400'
-                                : 'text-red-600 dark:text-red-400'
+                                ? 'text-green-600'
+                                : 'text-red-600'
                             }`}>
                               {stat.change}
                             </p>
@@ -314,35 +314,35 @@ export default function AdminDashboard() {
 
           {/* Quick Actions */}
           <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
               {t('admin.quickActions', 'Quick Actions', 'விரைவு நடவடிக்கைகள்')}
             </h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Link href="/admin/news">
-                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 border-blue-200 dark:border-blue-700 hover:shadow-md transition-shadow cursor-pointer">
+                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4 text-center">
-                    <NewspaperIcon className="h-8 w-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-                    <p className="font-medium text-blue-900 dark:text-blue-100">
+                    <NewspaperIcon className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                    <p className="font-medium text-blue-900">
                       {t('admin.addNews', 'Add News', 'செய்தி சேர்க்க')}
                     </p>
                   </CardContent>
                 </Card>
               </Link>
               <Link href="/admin/events">
-                <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 border-green-200 dark:border-green-700 hover:shadow-md transition-shadow cursor-pointer">
+                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4 text-center">
-                    <CalendarIcon className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
-                    <p className="font-medium text-green-900 dark:text-green-100">
+                    <CalendarIcon className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                    <p className="font-medium text-green-900">
                       {t('admin.addEvent', 'Add Event', 'நிகழ்வு சேர்க்க')}
                     </p>
                   </CardContent>
                 </Card>
               </Link>
               <Link href="/admin/radio">
-                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 border-blue-200 dark:border-yellow-700 hover:shadow-md transition-shadow cursor-pointer">
+                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4 text-center">
-                    <MicrophoneIcon className="h-8 w-8 text-blue-600 dark:text-yellow-400 mx-auto mb-2" />
-                    <p className="font-medium text-blue-900 dark:text-blue-100">
+                    <MicrophoneIcon className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                    <p className="font-medium text-blue-900">
                       {t('admin.addRadio', 'Manage Radio', 'வானொலி நிர்வகிக்க')}
                     </p>
                   </CardContent>
@@ -354,24 +354,24 @@ export default function AdminDashboard() {
           {/* Recent Content */}
           {recentContent.news.length > 0 && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 {t('admin.recentContent', 'Recent Content', 'சமீபத்திய உள்ளடக்கம்')}
               </h2>
-              <Card className="bg-white dark:bg-blue-900 border-gray-200 dark:border-gray-700">
+              <Card className="bg-white border-gray-200">
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     {recentContent.news.slice(0, 5).map((item: any) => (
-                      <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-blue-800 rounded-lg">
+                      <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex-1">
-                          <h4 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1">
+                          <h4 className="text-sm font-medium text-gray-900 line-clamp-1">
                             {item.title}
                           </h4>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-gray-500 mt-1">
                             {item.category} • {formatDate(item.publishedAt)}
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                          <span className="text-xs text-gray-500 flex items-center">
                             <EyeIcon className="h-3 w-3 mr-1" />
                             {item.views || 0}
                           </span>
@@ -396,8 +396,8 @@ export default function AdminDashboard() {
       {activeTab === 'news' && (
         <div className="text-center py-12">
           <NewspaperIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">News Management</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">Manage your news articles and content</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">News Management</h3>
+          <p className="text-gray-600 mb-4">Manage your news articles and content</p>
           <Link href="/admin/news">
             <Button>Go to News Management</Button>
           </Link>
@@ -406,8 +406,8 @@ export default function AdminDashboard() {
       {activeTab === 'events' && (
         <div className="text-center py-12">
           <CalendarIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Events Management</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">Manage your events and schedules</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Events Management</h3>
+          <p className="text-gray-600 mb-4">Manage your events and schedules</p>
           <Link href="/admin/events">
             <Button>Go to Events Management</Button>
           </Link>
@@ -416,8 +416,8 @@ export default function AdminDashboard() {
       {activeTab === 'directory' && (
         <div className="text-center py-12">
           <BuildingOfficeIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Directory Management</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">Manage business listings and directory</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Directory Management</h3>
+          <p className="text-gray-600 mb-4">Manage business listings and directory</p>
           <Link href="/admin/directory">
             <Button>Go to Directory Management</Button>
           </Link>
@@ -426,8 +426,8 @@ export default function AdminDashboard() {
       {activeTab === 'users' && (
         <div className="text-center py-12">
           <UserGroupIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">User Management</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">Manage users and permissions</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">User Management</h3>
+          <p className="text-gray-600 mb-4">Manage users and permissions</p>
           <Button disabled>Coming Soon</Button>
         </div>
       )}

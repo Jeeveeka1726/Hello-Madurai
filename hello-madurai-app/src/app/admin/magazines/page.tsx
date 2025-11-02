@@ -130,10 +130,10 @@ export default function AdminMagazinesPage() {
 
   if (loading && magazines.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+      <div className="min-h-screen bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-gray-500 dark:text-gray-400">ஏற்றுகிறது...</p>
+            <p className="text-gray-500">ஏற்றுகிறது...</p>
           </div>
         </div>
       </div>
@@ -141,15 +141,15 @@ export default function AdminMagazinesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-gray-900">
               பத்திரிகை மேலாண்மை
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-300">
+            <p className="mt-2 text-gray-600">
               டிஜிட்டல் பத்திரிகைகளை உருவாக்கவும், திருத்தவும், நிர்வகிக்கவும்
             </p>
           </div>
@@ -175,9 +175,9 @@ export default function AdminMagazinesPage() {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100">
+            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white text-gray-900">
               <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-white">
+                <CardTitle className="text-gray-900">
                   {editingMagazine ? 'பத்திரிகை திருத்து' : 'பத்திரிகை சேர்க்க'}
                 </CardTitle>
               </CardHeader>
@@ -185,7 +185,7 @@ export default function AdminMagazinesPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Title - Tamil only */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       தலைப்பு *
                     </label>
                     <input
@@ -194,13 +194,13 @@ export default function AdminMagazinesPage() {
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                       placeholder="பத்திரிகை தலைப்பை உள்ளிடவும்"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
 
                   {/* Description - Tamil only */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       விளக்கம் *
                     </label>
                     <textarea
@@ -209,7 +209,7 @@ export default function AdminMagazinesPage() {
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       placeholder="பத்திரிகை விளக்கத்தை உள்ளிடவும்"
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
 
@@ -235,7 +235,7 @@ export default function AdminMagazinesPage() {
 
                   <div className="grid gap-6 md:grid-cols-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         இதழ் எண் *
                       </label>
                       <input
@@ -243,7 +243,7 @@ export default function AdminMagazinesPage() {
                         required
                         value={formData.issueNumber}
                         onChange={(e) => setFormData({ ...formData, issueNumber: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="எ.கா., இதழ் 1, தொகுதி 2"
                       />
                     </div>
@@ -256,7 +256,7 @@ export default function AdminMagazinesPage() {
                           onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
                           className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                         />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <span className="text-sm font-medium text-gray-700">
                           சிறப்பு பத்திரிகை
                         </span>
                       </label>
@@ -297,13 +297,13 @@ export default function AdminMagazinesPage() {
                   />
                 )}
                 <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-semibold text-gray-900">
                     {magazine.title}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                  <p className="text-sm text-gray-600 line-clamp-2">
                     {magazine.description}
                   </p>
-                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center justify-between text-sm text-gray-500">
                     <span>{magazine.issueNumber}</span>
                     <div className="flex items-center">
                       <EyeIcon className="h-4 w-4 mr-1" />
@@ -311,7 +311,7 @@ export default function AdminMagazinesPage() {
                     </div>
                   </div>
                   {magazine.featured && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       சிறப்பு
                     </span>
                   )}
@@ -352,10 +352,10 @@ export default function AdminMagazinesPage() {
         {magazines.length === 0 && !loading && (
           <div className="text-center py-12">
             <DocumentIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+            <h3 className="mt-2 text-sm font-medium text-gray-900">
               பத்திரிகைகள் இல்லை
             </h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-sm text-gray-500">
               புதிய பத்திரிகையை உருவாக்குவதன் மூலம் தொடங்குங்கள்.
             </p>
           </div>

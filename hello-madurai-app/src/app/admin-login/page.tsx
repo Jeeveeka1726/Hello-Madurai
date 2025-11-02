@@ -34,30 +34,30 @@ function AdminLoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Hello Madurai
           </h1>
-          <h2 className="text-2xl font-semibold text-blue-600 dark:text-yellow-400 mb-4">
+          <h2 className="text-2xl font-semibold text-blue-600 mb-4">
             {t('admin.login.title', 'Admin Login', 'நிர்வாக உள்நுழைவு')}
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600">
             {t('admin.login.subtitle', 'Enter your password to access the admin dashboard', 'நிர்வாக டாஷ்போர்டை அணுக உங்கள் கடவுச்சொல்லை உள்ளிடவும்')}
           </p>
         </div>
 
-        <Card className="bg-white dark:bg-gray-800 shadow-xl border-0">
+        <Card className="bg-white shadow-xl border-0">
           <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl text-gray-900 dark:text-white">
+            <CardTitle className="text-xl text-gray-900">
               {t('admin.login.form.title', 'Secure Access', 'பாதுகாப்பான அணுகல்')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                   {t('admin.login.password', 'Admin Password', 'நிர்வாக கடவுச்சொல்')}
                 </label>
                 <div className="relative">
@@ -66,14 +66,14 @@ function AdminLoginPageContent() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder={t('admin.login.placeholder', 'Enter admin password', 'நிர்வாக கடவுச்சொல்லை உள்ளிடவும்')}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
                     {showPassword ? (
                       <EyeSlashIcon className="h-5 w-5" />
@@ -85,8 +85,8 @@ function AdminLoginPageContent() {
               </div>
 
               {error && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
-                  <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p className="text-red-600 text-sm">{error}</p>
                 </div>
               )}
 
@@ -106,11 +106,11 @@ function AdminLoginPageContent() {
               </Button>
             </form>
 
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="mt-6 pt-6 border-t border-gray-200">
               <div className="text-center">
                 <button
                   onClick={() => router.push('/')}
-                  className="text-blue-600 hover:text-blue-700 dark:text-yellow-400 dark:hover:text-blue-300 text-sm font-medium"
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                 >
                   ← {t('admin.login.back', 'Back to Website', 'வலைத்தளத்திற்கு திரும்பு')}
                 </button>
@@ -120,7 +120,7 @@ function AdminLoginPageContent() {
         </Card>
 
         <div className="text-center">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-gray-500">
             {t('admin.login.security', 'This is a secure admin area. Unauthorized access is prohibited.', 'இது ஒரு பாதுகாப்பான நிர்வாக பகுதி. அங்கீகரிக்கப்படாத அணுகல் தடைசெய்யப்பட்டுள்ளது.')}
           </p>
         </div>

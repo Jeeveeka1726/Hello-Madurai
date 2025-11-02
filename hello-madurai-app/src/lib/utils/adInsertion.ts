@@ -46,8 +46,8 @@ function renderAd(ad: Ad, index: number, language: 'en' | 'ta' = 'en'): string {
   // If ad has custom HTML code (e.g., Google AdSense)
   if (ad.htmlCode) {
     return `
-      <div class="ad-block my-6 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg" data-ad-id="${ad.id}" data-ad-index="${index}">
-        <div class="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">விளம்பரம் / Advertisement</div>
+      <div class="ad-block my-6 p-4 bg-gray-50 border border-gray-200 rounded-lg" data-ad-id="${ad.id}" data-ad-index="${index}">
+        <div class="text-xs text-gray-500 mb-2 text-center">விளம்பரம் / Advertisement</div>
         ${ad.htmlCode}
       </div>
     `
@@ -62,8 +62,8 @@ function renderAd(ad: Ad, index: number, language: 'en' | 'ta' = 'en'): string {
       : `<img src="${ad.imageUrl}" alt="${adTitle}" class="w-full h-auto rounded-lg shadow-md" />`
 
     return `
-      <div class="ad-block my-6 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg" data-ad-id="${ad.id}" data-ad-index="${index}">
-        <div class="text-xs text-gray-500 dark:text-gray-400 mb-2 text-center">விளம்பரம் / Advertisement</div>
+      <div class="ad-block my-6 p-4 bg-gray-50 border border-gray-200 rounded-lg" data-ad-id="${ad.id}" data-ad-index="${index}">
+        <div class="text-xs text-gray-500 mb-2 text-center">விளம்பரம் / Advertisement</div>
         ${adContent}
       </div>
     `

@@ -25,31 +25,64 @@ const getInitialLanguage = (): Language => {
     try {
       // Check if we have a pre-loaded language from the inline script
       if (window.__HELLO_MADURAI_LANG__) {
+        console.log('🔧 getInitialLanguage - using window.__HELLO_MADURAI_LANG__:', window.__HELLO_MADURAI_LANG__)
         return window.__HELLO_MADURAI_LANG__
+      }
+      // Fallback to localStorage
+      const savedLang = localStorage.getItem('hello-madurai-language')
+      if (savedLang === 'ta' || savedLang === 'en') {
+        console.log('🔧 getInitialLanguage - using localStorage:', savedLang)
+        return savedLang
       }
     } catch (error) {
       console.error('Error reading language:', error)
     }
   }
+  console.log('🔧 getInitialLanguage - using default: en')
   return 'en'
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(getInitialLanguage)
-  const [mounted, setMounted] = useState(false)
+  const [language, setLanguageState] = useState<Language>('en')
+  const [isClient, setIsClient] = useState(false)
 
-  // Ensure we're mounted on client side
+  // Load language from localStorage on mount - CLIENT SIDE ONLY
   useEffect(() => {
-    setMounted(true)
+    setIsClient(true)
+
+    if (typeof window !== 'undefined') {
+      try {
+        const savedLang = localStorage.getItem('hello-madurai-language')
+        console.log('🌐 [MOUNT] Loading language from localStorage:', savedLang)
+
+        if (savedLang === 'ta' || savedLang === 'en') {
+          console.log('🌐 [MOUNT] Setting language to:', savedLang)
+          setLanguageState(savedLang)
+        } else {
+          console.log('🌐 [MOUNT] No saved language, defaulting to: en')
+          // Set default to English
+          localStorage.setItem('hello-madurai-language', 'en')
+        }
+      } catch (error) {
+        console.error('❌ Error loading language from localStorage:', error)
+      }
+    }
   }, [])
 
   // Custom setLanguage that also updates localStorage
   const setLanguage = (lang: Language) => {
+    console.log('🌐 [CHANGE] Changing language to:', lang)
     setLanguageState(lang)
-    try {
-      localStorage.setItem('hello-madurai-language', lang)
-    } catch (error) {
-      console.error('Error saving language to localStorage:', error)
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('hello-madurai-language', lang)
+        console.log('🌐 [CHANGE] Saved to localStorage:', lang)
+        window.__HELLO_MADURAI_LANG__ = lang
+        console.log('🌐 [CHANGE] Updated window variable:', lang)
+      } catch (error) {
+        console.error('❌ Error saving language:', error)
+      }
     }
   }
 

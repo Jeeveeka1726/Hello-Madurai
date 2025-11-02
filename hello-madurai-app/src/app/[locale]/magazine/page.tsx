@@ -67,7 +67,7 @@ export default async function MagazinePage({ params }: MagazinePageProps) {
                       <span className="text-sm text-gray-500">
                         {formatDate(magazine.date)}
                       </span>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                       </span>
                     </div>
@@ -129,7 +129,7 @@ export default async function MagazinePage({ params }: MagazinePageProps) {
                       {formatDate(magazine.date)}
                     </span>
                     {magazine.featured && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {locale === 'ta' ? 'சிறப்பு' : 'Featured'}
                       </span>
                     )}

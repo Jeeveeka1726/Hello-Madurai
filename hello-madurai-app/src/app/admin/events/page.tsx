@@ -99,7 +99,7 @@ export default function AdminEventsPage() {
     try {
       const method = editingEvent ? 'PUT' : 'POST'
       const url = editingEvent ? `/api/admin/events/${editingEvent.id}` : '/api/admin/events'
-      
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -193,7 +193,7 @@ export default function AdminEventsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     )
@@ -201,12 +201,12 @@ export default function AdminEventsPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-blue-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
             <TranslatedText>Access Denied</TranslatedText>
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600">
             <TranslatedText>You don't have permission to access this page.</TranslatedText>
           </p>
         </div>
@@ -215,13 +215,13 @@ export default function AdminEventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-3">
             <CalendarIcon className="h-8 w-8 text-primary-600" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-gray-900">
               <TranslatedText>Manage Events</TranslatedText>
             </h1>
           </div>
@@ -238,10 +238,10 @@ export default function AdminEventsPage() {
               <div className="flex items-center">
                 <CalendarIcon className="h-8 w-8 text-blue-600" />
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  <p className="text-sm font-medium text-gray-600">
                     <TranslatedText>Total Events</TranslatedText>
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{events.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">{events.length}</p>
                 </div>
               </div>
             </CardContent>
@@ -251,10 +251,10 @@ export default function AdminEventsPage() {
               <div className="flex items-center">
                 <ClockIcon className="h-8 w-8 text-green-600" />
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  <p className="text-sm font-medium text-gray-600">
                     <TranslatedText>Upcoming Events</TranslatedText>
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-2xl font-bold text-gray-900">
                     {events.filter(e => new Date(e.startDate) > new Date()).length}
                   </p>
                 </div>
@@ -266,9 +266,9 @@ export default function AdminEventsPage() {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-blue-900 text-gray-900 dark:text-gray-100">
+            <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white text-gray-900">
               <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-white">
+                <CardTitle className="text-gray-900">
                   <TranslatedText>{editingEvent ? 'Edit Event' : 'Add Event'}</TranslatedText>
                 </CardTitle>
               </CardHeader>
@@ -276,7 +276,7 @@ export default function AdminEventsPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Featured Image */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       <TranslatedText>Featured Image</TranslatedText>
                     </label>
                     <FileUpload
@@ -293,7 +293,7 @@ export default function AdminEventsPage() {
                   {/* Title */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Title (English)</TranslatedText>
                       </label>
                       <input
@@ -301,19 +301,19 @@ export default function AdminEventsPage() {
                         required
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="Event title in English"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Title (Tamil)</TranslatedText>
                       </label>
                       <input
                         type="text"
                         value={formData.title_ta}
                         onChange={(e) => setFormData({ ...formData, title_ta: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="Event title in Tamil"
                       />
                     </div>
@@ -322,7 +322,7 @@ export default function AdminEventsPage() {
                   {/* Start Date and Time */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Start Date</TranslatedText> *
                       </label>
                       <input
@@ -330,11 +330,11 @@ export default function AdminEventsPage() {
                         required
                         value={formData.startDate}
                         onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Start Time</TranslatedText> *
                       </label>
                       <input
@@ -342,7 +342,7 @@ export default function AdminEventsPage() {
                         required
                         value={formData.startTime}
                         onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                   </div>
@@ -350,25 +350,25 @@ export default function AdminEventsPage() {
                   {/* End Date and Time */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>End Date</TranslatedText> (Optional)
                       </label>
                       <input
                         type="date"
                         value={formData.endDate}
                         onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>End Time</TranslatedText> (Optional)
                       </label>
                       <input
                         type="time"
                         value={formData.endTime}
                         onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                   </div>
@@ -376,25 +376,25 @@ export default function AdminEventsPage() {
                   {/* Duration and Category */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Duration</TranslatedText> (e.g., "3 Days", "1 Week")
                       </label>
                       <input
                         type="text"
                         value={formData.duration}
                         onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="e.g., 3 Days, 5 Days, 1 Week"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Category</TranslatedText>
                       </label>
                       <select
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         {eventCategories.map(cat => (
                           <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -406,7 +406,7 @@ export default function AdminEventsPage() {
                   {/* Location */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Location (English)</TranslatedText>
                       </label>
                       <input
@@ -414,19 +414,19 @@ export default function AdminEventsPage() {
                         required
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="Event location in English"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Location (Tamil)</TranslatedText>
                       </label>
                       <input
                         type="text"
                         value={formData.location_ta}
                         onChange={(e) => setFormData({ ...formData, location_ta: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="Event location in Tamil"
                       />
                     </div>
@@ -435,43 +435,43 @@ export default function AdminEventsPage() {
                   {/* Website and Phone */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Website</TranslatedText> (Optional)
                       </label>
                       <input
                         type="url"
                         value={formData.website}
                         onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="https://example.com"
                       />
-                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      <p className="mt-1 text-sm text-gray-500">
                         Website URL for booking
                       </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         <TranslatedText>Phone Number</TranslatedText> (Optional)
                       </label>
                       <input
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-blue-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="+91 98765 43210"
                       />
-                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      <p className="mt-1 text-sm text-gray-500">
                         Phone number for booking
                       </p>
                     </div>
                   </div>
-                  <p className="text-sm text-amber-600 dark:text-amber-400">
+                  <p className="text-sm text-amber-600">
                     <TranslatedText>Note: At least one booking option (Website OR Phone) should be provided</TranslatedText>
                   </p>
 
                   {/* Description */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       <TranslatedText>Description (English)</TranslatedText>
                     </label>
                     <RichTextEditor
@@ -482,7 +482,7 @@ export default function AdminEventsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       <TranslatedText>Description (Tamil)</TranslatedText>
                     </label>
                     <RichTextEditor
@@ -517,7 +517,7 @@ export default function AdminEventsPage() {
         {/* Events List */}
         <div className="space-y-4">
           {events.map((event) => (
-            <Card key={event.id} className="bg-white dark:bg-blue-900 border-gray-200 dark:border-blue-800">
+            <Card key={event.id} className="bg-white border-gray-200">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   {/* Featured Image */}
@@ -534,32 +534,32 @@ export default function AdminEventsPage() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        event.featured 
-                          ? 'bg-yellow-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
-                          : 'bg-gray-100 text-gray-800 dark:bg-blue-800 dark:text-blue-200'
+                        event.featured
+                          ? 'bg-yellow-100 text-blue-800'
+                          : 'bg-gray-100 text-gray-800'
                       }`}>
                         {event.featured ? 'Featured' : 'Regular'}
                       </span>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {eventCategories.find(cat => cat.id === event.category)?.name || event.category}
                       </span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      <span className="text-sm text-gray-500">
                         {formatDate(event.startDate)}
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
                       {event.title}
                     </h3>
                     {event.title_ta && (
-                      <h4 className="text-md text-gray-700 dark:text-gray-300 mb-2">
+                      <h4 className="text-md text-gray-700 mb-2">
                         {event.title_ta}
                       </h4>
                     )}
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <p className="text-sm text-gray-600 mb-2">
                       <MapPinIcon className="inline h-4 w-4 mr-1" />
                       {event.location}
                     </p>
-                    <div className="text-sm text-gray-600 dark:text-gray-400" 
+                    <div className="text-sm text-gray-600" 
                          dangerouslySetInnerHTML={{ __html: event.description.substring(0, 200) + '...' }} />
                   </div>
                   
@@ -589,10 +589,10 @@ export default function AdminEventsPage() {
             <Card>
               <CardContent className="p-8 text-center">
                 <CalendarIcon className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                <h3 className="mt-4 text-lg font-medium text-gray-900">
                   <TranslatedText>No events yet</TranslatedText>
                 </h3>
-                <p className="mt-2 text-gray-600 dark:text-gray-300">
+                <p className="mt-2 text-gray-600">
                   <TranslatedText>Get started by adding your first event.</TranslatedText>
                 </p>
               </CardContent>

@@ -27,9 +27,9 @@ export default function Button({
   
   const variantClasses = {
     primary: 'gradient-bg text-white hover:shadow-lg hover:shadow-blue-500/25 focus:ring-blue-500 hover-lift',
-    secondary: 'bg-blue-100 text-blue-800 hover:bg-blue-200 focus:ring-blue-500 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 hover-lift',
-    outline: 'border border-blue-300 bg-white text-blue-700 hover:bg-blue-50 focus:ring-blue-500 dark:border-blue-600 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 hover-lift',
-    ghost: 'text-blue-700 hover:bg-blue-100 focus:ring-blue-500 dark:text-blue-300 dark:hover:bg-blue-900 hover-lift',
+    secondary: 'bg-blue-100 text-blue-800 hover:bg-blue-200 focus:ring-blue-500 hover-lift',
+    outline: 'border border-blue-300 bg-white text-blue-700 hover:bg-blue-50 focus:ring-blue-500 hover-lift',
+    ghost: 'text-blue-700 hover:bg-blue-100 focus:ring-blue-500 hover-lift',
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 hover-lift'
   }
   
@@ -54,6 +54,10 @@ export default function Button({
         ${fullWidth ? 'w-full' : ''}
         ${className}
       `}
+      style={{
+        color: variant === 'primary' || variant === 'danger' ? '#ffffff' : undefined,
+        ...(props.style || {})
+      }}
       disabled={disabled || loading}
       {...props}
     >

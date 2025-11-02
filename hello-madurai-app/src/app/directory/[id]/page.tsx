@@ -211,7 +211,7 @@ export default function BusinessProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-blue-950">
+      <div className="min-h-screen bg-gray-50">
         <NewHeader />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-white text-xl">Loading...</div>
@@ -222,15 +222,15 @@ export default function BusinessProfilePage() {
 
   if (!business) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-blue-950">
+      <div className="min-h-screen bg-gray-50">
         <NewHeader />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Card className="text-center py-12">
             <CardContent>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
                 {t('directory.businessNotFound', 'Business Not Found', 'வணிகம் கிடைக்கவில்லை')}
               </h1>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
+              <p className="text-gray-600 mb-6">
                 {t('directory.businessNotFoundDesc', 'The business you are looking for does not exist or has been removed.', 'நீங்கள் தேடும் வணிகம் இல்லை அல்லது அகற்றப்பட்டுள்ளது.')}
               </p>
               <Link href="/directory">
@@ -249,13 +249,13 @@ export default function BusinessProfilePage() {
   const averageRating = getAverageRating()
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-blue-950">
+    <div className="min-h-screen bg-gray-50">
       <NewHeader />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <div className="mb-6">
           <Link href="/directory">
-            <Button variant="outline" className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <Button variant="outline" className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
               {t('directory.backToDirectory', 'Back to Directory', 'அடைவுக்கு திரும்பு')}
             </Button>
@@ -271,22 +271,22 @@ export default function BusinessProfilePage() {
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                      <h1 className="text-3xl font-bold text-gray-900">
                         {language === 'ta' && business.name_ta ? business.name_ta : business.name}
                       </h1>
                       {business.verified && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           ✓ {t('directory.verified', 'Verified', 'சரிபார்க்கப்பட்டது')}
                         </span>
                       )}
                       {business.featured && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                           ⭐ {t('directory.featured', 'Featured', 'சிறப்பு')}
                         </span>
                       )}
                     </div>
                     
-                    <p className="text-lg text-gray-600 dark:text-gray-400 capitalize mb-4">
+                    <p className="text-lg text-gray-600 capitalize mb-4">
                       {business.category}
                     </p>
 
@@ -296,7 +296,7 @@ export default function BusinessProfilePage() {
                         <div className="flex">
                           {renderStars(Math.round(averageRating))}
                         </div>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                        <span className="text-sm text-gray-600">
                           {averageRating.toFixed(1)} ({business.comments.length} {t('directory.reviews', 'reviews', 'மதிப்புரைகள்')})
                         </span>
                       </div>
@@ -305,7 +305,7 @@ export default function BusinessProfilePage() {
                 </div>
 
                 {/* Description */}
-                <p className="text-gray-700 dark:text-gray-300 mb-6 text-lg leading-relaxed">
+                <p className="text-gray-700 mb-6 text-lg leading-relaxed">
                   {language === 'ta' && business.description_ta ? business.description_ta : business.description}
                 </p>
 
@@ -314,7 +314,7 @@ export default function BusinessProfilePage() {
                   const youtubeId = getYouTubeId(business.videoUrl)
                   return (
                     <div className="mb-8">
-                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4">
                         {t('directory.promotionalVideo', 'Promotional Video', 'விளம்பர வீடியோ')}
                       </h3>
                       <div className="bg-black rounded-lg overflow-hidden" style={{ aspectRatio: '16/9', position: 'relative' }}>
@@ -366,7 +366,7 @@ export default function BusinessProfilePage() {
                   <Button 
                     variant="outline" 
                     onClick={handleDirections}
-                    className="flex flex-col items-center py-4 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="flex flex-col items-center py-4 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                   >
                     <MapPinIcon className="h-6 w-6 mb-2" />
                     {t('directory.directions', 'Directions', 'திசைகள்')}
@@ -376,7 +376,7 @@ export default function BusinessProfilePage() {
                     <Button 
                       variant="outline" 
                       onClick={() => handleWebsite(business.website!)}
-                      className="flex flex-col items-center py-4 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="flex flex-col items-center py-4 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
                       <GlobeAltIcon className="h-6 w-6 mb-2" />
                       {t('directory.website', 'Website', 'வலைத்தளம்')}
@@ -387,7 +387,7 @@ export default function BusinessProfilePage() {
                     <Button 
                       variant="outline" 
                       onClick={() => handleBooking(business.bookingUrl!)}
-                      className="flex flex-col items-center py-4 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="flex flex-col items-center py-4 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
                       <CalendarIcon className="h-6 w-6 mb-2" />
                       {t('directory.booking', 'Book', 'முன்பதிவு')}
@@ -398,7 +398,7 @@ export default function BusinessProfilePage() {
                 {/* Social Media */}
                 {(business.instagramUrl || business.facebookUrl) && (
                   <div className="mb-8">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">
                       {t('directory.followUs', 'Follow Us', 'எங்களைப் பின்தொடரவும்')}
                     </h3>
                     <div className="flex gap-4">
@@ -424,11 +424,11 @@ export default function BusinessProfilePage() {
                 )}
 
                 {/* Additional Actions */}
-                <div className="flex flex-wrap gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex flex-wrap gap-3 pt-6 border-t border-gray-200">
                   <Button 
                     variant="outline" 
                     onClick={handleDownload}
-                    className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                   >
                     <ArrowDownTrayIcon className="h-4 w-4 mr-2" />
                     {t('directory.download', 'Download Info', 'தகவல் பதிவிறக்கம்')}
@@ -437,7 +437,7 @@ export default function BusinessProfilePage() {
                   <Button 
                     variant="outline" 
                     onClick={handleShare}
-                    className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                   >
                     <ShareIcon className="h-4 w-4 mr-2" />
                     {t('directory.share', 'Share', 'பகிர்')}
@@ -446,7 +446,7 @@ export default function BusinessProfilePage() {
                   <Button 
                     variant="outline" 
                     onClick={() => setShowComments(true)}
-                    className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                   >
                     <ChatBubbleLeftIcon className="h-4 w-4 mr-2" />
                     {t('directory.writeReview', 'Write Review', 'மதிப்புரை எழுதுங்கள்')}
@@ -460,7 +460,7 @@ export default function BusinessProfilePage() {
           <div className="lg:col-span-1">
             <Card className="sticky top-8">
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   {t('directory.contactInfo', 'Contact Information', 'தொடர்பு தகவல்')}
                 </h3>
                 
@@ -468,10 +468,10 @@ export default function BusinessProfilePage() {
                   <div className="flex items-start gap-3">
                     <MapPinIcon className="h-5 w-5 text-gray-400 mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-gray-900 dark:text-white font-medium">
+                      <p className="text-gray-900 font-medium">
                         {t('directory.address', 'Address', 'முகவரி')}
                       </p>
-                      <p className="text-gray-600 dark:text-gray-300">
+                      <p className="text-gray-600">
                         {language === 'ta' && business.address_ta ? business.address_ta : business.address}
                       </p>
                     </div>
@@ -480,10 +480,10 @@ export default function BusinessProfilePage() {
                   <div className="flex items-start gap-3">
                     <PhoneIcon className="h-5 w-5 text-gray-400 mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-gray-900 dark:text-white font-medium">
+                      <p className="text-gray-900 font-medium">
                         {t('directory.phone', 'Phone', 'தொலைபேசி')}
                       </p>
-                      <p className="text-gray-600 dark:text-gray-300">
+                      <p className="text-gray-600">
                         {business.phone}
                       </p>
                     </div>
@@ -493,10 +493,10 @@ export default function BusinessProfilePage() {
                     <div className="flex items-start gap-3">
                       <EnvelopeIcon className="h-5 w-5 text-gray-400 mt-1 flex-shrink-0" />
                       <div>
-                        <p className="text-gray-900 dark:text-white font-medium">
+                        <p className="text-gray-900 font-medium">
                           {t('directory.email', 'Email', 'மின்னஞ்சல்')}
                         </p>
-                        <p className="text-gray-600 dark:text-gray-300 break-all">
+                        <p className="text-gray-600 break-all">
                           {business.email}
                         </p>
                       </div>
@@ -507,10 +507,10 @@ export default function BusinessProfilePage() {
                     <div className="flex items-start gap-3">
                       <GlobeAltIcon className="h-5 w-5 text-gray-400 mt-1 flex-shrink-0" />
                       <div>
-                        <p className="text-gray-900 dark:text-white font-medium">
+                        <p className="text-gray-900 font-medium">
                           {t('directory.website', 'Website', 'வலைத்தளம்')}
                         </p>
-                        <p className="text-gray-600 dark:text-gray-300 break-all">
+                        <p className="text-gray-600 break-all">
                           {business.website}
                         </p>
                       </div>
@@ -521,7 +521,7 @@ export default function BusinessProfilePage() {
                 {/* Map Embed */}
                 {(business.latitude && business.longitude) && (
                   <div className="mt-6">
-                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                    <h4 className="text-md font-semibold text-gray-900 mb-3">
                       {t('directory.location', 'Location', 'இடம்')}
                     </h4>
                     <div className="aspect-w-16 aspect-h-12 rounded-lg overflow-hidden">

@@ -58,18 +58,24 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
 
   const fetchAds = async () => {
     try {
+      console.log('📢 Fetching ads for news article...')
       const response = await fetch('/api/ads/active?category=news')
+      console.log('📢 Ads API response status:', response.status)
       if (response.ok) {
         const data = await response.json()
+        console.log('📢 Fetched ads:', data.length, 'ads found')
+        console.log('📢 Ads data:', data)
         setAds(data)
-        
+
         // Track impressions for each ad
         data.forEach((ad: Ad) => {
           fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
         })
+      } else {
+        console.error('📢 Failed to fetch ads, status:', response.status)
       }
     } catch (error) {
-      console.error('Error fetching ads:', error)
+      console.error('📢 Error fetching ads:', error)
     }
   }
 
@@ -96,7 +102,11 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
   }
 
   const injectAds = () => {
+    console.log('📢 Injecting ads into content...')
+    console.log('📢 Number of ads to inject:', ads.length)
+
     if (ads.length === 0) {
+      console.log('📢 No ads available, showing content without ads')
       setContentWithAds(content)
       return
     }
@@ -104,7 +114,7 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
     // Parse HTML and find paragraphs
     const parser = new DOMParser()
     const doc = parser.parseFromString(content, 'text/html')
-    
+
     // Fix any invalid image sources
     const images = doc.querySelectorAll('img')
     images.forEach((img) => {
@@ -116,8 +126,9 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
         }
       }
     })
-    
+
     const paragraphs = Array.from(doc.querySelectorAll('p, div'))
+    console.log('📢 Number of paragraphs found:', paragraphs.length)
 
     let adIndex = 0
     let paragraphCount = 0
@@ -126,10 +137,11 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
       // Insert ad after every 2-3 paragraphs
       if (paragraph.textContent && paragraph.textContent.trim().length > 50) {
         paragraphCount++
-        
+
         // Insert ad after 2nd, 5th, 8th paragraph, etc. (every 3 paragraphs)
         if (paragraphCount % 3 === 0 && adIndex < ads.length) {
           const ad = ads[adIndex]
+          console.log(`📢 Inserting ad ${adIndex + 1} after paragraph ${paragraphCount}`)
           const adElement = createAdElement(ad)
           paragraph.insertAdjacentHTML('afterend', adElement)
           adIndex = (adIndex + 1) % ads.length // Cycle through ads
@@ -137,6 +149,7 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
       }
     })
 
+    console.log('📢 Total ads injected:', adIndex)
     setContentWithAds(doc.body.innerHTML)
   }
 
@@ -144,29 +157,29 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
     if (ad.htmlCode) {
       // HTML/AdSense code
       return `
-        <div class="ad-container my-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg border-2 border-blue-300 dark:border-blue-600 shadow-lg">
-          <p class="text-xs text-blue-600 dark:text-blue-400 mb-3 text-center font-semibold">📢 Advertisement</p>
+        <div class="ad-container my-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
+          <p class="text-xs text-blue-700 mb-3 text-center font-bold">📢 Advertisement</p>
           ${ad.htmlCode}
         </div>
       `
     } else if (ad.imageUrl) {
       // Validate and clean image URL
       let imageUrl = ad.imageUrl
-      
+
       // Skip broken base64 URLs (too long or malformed)
       if (imageUrl.startsWith('data:image/') && imageUrl.length > 100000) {
-        console.warn('Skipping broken base64 ad image:', ad.id)
+        console.warn('📢 Skipping broken base64 ad image:', ad.id)
         return '' // Skip this ad
       }
-      
+
       // Image ad with optional link
       const img = `<img src="${imageUrl}" alt="${ad.title}" class="ad-image w-full h-auto rounded-lg shadow-md" onerror="this.parentElement.style.display='none'" />`
       const clickHandler = ad.link ? `onclick="handleAdClick('${ad.id}', '${ad.link}')"` : ''
-      
+
       return `
-        <div class="ad-container my-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg border-2 border-blue-300 dark:border-blue-600 shadow-lg">
-          <p class="text-xs text-blue-600 dark:text-blue-400 mb-3 text-center font-semibold">📢 Advertisement</p>
-          ${ad.link 
+        <div class="ad-container my-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
+          <p class="text-xs text-blue-700 mb-3 text-center font-bold">📢 Advertisement</p>
+          ${ad.link
             ? `<a href="${ad.link}" target="_blank" rel="noopener noreferrer" ${clickHandler} class="block hover:opacity-90 transition-opacity cursor-pointer">${img}</a>`
             : img
           }
@@ -198,12 +211,17 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
         .news-content {
           word-wrap: break-word !important;
           overflow-wrap: break-word !important;
+          color: #000000 !important;
+        }
+        .news-content * {
+          color: #000000 !important;
         }
         .news-content ul {
           list-style-type: disc !important;
           padding-left: 1.5rem !important;
           margin: 0.75rem 0 !important;
           list-style-position: outside !important;
+          color: #000000 !important;
         }
         @media (min-width: 640px) {
           .news-content ul {
@@ -215,6 +233,7 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
           padding-left: 1.5rem !important;
           margin: 0.75rem 0 !important;
           list-style-position: outside !important;
+          color: #000000 !important;
         }
         @media (min-width: 640px) {
           .news-content ol {
@@ -224,19 +243,36 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
         .news-content li {
           display: list-item !important;
           margin: 0.5rem 0 !important;
-          color: #374151 !important;
+          color: #000000 !important;
           word-wrap: break-word !important;
         }
         .dark .news-content li {
-          color: #F9FAFB !important;
+          color: #000000 !important;
         }
         .news-content p {
           margin: 0.75rem 0 !important;
           line-height: 1.7 !important;
+          color: #000000 !important;
+        }
+        .news-content div {
+          color: #000000 !important;
+        }
+        .news-content span {
+          color: #000000 !important;
+        }
+        .news-content strong,
+        .news-content b {
+          color: #000000 !important;
+        }
+        .news-content em,
+        .news-content i {
+          color: #000000 !important;
         }
         .news-content h1, .news-content h2, .news-content h3, .news-content h4, .news-content h5, .news-content h6 {
           margin: 1rem 0 0.5rem 0 !important;
           line-height: 1.3 !important;
+          color: #000000 !important;
+          font-weight: bold !important;
         }
         .news-content img {
           max-width: 100% !important;
@@ -284,18 +320,25 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
           border-left: 4px solid #3B82F6 !important;
           background-color: #F8FAFC !important;
           border-radius: 0 0.5rem 0.5rem 0 !important;
+          color: #000000 !important;
         }
         .dark .news-content blockquote {
-          background-color: #1E293B !important;
-          border-left-color: #93C5FD !important;
+          background-color: #F8FAFC !important;
+          border-left-color: #3B82F6 !important;
+          color: #000000 !important;
+        }
+        .news-content a {
+          color: #2563eb !important;
+          text-decoration: underline !important;
         }
       `}} />
-      <div 
-        className="news-content prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none dark:prose-invert"
+      <div
+        className="news-content prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none"
         dangerouslySetInnerHTML={{ __html: contentWithAds }}
         style={{
           fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
-          lineHeight: '1.7'
+          lineHeight: '1.7',
+          color: '#000000'
         }}
       />
     </>

@@ -78,7 +78,7 @@ export default async function RadioPage({ params }: RadioPageProps) {
             }
           </p>
           <div className="mt-6 flex justify-center">
-            <div className="flex items-center space-x-4 bg-white dark:bg-blue-900 rounded-lg shadow-md p-4">
+            <div className="flex items-center space-x-4 bg-white rounded-lg shadow-md p-4">
               <div className="flex items-center space-x-2">
                 <div className="h-3 w-3 bg-red-500 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-gray-900">
@@ -164,7 +164,7 @@ export default async function RadioPage({ params }: RadioPageProps) {
         </div>
 
         {/* Contact Info */}
-        <div className="mt-12 bg-white dark:bg-blue-900 rounded-lg shadow-md p-6">
+        <div className="mt-12 bg-white rounded-lg shadow-md p-6">
           <h3 className="text-xl font-bold text-gray-900 mb-4">
             {locale === 'ta' ? 'தொடர்பு கொள்ளுங்கள்' : 'Get in Touch'}
           </h3>
