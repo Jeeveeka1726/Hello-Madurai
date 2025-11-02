@@ -422,8 +422,8 @@ export default function EnhancedRadioPlayer({
                   onClick={() => onShowChange(index)}
                   className={`w-full text-left p-2 rounded-lg transition-colors ${
                     index === currentShowIndex
-                      ? 'bg-blue-100 text-blue-900
-                      : 'hover:bg-gray-100
+                      ? 'bg-blue-100 text-blue-900'
+                      : 'hover:bg-gray-100'
                   }`}
                 >
                   <div className="flex items-center justify-between">
