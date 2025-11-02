@@ -91,44 +91,9 @@ body:not(.admin-page) #__next {
 .bg-blue-700 span,
 .bg-blue-700 a,
 .bg-blue-700 div,
-.bg-gradient-to-r,
-.bg-gradient-to-r *,
-.bg-gradient-to-r h1,
-.bg-gradient-to-r h2,
-.bg-gradient-to-r h3,
-.bg-gradient-to-r h4,
-.bg-gradient-to-r h5,
-.bg-gradient-to-r h6,
-.bg-gradient-to-r p,
-.bg-gradient-to-r span,
-.bg-gradient-to-r a,
-.bg-gradient-to-r div,
-[class*="from-blue"],
-[class*="from-blue"] *,
-[class*="from-blue"] h1,
-[class*="from-blue"] h2,
-[class*="from-blue"] h3,
-[class*="from-blue"] h4,
-[class*="from-blue"] h5,
-[class*="from-blue"] h6,
-[class*="from-blue"] p,
-[class*="from-blue"] span,
-[class*="from-blue"] a,
-[class*="from-blue"] div,
-[class*="to-blue"],
-[class*="to-blue"] *,
-[class*="to-blue"] h1,
-[class*="to-blue"] h2,
-[class*="to-blue"] h3,
-[class*="to-blue"] h4,
-[class*="to-blue"] h5,
-[class*="to-blue"] h6,
-[class*="to-blue"] p,
-[class*="to-blue"] span,
-[class*="to-blue"] a,
-[class*="to-blue"] div {
-  color: #ffffff !important;
-}
+/* REMOVED: These selectors were too broad and matched light backgrounds like from-blue-50 */
+/* Only apply white text to actual dark blue backgrounds (bg-blue-500, bg-blue-600, bg-blue-700) */
+/* Light gradient backgrounds (from-blue-50, to-yellow-50) should have BLACK text */
 
 /* Black text on white/light backgrounds - ONLY for specific content elements, NOT navigation */
 /* Removed global rules that were forcing header navigation to black */
@@ -147,10 +112,7 @@ body:not(.admin-page) #__next {
 /* Exception: White buttons on blue backgrounds should have blue text */
 .bg-blue-500 button.bg-white,
 .bg-blue-600 button.bg-white,
-.bg-blue-700 button.bg-white,
-.bg-gradient-to-r button.bg-white,
-[class*="from-blue"] button.bg-white,
-[class*="to-blue"] button.bg-white {
+.bg-blue-700 button.bg-white {
   color: #2563eb !important;
 }
 
