@@ -130,7 +130,7 @@ function NewsDetailPageContent() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">
+            <p className="mt-4 text-gray-600 dark:text-gray-300" suppressHydrationWarning>
               {t('news.loading', 'Loading article...', 'கட்டுரை ஏற்றப்படுகிறது...')}
             </p>
           </div>

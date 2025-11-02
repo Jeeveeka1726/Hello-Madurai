@@ -86,10 +86,10 @@ export default function RootPage() {
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-500 dark:to-blue-600">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
             <div className="text-center">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6" suppressHydrationWarning>
                 {t('home.title', 'Hello Madurai', 'ஹலோ மதுரை')}
               </h1>
-              <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+              <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto" suppressHydrationWarning>
                 {t('home.subtitle', 'Your gateway to Madurai - News, Radio & More', 'மதுரைக்கான உங்கள் நுழைவாயில் - செய்திகள், வானொலி மற்றும் பலவும்')}
               </p>
               <Link

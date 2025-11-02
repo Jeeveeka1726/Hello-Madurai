@@ -61,7 +61,7 @@ export default function Footer() {
               <span className="text-2xl font-bold text-white">Hello Madurai</span>
               <span className="ml-2 text-lg text-blue-200">ஹலோ மதுரை</span>
             </Link>
-            <p className="text-blue-200 mb-4 max-w-md">
+            <p className="text-blue-200 mb-4 max-w-md" suppressHydrationWarning>
               {t('footer.description', 'Your local news and information hub. Stay connected with the latest news, events, and services from Madurai and surrounding areas.', 'உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம். மதுரை மற்றும் சுற்றுவட்டார பகுதிகளின் சமீபத்திய செய்திகள், நிகழ்வுகள் மற்றும் சேவைகளை அறிந்து கொள்ளுங்கள்.')}
             </p>
             <div className="flex space-x-4">
@@ -82,7 +82,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">
+            <h3 className="text-lg font-semibold mb-4" suppressHydrationWarning>
               {t('footer.quickLinks', 'Quick Links', 'விரைவு இணைப்புகள்')}
             </h3>
             <ul className="space-y-2">
@@ -91,6 +91,7 @@ export default function Footer() {
                   <Link
                     href={link.href}
                     className="text-blue-300 hover:text-white transition-colors duration-200"
+                    suppressHydrationWarning
                   >
                     {t(`nav.${link.name}`, link.name, link.name)}
                   </Link>
@@ -101,7 +102,7 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">
+            <h3 className="text-lg font-semibold mb-4" suppressHydrationWarning>
               {t('footer.services', 'Services', 'சேவைகள்')}
             </h3>
             <ul className="space-y-2">
@@ -110,6 +111,7 @@ export default function Footer() {
                   <Link
                     href={service.href}
                     className="text-blue-300 hover:text-white transition-colors duration-200"
+                    suppressHydrationWarning
                   >
                     {t(`nav.${service.name}`, service.name, service.name)}
                   </Link>
@@ -122,17 +124,17 @@ export default function Footer() {
         {/* Bottom section */}
         <div className="mt-8 pt-8 border-t border-blue-800">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-blue-300 text-sm">
+            <p className="text-blue-300 text-sm" suppressHydrationWarning>
               © {currentYear} Hello Madurai. {t('footer.copyright', 'All rights reserved.', 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.')}
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="/privacy" className="text-blue-300 hover:text-white text-sm transition-colors duration-200">
+              <Link href="/privacy" className="text-blue-300 hover:text-white text-sm transition-colors duration-200" suppressHydrationWarning>
                 {t('footer.privacy', 'Privacy Policy', 'தனியுரிமை கொள்கை')}
               </Link>
-              <Link href="/terms" className="text-blue-300 hover:text-white text-sm transition-colors duration-200">
+              <Link href="/terms" className="text-blue-300 hover:text-white text-sm transition-colors duration-200" suppressHydrationWarning>
                 {t('footer.terms', 'Terms of Service', 'விதிமுறைகள்')}
               </Link>
-              <Link href="/contact" className="text-blue-300 hover:text-white text-sm transition-colors duration-200">
+              <Link href="/contact" className="text-blue-300 hover:text-white text-sm transition-colors duration-200" suppressHydrationWarning>
                 {t('footer.contact', 'Contact', 'தொடர்பு')}
               </Link>
             </div>

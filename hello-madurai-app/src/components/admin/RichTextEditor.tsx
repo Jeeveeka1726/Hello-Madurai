@@ -38,7 +38,7 @@ export default function RichTextEditor({
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [1, 2, 3]
+          levels: [1, 2, 3, 4, 5, 6]
         }
       }),
       Image.configure({
@@ -302,6 +302,46 @@ export default function RichTextEditor({
           title="Heading 2"
         >
           H2
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
+            editor.isActive('heading', { level: 3 }) ? 'bg-blue-200 dark:bg-blue-800' : ''
+          }`}
+          title="Heading 3"
+        >
+          H3
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
+          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
+            editor.isActive('heading', { level: 4 }) ? 'bg-blue-200 dark:bg-blue-800' : ''
+          }`}
+          title="Heading 4"
+        >
+          H4
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
+          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
+            editor.isActive('heading', { level: 5 }) ? 'bg-blue-200 dark:bg-blue-800' : ''
+          }`}
+          title="Heading 5"
+        >
+          H5
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
+          className={`px-2 py-1 text-sm font-bold hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors ${
+            editor.isActive('heading', { level: 6 }) ? 'bg-blue-200 dark:bg-blue-800' : ''
+          }`}
+          title="Heading 6"
+        >
+          H6
         </button>
 
         <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
