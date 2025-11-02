@@ -46,7 +46,7 @@ export default function NewHeader() {
       href: '/magazine' 
     },
     {
-      name: t('nav.directory', 'Directory', 'முகவரி'),
+      name: t('nav.directory', 'Directory', 'முகவரி நூல்'),
       href: '/directory'
     },
   ]

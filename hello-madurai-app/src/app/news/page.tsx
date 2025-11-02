@@ -125,7 +125,7 @@ function NewsPageContent() {
         {loading && (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">
+            <p className="mt-4 text-gray-600 dark:text-gray-300" suppressHydrationWarning>
               {t('news.loading', 'Loading news...', 'செய்திகள் ஏற்றப்படுகின்றன...')}
             </p>
           </div>

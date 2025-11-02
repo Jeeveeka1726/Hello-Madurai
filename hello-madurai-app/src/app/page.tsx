@@ -2,11 +2,11 @@
 
 import { useLanguage } from '@/contexts/LanguageContext'
 import Link from 'next/link'
-import { 
-  NewspaperIcon, 
-  // VideoCameraIcon removed 
-  MicrophoneIcon, 
-  DocumentIcon, 
+import {
+  NewspaperIcon,
+  VideoCameraIcon,
+  MicrophoneIcon,
+  DocumentIcon,
   PhoneIcon,
   CalendarIcon,
   BuildingOfficeIcon,
@@ -35,11 +35,18 @@ export default function RootPage() {
       color: 'bg-green-500'
     },
     {
-      name: t('nav.magazine', 'E-Paper', 'பத்திரிகை'),
-      description: t('home.magazineDesc', 'Read digital newspapers', 'டிஜிட்டல் பத்திரிகைகளைப் படியுங்கள்'),
-      href: '/magazine',
-      icon: DocumentIcon,
-      color: 'bg-blue-500'
+      name: t('nav.video', 'Video', 'காணொளி'),
+      description: t('home.videoDesc', 'Watch videos from Madurai', 'மதுரையின் காணொளிகளைப் பார்க்கவும்'),
+      href: '/video',
+      icon: VideoCameraIcon,
+      color: 'bg-purple-500'
+    },
+    {
+      name: t('nav.directory', 'Directory', 'முகவரி நூல்'),
+      description: t('home.directoryDesc', 'Business listings and contacts', 'வணிக பட்டியல்கள் மற்றும் தொடர்புகள்'),
+      href: '/directory',
+      icon: BuildingOfficeIcon,
+      color: 'bg-indigo-500'
     },
     {
       name: t('nav.events', 'Events', 'நிகழ்வுகள்'),
@@ -49,18 +56,11 @@ export default function RootPage() {
       color: 'bg-orange-500'
     },
     {
-      name: t('nav.directory', 'Directory', 'அடைவு'),
-      description: t('home.directoryDesc', 'Business listings and contacts', 'வணிக பட்டியல்கள் மற்றும் தொடர்புகள்'),
-      href: '/directory',
-      icon: BuildingOfficeIcon,
-      color: 'bg-indigo-500'
-    },
-    {
-      name: t('nav.discount', 'Discount Card', 'தள்ளுபடி அட்டை'),
-      description: t('home.discountDesc', 'Get discounts across Madurai', 'மதுரை முழுவதும் தள்ளுபடி பெறுங்கள்'),
-      href: '/discount',
-      icon: CreditCardIcon,
-      color: 'bg-yellow-500'
+      name: t('nav.magazine', 'E-Paper', 'பத்திரிகை'),
+      description: t('home.magazineDesc', 'Read digital newspapers', 'டிஜிட்டல் பத்திரிகைகளைப் படியுங்கள்'),
+      href: '/magazine',
+      icon: DocumentIcon,
+      color: 'bg-blue-500'
     },
     {
       name: t('nav.helpline', 'Help Line', 'உதவி எண்'),
@@ -68,6 +68,13 @@ export default function RootPage() {
       href: '/helpline',
       icon: PhoneIcon,
       color: 'bg-red-600'
+    },
+    {
+      name: t('nav.discount', 'Discount Card', 'தள்ளுபடி அட்டை'),
+      description: t('home.discountDesc', 'Get discounts across Madurai', 'மதுரை முழுவதும் தள்ளுபடி பெறுங்கள்'),
+      href: '/discount',
+      icon: CreditCardIcon,
+      color: 'bg-yellow-500'
     },
     {
       name: t('nav.contact', 'Contact', 'தொடர்பு'),
