@@ -59,15 +59,24 @@ export default function EventDetailClient({ event }: Props) {
     incrementView()
   }, [event.id])
 
-  // Fix YouTube iframes to use youtube-nocookie.com domain
+  // Fix YouTube iframes to use youtube-nocookie.com domain and ensure proper sizing
   useEffect(() => {
     setTimeout(() => {
-      const iframes = document.querySelectorAll('iframe[src*="youtube.com"]')
+      const iframes = document.querySelectorAll('.event-description iframe')
       iframes.forEach((iframe) => {
         const src = iframe.getAttribute('src')
+
+        // Fix YouTube domain
         if (src && src.includes('youtube.com') && !src.includes('youtube-nocookie.com')) {
           const newSrc = src.replace('youtube.com', 'youtube-nocookie.com')
           iframe.setAttribute('src', newSrc)
+        }
+
+        // Remove inline width/height attributes - let CSS handle sizing
+        if (src && (src.includes('youtube') || src.includes('instagram'))) {
+          iframe.removeAttribute('width')
+          iframe.removeAttribute('height')
+          iframe.removeAttribute('style')
         }
       })
     }, 100)
@@ -321,16 +330,29 @@ export default function EventDetailClient({ event }: Props) {
           margin-bottom: 1rem;
         }
         
-        .event-description iframe,
-        .event-description iframe[src*="youtube"] {
-          width: 100% !important;
-          max-width: 1280px !important;
-          height: auto !important;
-          aspect-ratio: 16 / 9 !important;
+        /* Base styles for all iframes */
+        .event-description iframe {
           border-radius: 0.5rem !important;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
           margin: 1.5rem auto !important;
           display: block !important;
+        }
+
+        /* YouTube videos - 1280x720 max, responsive */
+        .event-description iframe[src*="youtube"],
+        .event-description iframe[src*="youtube-nocookie"] {
+          width: 100% !important;
+          max-width: 1280px !important;
+          height: auto !important;
+          aspect-ratio: 16 / 9 !important;
+        }
+
+        /* Instagram Reels - 540x720 max, responsive */
+        .event-description iframe[src*="instagram"] {
+          width: 100% !important;
+          max-width: 540px !important;
+          height: auto !important;
+          aspect-ratio: 9 / 16 !important;
         }
       `}</style>
     </div>

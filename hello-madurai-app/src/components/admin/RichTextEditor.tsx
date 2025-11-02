@@ -63,7 +63,7 @@ export default function RichTextEditor({
         enableIFrameApi: false,
         HTMLAttributes: {
           class: 'youtube-video',
-          style: 'width: 1280px; height: 720px; max-width: 100%; display: block; margin: 1.5rem auto;',
+          style: 'width: 100%; max-width: 1280px; height: auto; aspect-ratio: 16 / 9; display: block; margin: 1.5rem auto;',
           allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
           allowfullscreen: 'true',
           frameborder: '0',
@@ -174,11 +174,25 @@ export default function RichTextEditor({
   }
 
   const addYouTubeVideo = () => {
-    const url = prompt('Enter YouTube URL (e.g., https://www.youtube.com/watch?v=VIDEO_ID):')
+    const url = prompt('Enter YouTube URL (supports regular videos, Shorts, and Instagram Reels):\n\nExamples:\n• https://www.youtube.com/watch?v=VIDEO_ID\n• https://youtube.com/shorts/VIDEO_ID\n• https://www.instagram.com/reel/REEL_ID/')
     if (url) {
+      // Check if it's an Instagram Reel
+      const instagramReelRegex = /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel)\/([A-Za-z0-9_-]+)/
+      const instagramMatch = url.match(instagramReelRegex)
+
+      if (instagramMatch) {
+        const reelId = instagramMatch[1]
+        // Insert Instagram Reel as iframe
+        const instagramEmbed = `<div style="max-width: 540px; margin: 1.5rem auto;"><iframe src="https://www.instagram.com/reel/${reelId}/embed" width="540" height="720" frameborder="0" scrolling="no" allowtransparency="true" allow="encrypted-media" style="width: 100%; max-width: 540px; height: 720px; border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display: block; margin: 0 auto;"></iframe></div>`
+        editor.commands.insertContent(instagramEmbed)
+        toast.success('✅ Instagram Reel embedded!')
+        return
+      }
+
+      // Check if it's a YouTube URL (including Shorts)
       const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/
       if (!youtubeRegex.test(url)) {
-        toast.error('Please enter a valid YouTube URL')
+        toast.error('Please enter a valid YouTube or Instagram Reel URL')
         return
       }
 
@@ -203,6 +217,12 @@ export default function RichTextEditor({
         videoId = embedMatch[1]
       }
 
+      // Handle youtube.com/shorts/VIDEO_ID format (YouTube Shorts)
+      const shortsMatch = url.match(/youtube\.com\/shorts\/([^?]+)/)
+      if (shortsMatch) {
+        videoId = shortsMatch[1]
+      }
+
       if (!videoId) {
         toast.error('Could not extract video ID from URL')
         return
@@ -214,7 +234,7 @@ export default function RichTextEditor({
         width: 1280,
         height: 720
       })
-      toast.success('✅ YouTube video embedded at 1280×720! (Using youtube-nocookie.com for better compatibility)')
+      toast.success('✅ YouTube video embedded at 1280×720! (Supports Shorts too)')
     }
   }
 
@@ -228,10 +248,10 @@ export default function RichTextEditor({
             {label}
           </label>
           <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-            ✅ Images auto-resize to 1280×720 px | 📺 YouTube videos embed at 1280×720 px
+            ✅ Images auto-resize to 1280×720 px | 📺 YouTube videos/Shorts embed at 1280×720 px | 📱 Instagram Reels supported
           </p>
           <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-            ⚠️ Important: Only use YouTube videos that allow embedding (public videos with embedding enabled)
+            ⚠️ Important: Only use public videos/reels with embedding enabled
           </p>
         </div>
       )}
@@ -336,14 +356,14 @@ export default function RichTextEditor({
           🖼️ URL
         </button>
 
-        {/* YouTube Video */}
+        {/* YouTube Video / Instagram Reel */}
         <button
           type="button"
           onClick={addYouTubeVideo}
           className="px-2 py-1 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors text-gray-700 dark:text-gray-300"
-          title="Embed YouTube Video (1280x720)"
+          title="Embed YouTube Video/Shorts or Instagram Reel"
         >
-          ▶️ YouTube
+          ▶️ Video
         </button>
 
 
@@ -366,8 +386,14 @@ export default function RichTextEditor({
         <ul className="space-y-1 ml-4">
           <li>• <strong>Type freely</strong> - ALL content saves! No truncation!</li>
           <li>• <strong>Images:</strong> Click 📷 to upload or 🖼️ URL for links</li>
-          <li>• <strong>YouTube Videos:</strong> Click ▶️ YouTube and paste full YouTube URL (embeds at 1280×720 px)</li>
-          <li className="text-amber-600 dark:text-amber-400">⚠️ <strong>Note:</strong> Only public YouTube videos with embedding enabled will play</li>
+          <li>• <strong>Videos:</strong> Click ▶️ Video and paste:
+            <ul className="ml-4 mt-1">
+              <li>- YouTube videos (embeds at 1280×720 px)</li>
+              <li>- YouTube Shorts (youtube.com/shorts/...)</li>
+              <li>- Instagram Reels (instagram.com/reel/...)</li>
+            </ul>
+          </li>
+          <li className="text-amber-600 dark:text-amber-400">⚠️ <strong>Note:</strong> Only public videos/reels with embedding enabled will play</li>
           <li>• <strong>Format:</strong> Use toolbar buttons or Ctrl+B (bold), Ctrl+I (italic)</li>
         </ul>
       </div>
@@ -475,9 +501,10 @@ export default function RichTextEditor({
           cursor: pointer;
         }
         .ProseMirror iframe {
-          width: 1280px;
-          height: 720px;
-          max-width: 100%;
+          width: 100% !important;
+          max-width: 1280px !important;
+          height: auto !important;
+          aspect-ratio: 16 / 9 !important;
           border-radius: 0.75rem;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           margin: 1.5rem auto;

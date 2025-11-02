@@ -41,6 +41,7 @@ function EventsPageContent() {
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [shareMenuOpen, setShareMenuOpen] = useState<string | null>(null)
+  const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set())
 
   // Fetch events from database
   useEffect(() => {
@@ -86,18 +87,26 @@ function EventsPageContent() {
     fetchEvents()
   }, [])
 
-  // Fix YouTube iframes to use youtube-nocookie.com domain
+  // Fix YouTube iframes to use youtube-nocookie.com domain and ensure proper sizing
   useEffect(() => {
     if (!loading && events.length > 0) {
       // Wait for DOM to render
       setTimeout(() => {
-        const iframes = document.querySelectorAll('iframe[src*="youtube.com"]')
+        const iframes = document.querySelectorAll('.event-description iframe')
         iframes.forEach((iframe) => {
           const src = iframe.getAttribute('src')
+
+          // Fix YouTube domain
           if (src && src.includes('youtube.com') && !src.includes('youtube-nocookie.com')) {
-            // Replace youtube.com with youtube-nocookie.com
             const newSrc = src.replace('youtube.com', 'youtube-nocookie.com')
             iframe.setAttribute('src', newSrc)
+          }
+
+          // Remove inline width/height attributes - let CSS handle sizing
+          if (src && (src.includes('youtube') || src.includes('instagram'))) {
+            iframe.removeAttribute('width')
+            iframe.removeAttribute('height')
+            iframe.removeAttribute('style')
           }
         })
       }, 100)
@@ -154,6 +163,18 @@ function EventsPageContent() {
 
   const handleShare = (eventId: string) => {
     setShareMenuOpen(shareMenuOpen === eventId ? null : eventId)
+  }
+
+  const toggleReadMore = (eventId: string) => {
+    setExpandedEvents(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(eventId)) {
+        newSet.delete(eventId)
+      } else {
+        newSet.add(eventId)
+      }
+      return newSet
+    })
   }
 
   const incrementView = async (eventId: string) => {
@@ -295,30 +316,76 @@ function EventsPageContent() {
                           display: block !important;
                           border-radius: 0.5rem !important;
                         }
-                        .event-description iframe,
-                        .event-description iframe[src*="youtube"] {
-                          width: 100% !important;
-                          max-width: 1280px !important;
-                          height: auto !important;
-                          aspect-ratio: 16 / 9 !important;
+                        /* Base styles for all iframes */
+                        .event-description iframe {
                           border-radius: 0.5rem !important;
                           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
                           margin: 1.5rem auto !important;
                           display: block !important;
                         }
+
+                        /* YouTube videos - 1280x720 max, responsive */
+                        .event-description iframe[src*="youtube"],
+                        .event-description iframe[src*="youtube-nocookie"] {
+                          width: 100% !important;
+                          max-width: 1280px !important;
+                          height: auto !important;
+                          aspect-ratio: 16 / 9 !important;
+                        }
+
+                        /* Instagram Reels - 540x720 max, responsive */
+                        .event-description iframe[src*="instagram"] {
+                          width: 100% !important;
+                          max-width: 540px !important;
+                          height: auto !important;
+                          aspect-ratio: 9 / 16 !important;
+                        }
+
                         .event-description div[data-youtube-video] {
                           width: 100% !important;
                           max-width: 1280px !important;
                           margin: 1.5rem auto !important;
                           display: block !important;
                         }
+                        .event-description-collapsed {
+                          max-height: 200px;
+                          overflow: hidden;
+                          position: relative;
+                        }
+                        .event-description-collapsed::after {
+                          content: '';
+                          position: absolute;
+                          bottom: 0;
+                          left: 0;
+                          right: 0;
+                          height: 80px;
+                          background: linear-gradient(to bottom, transparent, white);
+                        }
+                        .dark .event-description-collapsed::after {
+                          background: linear-gradient(to bottom, transparent, rgb(31, 41, 55));
+                        }
                       `}} />
                       <div
-                        className="event-description text-gray-700 dark:text-gray-200"
+                        className={`event-description text-gray-700 dark:text-gray-200 ${
+                          !expandedEvents.has(event.id) ? 'event-description-collapsed' : ''
+                        }`}
                         dangerouslySetInnerHTML={{
                           __html: language === 'ta' && event.description_ta ? event.description_ta : event.description
                         }}
                       />
+                      {/* Read More Button */}
+                      {((language === 'ta' && event.description_ta && event.description_ta.length > 500) ||
+                        (language !== 'ta' && event.description && event.description.length > 500)) && (
+                        <button
+                          onClick={() => toggleReadMore(event.id)}
+                          className="mt-3 text-blue-600 dark:text-yellow-400 hover:underline font-medium text-sm"
+                          suppressHydrationWarning
+                        >
+                          {expandedEvents.has(event.id)
+                            ? t('events.readLess', 'Read Less', 'குறைவாக படிக்கவும்')
+                            : t('events.readMore', 'Read More', 'மேலும் படிக்கவும்')}
+                        </button>
+                      )}
                     </div>
                     
                     {/* Posted Date and Views at Bottom */}

@@ -31,6 +31,31 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
     }
   }, [ads, content])
 
+  // Fix YouTube iframes to use youtube-nocookie.com domain and ensure proper sizing
+  useEffect(() => {
+    if (contentWithAds) {
+      setTimeout(() => {
+        const iframes = document.querySelectorAll('.news-content iframe')
+        iframes.forEach((iframe) => {
+          const src = iframe.getAttribute('src')
+
+          // Fix YouTube domain
+          if (src && src.includes('youtube.com') && !src.includes('youtube-nocookie.com')) {
+            const newSrc = src.replace('youtube.com', 'youtube-nocookie.com')
+            iframe.setAttribute('src', newSrc)
+          }
+
+          // Remove inline width/height attributes - let CSS handle sizing
+          if (src && (src.includes('youtube') || src.includes('instagram'))) {
+            iframe.removeAttribute('width')
+            iframe.removeAttribute('height')
+            iframe.removeAttribute('style')
+          }
+        })
+      }, 100)
+    }
+  }, [contentWithAds])
+
   const fetchAds = async () => {
     try {
       const response = await fetch('/api/ads/active?category=news')
@@ -229,32 +254,29 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
           height: auto !important;
           object-fit: contain !important;
         }
+        /* Base styles for all iframes */
         .news-content iframe {
-          width: 100% !important;
-          aspect-ratio: 16 / 9 !important;
           border-radius: 0.5rem !important;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
           margin: 1.5rem auto !important;
           display: block !important;
         }
-        @media (min-width: 1024px) {
-          .news-content iframe {
-            width: 100% !important;
-            max-width: 1280px !important;
-            height: 720px !important;
-            margin: 2rem auto !important;
-          }
+
+        /* YouTube videos - 1280x720 max, responsive */
+        .news-content iframe[src*="youtube"],
+        .news-content iframe[src*="youtube-nocookie"] {
+          width: 100% !important;
+          max-width: 1280px !important;
+          height: auto !important;
+          aspect-ratio: 16 / 9 !important;
         }
-        @media (min-width: 768px) and (max-width: 1023px) {
-          .news-content iframe {
-            height: 500px !important;
-          }
-        }
-        @media (max-width: 767px) {
-          .news-content iframe {
-            height: 250px !important;
-            margin: 1rem auto !important;
-          }
+
+        /* Instagram Reels - 540x720 max, responsive */
+        .news-content iframe[src*="instagram"] {
+          width: 100% !important;
+          max-width: 540px !important;
+          height: auto !important;
+          aspect-ratio: 9 / 16 !important;
         }
         .news-content blockquote {
           margin: 1rem 0 !important;

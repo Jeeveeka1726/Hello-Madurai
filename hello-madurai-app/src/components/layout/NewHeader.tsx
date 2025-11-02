@@ -91,11 +91,13 @@ export default function NewHeader() {
               )}
             </Link>
             {isNewsPage && (
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 className="ml-3 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors duration-200 hover-lift"
               >
-                {t('nav.home', 'Home', 'முகப்பு')}
+                <span suppressHydrationWarning>
+                  {t('nav.home', 'Home', 'முகப்பு')}
+                </span>
               </Link>
             )}
           </div>

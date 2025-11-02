@@ -10,7 +10,7 @@ DATABASE_URL=mysql://u449309789_hellomadurai25:HelloMadurai123@srv1990.hstgr.io:
 # Node Environment
 NODE_ENV=production
 
-# Public App URL
+# Public App URL (Used for Open Graph images and social media sharing)
 NEXT_PUBLIC_APP_URL=https://hello-madurai-c5xr.vercel.app
 
 # ========================================
