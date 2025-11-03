@@ -15,8 +15,8 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   font-size: 16px; /* Comfortable base size */
   font-weight: 500; /* Medium weight - not too bold */
-  line-height: 1.8; /* Increased line height for better Tamil readability */
-  letter-spacing: 0.04em; /* Increased letter spacing for Tamil - less congested */
+  line-height: 2.0; /* Increased line height for Tamil - focus on vertical spacing */
+  letter-spacing: 0.02em; /* Moderate letter spacing - focus on line spacing instead */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #ffffff !important; /* Pure white background */
@@ -345,93 +345,100 @@ header button:hover {
 /* Enhanced Typography - Better Readability */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600 !important; /* Semi-bold headings - not too heavy */
-  letter-spacing: 0.04em !important; /* Increased letter spacing for Tamil - less congested */
+  letter-spacing: 0.02em !important; /* Moderate letter spacing */
 }
 
 h1 {
   font-size: 2.25rem !important; /* 36px */
-  line-height: 1.4 !important; /* Increased line height */
-  letter-spacing: 0.03em !important; /* Increased spacing for Tamil */
+  line-height: 1.6 !important; /* Focus on vertical spacing */
+  letter-spacing: 0.015em !important; /* Moderate spacing */
 }
 
 h2 {
   font-size: 1.875rem !important; /* 30px */
-  line-height: 1.5 !important; /* Increased line height */
-  letter-spacing: 0.035em !important; /* Increased spacing for Tamil */
+  line-height: 1.7 !important; /* Focus on vertical spacing */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
 }
 
 h3 {
   font-size: 1.5rem !important; /* 24px */
-  line-height: 1.5 !important; /* Increased line height */
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  line-height: 1.7 !important; /* Focus on vertical spacing */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
 }
 
 h4 {
   font-size: 1.25rem !important; /* 20px */
-  line-height: 1.6 !important; /* Increased line height */
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  line-height: 1.8 !important; /* Focus on vertical spacing */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
 }
 
 h5 {
   font-size: 1.125rem !important; /* 18px */
-  line-height: 1.6 !important; /* Increased line height */
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  line-height: 1.8 !important; /* Focus on vertical spacing */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
 }
 
 h6 {
   font-size: 1rem !important; /* 16px */
-  line-height: 1.6 !important; /* Increased line height */
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  line-height: 1.8 !important; /* Focus on vertical spacing */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
 }
 
 p {
   font-size: 1rem !important; /* 16px - comfortable size */
   font-weight: 500 !important; /* Medium weight - not too bold */
-  line-height: 1.85 !important; /* Increased line height for Tamil */
-  letter-spacing: 0.04em !important; /* Increased letter spacing for Tamil - less congested */
+  line-height: 2.0 !important; /* Strong focus on line spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate letter spacing */
 }
 
 /* Card text improvements - Only apply white color on dark backgrounds */
 .text-sm {
   font-size: 0.875rem !important; /* 14px */
   font-weight: 500 !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
+  line-height: 1.8 !important; /* Focus on vertical spacing */
 }
 
 .text-base {
   font-size: 1rem !important; /* 16px */
   font-weight: 500 !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
+  line-height: 1.9 !important; /* Focus on vertical spacing */
 }
 
 .text-lg {
   font-size: 1.125rem !important; /* 18px */
   font-weight: 500 !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
+  line-height: 1.9 !important; /* Focus on vertical spacing */
 }
 
 .text-xl {
   font-size: 1.25rem !important; /* 20px */
   font-weight: 600 !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
+  line-height: 1.8 !important; /* Focus on vertical spacing */
 }
 
 .text-2xl {
   font-size: 1.5rem !important; /* 24px */
   font-weight: 600 !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
+  line-height: 1.7 !important; /* Focus on vertical spacing */
 }
 
 .text-3xl {
   font-size: 1.875rem !important; /* 30px */
   font-weight: 700 !important;
-  letter-spacing: 0.035em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.015em !important; /* Moderate spacing */
+  line-height: 1.6 !important; /* Focus on vertical spacing */
 }
 
 .text-4xl {
   font-size: 2.25rem !important; /* 36px */
   font-weight: 700 !important;
-  letter-spacing: 0.03em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.015em !important; /* Moderate spacing */
+  line-height: 1.6 !important; /* Focus on vertical spacing */
   color: #ffffff !important; /* Pure white */
 }
 
@@ -772,77 +779,77 @@ img {
 .news-content {
   font-size: 1rem !important; /* 16px - comfortable size */
   font-weight: 500 !important; /* Medium weight - not too bold */
-  line-height: 1.9 !important; /* Increased line height for Tamil readability */
-  letter-spacing: 0.045em !important; /* Increased letter spacing for Tamil - less congested */
+  line-height: 2.1 !important; /* Strong focus on vertical spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate letter spacing */
   color: #ffffff !important; /* Pure white */
 }
 
 .news-content p {
   font-size: 1rem !important; /* 16px */
   font-weight: 500 !important; /* Medium weight */
-  line-height: 1.9 !important; /* Increased line height */
+  line-height: 2.1 !important; /* Strong focus on vertical spacing */
   margin-bottom: 1.5rem !important; /* Good space between paragraphs */
-  letter-spacing: 0.045em !important; /* Increased spacing for Tamil - less congested */
+  letter-spacing: 0.02em !important; /* Moderate letter spacing */
   color: #ffffff !important; /* Pure white */
 }
 
 .news-content h1 {
   font-size: 2.25rem !important; /* 36px */
   font-weight: 700 !important; /* Bold but not extra bold */
-  line-height: 1.4 !important; /* Increased line height */
+  line-height: 1.7 !important; /* Focus on vertical spacing */
   margin-bottom: 1.25rem !important;
   margin-top: 2rem !important;
-  letter-spacing: 0.035em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.015em !important; /* Moderate spacing */
   color: #ffffff !important; /* Pure white */
 }
 
 .news-content h2 {
   font-size: 1.875rem !important; /* 30px */
   font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.5 !important; /* Increased line height */
+  line-height: 1.8 !important; /* Focus on vertical spacing */
   margin-bottom: 1rem !important;
   margin-top: 1.75rem !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
   color: #ffffff !important; /* Pure white */
 }
 
 .news-content h3 {
   font-size: 1.5rem !important; /* 24px */
   font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.5 !important; /* Increased line height */
+  line-height: 1.8 !important; /* Focus on vertical spacing */
   margin-bottom: 0.875rem !important;
   margin-top: 1.5rem !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
   color: #ffffff !important; /* Pure white */
 }
 
 .news-content h4 {
   font-size: 1.25rem !important; /* 20px */
   font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.6 !important; /* Increased line height */
+  line-height: 1.9 !important; /* Focus on vertical spacing */
   margin-bottom: 0.75rem !important;
   margin-top: 1.25rem !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
   color: #ffffff !important; /* Pure white */
 }
 
 .news-content h5 {
   font-size: 1.125rem !important; /* 18px */
   font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.6 !important; /* Increased line height */
+  line-height: 1.9 !important; /* Focus on vertical spacing */
   margin-bottom: 0.625rem !important;
   margin-top: 1rem !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
   color: #ffffff !important; /* Pure white */
 }
 
 .news-content h6 {
   font-size: 1rem !important; /* 16px */
   font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.6 !important; /* Increased line height */
+  line-height: 1.9 !important; /* Focus on vertical spacing */
   margin-bottom: 0.5rem !important;
   margin-top: 0.875rem !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
   color: #ffffff !important; /* Pure white */
 }
 
@@ -850,10 +857,10 @@ img {
 .news-content ol {
   font-size: 1rem !important; /* 16px */
   font-weight: 500 !important;
-  line-height: 1.9 !important; /* Increased line height */
+  line-height: 2.1 !important; /* Strong focus on vertical spacing */
   margin-bottom: 1.5rem !important;
   padding-left: 2rem !important;
-  letter-spacing: 0.045em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate letter spacing */
   color: #ffffff !important; /* Pure white */
 }
 
@@ -884,77 +891,77 @@ img {
 .event-description {
   font-size: 1rem !important; /* 16px - comfortable size */
   font-weight: 500 !important; /* Medium weight - not too bold */
-  line-height: 1.9 !important; /* Increased line height for Tamil readability */
-  letter-spacing: 0.045em !important; /* Increased letter spacing for Tamil - less congested */
+  line-height: 2.1 !important; /* Strong focus on vertical spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate letter spacing */
   color: #000000 !important; /* Black text for readability */
 }
 
 .event-description p {
   font-size: 1rem !important; /* 16px */
   font-weight: 500 !important; /* Medium weight */
-  line-height: 1.9 !important; /* Increased line height */
+  line-height: 2.1 !important; /* Strong focus on vertical spacing */
   margin-bottom: 1.5rem !important; /* Good space between paragraphs */
-  letter-spacing: 0.045em !important; /* Increased spacing for Tamil - less congested */
+  letter-spacing: 0.02em !important; /* Moderate letter spacing */
   color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h1 {
   font-size: 2.25rem !important; /* 36px */
   font-weight: 700 !important; /* Bold but not extra bold */
-  line-height: 1.4 !important; /* Increased line height */
+  line-height: 1.7 !important; /* Focus on vertical spacing */
   margin-bottom: 1.25rem !important;
   margin-top: 2rem !important;
-  letter-spacing: 0.035em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.015em !important; /* Moderate spacing */
   color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h2 {
   font-size: 1.875rem !important; /* 30px */
   font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.5 !important; /* Increased line height */
+  line-height: 1.8 !important; /* Focus on vertical spacing */
   margin-bottom: 1rem !important;
   margin-top: 1.75rem !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
   color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h3 {
   font-size: 1.5rem !important; /* 24px */
   font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.5 !important; /* Increased line height */
+  line-height: 1.8 !important; /* Focus on vertical spacing */
   margin-bottom: 0.875rem !important;
   margin-top: 1.5rem !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
   color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h4 {
   font-size: 1.25rem !important; /* 20px */
   font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.6 !important; /* Increased line height */
+  line-height: 1.9 !important; /* Focus on vertical spacing */
   margin-bottom: 0.75rem !important;
   margin-top: 1.25rem !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
   color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h5 {
   font-size: 1.125rem !important; /* 18px */
   font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.6 !important; /* Increased line height */
+  line-height: 1.9 !important; /* Focus on vertical spacing */
   margin-bottom: 0.625rem !important;
   margin-top: 1rem !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
   color: #000000 !important; /* Black text for readability */
 }
 
 .event-description h6 {
   font-size: 1rem !important; /* 16px */
   font-weight: 600 !important; /* Semi-bold */
-  line-height: 1.6 !important; /* Increased line height */
+  line-height: 1.9 !important; /* Focus on vertical spacing */
   margin-bottom: 0.5rem !important;
   margin-top: 0.875rem !important;
-  letter-spacing: 0.04em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate spacing */
   color: #000000 !important; /* Black text for readability */
 }
 
@@ -962,10 +969,10 @@ img {
 .event-description ol {
   font-size: 1rem !important; /* 16px */
   font-weight: 500 !important;
-  line-height: 1.9 !important; /* Increased line height */
+  line-height: 2.1 !important; /* Strong focus on vertical spacing */
   margin-bottom: 1.5rem !important;
   padding-left: 2rem !important;
-  letter-spacing: 0.045em !important; /* Increased spacing for Tamil */
+  letter-spacing: 0.02em !important; /* Moderate letter spacing */
   color: #000000 !important; /* Black text for readability */
 }
 
@@ -985,14 +992,14 @@ img {
   .news-content,
   .event-description {
     font-size: 0.9375rem !important; /* 15px on mobile */
-    letter-spacing: 0.045em !important; /* Increased spacing for Tamil */
+    letter-spacing: 0.02em !important; /* Moderate spacing */
   }
 
   .news-content p,
   .event-description p {
     font-size: 0.9375rem !important; /* 15px on mobile */
-    line-height: 1.85 !important; /* Increased line height */
-    letter-spacing: 0.045em !important; /* Increased spacing for Tamil */
+    line-height: 2.0 !important; /* Strong focus on vertical spacing */
+    letter-spacing: 0.02em !important; /* Moderate spacing */
   }
 
   .news-content h1,
@@ -1037,14 +1044,14 @@ img {
   .news-content,
   .event-description {
     font-size: 1.0625rem !important; /* 17px on tablet */
-    letter-spacing: 0.045em !important; /* Increased spacing for Tamil */
+    letter-spacing: 0.02em !important; /* Moderate spacing */
   }
 
   .news-content p,
   .event-description p {
     font-size: 1.0625rem !important; /* 17px on tablet */
-    line-height: 1.9 !important; /* Increased line height */
-    letter-spacing: 0.045em !important; /* Increased spacing for Tamil */
+    line-height: 2.05 !important; /* Strong focus on vertical spacing */
+    letter-spacing: 0.02em !important; /* Moderate spacing */
   }
 
   .news-content h1,
@@ -1083,14 +1090,14 @@ img {
   .news-content,
   .event-description {
     font-size: 1.125rem !important; /* 18px on desktop */
-    letter-spacing: 0.045em !important; /* Increased spacing for Tamil */
+    letter-spacing: 0.02em !important; /* Moderate spacing */
   }
 
   .news-content p,
   .event-description p {
     font-size: 1.125rem !important; /* 18px on desktop */
-    line-height: 1.95 !important; /* Increased breathing room for Tamil */
-    letter-spacing: 0.045em !important; /* Increased spacing for Tamil */
+    line-height: 2.1 !important; /* Strong focus on vertical spacing for Tamil */
+    letter-spacing: 0.02em !important; /* Moderate spacing */
   }
 
   .news-content h1,

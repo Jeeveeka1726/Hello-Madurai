@@ -171,9 +171,13 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
     let adsInjected = 0
 
     paragraphs.forEach((paragraph, index) => {
-      // Insert ad after every 2 paragraphs (reduced from 3 to 2 for better coverage)
-      if (paragraph.textContent && paragraph.textContent.trim().length > 20) { // Reduced from 30 to 20
+      const textLength = paragraph.textContent ? paragraph.textContent.trim().length : 0
+      console.log(`📢 Paragraph ${index + 1} length: ${textLength} chars`)
+
+      // Insert ad after every 2 paragraphs - very low minimum (10 chars)
+      if (paragraph.textContent && textLength > 10) { // Reduced from 20 to 10
         paragraphCount++
+        console.log(`📢 Valid paragraph ${paragraphCount} found (${textLength} chars)`)
 
         // Insert ad after 2nd, 4th, 6th paragraph, etc. (every 2 paragraphs)
         if (paragraphCount % 2 === 0) {
@@ -184,6 +188,8 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
           adIndex = (adIndex + 1) % ads.length // Cycle through ads
           adsInjected++
         }
+      } else {
+        console.log(`📢 Paragraph ${index + 1} skipped (too short: ${textLength} chars)`)
       }
     })
 
