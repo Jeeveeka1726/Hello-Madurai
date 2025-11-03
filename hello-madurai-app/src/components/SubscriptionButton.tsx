@@ -82,11 +82,12 @@ export default function SubscriptionButton({ className = '', variant = 'button' 
     <>
       <button
         onClick={() => setShowModal(true)}
-        className={`inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors ${className}`}
+        className={`inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors ${className}`}
+        style={{ color: '#ffffff' }}
         suppressHydrationWarning
       >
-        <BellIcon className="h-4 w-4" />
-        <span suppressHydrationWarning>
+        <BellIcon className="h-4 w-4" style={{ color: '#ffffff' }} />
+        <span suppressHydrationWarning style={{ color: '#ffffff' }}>
           {t('subscription.button.text', 'Subscribe', 'சந்தா செய்யுங்கள்')}
         </span>
       </button>

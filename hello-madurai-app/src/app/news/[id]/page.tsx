@@ -321,7 +321,7 @@ function NewsDetailPageContent() {
         {/* Related Articles */}
         <div className="mt-8 sm:mt-12">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-            {t('news.relatedArticles', 'Related Articles', 'தொடர்புடைய கட்டுரைகள்')}
+            {t('news.relatedArticles', 'Related Articles', 'தொடர்புடைய செய்திகள்')}
           </h2>
           <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
             {relatedArticles.map((relatedArticle) => (
