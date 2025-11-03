@@ -127,22 +127,21 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
       }
     })
 
-    // First, try to get all <p> tags (TipTap editor creates <p> tags for each paragraph)
-    let paragraphs = Array.from(doc.querySelectorAll('p'))
-    console.log('📢 Number of <p> tags found:', paragraphs.length)
+    // Get all paragraph-like elements (p, h1-h6, div with text)
+    // This handles both <p> tags and heading tags (h1-h6) used for content
+    let paragraphs = Array.from(doc.querySelectorAll('p, h1, h2, h3, h4, h5, h6, div'))
+    console.log('📢 Number of paragraph-like elements found:', paragraphs.length)
     console.log('📢 Raw HTML structure:', doc.body.innerHTML.substring(0, 800))
 
-    // If we found <p> tags, filter out empty ones
-    if (paragraphs.length > 0) {
-      const validParagraphs = paragraphs.filter(p => {
-        const text = (p.textContent || '').trim()
-        return text.length > 30
-      })
-      console.log('📢 Valid <p> tags (>30 chars):', validParagraphs.length)
+    // Filter out empty elements and keep only those with meaningful content
+    const validParagraphs = paragraphs.filter(p => {
+      const text = (p.textContent || '').trim()
+      return text.length > 30
+    })
+    console.log('📢 Valid paragraph-like elements (>30 chars):', validParagraphs.length)
 
-      if (validParagraphs.length > 0) {
-        paragraphs = validParagraphs
-      }
+    if (validParagraphs.length > 0) {
+      paragraphs = validParagraphs
     }
 
     // If still only 1 or 0 paragraphs, try alternative splitting methods
