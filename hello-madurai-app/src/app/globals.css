@@ -109,6 +109,22 @@ body:not(.admin-page) #__next {
   color: inherit !important;
 }
 
+/* FORCE white text on blue buttons - Subscribe and Read News buttons */
+button.bg-blue-600,
+button.bg-blue-600 *,
+button.bg-blue-600 span,
+button.bg-blue-700,
+button.bg-blue-700 *,
+button.bg-blue-700 span,
+a.bg-blue-600,
+a.bg-blue-600 *,
+a.bg-blue-600 span,
+a.bg-blue-700,
+a.bg-blue-700 *,
+a.bg-blue-700 span {
+  color: #ffffff !important;
+}
+
 /* Exception: White buttons on blue backgrounds should have blue text */
 .bg-blue-500 button.bg-white,
 .bg-blue-600 button.bg-white,
