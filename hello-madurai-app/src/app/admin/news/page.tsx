@@ -51,7 +51,7 @@ export default function AdminNewsPage() {
   const categories = [
     { id: 'general', name: language === 'ta' ? 'பொதுவானது' : 'General' },
     { id: 'collector', name: language === 'ta' ? 'கலெக்டர்' : 'Collector' },
-    { id: 'corporation', name: language === 'ta' ? 'நகராட்சி' : 'Corporation' },
+    { id: 'corporation', name: language === 'ta' ? 'மாநகராட்சி' : 'Corporation' },
     { id: 'education', name: language === 'ta' ? 'கல்வி' : 'Education' },
     { id: 'religious', name: language === 'ta' ? 'மதம்' : 'Religious' },
     { id: 'cinema', name: language === 'ta' ? 'சினிமா' : 'Cinema' },
@@ -357,19 +357,6 @@ export default function AdminNewsPage() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
-                    <div className="flex items-center">
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={formData.featured}
-                          onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                          className="mr-2"
-                        />
-                        <span className="text-sm font-medium text-gray-700">
-                          {language === 'ta' ? 'சிறப்பு கட்டுரை' : 'Featured Article'}
-                        </span>
-                      </label>
-                    </div>
                   </div>
 
                   <div className="flex justify-end space-x-4">
@@ -409,13 +396,6 @@ export default function AdminNewsPage() {
                   
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        newsItem.featured
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {newsItem.featured ? (language === 'ta' ? 'சிறப்பு' : 'Featured') : (language === 'ta' ? 'வழக்கமான' : 'Regular')}
-                      </span>
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {newsItem.category}
                       </span>

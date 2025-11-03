@@ -61,7 +61,7 @@ function NewsPageContent() {
     { id: 'all', name: t('categories.all', 'All News', 'அனைத்து செய்திகள்') },
     { id: 'general', name: t('categories.general', 'General', 'பொதுவானது') },
     { id: 'collector', name: t('categories.collector', 'Collector', 'கலெக்டர்') },
-    { id: 'corporation', name: t('categories.corporation', 'Corporation', 'நகராட்சி') },
+    { id: 'corporation', name: t('categories.corporation', 'Corporation', 'மாநகராட்சி') },
     { id: 'education', name: t('categories.education', 'Education', 'கல்வி') },
     { id: 'religious', name: t('categories.religious', 'Religious', 'மதம்') },
     { id: 'cinema', name: t('categories.cinema', 'Cinema', 'சினிமா') },
@@ -79,8 +79,9 @@ function NewsPageContent() {
     ? newsArticles
     : newsArticles.filter(article => article.category === selectedCategory)
 
-  const featuredNews = filteredArticles.filter(article => article.featured)
-  const regularNews = filteredArticles.filter(article => !article.featured)
+  // Get last 2 updated news for first row, rest for remaining rows
+  const latestTwo = filteredArticles.slice(0, 2)
+  const remainingNews = filteredArticles.slice(2)
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -152,85 +153,85 @@ function NewsPageContent() {
               </div>
             </div>
 
-            {/* Featured News */}
-        {featuredNews.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              {t('news.featured', 'Featured News', 'சிறப்பு செய்திகள்')}
-            </h2>
-            <div className="grid gap-8 lg:grid-cols-2">
-              {featuredNews.map((article) => (
-                <Card key={article.id} className="news-card overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200 h-full flex flex-col">
-                  {article.featuredImage ? (
-                    <div className="aspect-w-16 aspect-h-9 overflow-hidden">
-                      <img
-                        src={article.featuredImage}
-                        alt={t(`news.${article.id}.title`, article.title, article.title_ta)}
-                        className="featured-image w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-                      <div className="flex items-center justify-center text-gray-400">
-                        <span className="text-sm">
-                          {t('news.imageComingSoon', 'Image Coming Soon', 'படம் விரைவில்')}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                  <CardContent className="news-card-content p-6 flex flex-col flex-grow">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
-                        {t('news.featured', 'Featured', 'சிறப்பு')}
-                      </span>
-                      <span className="text-sm text-gray-500 capitalize">
-                        {article.category}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">
-                      {t(`news.${article.id}.title`, article.title, article.title_ta)}
-                    </h3>
-                    <p className="text-gray-600 mb-4 flex-grow">
-                      {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
-                    </p>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 text-sm text-gray-500 mb-4">
-                      <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-                        <div className="flex items-center">
-                          <UserIcon className="h-4 w-4 mr-1" />
-                          <span className="truncate">{article.author}</span>
+            {/* Latest 2 News - First Row (2 columns) */}
+            {latestTwo.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  {selectedCategory === 'all'
+                    ? t('news.allNews', 'All News', 'அனைத்து செய்திகள்')
+                    : categories.find(cat => cat.id === selectedCategory)?.name
+                  }
+                </h2>
+                <div className="grid gap-6 md:grid-cols-2 mb-6">
+                  {latestTwo.map((article) => (
+                    <Card key={article.id} className="news-card hover:shadow-lg transition-shadow bg-white border-gray-200 h-full flex flex-col">
+                      {article.featuredImage ? (
+                        <div className="aspect-w-16 aspect-h-9 overflow-hidden">
+                          <img
+                            src={article.featuredImage}
+                            alt={t(`news.${article.id}.title`, article.title, article.title_ta)}
+                            className="featured-image w-full h-full object-cover"
+                          />
                         </div>
-                        <div className="flex items-center">
-                          <CalendarIcon className="h-4 w-4 mr-1" />
-                          <span className="truncate">{formatDate(article.publishedAt)}</span>
+                      ) : (
+                        <div className="aspect-w-16 aspect-h-9 bg-gray-200">
+                          <div className="flex items-center justify-center text-gray-400">
+                            <span className="text-sm">
+                              {t('news.imageComingSoon', 'Image Coming Soon', 'படம் விரைவில்')}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex items-center">
-                          <EyeIcon className="h-4 w-4 mr-1" />
-                          <span className="truncate">{article.views.toLocaleString()}</span>
+                      )}
+                      <CardContent className="news-card-content p-6 flex flex-col flex-grow">
+                        <div className="content-section">
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm text-gray-500 capitalize">
+                                {article.category}
+                              </span>
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-3">
+                              {t(`news.${article.id}.title`, article.title, article.title_ta)}
+                            </h3>
+                            <p className="text-gray-600 mb-4">
+                              {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
+                            </p>
+                          </div>
+                          <div>
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 text-sm text-gray-500 mb-4">
+                              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                                <div className="flex items-center">
+                                  <UserIcon className="h-4 w-4 mr-1" />
+                                  <span className="truncate">{article.author}</span>
+                                </div>
+                                <div className="flex items-center">
+                                  <CalendarIcon className="h-4 w-4 mr-1" />
+                                  <span className="truncate">{formatDate(article.publishedAt)}</span>
+                                </div>
+                                <div className="flex items-center">
+                                  <EyeIcon className="h-4 w-4 mr-1" />
+                                  <span className="truncate">{article.views.toLocaleString()}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <Link href={`/news/${article.id}`}>
+                              <Button className="w-full">
+                                {t('news.readMore', 'Read More', 'மேலும் படிக்க')}
+                              </Button>
+                            </Link>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <Link href={`/news/${article.id}`} className="mt-auto">
-                      <Button className="w-full">
-                        {t('news.readMore', 'Read More', 'மேலும் படிக்க')}
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
 
-        {/* Regular News */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            {selectedCategory === 'all'
-              ? t('news.allNews', 'All News', 'அனைத்து செய்திகள்')
-              : categories.find(cat => cat.id === selectedCategory)?.name
-            }
-          </h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {(selectedCategory === 'all' ? regularNews : filteredArticles.filter(a => !a.featured)).map((article) => (
+            {/* Remaining News - 3 columns per row */}
+            {remainingNews.length > 0 && (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {remainingNews.map((article) => (
               <Card key={article.id} className="news-card hover:shadow-lg transition-shadow bg-white border-gray-200 h-full flex flex-col">
                 {article.featuredImage ? (
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden">
@@ -278,32 +279,32 @@ function NewsPageContent() {
                   </Link>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+                ))}
+              </div>
+            )}
 
-          {/* No results message */}
-          {filteredArticles.length === 0 && newsArticles.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">
-                {t('news.noData', 'No news articles found. Add some articles via the admin panel!', 'செய்தி கட்டுரைகள் எதுவும் கிடைக்கவில்லை. நிர்வாக பேனல் வழியாக சில கட்டுரைகளைச் சேர்க்கவும்!')}
-              </p>
-              <a
-                href="/admin/news"
-                className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
-              >
-                {t('news.addArticles', 'Add Articles', 'கட்டுரைகளைச் சேர்க்கவும்')}
-              </a>
-            </div>
-          )}
+            {/* No results message */}
+            {filteredArticles.length === 0 && newsArticles.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 mb-4">
+                  {t('news.noData', 'No news articles found. Add some articles via the admin panel!', 'செய்தி கட்டுரைகள் எதுவும் கிடைக்கவில்லை. நிர்வாக பேனல் வழியாக சில கட்டுரைகளைச் சேர்க்கவும்!')}
+                </p>
+                <a
+                  href="/admin/news"
+                  className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+                >
+                  {t('news.addArticles', 'Add Articles', 'கட்டுரைகளைச் சேர்க்கவும்')}
+                </a>
+              </div>
+            )}
 
-          {filteredArticles.length === 0 && newsArticles.length > 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">
-                {t('news.noResults', 'No news articles found in this category', 'இந்த வகையில் செய்தி கட்டுரைகள் எதுவும் கிடைக்கவில்லை')}
-              </p>
-            </div>
-          )}
-        </div>
+            {filteredArticles.length === 0 && newsArticles.length > 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500">
+                  {t('news.noResults', 'No news articles found in this category', 'இந்த வகையில் செய்தி கட்டுரைகள் எதுவும் கிடைக்கவில்லை')}
+                </p>
+              </div>
+            )}
           </>
         )}
       </div>
