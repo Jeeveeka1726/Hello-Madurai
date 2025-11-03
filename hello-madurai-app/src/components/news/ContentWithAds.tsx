@@ -127,17 +127,31 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
       }
     })
 
-    let paragraphs = Array.from(doc.querySelectorAll('p, div'))
-    console.log('📢 Number of paragraphs found:', paragraphs.length)
-    console.log('📢 Raw content preview:', doc.body.innerHTML.substring(0, 500))
+    // First, try to get all <p> tags (TipTap editor creates <p> tags for each paragraph)
+    let paragraphs = Array.from(doc.querySelectorAll('p'))
+    console.log('📢 Number of <p> tags found:', paragraphs.length)
+    console.log('📢 Raw HTML structure:', doc.body.innerHTML.substring(0, 800))
 
-    // If only 1 paragraph found, try to split by double line breaks or newlines
+    // If we found <p> tags, filter out empty ones
+    if (paragraphs.length > 0) {
+      const validParagraphs = paragraphs.filter(p => {
+        const text = (p.textContent || '').trim()
+        return text.length > 30
+      })
+      console.log('📢 Valid <p> tags (>30 chars):', validParagraphs.length)
+
+      if (validParagraphs.length > 0) {
+        paragraphs = validParagraphs
+      }
+    }
+
+    // If still only 1 or 0 paragraphs, try alternative splitting methods
     if (paragraphs.length <= 1) {
-      console.log('📢 Only 1 paragraph found, attempting to split content...')
+      console.log('📢 Only', paragraphs.length, 'valid paragraph(s) found, attempting alternative splitting...')
       const bodyContent = doc.body.innerHTML
       const textContent = doc.body.textContent || ''
 
-      // First, try splitting by double line breaks (\n\n) in the text content
+      // Try splitting by double line breaks (\n\n) in the text content
       const textParagraphs = textContent.split(/\n\n+/).filter(p => p.trim().length > 30)
       console.log('📢 Found', textParagraphs.length, 'text paragraphs by double line breaks')
 
