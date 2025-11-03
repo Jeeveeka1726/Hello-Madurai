@@ -129,39 +129,39 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
 
     let paragraphs = Array.from(doc.querySelectorAll('p, div'))
     console.log('📢 Number of paragraphs found:', paragraphs.length)
+    console.log('📢 Raw content preview:', doc.body.innerHTML.substring(0, 500))
 
-    // If only 1 paragraph found, try to split by <br> tags or newlines
+    // If only 1 paragraph found, try to split by double line breaks or newlines
     if (paragraphs.length <= 1) {
       console.log('📢 Only 1 paragraph found, attempting to split content...')
       const bodyContent = doc.body.innerHTML
+      const textContent = doc.body.textContent || ''
 
-      // Split by <br> tags and create virtual paragraphs (reduced minimum length to 20)
-      const parts = bodyContent.split(/<br\s*\/?>/i).filter(part => part.trim().length > 20)
-      console.log('📢 Split into', parts.length, 'parts by <br> tags')
+      // First, try splitting by double line breaks (\n\n) in the text content
+      const textParagraphs = textContent.split(/\n\n+/).filter(p => p.trim().length > 30)
+      console.log('📢 Found', textParagraphs.length, 'text paragraphs by double line breaks')
 
-      if (parts.length > 1) {
+      if (textParagraphs.length > 1) {
         // Reconstruct content with proper paragraph tags
-        let reconstructed = parts.map(part => `<p>${part.trim()}</p>`).join('')
+        let reconstructed = textParagraphs.map(p => `<p>${p.trim()}</p>`).join('')
         doc.body.innerHTML = reconstructed
         paragraphs = Array.from(doc.querySelectorAll('p'))
-        console.log('📢 Reconstructed into', paragraphs.length, 'paragraphs')
+        console.log('📢 Reconstructed into', paragraphs.length, 'paragraphs from text')
       } else {
-        // If still only 1 paragraph, try splitting by sentences (periods followed by space)
-        console.log('📢 Trying to split by sentences...')
-        const textContent = doc.body.textContent || ''
-        const sentences = textContent.split(/\.\s+/).filter(s => s.trim().length > 30)
-        console.log('📢 Found', sentences.length, 'sentences')
+        // Try splitting by <br><br> or multiple <br> tags
+        const parts = bodyContent.split(/<br\s*\/?>\s*<br\s*\/?>/i).filter(part => {
+          const tempDiv = document.createElement('div')
+          tempDiv.innerHTML = part
+          return (tempDiv.textContent || '').trim().length > 30
+        })
+        console.log('📢 Split into', parts.length, 'parts by double <br> tags (min 30 chars)')
 
-        if (sentences.length > 2) {
-          // Group sentences into paragraphs (2-3 sentences each)
-          const newParagraphs: string[] = []
-          for (let i = 0; i < sentences.length; i += 2) {
-            const group = sentences.slice(i, i + 2).join('. ') + '.'
-            newParagraphs.push(`<p>${group}</p>`)
-          }
-          doc.body.innerHTML = newParagraphs.join('')
+        if (parts.length > 1) {
+          // Reconstruct content with proper paragraph tags
+          let reconstructed = parts.map(part => `<p>${part.trim()}</p>`).join('')
+          doc.body.innerHTML = reconstructed
           paragraphs = Array.from(doc.querySelectorAll('p'))
-          console.log('📢 Reconstructed into', paragraphs.length, 'sentence-based paragraphs')
+          console.log('📢 Reconstructed into', paragraphs.length, 'paragraphs from <br> tags')
         }
       }
     }
@@ -174,13 +174,13 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
       const textLength = paragraph.textContent ? paragraph.textContent.trim().length : 0
       console.log(`📢 Paragraph ${index + 1} length: ${textLength} chars`)
 
-      // Insert ad after every 2 paragraphs - very low minimum (10 chars)
-      if (paragraph.textContent && textLength > 10) { // Reduced from 20 to 10
+      // Insert ad after every 3 paragraphs - minimum 30 chars for valid paragraph
+      if (paragraph.textContent && textLength > 30) {
         paragraphCount++
         console.log(`📢 Valid paragraph ${paragraphCount} found (${textLength} chars)`)
 
-        // Insert ad after 2nd, 4th, 6th paragraph, etc. (every 2 paragraphs)
-        if (paragraphCount % 2 === 0) {
+        // Insert ad after 3rd, 6th, 9th paragraph, etc. (every 3 paragraphs)
+        if (paragraphCount % 3 === 0) {
           const ad = ads[adIndex]
           console.log(`📢 Inserting ad ${adIndex + 1} after paragraph ${paragraphCount}`)
           const adElement = createAdElement(ad)
