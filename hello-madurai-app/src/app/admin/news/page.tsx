@@ -42,7 +42,7 @@ export default function AdminNewsPage() {
     excerpt: '',
     excerpt_ta: '',
     category: 'general',
-    author: 'Admin',
+    author: 'Hello Madurai',
     featured: false,
     featuredImage: '',
     tags: ''
@@ -110,7 +110,7 @@ export default function AdminNewsPage() {
           excerpt: '',
           excerpt_ta: '',
           category: 'general',
-          author: 'Admin',
+          author: 'Hello Madurai',
           featured: false,
           featuredImage: '',
           tags: ''
@@ -222,7 +222,7 @@ export default function AdminNewsPage() {
                   excerpt: '',
                   excerpt_ta: '',
                   category: 'general',
-                  author: 'Admin',
+                  author: 'Hello Madurai',
                   featured: false,
                   featuredImage: '',
                   tags: ''

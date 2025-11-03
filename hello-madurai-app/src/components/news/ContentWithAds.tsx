@@ -127,19 +127,37 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
       }
     })
 
-    const paragraphs = Array.from(doc.querySelectorAll('p, div'))
+    let paragraphs = Array.from(doc.querySelectorAll('p, div'))
     console.log('📢 Number of paragraphs found:', paragraphs.length)
+
+    // If only 1 paragraph found, try to split by <br> tags or newlines
+    if (paragraphs.length <= 1) {
+      console.log('📢 Only 1 paragraph found, attempting to split content...')
+      const bodyContent = doc.body.innerHTML
+
+      // Split by <br> tags and create virtual paragraphs
+      const parts = bodyContent.split(/<br\s*\/?>/i).filter(part => part.trim().length > 50)
+      console.log('📢 Split into', parts.length, 'parts by <br> tags')
+
+      if (parts.length > 1) {
+        // Reconstruct content with proper paragraph tags
+        let reconstructed = parts.map(part => `<p>${part.trim()}</p>`).join('')
+        doc.body.innerHTML = reconstructed
+        paragraphs = Array.from(doc.querySelectorAll('p'))
+        console.log('📢 Reconstructed into', paragraphs.length, 'paragraphs')
+      }
+    }
 
     let adIndex = 0
     let paragraphCount = 0
 
     paragraphs.forEach((paragraph, index) => {
-      // Insert ad after every 2-3 paragraphs
-      if (paragraph.textContent && paragraph.textContent.trim().length > 50) {
+      // Insert ad after every 2-3 paragraphs (reduced from 3 to 2 for better coverage)
+      if (paragraph.textContent && paragraph.textContent.trim().length > 30) { // Reduced from 50 to 30
         paragraphCount++
 
-        // Insert ad after 2nd, 5th, 8th paragraph, etc. (every 3 paragraphs)
-        if (paragraphCount % 3 === 0 && adIndex < ads.length) {
+        // Insert ad after 2nd, 4th, 6th paragraph, etc. (every 2 paragraphs)
+        if (paragraphCount % 2 === 0 && adIndex < ads.length) {
           const ad = ads[adIndex]
           console.log(`📢 Inserting ad ${adIndex + 1} after paragraph ${paragraphCount}`)
           const adElement = createAdElement(ad)
@@ -336,7 +354,7 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
         className="news-content prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none"
         dangerouslySetInnerHTML={{ __html: contentWithAds }}
         style={{
-          fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
+          fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)', // H4 size: 18px to 20px (larger default)
           lineHeight: '1.7',
           color: '#000000'
         }}

@@ -173,6 +173,21 @@ function NewsDetailPageContent() {
     })
   }
 
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString)
+    const dateStr = date.toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+    const timeStr = date.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    })
+    return `${dateStr} at ${timeStr}`
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
       <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-8">
@@ -198,28 +213,8 @@ function NewsDetailPageContent() {
           {/* Article Card */}
           <div className="flex-1 w-full">
             <Card className="bg-white border-gray-200">
-              {/* Featured Image */}
-              {article.featuredImage ? (
-                <div className="aspect-w-16 aspect-h-9 overflow-hidden">
-                  <img
-                    src={article.featuredImage}
-                    alt={t(`news.${article.id}.title`, article.title, article.title_ta)}
-                    className="w-full h-full object-cover"
-                    style={{ maxHeight: '400px' }}
-                  />
-                </div>
-              ) : (
-                <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-                  <div className="flex items-center justify-center">
-                    <span className="text-gray-400">
-                      {t('news.imageComingSoon', 'Featured Image Coming Soon', 'சிறப்பு படம் விரைவில்')}
-                    </span>
-                  </div>
-                </div>
-              )}
-
               <CardContent className="p-4 sm:p-6 lg:p-8">
-                {/* Article Header */}
+                {/* Article Header - Above Image */}
                 <div className="mb-4 sm:mb-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800 w-fit">
@@ -232,24 +227,24 @@ function NewsDetailPageContent() {
                       </Button>
                     )}
                   </div>
-                  
-                  
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">
+
+                  {/* Title - H3 size */}
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">
                     {t(`news.${article.id}.title`, article.title, article.title_ta)}
                   </h1>
-                  
-                  <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-4 sm:mb-6 leading-relaxed">
+
+                  <p className="text-base sm:text-lg text-gray-600 mb-4 leading-relaxed">
                     {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
                   </p>
 
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-sm text-gray-500">
                     <div className="flex items-center">
                       <UserIcon className="h-4 w-4 mr-2" />
-                      <span className="truncate">{article.author}</span>
+                      <span className="truncate">Hello Madurai</span>
                     </div>
                     <div className="flex items-center">
                       <CalendarIcon className="h-4 w-4 mr-2" />
-                      <span className="truncate">{formatDate(article.publishedAt)}</span>
+                      <span className="truncate">{formatDateTime(article.publishedAt)}</span>
                     </div>
                     <div className="flex items-center">
                       <EyeIcon className="h-4 w-4 mr-2" />
@@ -257,6 +252,26 @@ function NewsDetailPageContent() {
                     </div>
                   </div>
                 </div>
+
+                {/* Featured Image - Below Title */}
+                {article.featuredImage ? (
+                  <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-lg mb-6">
+                    <img
+                      src={article.featuredImage}
+                      alt={t(`news.${article.id}.title`, article.title, article.title_ta)}
+                      className="w-full h-full object-cover"
+                      style={{ maxHeight: '400px' }}
+                    />
+                  </div>
+                ) : (
+                  <div className="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg mb-6">
+                    <div className="flex items-center justify-center">
+                      <span className="text-gray-400">
+                        {t('news.imageComingSoon', 'Featured Image Coming Soon', 'சிறப்பு படம் விரைவில்')}
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Article Content with Auto-Inserted Ads */}
                 <div className="mb-8">
