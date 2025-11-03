@@ -202,7 +202,7 @@ function NewsPageContent() {
                               <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                                 <div className="flex items-center">
                                   <UserIcon className="h-4 w-4 mr-1" />
-                                  <span className="truncate">{article.author}</span>
+                                  <span className="truncate">Hello Madurai</span>
                                 </div>
                                 <div className="flex items-center">
                                   <CalendarIcon className="h-4 w-4 mr-1" />
@@ -266,7 +266,7 @@ function NewsPageContent() {
                     {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
                   </p>
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                    <span>{article.author}</span>
+                    <span>Hello Madurai</span>
                     <div className="flex items-center">
                       <EyeIcon className="h-3 w-3 mr-1" />
                       {article.views.toLocaleString()}
