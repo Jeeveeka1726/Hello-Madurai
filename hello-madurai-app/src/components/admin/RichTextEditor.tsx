@@ -5,15 +5,73 @@ import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Youtube from '@tiptap/extension-youtube'
-import { 
-  BoldIcon, 
-  ItalicIcon, 
+import { Node } from '@tiptap/core'
+import {
+  BoldIcon,
+  ItalicIcon,
   PhotoIcon,
   LinkIcon,
   ListBulletIcon
 } from '@heroicons/react/24/outline'
 import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-hot-toast'
+
+// Custom Instagram Reel Extension
+const InstagramReel = Node.create({
+  name: 'instagramReel',
+  group: 'block',
+  atom: true,
+
+  addAttributes() {
+    return {
+      src: {
+        default: null,
+      },
+    }
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: 'div[data-instagram-reel]',
+      },
+    ]
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return [
+      'div',
+      {
+        'data-instagram-reel': '',
+        style: 'max-width: 540px; margin: 1.5rem auto;',
+      },
+      [
+        'iframe',
+        {
+          src: HTMLAttributes.src,
+          width: '540',
+          height: '720',
+          frameborder: '0',
+          scrolling: 'no',
+          allowtransparency: 'true',
+          allow: 'encrypted-media',
+          style: 'width: 100%; max-width: 540px; height: 720px; border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display: block; margin: 0 auto;',
+        },
+      ],
+    ]
+  },
+
+  addCommands() {
+    return {
+      setInstagramReel: (options: { src: string }) => ({ commands }) => {
+        return commands.insertContent({
+          type: this.name,
+          attrs: options,
+        })
+      },
+    }
+  },
+})
 
 interface RichTextEditorProps {
   value: string
@@ -72,6 +130,7 @@ export default function RichTextEditor({
           frameborder: '0',
         },
       }),
+      InstagramReel,
     ],
     content: value || '',
     editorProps: {
@@ -199,9 +258,10 @@ export default function RichTextEditor({
 
       if (instagramMatch) {
         const reelId = instagramMatch[1]
-        // Insert Instagram Reel as iframe
-        const instagramEmbed = `<div style="max-width: 540px; margin: 1.5rem auto;"><iframe src="https://www.instagram.com/reel/${reelId}/embed" width="540" height="720" frameborder="0" scrolling="no" allowtransparency="true" allow="encrypted-media" style="width: 100%; max-width: 540px; height: 720px; border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display: block; margin: 0 auto;"></iframe></div>`
-        editor.commands.insertContent(instagramEmbed)
+        // Use the custom InstagramReel extension
+        editor.commands.setInstagramReel({
+          src: `https://www.instagram.com/reel/${reelId}/embed`
+        })
         toast.success('✅ Instagram Reel embedded!')
         return
       }
@@ -584,6 +644,21 @@ export default function RichTextEditor({
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           margin: 1.5rem auto;
           display: block;
+        }
+        /* Instagram Reels - vertical aspect ratio */
+        .ProseMirror div[data-instagram-reel] {
+          max-width: 540px !important;
+          margin: 1.5rem auto !important;
+        }
+        .ProseMirror div[data-instagram-reel] iframe {
+          width: 100% !important;
+          max-width: 540px !important;
+          height: 720px !important;
+          aspect-ratio: 9 / 16 !important;
+          border-radius: 0.5rem !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+          display: block !important;
+          margin: 0 auto !important;
         }
         .dark .ProseMirror {
           color: #F9FAFB;
