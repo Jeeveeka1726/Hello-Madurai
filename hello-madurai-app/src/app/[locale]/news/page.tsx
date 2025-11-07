@@ -115,7 +115,7 @@ export default async function NewsPage({
         </div>
 
         {/* News Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredNews.map((news) => (
             <Link key={news.id} href={`/${locale}/news/${news.id}`}>
               <Card hover className="h-full">

@@ -228,9 +228,9 @@ function NewsPageContent() {
               </div>
             )}
 
-            {/* Remaining News - 3 columns per row */}
+            {/* Remaining News - 2 columns per row */}
             {remainingNews.length > 0 && (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 md:grid-cols-2">
                 {remainingNews.map((article) => (
               <Card key={article.id} className="news-card hover:shadow-lg transition-shadow bg-white border-gray-200 h-full flex flex-col">
                 {article.featuredImage ? (
