@@ -645,20 +645,41 @@ export default function RichTextEditor({
           margin: 1.5rem auto;
           display: block;
         }
-        /* Instagram Reels - vertical aspect ratio */
+        /* Instagram Reels - vertical aspect ratio - RESPONSIVE */
         .ProseMirror div[data-instagram-reel] {
-          max-width: 540px !important;
-          margin: 1.5rem auto !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          margin: 1rem auto !important;
+          padding: 0 0.5rem !important;
         }
         .ProseMirror div[data-instagram-reel] iframe {
           width: 100% !important;
-          max-width: 540px !important;
-          height: 720px !important;
+          max-width: 100% !important;
+          height: auto !important;
           aspect-ratio: 9 / 16 !important;
           border-radius: 0.5rem !important;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
           display: block !important;
           margin: 0 auto !important;
+        }
+        /* Tablet and up - limit width */
+        @media (min-width: 640px) {
+          .ProseMirror div[data-instagram-reel] {
+            max-width: 400px !important;
+            padding: 0 !important;
+          }
+          .ProseMirror div[data-instagram-reel] iframe {
+            max-width: 400px !important;
+          }
+        }
+        /* Desktop - full Instagram Reel size */
+        @media (min-width: 1024px) {
+          .ProseMirror div[data-instagram-reel] {
+            max-width: 540px !important;
+          }
+          .ProseMirror div[data-instagram-reel] iframe {
+            max-width: 540px !important;
+          }
         }
         .dark .ProseMirror {
           color: #F9FAFB;

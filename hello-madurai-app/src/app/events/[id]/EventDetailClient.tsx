@@ -490,12 +490,40 @@ export default function EventDetailClient({ event }: Props) {
           aspect-ratio: 16 / 9 !important;
         }
 
-        /* Instagram Reels - 540x720 max, responsive */
-        .event-description iframe[src*="instagram"] {
+        /* Instagram Reels - RESPONSIVE - Mobile First */
+        .event-description div[data-instagram-reel] {
           width: 100% !important;
-          max-width: 540px !important;
+          max-width: 100% !important;
+          margin: 1rem auto !important;
+          padding: 0 0.5rem !important;
+        }
+        .event-description iframe[src*="instagram"],
+        .event-description div[data-instagram-reel] iframe {
+          width: 100% !important;
+          max-width: 100% !important;
           height: auto !important;
           aspect-ratio: 9 / 16 !important;
+        }
+        /* Tablet - limit width to 400px */
+        @media (min-width: 640px) {
+          .event-description div[data-instagram-reel] {
+            max-width: 400px !important;
+            padding: 0 !important;
+          }
+          .event-description iframe[src*="instagram"],
+          .event-description div[data-instagram-reel] iframe {
+            max-width: 400px !important;
+          }
+        }
+        /* Desktop - full Instagram Reel size (540px) */
+        @media (min-width: 1024px) {
+          .event-description div[data-instagram-reel] {
+            max-width: 540px !important;
+          }
+          .event-description iframe[src*="instagram"],
+          .event-description div[data-instagram-reel] iframe {
+            max-width: 540px !important;
+          }
         }
       `}</style>
     </div>
