@@ -259,7 +259,7 @@ function NewsPageContent() {
                       {formatDate(article.publishedAt)}
                     </span>
                   </div>
-                  <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
+                  <h3 className="font-bold text-gray-900 mb-2">
                     {t(`news.${article.id}.title`, article.title, article.title_ta)}
                   </h3>
                   <p className="text-gray-600 text-sm mb-3 line-clamp-2 flex-grow">
