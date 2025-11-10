@@ -91,6 +91,31 @@ const InstagramReel = Node.create({
   },
 })
 
+// Custom YouTube extension that extends the default one to handle Shorts
+const CustomYoutube = Youtube.extend({
+  addPasteRules() {
+    return [
+      {
+        // Match YouTube regular videos
+        find: /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]+)/g,
+        handler: ({ match, chain }) => {
+          const videoId = match[1]
+          chain().setYoutubeVideo({ src: `https://www.youtube.com/watch?v=${videoId}` }).run()
+        },
+      },
+      {
+        // Match YouTube Shorts
+        find: /(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([A-Za-z0-9_-]+)/g,
+        handler: ({ match, chain }) => {
+          const videoId = match[1]
+          // YouTube Shorts use the same video ID format, just different URL
+          chain().setYoutubeVideo({ src: `https://www.youtube.com/watch?v=${videoId}` }).run()
+        },
+      },
+    ]
+  },
+})
+
 interface RichTextEditorProps {
   value: string
   onChange: (value: string) => void
@@ -133,15 +158,13 @@ export default function RichTextEditor({
           rel: 'noopener noreferrer',
         },
       }),
-      Youtube.configure({
+      CustomYoutube.configure({
         width: 1280,
         height: 720,
         controls: true,
         nocookie: true, // Use youtube-nocookie.com to avoid embedding restrictions
         modestBranding: true,
         enableIFrameApi: false,
-        // Auto-paste detection for YouTube videos AND Shorts
-        addPasteHandler: true,
         inline: false,
         HTMLAttributes: {
           class: 'youtube-video',
