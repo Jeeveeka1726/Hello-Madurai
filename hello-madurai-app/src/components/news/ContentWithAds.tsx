@@ -31,7 +31,7 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
     }
   }, [ads, content])
 
-  // Fix YouTube iframes to use youtube-nocookie.com domain and ensure proper sizing
+  // Fix YouTube iframes and load Instagram embeds
   useEffect(() => {
     if (contentWithAds) {
       setTimeout(() => {
@@ -46,12 +46,28 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
           }
 
           // Remove inline width/height attributes - let CSS handle sizing
-          if (src && (src.includes('youtube') || src.includes('instagram'))) {
+          if (src && src.includes('youtube')) {
             iframe.removeAttribute('width')
             iframe.removeAttribute('height')
             iframe.removeAttribute('style')
           }
         })
+
+        // Load Instagram embed script if there are Instagram embeds
+        const instagramEmbeds = document.querySelectorAll('.news-content blockquote.instagram-media')
+        if (instagramEmbeds.length > 0) {
+          if (!document.querySelector('script[src*="instagram.com/embed.js"]')) {
+            const script = document.createElement('script')
+            script.async = true
+            script.src = 'https://www.instagram.com/embed.js'
+            document.body.appendChild(script)
+          } else {
+            // If script already loaded, process embeds
+            if (window.instgrm) {
+              window.instgrm.Embeds.process()
+            }
+          }
+        }
       }, 100)
     }
   }, [contentWithAds])
@@ -365,38 +381,32 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
           aspect-ratio: 16 / 9 !important;
         }
 
-        /* Instagram Reels - RESPONSIVE - Mobile First */
-        .news-content div[data-instagram-reel] {
-          width: 100% !important;
-          max-width: 100% !important;
+        /* Instagram Reels - RESPONSIVE - Using blockquote embed */
+        .news-content blockquote.instagram-media {
           margin: 1rem auto !important;
-          padding: 0 0.5rem !important;
+          max-width: 540px !important;
+          min-width: 326px !important;
         }
-        .news-content iframe[src*="instagram"],
-        .news-content div[data-instagram-reel] iframe {
-          width: 100% !important;
-          max-width: 100% !important;
-          height: auto !important;
-          aspect-ratio: 9 / 16 !important;
+
+        /* Mobile - full width with padding */
+        @media (max-width: 639px) {
+          .news-content blockquote.instagram-media {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 0.5rem !important;
+          }
         }
+
         /* Tablet - limit width to 400px */
-        @media (min-width: 640px) {
-          .news-content div[data-instagram-reel] {
-            max-width: 400px !important;
-            padding: 0 !important;
-          }
-          .news-content iframe[src*="instagram"],
-          .news-content div[data-instagram-reel] iframe {
+        @media (min-width: 640px) and (max-width: 1023px) {
+          .news-content blockquote.instagram-media {
             max-width: 400px !important;
           }
         }
+
         /* Desktop - full Instagram Reel size (540px) */
         @media (min-width: 1024px) {
-          .news-content div[data-instagram-reel] {
-            max-width: 540px !important;
-          }
-          .news-content iframe[src*="instagram"],
-          .news-content div[data-instagram-reel] iframe {
+          .news-content blockquote.instagram-media {
             max-width: 540px !important;
           }
         }

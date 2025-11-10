@@ -16,7 +16,19 @@ import {
 import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-hot-toast'
 
+// TypeScript declaration for Instagram embed script
+declare global {
+  interface Window {
+    instgrm?: {
+      Embeds: {
+        process: () => void
+      }
+    }
+  }
+}
+
 // Custom Instagram Reel Extension with Auto-Paste Detection
+// Uses Instagram's official blockquote + script embed method
 const InstagramReel = Node.create({
   name: 'instagramReel',
   group: 'block',
@@ -24,7 +36,7 @@ const InstagramReel = Node.create({
 
   addAttributes() {
     return {
-      src: {
+      url: {
         default: null,
       },
     }
@@ -33,37 +45,57 @@ const InstagramReel = Node.create({
   parseHTML() {
     return [
       {
-        tag: 'div[data-instagram-reel]',
+        tag: 'blockquote[data-instagram-reel]',
       },
     ]
   },
 
   renderHTML({ HTMLAttributes }) {
+    // Instagram's official embed format: blockquote + script
     return [
-      'div',
+      'blockquote',
       {
         'data-instagram-reel': '',
-        style: 'max-width: 540px; margin: 1.5rem auto;',
+        'class': 'instagram-media',
+        'data-instgrm-permalink': HTMLAttributes.url,
+        'data-instgrm-version': '14',
+        'style': 'background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px auto; max-width:540px; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);',
       },
       [
-        'iframe',
-        {
-          src: HTMLAttributes.src,
-          width: '540',
-          height: '720',
-          frameborder: '0',
-          scrolling: 'no',
-          allowtransparency: 'true',
-          allow: 'encrypted-media',
-          style: 'width: 100%; max-width: 540px; height: 720px; border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display: block; margin: 0 auto;',
-        },
+        'div',
+        { style: 'padding:16px;' },
+        [
+          'a',
+          {
+            href: HTMLAttributes.url,
+            target: '_blank',
+            rel: 'noopener noreferrer',
+            style: 'background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;',
+          },
+          'View this post on Instagram',
+        ],
       ],
     ]
   },
 
   addCommands() {
     return {
-      setInstagramReel: (options: { src: string }) => ({ commands }) => {
+      setInstagramReel: (options: { url: string }) => ({ commands }) => {
+        // Load Instagram embed script if not already loaded
+        if (!document.querySelector('script[src*="instagram.com/embed.js"]')) {
+          const script = document.createElement('script')
+          script.async = true
+          script.src = 'https://www.instagram.com/embed.js'
+          document.body.appendChild(script)
+        } else {
+          // If script already loaded, process embeds
+          if (window.instgrm) {
+            setTimeout(() => {
+              window.instgrm.Embeds.process()
+            }, 100)
+          }
+        }
+
         return commands.insertContent({
           type: this.name,
           attrs: options,
@@ -78,10 +110,10 @@ const InstagramReel = Node.create({
       {
         find: /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel)\/([A-Za-z0-9_-]+)/g,
         handler: ({ match, chain }) => {
-          const reelId = match[1]
-          if (reelId) {
+          const fullUrl = match[0].startsWith('http') ? match[0] : `https://www.instagram.com/reel/${match[1]}/`
+          if (fullUrl) {
             chain().setInstagramReel({
-              src: `https://www.instagram.com/reel/${reelId}/embed`
+              url: fullUrl
             }).run()
           }
         },
@@ -277,10 +309,10 @@ export default function RichTextEditor({
       const instagramMatch = url.match(instagramReelRegex)
 
       if (instagramMatch) {
-        const reelId = instagramMatch[1]
-        // Use the custom InstagramReel extension
+        // Use the custom InstagramReel extension with full URL
+        const fullUrl = url.startsWith('http') ? url : `https://www.instagram.com/reel/${instagramMatch[1]}/`
         editor.commands.setInstagramReel({
-          src: `https://www.instagram.com/reel/${reelId}/embed`
+          url: fullUrl
         })
         toast.success('✅ Instagram Reel embedded!')
         return
@@ -665,39 +697,32 @@ export default function RichTextEditor({
           margin: 1.5rem auto;
           display: block;
         }
-        /* Instagram Reels - vertical aspect ratio - RESPONSIVE */
-        .ProseMirror div[data-instagram-reel] {
-          width: 100% !important;
-          max-width: 100% !important;
+        /* Instagram Reels - blockquote embed - RESPONSIVE */
+        .ProseMirror blockquote.instagram-media {
           margin: 1rem auto !important;
-          padding: 0 0.5rem !important;
+          max-width: 540px !important;
+          min-width: 326px !important;
         }
-        .ProseMirror div[data-instagram-reel] iframe {
-          width: 100% !important;
-          max-width: 100% !important;
-          height: auto !important;
-          aspect-ratio: 9 / 16 !important;
-          border-radius: 0.5rem !important;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-          display: block !important;
-          margin: 0 auto !important;
-        }
-        /* Tablet and up - limit width */
-        @media (min-width: 640px) {
-          .ProseMirror div[data-instagram-reel] {
-            max-width: 400px !important;
-            padding: 0 !important;
+
+        /* Mobile - full width with padding */
+        @media (max-width: 639px) {
+          .ProseMirror blockquote.instagram-media {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 0.5rem !important;
           }
-          .ProseMirror div[data-instagram-reel] iframe {
+        }
+
+        /* Tablet - limit width to 400px */
+        @media (min-width: 640px) and (max-width: 1023px) {
+          .ProseMirror blockquote.instagram-media {
             max-width: 400px !important;
           }
         }
-        /* Desktop - full Instagram Reel size */
+
+        /* Desktop - full Instagram Reel size (540px) */
         @media (min-width: 1024px) {
-          .ProseMirror div[data-instagram-reel] {
-            max-width: 540px !important;
-          }
-          .ProseMirror div[data-instagram-reel] iframe {
+          .ProseMirror blockquote.instagram-media {
             max-width: 540px !important;
           }
         }
