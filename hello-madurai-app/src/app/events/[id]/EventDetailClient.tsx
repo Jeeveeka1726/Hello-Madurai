@@ -15,17 +15,6 @@ import {
 } from 'react-share'
 import Image from 'next/image'
 
-// TypeScript declaration for Instagram embed script
-declare global {
-  interface Window {
-    instgrm?: {
-      Embeds: {
-        process: () => void
-      }
-    }
-  }
-}
-
 interface Event {
   id: string
   title: string
@@ -70,7 +59,7 @@ export default function EventDetailClient({ event }: Props) {
     incrementView()
   }, [event.id])
 
-  // Fix YouTube iframes to use youtube-nocookie.com domain and ensure proper sizing
+  // Fix YouTube iframes - Instagram iframes work automatically with /embed endpoint
   useEffect(() => {
     const processEmbeds = () => {
       const iframes = document.querySelectorAll('.event-description iframe')
@@ -83,7 +72,7 @@ export default function EventDetailClient({ event }: Props) {
           iframe.setAttribute('src', newSrc)
         }
 
-        // Remove inline width/height attributes - let CSS handle sizing
+        // Remove inline width/height attributes for YouTube - let CSS handle sizing
         if (src && src.includes('youtube')) {
           iframe.removeAttribute('width')
           iframe.removeAttribute('height')
@@ -91,30 +80,9 @@ export default function EventDetailClient({ event }: Props) {
         }
       })
 
-      // Process Instagram embeds
-      const instagramEmbeds = document.querySelectorAll('.event-description blockquote.instagram-media')
-      console.log('📸 Found Instagram embeds in event:', instagramEmbeds.length)
-
-      if (instagramEmbeds.length > 0) {
-        // Check if Instagram script is loaded
-        if (window.instgrm) {
-          console.log('📸 Instagram script loaded, processing embeds...')
-          window.instgrm.Embeds.process()
-        } else {
-          console.log('📸 Instagram script not loaded yet, waiting...')
-          // Wait for script to load
-          const checkInstagram = setInterval(() => {
-            if (window.instgrm) {
-              console.log('📸 Instagram script now loaded, processing embeds...')
-              window.instgrm.Embeds.process()
-              clearInterval(checkInstagram)
-            }
-          }, 100)
-
-          // Clear interval after 5 seconds to prevent infinite loop
-          setTimeout(() => clearInterval(checkInstagram), 5000)
-        }
-      }
+      // Instagram iframes with /embed endpoint work automatically - no script needed!
+      const instagramEmbeds = document.querySelectorAll('.event-description iframe[data-instagram-reel]')
+      console.log('📸 Found Instagram iframe embeds in event:', instagramEmbeds.length)
     }
 
     // Process immediately
@@ -122,7 +90,6 @@ export default function EventDetailClient({ event }: Props) {
 
     // Also process after a delay to catch any late-loading content
     setTimeout(processEmbeds, 500)
-    setTimeout(processEmbeds, 1000)
   }, [event])
 
   const formatDate = (dateString: string) => {
@@ -533,33 +500,37 @@ export default function EventDetailClient({ event }: Props) {
           aspect-ratio: 16 / 9 !important;
         }
 
-        /* Instagram Reels - RESPONSIVE - Using blockquote embed */
-        .event-description blockquote.instagram-media {
+        /* Instagram Reels - RESPONSIVE - Using iframe /embed endpoint */
+        .event-description iframe[data-instagram-reel] {
           margin: 1rem auto !important;
           max-width: 540px !important;
-          min-width: 326px !important;
+          width: 100% !important;
+          height: 960px !important;
+          border: none !important;
+          display: block !important;
         }
 
-        /* Mobile - full width with padding */
+        /* Mobile - full width */
         @media (max-width: 639px) {
-          .event-description blockquote.instagram-media {
-            width: 100% !important;
+          .event-description iframe[data-instagram-reel] {
             max-width: 100% !important;
-            padding: 0 0.5rem !important;
+            height: 700px !important;
           }
         }
 
         /* Tablet - limit width to 400px */
         @media (min-width: 640px) and (max-width: 1023px) {
-          .event-description blockquote.instagram-media {
+          .event-description iframe[data-instagram-reel] {
             max-width: 400px !important;
+            height: 800px !important;
           }
         }
 
         /* Desktop - full Instagram Reel size (540px) */
         @media (min-width: 1024px) {
-          .event-description blockquote.instagram-media {
+          .event-description iframe[data-instagram-reel] {
             max-width: 540px !important;
+            height: 960px !important;
           }
         }
       `}</style>

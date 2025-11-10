@@ -16,19 +16,8 @@ import {
 import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-hot-toast'
 
-// TypeScript declaration for Instagram embed script
-declare global {
-  interface Window {
-    instgrm?: {
-      Embeds: {
-        process: () => void
-      }
-    }
-  }
-}
-
 // Custom Instagram Reel Extension with Auto-Paste Detection
-// Uses Instagram's official blockquote + script embed method
+// Uses Instagram's /embed iframe endpoint (works without external scripts)
 const InstagramReel = Node.create({
   name: 'instagramReel',
   group: 'block',
@@ -36,7 +25,7 @@ const InstagramReel = Node.create({
 
   addAttributes() {
     return {
-      url: {
+      src: {
         default: null,
       },
     }
@@ -45,60 +34,40 @@ const InstagramReel = Node.create({
   parseHTML() {
     return [
       {
-        tag: 'blockquote[data-instagram-reel]',
+        tag: 'iframe[data-instagram-reel]',
       },
     ]
   },
 
   renderHTML({ HTMLAttributes }) {
-    // Instagram's official embed format: blockquote + script
+    // Instagram's /embed endpoint - works directly in iframe without scripts
     return [
-      'blockquote',
+      'iframe',
       {
         'data-instagram-reel': '',
-        'class': 'instagram-media',
-        'data-instgrm-permalink': HTMLAttributes.url,
-        'data-instgrm-version': '14',
-        'style': 'background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px auto; max-width:540px; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);',
+        'src': HTMLAttributes.src,
+        'frameborder': '0',
+        'scrolling': 'no',
+        'allowfullscreen': 'true',
+        'style': 'border: none; overflow: hidden; width: 100%; max-width: 540px; height: 960px; margin: 0 auto; display: block;',
       },
-      [
-        'div',
-        { style: 'padding:16px;' },
-        [
-          'a',
-          {
-            href: HTMLAttributes.url,
-            target: '_blank',
-            rel: 'noopener noreferrer',
-            style: 'background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;',
-          },
-          'View this post on Instagram',
-        ],
-      ],
     ]
   },
 
   addCommands() {
     return {
       setInstagramReel: (options: { url: string }) => ({ commands }) => {
-        // Load Instagram embed script if not already loaded
-        if (!document.querySelector('script[src*="instagram.com/embed.js"]')) {
-          const script = document.createElement('script')
-          script.async = true
-          script.src = 'https://www.instagram.com/embed.js'
-          document.body.appendChild(script)
-        } else {
-          // If script already loaded, process embeds
-          if (window.instgrm) {
-            setTimeout(() => {
-              window.instgrm.Embeds.process()
-            }, 100)
-          }
-        }
+        // Extract reel ID from URL
+        const match = options.url.match(/\/(?:p|reel)\/([A-Za-z0-9_-]+)/)
+        if (!match) return false
+
+        const reelId = match[1]
+        // Use Instagram's /embed endpoint
+        const embedSrc = `https://www.instagram.com/reel/${reelId}/embed`
 
         return commands.insertContent({
           type: this.name,
-          attrs: options,
+          attrs: { src: embedSrc },
         })
       },
     }
@@ -697,33 +666,37 @@ export default function RichTextEditor({
           margin: 1.5rem auto;
           display: block;
         }
-        /* Instagram Reels - blockquote embed - RESPONSIVE */
-        .ProseMirror blockquote.instagram-media {
+        /* Instagram Reels - iframe embed - RESPONSIVE */
+        .ProseMirror iframe[data-instagram-reel] {
           margin: 1rem auto !important;
           max-width: 540px !important;
-          min-width: 326px !important;
+          width: 100% !important;
+          height: 960px !important;
+          border: none !important;
+          display: block !important;
         }
 
-        /* Mobile - full width with padding */
+        /* Mobile - full width */
         @media (max-width: 639px) {
-          .ProseMirror blockquote.instagram-media {
-            width: 100% !important;
+          .ProseMirror iframe[data-instagram-reel] {
             max-width: 100% !important;
-            padding: 0 0.5rem !important;
+            height: 700px !important;
           }
         }
 
         /* Tablet - limit width to 400px */
         @media (min-width: 640px) and (max-width: 1023px) {
-          .ProseMirror blockquote.instagram-media {
+          .ProseMirror iframe[data-instagram-reel] {
             max-width: 400px !important;
+            height: 800px !important;
           }
         }
 
         /* Desktop - full Instagram Reel size (540px) */
         @media (min-width: 1024px) {
-          .ProseMirror blockquote.instagram-media {
+          .ProseMirror iframe[data-instagram-reel] {
             max-width: 540px !important;
+            height: 960px !important;
           }
         }
         .dark .ProseMirror {
