@@ -73,13 +73,18 @@ export async function POST(request: NextRequest) {
     try {
       // Try to save to Hostinger database
       console.log('📤 Attempting to save to database...')
+      console.log('📤 Image details:', {
+        filename,
+        mimeType,
+        size: processedBuffer.length
+      })
+
       const imageRecord = await prisma.image.create({
         data: {
           filename: filename,
           data: processedBuffer,
           mimeType: mimeType,
-          size: processedBuffer.length,
-          category: 'image'
+          size: processedBuffer.length
         }
       })
 
