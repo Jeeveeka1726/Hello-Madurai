@@ -7,13 +7,24 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
-import { 
+import {
   FacebookShareButton,
   WhatsappShareButton,
   FacebookIcon,
   WhatsappIcon
 } from 'react-share'
 import Image from 'next/image'
+
+// TypeScript declaration for Instagram embed script
+declare global {
+  interface Window {
+    instgrm?: {
+      Embeds: {
+        process: () => void
+      }
+    }
+  }
+}
 
 interface Event {
   id: string
@@ -61,7 +72,7 @@ export default function EventDetailClient({ event }: Props) {
 
   // Fix YouTube iframes to use youtube-nocookie.com domain and ensure proper sizing
   useEffect(() => {
-    setTimeout(() => {
+    const processEmbeds = () => {
       const iframes = document.querySelectorAll('.event-description iframe')
       iframes.forEach((iframe) => {
         const src = iframe.getAttribute('src')
@@ -80,22 +91,38 @@ export default function EventDetailClient({ event }: Props) {
         }
       })
 
-      // Load Instagram embed script if there are Instagram embeds
+      // Process Instagram embeds
       const instagramEmbeds = document.querySelectorAll('.event-description blockquote.instagram-media')
+      console.log('📸 Found Instagram embeds in event:', instagramEmbeds.length)
+
       if (instagramEmbeds.length > 0) {
-        if (!document.querySelector('script[src*="instagram.com/embed.js"]')) {
-          const script = document.createElement('script')
-          script.async = true
-          script.src = 'https://www.instagram.com/embed.js'
-          document.body.appendChild(script)
+        // Check if Instagram script is loaded
+        if (window.instgrm) {
+          console.log('📸 Instagram script loaded, processing embeds...')
+          window.instgrm.Embeds.process()
         } else {
-          // If script already loaded, process embeds
-          if (window.instgrm) {
-            window.instgrm.Embeds.process()
-          }
+          console.log('📸 Instagram script not loaded yet, waiting...')
+          // Wait for script to load
+          const checkInstagram = setInterval(() => {
+            if (window.instgrm) {
+              console.log('📸 Instagram script now loaded, processing embeds...')
+              window.instgrm.Embeds.process()
+              clearInterval(checkInstagram)
+            }
+          }, 100)
+
+          // Clear interval after 5 seconds to prevent infinite loop
+          setTimeout(() => clearInterval(checkInstagram), 5000)
         }
       }
-    }, 100)
+    }
+
+    // Process immediately
+    processEmbeds()
+
+    // Also process after a delay to catch any late-loading content
+    setTimeout(processEmbeds, 500)
+    setTimeout(processEmbeds, 1000)
   }, [event])
 
   const formatDate = (dateString: string) => {

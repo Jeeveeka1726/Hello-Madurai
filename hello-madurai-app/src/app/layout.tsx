@@ -41,6 +41,11 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXXX"
           crossOrigin="anonymous"
         ></script>
+        {/* Instagram Embed Script */}
+        <script
+          async
+          src="https://www.instagram.com/embed.js"
+        ></script>
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <ThemeProvider>
