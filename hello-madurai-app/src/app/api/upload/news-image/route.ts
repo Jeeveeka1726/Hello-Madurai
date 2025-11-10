@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
 
     try {
       // Try to save to Hostinger database
+      console.log('📤 Attempting to save to database...')
       const imageRecord = await prisma.image.create({
         data: {
           filename: filename,
@@ -86,23 +87,42 @@ export async function POST(request: NextRequest) {
       publicUrl = `/api/image/${imageRecord.id}`
       console.log('✅ Image saved to Hostinger database:', imageRecord.id)
     } catch (dbError) {
-      console.error('Database save error:', dbError)
+      console.error('❌ Database save error:', dbError)
+      console.error('Error details:', {
+        name: dbError instanceof Error ? dbError.name : 'Unknown',
+        message: dbError instanceof Error ? dbError.message : String(dbError),
+        stack: dbError instanceof Error ? dbError.stack : undefined
+      })
 
       // Fallback to local file system (development only)
       try {
+        console.log('📁 Attempting fallback to local file system...')
         const uploadsDir = join(process.cwd(), 'public', 'uploads', 'image')
         if (!existsSync(uploadsDir)) {
+          console.log('📁 Creating uploads directory:', uploadsDir)
           mkdirSync(uploadsDir, { recursive: true })
         }
 
         const filePath = join(uploadsDir, filename)
+        console.log('📁 Writing file to:', filePath)
         await writeFile(filePath, processedBuffer)
         publicUrl = `/uploads/image/${filename}`
         console.log('✅ Image saved to local file system:', filename)
       } catch (fileError) {
-        console.error('File system write also failed:', fileError)
+        console.error('❌ File system write also failed:', fileError)
+        console.error('File error details:', {
+          name: fileError instanceof Error ? fileError.name : 'Unknown',
+          message: fileError instanceof Error ? fileError.message : String(fileError),
+          stack: fileError instanceof Error ? fileError.stack : undefined
+        })
         return NextResponse.json(
-          { error: 'Failed to save image. Please try again.' },
+          {
+            error: 'Failed to save image. Please try again.',
+            details: {
+              dbError: dbError instanceof Error ? dbError.message : String(dbError),
+              fileError: fileError instanceof Error ? fileError.message : String(fileError)
+            }
+          },
           { status: 500 }
         )
       }

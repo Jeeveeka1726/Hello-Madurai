@@ -16,7 +16,7 @@ import {
 import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-hot-toast'
 
-// Custom Instagram Reel Extension
+// Custom Instagram Reel Extension with Auto-Paste Detection
 const InstagramReel = Node.create({
   name: 'instagramReel',
   group: 'block',
@@ -71,6 +71,23 @@ const InstagramReel = Node.create({
       },
     }
   },
+
+  // Auto-paste detection for Instagram Reels
+  addPasteRules() {
+    return [
+      {
+        find: /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel)\/([A-Za-z0-9_-]+)/g,
+        handler: ({ match, chain }) => {
+          const reelId = match[1]
+          if (reelId) {
+            chain().setInstagramReel({
+              src: `https://www.instagram.com/reel/${reelId}/embed`
+            }).run()
+          }
+        },
+      },
+    ]
+  },
 })
 
 interface RichTextEditorProps {
@@ -122,6 +139,9 @@ export default function RichTextEditor({
         nocookie: true, // Use youtube-nocookie.com to avoid embedding restrictions
         modestBranding: true,
         enableIFrameApi: false,
+        // Auto-paste detection for YouTube videos AND Shorts
+        addPasteHandler: true,
+        inline: false,
         HTMLAttributes: {
           class: 'youtube-video',
           style: 'width: 100%; max-width: 1280px; height: auto; aspect-ratio: 16 / 9; display: block; margin: 1.5rem auto;',

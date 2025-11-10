@@ -233,29 +233,17 @@ function NewsDetailPageContent() {
                     {t(`news.${article.id}.title`, article.title, article.title_ta)}
                   </h1>
 
-                  <p className="text-base sm:text-lg text-gray-600 mb-4 leading-relaxed">
-                    {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-sm text-gray-500">
-                    <div className="flex items-center">
-                      <UserIcon className="h-4 w-4 mr-2" />
-                      <span className="truncate">Hello Madurai</span>
-                    </div>
-                    <div className="flex items-center">
-                      <CalendarIcon className="h-4 w-4 mr-2" />
-                      <span className="truncate">{formatDateTime(article.publishedAt)}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <EyeIcon className="h-4 w-4 mr-2" />
-                      <span className="truncate">{article.views.toLocaleString()} {t('news.views', 'views', 'பார்வைகள்')}</span>
-                    </div>
-                  </div>
+                  {/* Excerpt - Only show if exists */}
+                  {article.excerpt && (
+                    <p className="text-base sm:text-lg text-gray-600 mb-4 leading-relaxed">
+                      {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
+                    </p>
+                  )}
                 </div>
 
                 {/* Featured Image - Below Title */}
                 {article.featuredImage ? (
-                  <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-lg mb-6">
+                  <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-lg mb-4">
                     <img
                       src={article.featuredImage}
                       alt={t(`news.${article.id}.title`, article.title, article.title_ta)}
@@ -264,7 +252,7 @@ function NewsDetailPageContent() {
                     />
                   </div>
                 ) : (
-                  <div className="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg mb-6">
+                  <div className="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg mb-4">
                     <div className="flex items-center justify-center">
                       <span className="text-gray-400">
                         {t('news.imageComingSoon', 'Featured Image Coming Soon', 'சிறப்பு படம் விரைவில்')}
@@ -272,6 +260,22 @@ function NewsDetailPageContent() {
                     </div>
                   </div>
                 )}
+
+                {/* Metadata - Below Image: Author, Date, Views */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-sm text-gray-500 mb-6">
+                  <div className="flex items-center">
+                    <UserIcon className="h-4 w-4 mr-2" />
+                    <span className="truncate">Hello Madurai</span>
+                  </div>
+                  <div className="flex items-center">
+                    <CalendarIcon className="h-4 w-4 mr-2" />
+                    <span className="truncate">{formatDateTime(article.publishedAt)}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <EyeIcon className="h-4 w-4 mr-2" />
+                    <span className="truncate">{article.views.toLocaleString()} {t('news.views', 'views', 'பார்வைகள்')}</span>
+                  </div>
+                </div>
 
                 {/* Article Content with Auto-Inserted Ads */}
                 <div className="mb-8">

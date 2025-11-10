@@ -261,19 +261,19 @@ export default function AdminNewsPage() {
                     }}
                   />
 
-                  {/* Excerpt - English & Tamil */}
+                  {/* Excerpt - English & Tamil - OPTIONAL */}
                   <BilingualField
-                    label="Excerpt"
-                    labelTamil="சுருக்கம்"
+                    label="Excerpt (Optional)"
+                    labelTamil="சுருக்கம் (விரும்பினால்)"
                     englishValue={formData.excerpt}
                     tamilValue={formData.excerpt_ta}
                     onEnglishChange={(value) => setFormData({ ...formData, excerpt: value })}
                     onTamilChange={(value) => setFormData({ ...formData, excerpt_ta: value })}
                     type="textarea"
-                    required={true}
+                    required={false}
                     placeholder={{
-                      english: "Enter a brief excerpt in English",
-                      tamil: "சுருக்கமான விளக்கத்தை தமிழில் உள்ளிடவும்"
+                      english: "Enter a brief excerpt in English (optional)",
+                      tamil: "சுருக்கமான விளக்கத்தை தமிழில் உள்ளிடவும் (விரும்பினால்)"
                     }}
                     rows={3}
                   />
