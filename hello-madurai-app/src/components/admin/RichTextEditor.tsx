@@ -79,16 +79,19 @@ const InstagramReel = Node.create({
   addPasteRules() {
     return [
       {
-        find: /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel)\/([A-Za-z0-9_-]+)/g,
-        handler: ({ match, chain }) => {
+        find: /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel)\/([A-Za-z0-9_-]+)(?:[?#][^\s]*)?/g,
+        handler: ({ match, chain, state, range }) => {
           console.log('📸 Instagram Reel detected:', match[0])
           const fullUrl = match[0].startsWith('http') ? match[0] : `https://www.instagram.com/reel/${match[1]}/`
           console.log('📸 Embedding Instagram Reel:', fullUrl)
-          if (fullUrl) {
-            chain().setInstagramReel({
-              url: fullUrl
-            }).run()
-          }
+
+          // Delete the pasted text and insert the embed
+          chain()
+            .deleteRange(range)
+            .setInstagramReel({ url: fullUrl })
+            .run()
+
+          return true // Prevent default paste behavior
         },
       },
     ]
@@ -101,19 +104,27 @@ const CustomYoutube = Youtube.extend({
     return [
       {
         // Match YouTube regular videos
-        find: /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]+)/g,
-        handler: ({ match, chain }) => {
+        find: /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]+)(?:[?&][^\s]*)?/g,
+        handler: ({ match, chain, range }) => {
           const videoId = match[1]
-          chain().setYoutubeVideo({ src: `https://www.youtube.com/watch?v=${videoId}` }).run()
+          chain()
+            .deleteRange(range)
+            .setYoutubeVideo({ src: `https://www.youtube.com/watch?v=${videoId}` })
+            .run()
+          return true
         },
       },
       {
         // Match YouTube Shorts
-        find: /(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([A-Za-z0-9_-]+)/g,
-        handler: ({ match, chain }) => {
+        find: /(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([A-Za-z0-9_-]+)(?:[?#][^\s]*)?/g,
+        handler: ({ match, chain, range }) => {
           const videoId = match[1]
           // YouTube Shorts use the same video ID format, just different URL
-          chain().setYoutubeVideo({ src: `https://www.youtube.com/watch?v=${videoId}` }).run()
+          chain()
+            .deleteRange(range)
+            .setYoutubeVideo({ src: `https://www.youtube.com/watch?v=${videoId}` })
+            .run()
+          return true
         },
       },
     ]
