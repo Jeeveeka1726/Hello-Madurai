@@ -58,14 +58,14 @@ const InstagramReel = Node.create({
   addCommands() {
     return {
       setInstagramReel: (options: { url: string }) => ({ commands }) => {
-        // Extract reel ID from URL
+        // Extract reel ID from URL and remove query parameters
         const match = options.url.match(/\/(?:p|reel)\/([A-Za-z0-9_-]+)/)
         if (!match) return false
 
         const reelId = match[1]
-        // Use Instagram's /embed endpoint with captioned=1 for better compatibility
-        // This shows the post with caption which has better support
-        const embedSrc = `https://www.instagram.com/reel/${reelId}/embed/captioned`
+        // Use Instagram's /embed endpoint
+        // Add utm_source=ig_embed to tell Instagram this is an embedded player
+        const embedSrc = `https://www.instagram.com/p/${reelId}/embed/?utm_source=ig_embed&amp;utm_campaign=loading`
 
         return commands.insertContent({
           type: this.name,
@@ -79,16 +79,18 @@ const InstagramReel = Node.create({
   addPasteRules() {
     return [
       {
-        find: /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel)\/([A-Za-z0-9_-]+)(?:[?#][^\s]*)?/g,
+        // Match Instagram URL and capture everything including query params
+        find: /https?:\/\/(?:www\.)?instagram\.com\/(?:p|reel)\/([A-Za-z0-9_-]+)(?:\/)?(?:\?[^\s]*)?\s*/g,
         handler: ({ match, chain, state, range }) => {
           console.log('📸 Instagram Reel detected:', match[0])
-          const fullUrl = match[0].startsWith('http') ? match[0] : `https://www.instagram.com/reel/${match[1]}/`
-          console.log('📸 Embedding Instagram Reel:', fullUrl)
+          const reelId = match[1]
+          const cleanUrl = `https://www.instagram.com/reel/${reelId}/`
+          console.log('📸 Embedding Instagram Reel (clean URL):', cleanUrl)
 
-          // Delete the pasted text and insert the embed
+          // Delete the pasted text (including query params) and insert the embed
           chain()
             .deleteRange(range)
-            .setInstagramReel({ url: fullUrl })
+            .setInstagramReel({ url: cleanUrl })
             .run()
 
           return true // Prevent default paste behavior
