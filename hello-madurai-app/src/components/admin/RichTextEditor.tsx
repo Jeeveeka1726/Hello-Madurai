@@ -40,7 +40,7 @@ const InstagramReel = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    // Instagram's /embed endpoint - works directly in iframe without scripts
+    // Instagram's /embed endpoint with captioned=1 parameter for better compatibility
     return [
       'iframe',
       {
@@ -48,8 +48,9 @@ const InstagramReel = Node.create({
         'src': HTMLAttributes.src,
         'frameborder': '0',
         'scrolling': 'no',
+        'allowtransparency': 'true',
         'allowfullscreen': 'true',
-        'style': 'border: none; overflow: hidden; width: 100%; max-width: 540px; height: 960px; margin: 0 auto; display: block;',
+        'style': 'border: none; overflow: hidden; width: 100%; max-width: 540px; height: 960px; margin: 0 auto; display: block; background: white;',
       },
     ]
   },
@@ -62,8 +63,9 @@ const InstagramReel = Node.create({
         if (!match) return false
 
         const reelId = match[1]
-        // Use Instagram's /embed endpoint
-        const embedSrc = `https://www.instagram.com/reel/${reelId}/embed`
+        // Use Instagram's /embed endpoint with captioned=1 for better compatibility
+        // This shows the post with caption which has better support
+        const embedSrc = `https://www.instagram.com/reel/${reelId}/embed/captioned`
 
         return commands.insertContent({
           type: this.name,
@@ -79,7 +81,9 @@ const InstagramReel = Node.create({
       {
         find: /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel)\/([A-Za-z0-9_-]+)/g,
         handler: ({ match, chain }) => {
+          console.log('📸 Instagram Reel detected:', match[0])
           const fullUrl = match[0].startsWith('http') ? match[0] : `https://www.instagram.com/reel/${match[1]}/`
+          console.log('📸 Embedding Instagram Reel:', fullUrl)
           if (fullUrl) {
             chain().setInstagramReel({
               url: fullUrl
