@@ -79,10 +79,13 @@ function NewsDetailPageContent() {
           const allResponse = await fetch('/api/news')
           if (allResponse.ok) {
             const allData = await allResponse.json()
-            // Filter out current article and get related ones
+            // Filter articles by same category, exclude current article, and get 6 related ones
             const related = allData
-              .filter((a: NewsArticle) => a.id !== newsId)
-              .slice(0, 2)
+              .filter((a: NewsArticle) =>
+                a.id !== newsId &&
+                a.category === articleData.category
+              )
+              .slice(0, 6)
             setRelatedArticles(related)
           }
         }
@@ -323,48 +326,50 @@ function NewsDetailPageContent() {
         </div>
 
         {/* Related Articles */}
-        <div className="mt-8 sm:mt-12">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-            {t('news.relatedArticles', 'Related Articles', 'தொடர்புடைய செய்திகள்')}
-          </h2>
-          <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
-            {relatedArticles.map((relatedArticle) => (
-                <Link key={relatedArticle.id} href={`/news/${relatedArticle.id}`}>
-                  <Card className="hover:shadow-lg transition-shadow bg-white border-gray-200">
-                    {relatedArticle.featuredImage ? (
-                      <div className="aspect-w-16 aspect-h-9 overflow-hidden">
-                        <img
-                          src={relatedArticle.featuredImage}
-                          alt={t(`news.${relatedArticle.id}.title`, relatedArticle.title, relatedArticle.title_ta)}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-                        <div className="flex items-center justify-center">
-                          <span className="text-sm text-gray-400">
-                            {t('news.imageComingSoon', 'Image Coming Soon', 'படம் விரைவில்')}
-                          </span>
+        {relatedArticles.length > 0 && (
+          <div className="mt-8 sm:mt-12">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+              {t('news.relatedArticles', 'Related Articles', 'தொடர்புடைய செய்திகள்')}
+            </h2>
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {relatedArticles.map((relatedArticle) => (
+                  <Link key={relatedArticle.id} href={`/news/${relatedArticle.id}`}>
+                    <Card className="hover:shadow-lg transition-shadow bg-white border-gray-200 h-full">
+                      {relatedArticle.featuredImage ? (
+                        <div className="aspect-w-16 aspect-h-9 overflow-hidden">
+                          <img
+                            src={relatedArticle.featuredImage}
+                            alt={t(`news.${relatedArticle.id}.title`, relatedArticle.title, relatedArticle.title_ta)}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                      </div>
-                    )}
-                    <CardContent className="p-4">
-                      <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
-                        {t(`news.${relatedArticle.id}.title`, relatedArticle.title, relatedArticle.title_ta)}
-                      </h3>
-                      <p className="text-gray-600 text-sm line-clamp-2">
-                        {t(`news.${relatedArticle.id}.excerpt`, relatedArticle.excerpt, relatedArticle.excerpt_ta)}
-                      </p>
-                      <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
-                        <span>{formatDate(relatedArticle.publishedAt)}</span>
-                        <span>{relatedArticle.views.toLocaleString()} {t('news.views', 'views', 'பார்வைகள்')}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
+                      ) : (
+                        <div className="aspect-w-16 aspect-h-9 bg-gray-200">
+                          <div className="flex items-center justify-center">
+                            <span className="text-sm text-gray-400">
+                              {t('news.imageComingSoon', 'Image Coming Soon', 'படம் விரைவில்')}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      <CardContent className="p-4">
+                        <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
+                          {t(`news.${relatedArticle.id}.title`, relatedArticle.title, relatedArticle.title_ta)}
+                        </h3>
+                        <p className="text-gray-600 text-sm line-clamp-2">
+                          {t(`news.${relatedArticle.id}.excerpt`, relatedArticle.excerpt, relatedArticle.excerpt_ta)}
+                        </p>
+                        <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+                          <span>{formatDate(relatedArticle.publishedAt)}</span>
+                          <span>{relatedArticle.views.toLocaleString()} {t('news.views', 'views', 'பார்வைகள்')}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
