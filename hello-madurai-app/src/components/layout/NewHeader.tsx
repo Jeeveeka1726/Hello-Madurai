@@ -41,12 +41,12 @@ export default function NewHeader() {
       name: t('nav.videos', 'Videos', 'வீடியோ'),
       href: '/videos'
     },
-    { 
+    {
       name: t('nav.magazine', 'E-Paper', 'பத்திரிகை'),
-      href: '/magazine' 
+      href: '/magazine'
     },
     {
-      name: t('nav.directory', 'Directory', 'முகவரி நூல்'),
+      name: t('nav.directory', 'Directory', 'வணிக முகவரி'),
       href: '/directory'
     },
   ]

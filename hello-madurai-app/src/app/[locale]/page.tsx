@@ -80,7 +80,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               </Link>
               <Link href={`/${locale}/directory`}>
                 <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-indigo-600">
-                  {locale === 'ta' ? 'முகவரி நூல்' : 'Directory'}
+                  {locale === 'ta' ? 'வணிக முகவரி' : 'Directory'}
                 </Button>
               </Link>
             </div>
@@ -207,7 +207,7 @@ function getNavigationTamil(sectionName: string): string {
     news: 'செய்திகள்',
     videos: 'வீடியோ',
     events: 'நிகழ்ச்சிகள்',
-    directory: 'முகவரி நூல்',
+    directory: 'வணிக முகவரி',
     tourism: 'சுற்றுலா வழிகாட்டி',
     jobs: 'வேலைவாய்ப்பு'
   }

@@ -60,10 +60,10 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-            {locale === 'ta' ? 'வணிக முகவரி நூல்' : 'Business Directory'}
+            {locale === 'ta' ? 'வணிக முகவரி' : 'Business Directory'}
           </h1>
           <p className="mt-2 text-lg text-gray-600">
-            {locale === 'ta' 
+            {locale === 'ta'
               ? 'மதுரையில் உள்ள உள்ளூர் வணிகங்கள், சேவைகள் மற்றும் தொடர்பு தகவல்களை கண்டறியுங்கள்'
               : 'Find local businesses, services and contact information in Madurai'
             }
