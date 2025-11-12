@@ -66,7 +66,7 @@ function NewsPageContent() {
     { id: 'religious', name: t('categories.religious', 'Religious', 'மதம்') },
     { id: 'cinema', name: t('categories.cinema', 'Cinema', 'சினிமா') },
     { id: 'games', name: t('categories.games', 'Games', 'விளையாட்டு') },
-    { id: 'political', name: t('categories.political', 'Political', 'அரசியல்') },
+    { id: 'political', name: t('categories.political', 'Minister', 'அமைச்சர்') },
     { id: 'police', name: t('categories.police', 'Police', 'போலீஸ்') },
     { id: 'agri', name: t('categories.agri', 'Agriculture', 'விவசாயம்') },
     { id: 'jobs', name: t('categories.jobs', 'Jobs', 'வேலைவாய்ப்பு') },

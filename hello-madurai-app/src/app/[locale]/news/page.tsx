@@ -15,7 +15,7 @@ const newsCategories = [
   { id: 'religious', name: 'Religious', name_ta: 'மதம்' },
   { id: 'cinema', name: 'Cinema', name_ta: 'சினிமா' },
   { id: 'games', name: 'Games', name_ta: 'விளையாட்டு' },
-  { id: 'political', name: 'Political', name_ta: 'அரசியல்' },
+  { id: 'political', name: 'Minister', name_ta: 'அமைச்சர்' },
   { id: 'police', name: 'Police', name_ta: 'போலீஸ்' },
   { id: 'agri', name: 'Agriculture', name_ta: 'விவசாயம்' },
   { id: 'jobs', name: 'Jobs', name_ta: 'வேலைவாய்ப்பு' },

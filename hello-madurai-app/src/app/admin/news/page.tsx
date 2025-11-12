@@ -56,7 +56,7 @@ export default function AdminNewsPage() {
     { id: 'religious', name: language === 'ta' ? 'மதம்' : 'Religious' },
     { id: 'cinema', name: language === 'ta' ? 'சினிமா' : 'Cinema' },
     { id: 'games', name: language === 'ta' ? 'விளையாட்டு' : 'Games' },
-    { id: 'political', name: language === 'ta' ? 'அரசியல்' : 'Political' },
+    { id: 'political', name: language === 'ta' ? 'அமைச்சர்' : 'Minister' },
     { id: 'police', name: language === 'ta' ? 'போலீஸ்' : 'Police' },
     { id: 'agri', name: language === 'ta' ? 'விவசாயம்' : 'Agriculture' },
     { id: 'jobs', name: language === 'ta' ? 'வேலைவாய்ப்பு' : 'Jobs' },
