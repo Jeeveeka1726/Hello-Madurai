@@ -53,7 +53,7 @@ export default function AdminNewsPage() {
     { id: 'collector', name: language === 'ta' ? 'கலெக்டர்' : 'Collector' },
     { id: 'corporation', name: language === 'ta' ? 'மாநகராட்சி' : 'Corporation' },
     { id: 'education', name: language === 'ta' ? 'கல்வி' : 'Education' },
-    { id: 'religious', name: language === 'ta' ? 'மதம்' : 'Religious' },
+    { id: 'religious', name: language === 'ta' ? 'ஆன்மிகம்' : 'Devotion' },
     { id: 'cinema', name: language === 'ta' ? 'சினிமா' : 'Cinema' },
     { id: 'games', name: language === 'ta' ? 'விளையாட்டு' : 'Games' },
     { id: 'political', name: language === 'ta' ? 'அமைச்சர்' : 'Minister' },

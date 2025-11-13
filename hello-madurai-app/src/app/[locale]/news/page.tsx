@@ -12,7 +12,7 @@ const newsCategories = [
   { id: 'collector', name: 'Collector', name_ta: 'கலெக்டர்' },
   { id: 'corporation', name: 'Corporation', name_ta: 'நகராட்சி' },
   { id: 'education', name: 'Education', name_ta: 'கல்வி' },
-  { id: 'religious', name: 'Religious', name_ta: 'மதம்' },
+  { id: 'religious', name: 'Devotion', name_ta: 'ஆன்மிகம்' },
   { id: 'cinema', name: 'Cinema', name_ta: 'சினிமா' },
   { id: 'games', name: 'Games', name_ta: 'விளையாட்டு' },
   { id: 'political', name: 'Minister', name_ta: 'அமைச்சர்' },
