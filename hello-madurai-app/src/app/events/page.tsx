@@ -37,12 +37,27 @@ interface Event {
   updatedAt: string
 }
 
+// Event categories matching admin panel
+const eventCategories = [
+  { id: 'all', name: 'All Events', name_ta: 'அனைத்து நிகழ்வுகள்' },
+  { id: 'festival', name: 'Festival', name_ta: 'திருவிழா' },
+  { id: 'business', name: 'Business', name_ta: 'வணிகம்' },
+  { id: 'temple', name: 'Temple', name_ta: 'கோவில்' },
+  { id: 'education', name: 'Education', name_ta: 'கல்வி' },
+  { id: 'medical', name: 'Medical', name_ta: 'மருத்துவம்' },
+  { id: 'exhibition', name: 'Exhibition', name_ta: 'கண்காட்சி' },
+  { id: 'games', name: 'Games', name_ta: 'விளையாட்டு' },
+  { id: 'workshop', name: 'Workshop', name_ta: 'பட்டறை' },
+  { id: 'shows', name: 'Shows', name_ta: 'நிகழ்ச்சிகள்' }
+]
+
 function EventsPageContent() {
   const { t, language } = useLanguage()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [shareMenuOpen, setShareMenuOpen] = useState<string | null>(null)
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set())
+  const [selectedCategory, setSelectedCategory] = useState('all')
 
   // Fetch events from database
   useEffect(() => {
@@ -209,6 +224,23 @@ function EventsPageContent() {
           </p>
         </div>
 
+        {/* Category Filter */}
+        <div className="mb-8">
+          <div className="flex flex-wrap gap-2 justify-center">
+            {eventCategories.map((category) => (
+              <Button
+                key={category.id}
+                variant={selectedCategory === category.id ? 'primary' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedCategory(category.id)}
+                suppressHydrationWarning
+              >
+                {language === 'ta' ? category.name_ta : category.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+
         {/* Loading State */}
         {loading && (
           <div className="text-center py-12">
@@ -223,10 +255,12 @@ function EventsPageContent() {
         {!loading && events.length > 0 && (
         <div>
           <div className="flex flex-col gap-6 max-w-4xl mx-auto">
-            {events.map((event) => {
+            {events
+              .filter(event => selectedCategory === 'all' || event.category === selectedCategory)
+              .map((event) => {
               const eventUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/events/${event.id}`
               const eventTitle = language === 'ta' && event.title_ta ? event.title_ta : event.title
-              
+
               return (
                 <Card key={event.id} className="event-card overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200">
                   <CardContent className="p-6">
@@ -482,10 +516,13 @@ function EventsPageContent() {
         )}
 
         {/* No events message */}
-        {!loading && events.length === 0 && (
+        {!loading && events.filter(event => selectedCategory === 'all' || event.category === selectedCategory).length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500" suppressHydrationWarning>
-              {t('events.noEvents', 'No upcoming events at the moment. Check back soon!', 'இப்போது வரவிருக்கும் நிகழ்வுகள் எதுவும் இல்லை. விரைவில் சரிபார்க்கவும்!')}
+              {selectedCategory === 'all'
+                ? t('events.noEvents', 'No upcoming events at the moment. Check back soon!', 'இப்போது வரவிருக்கும் நிகழ்வுகள் எதுவும் இல்லை. விரைவில் சரிபார்க்கவும்!')
+                : t('events.noEventsInCategory', 'No events in this category at the moment.', 'இந்த வகையில் தற்போது நிகழ்வுகள் எதுவும் இல்லை.')
+              }
             </p>
           </div>
         )}
