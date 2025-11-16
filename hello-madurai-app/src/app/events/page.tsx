@@ -271,11 +271,12 @@ function EventsPageContent() {
                     
                     {/* Featured Image */}
                     {event.featuredImage && (
-                      <div className="w-full h-64 md:h-96 overflow-hidden rounded-lg mb-4">
-                        <img 
-                          src={event.featuredImage} 
+                      <div className="w-full rounded-lg mb-4 bg-gray-100">
+                        <img
+                          src={event.featuredImage}
                           alt={eventTitle}
-                          className="w-full h-full object-cover"
+                          className="w-full h-auto object-contain rounded-lg"
+                          style={{ maxHeight: '500px' }}
                         />
                       </div>
                     )}
