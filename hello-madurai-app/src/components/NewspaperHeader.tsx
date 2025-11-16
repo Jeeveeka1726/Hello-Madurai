@@ -39,7 +39,7 @@ export default function NewspaperHeader({ className = '', showTagline = true }: 
               className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shadow-md flex-shrink-0"
             />
             <div className="text-center">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-blue-600 leading-tight" style={{ fontFamily: 'Impact, "Arial Black", sans-serif' }}>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-blue-600 leading-tight" style={{ fontFamily: '"Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif' }}>
                 Hello Madurai
               </h1>
               <div className="text-xs sm:text-sm text-gray-600 font-medium mt-1">
