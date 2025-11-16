@@ -5,9 +5,10 @@ import { useState, useEffect } from 'react'
 
 interface NewspaperHeaderProps {
   className?: string
+  showTagline?: boolean
 }
 
-export default function NewspaperHeader({ className = '' }: NewspaperHeaderProps) {
+export default function NewspaperHeader({ className = '', showTagline = true }: NewspaperHeaderProps) {
   const { t } = useLanguage()
   const [currentDate, setCurrentDate] = useState('')
 
@@ -46,12 +47,14 @@ export default function NewspaperHeader({ className = '' }: NewspaperHeaderProps
               </div>
             </div>
           </div>
-          
+
           {/* Tagline */}
-          <p className="text-sm sm:text-base lg:text-lg text-gray-700 font-medium" suppressHydrationWarning>
-            {t('news.newspaperTagline', 'Your Local News & Information Center', 'உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம்')}
-          </p>
-          
+          {showTagline && (
+            <p className="text-sm sm:text-base lg:text-lg text-gray-700 font-medium" suppressHydrationWarning>
+              {t('news.newspaperTagline', 'Your Local News & Information Center', 'உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம்')}
+            </p>
+          )}
+
         </div>
       </div>
     </div>

@@ -315,7 +315,7 @@ function NewsPageContent() {
 export default function NewsPage() {
   return (
     <div>
-      <NewspaperHeader />
+      <NewspaperHeader showTagline={true} />
       <NewHeader />
       <NewsPageContent />
     </div>

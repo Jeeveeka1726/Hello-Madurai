@@ -16,16 +16,12 @@ export default function NewHeader() {
   const [isOthersOpen, setIsOthersOpen] = useState(false)
   const { language, setLanguage, t } = useLanguage()
   const pathname = usePathname()
-  
-  // Check if we're on a news page or homepage
-  const isNewsPage = pathname?.startsWith('/news')
-  const isHomePage = pathname === '/' || pathname === '/en' || pathname === '/ta'
 
   const navigation = [
-    ...(isNewsPage ? [] : [{
+    {
       name: t('nav.home', 'Home', 'முகப்பு'),
       href: '/'
-    }]),
+    },
     { 
       name: t('nav.news', 'News', 'செய்திகள்'),
       href: '/news' 
@@ -75,32 +71,15 @@ export default function NewHeader() {
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg transition-all duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+          {/* Logo - Only logo, no text */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-3">
+            <Link href="/" className="flex items-center">
               <img
                 src="/logo.jpg"
                 alt="Hello Madurai Logo"
                 className="h-10 w-10 rounded-full object-cover"
               />
-              {!isNewsPage && !isHomePage && (
-                <div className="hidden sm:block">
-                  <h1 className="text-xl font-bold text-blue-600">
-                    Hello Madurai
-                  </h1>
-                </div>
-              )}
             </Link>
-            {isNewsPage && (
-              <Link
-                href="/"
-                className="ml-3 text-blue-600 hover:text-blue-700 px-3 py-2 text-sm font-medium transition-colors duration-200 hover-lift"
-              >
-                <span suppressHydrationWarning>
-                  {t('nav.home', 'Home', 'முகப்பு')}
-                </span>
-              </Link>
-            )}
           </div>
 
           {/* Desktop Navigation */}

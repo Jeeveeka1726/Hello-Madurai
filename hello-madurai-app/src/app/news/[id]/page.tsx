@@ -378,7 +378,7 @@ function NewsDetailPageContent() {
 export default function NewsDetailPage() {
   return (
     <div>
-      <NewspaperHeader />
+      <NewspaperHeader showTagline={true} />
     <AppWrapper>
       <NewsDetailPageContent />
     </AppWrapper>

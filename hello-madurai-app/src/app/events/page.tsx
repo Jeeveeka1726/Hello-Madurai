@@ -534,8 +534,8 @@ function EventsPageContent() {
 export default function EventsPage() {
   return (
     <div>
+      <NewspaperHeader showTagline={false} />
       <NewHeader />
-      <NewspaperHeader />
       <EventsPageContent />
     </div>
   )
