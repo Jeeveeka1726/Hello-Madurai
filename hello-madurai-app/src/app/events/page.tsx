@@ -424,7 +424,7 @@ function EventsPageContent() {
                         (language !== 'ta' && event.description && event.description.length > 500)) && (
                         <button
                           onClick={() => toggleReadMore(event.id)}
-                          className="mt-3 text-blue-600 hover:underline font-medium text-sm"
+                          className="mt-3 text-blue-600 hover:text-blue-700 hover:underline font-bold text-sm"
                           suppressHydrationWarning
                         >
                           {expandedEvents.has(event.id)
