@@ -41,11 +41,14 @@ interface Event {
 
 const eventCategories = [
   { id: 'festival', name: 'Festival', name_ta: 'திருவிழா' },
-  { id: 'cultural', name: 'Cultural', name_ta: 'கலாச்சாரம்' },
   { id: 'business', name: 'Business', name_ta: 'வணிகம்' },
+  { id: 'temple', name: 'Temple', name_ta: 'கோவில்' },
   { id: 'education', name: 'Education', name_ta: 'கல்வி' },
-  { id: 'sports', name: 'Sports', name_ta: 'விளையாட்டு' },
-  { id: 'other', name: 'Other', name_ta: 'மற்றவை' }
+  { id: 'medical', name: 'Medical', name_ta: 'மருத்துவம்' },
+  { id: 'exhibition', name: 'Exhibition', name_ta: 'கண்காட்சி' },
+  { id: 'games', name: 'Games', name_ta: 'விளையாட்டு' },
+  { id: 'workshop', name: 'Workshop', name_ta: 'பட்டறை' },
+  { id: 'shows', name: 'Shows', name_ta: 'நிகழ்ச்சிகள்' }
 ]
 
 export default function AdminEventsPage() {

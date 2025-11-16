@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react'
 import { CalendarIcon, MapPinIcon, ClockIcon, PhoneIcon, GlobeAltIcon, EyeIcon, ShareIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
+import NewspaperHeader from '@/components/NewspaperHeader'
 import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
-import { 
+import {
   FacebookShareButton,
   WhatsappShareButton,
   FacebookIcon,
@@ -53,9 +54,12 @@ function EventsPageContent() {
 
           // Filter to show only upcoming events (not ended)
           const now = new Date()
+          now.setHours(0, 0, 0, 0) // Set to start of today
+
           const upcomingEvents = data.filter((event: Event) => {
             const eventEndDate = event.endDate ? new Date(event.endDate) : new Date(event.startDate)
-            // Show event if end date hasn't passed yet
+            eventEndDate.setHours(23, 59, 59, 999) // Set to end of the event day
+            // Show event if end date hasn't passed yet (event is today or in the future)
             return eventEndDate >= now
           })
 
@@ -494,6 +498,7 @@ export default function EventsPage() {
   return (
     <div>
       <NewHeader />
+      <NewspaperHeader />
       <EventsPageContent />
     </div>
   )

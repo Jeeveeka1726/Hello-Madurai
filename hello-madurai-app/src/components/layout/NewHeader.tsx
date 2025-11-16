@@ -17,13 +17,14 @@ export default function NewHeader() {
   const { language, setLanguage, t } = useLanguage()
   const pathname = usePathname()
   
-  // Check if we're on a news page
+  // Check if we're on a news page or homepage
   const isNewsPage = pathname?.startsWith('/news')
+  const isHomePage = pathname === '/' || pathname === '/en' || pathname === '/ta'
 
   const navigation = [
-    ...(isNewsPage ? [] : [{ 
+    ...(isNewsPage ? [] : [{
       name: t('nav.home', 'Home', 'முகப்பு'),
-      href: '/' 
+      href: '/'
     }]),
     { 
       name: t('nav.news', 'News', 'செய்திகள்'),
@@ -82,7 +83,7 @@ export default function NewHeader() {
                 alt="Hello Madurai Logo"
                 className="h-10 w-10 rounded-full object-cover"
               />
-              {!isNewsPage && (
+              {!isNewsPage && !isHomePage && (
                 <div className="hidden sm:block">
                   <h1 className="text-xl font-bold text-blue-600">
                     Hello Madurai
