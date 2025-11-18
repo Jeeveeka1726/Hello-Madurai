@@ -348,3 +348,50 @@ model Image {
 
   @@map("images")
 }
+
+model Video {
+  id             String         @id @default(cuid())
+  title          String
+  title_ta       String?
+  description    String         @db.Text
+  description_ta String?        @db.Text
+  videoUrl       String
+  thumbnailUrl   String?
+  category       String
+  duration       String?
+  views          Int            @default(0)
+  likes          Int            @default(0)
+  dislikes       Int            @default(0)
+  featured       Boolean        @default(false)
+  publishedAt    DateTime       @default(now())
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  comments       VideoComment[]
+  shares         VideoShare[]
+
+  @@map("videos")
+}
+
+model VideoComment {
+  id        String   @id @default(cuid())
+  content   String
+  author    String
+  email     String?
+  videoId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@map("video_comments")
+}
+
+model VideoShare {
+  id        String   @id @default(cuid())
+  videoId   String
+  platform  String
+  userAgent String?
+  createdAt DateTime @default(now())
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@map("video_shares")
+}
