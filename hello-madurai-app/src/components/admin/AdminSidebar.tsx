@@ -13,7 +13,8 @@ import {
   Bars3Icon,
   XMarkIcon,
   ChartBarIcon,
-  MegaphoneIcon
+  MegaphoneIcon,
+  VideoCameraIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAdmin } from '@/contexts/AdminContext'
@@ -57,6 +58,13 @@ const navigation = [
     name_ta: 'வானொலி',
     href: '/admin/radio',
     icon: ChartBarIcon
+  },
+  {
+    name: 'Videos',
+    name_ta: 'வீடியோக்கள்',
+    href: '/admin/videos',
+    icon: VideoCameraIcon,
+    badge: 'new'
   },
   {
     name: 'Ads',

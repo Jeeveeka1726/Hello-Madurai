@@ -40,11 +40,11 @@ export default function RootPage() {
       color: 'bg-green-500'
     },
     {
-      nameEn: 'Video',
-      nameTa: 'காணொளி',
+      nameEn: 'Videos',
+      nameTa: 'வீடியோக்கள்',
       descEn: 'Watch videos from Madurai',
-      descTa: 'மதுரையின் காணொளிகளைப் பார்க்கவும்',
-      href: '/video',
+      descTa: 'மதுரையின் வீடியோக்களைப் பார்க்கவும்',
+      href: '/videos',
       icon: VideoCameraIcon,
       color: 'bg-purple-500'
     },
