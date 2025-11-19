@@ -31,7 +31,12 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: ['localhost:3000'],
+      bodySizeLimit: '100mb', // Allow large file uploads
     },
+  },
+  // Configure API routes to accept large files
+  serverRuntimeConfig: {
+    maxFileSize: 100 * 1024 * 1024, // 100MB in bytes
   },
   async headers() {
     return [

@@ -91,6 +91,15 @@ export default function AdminVideosPage() {
         alert('Please select a valid video file')
         return
       }
+
+      // Check file size (4MB limit for Vercel free tier)
+      const maxSize = 4 * 1024 * 1024 // 4MB in bytes
+      if (file.size > maxSize) {
+        alert(`File size is ${(file.size / 1024 / 1024).toFixed(2)}MB. Maximum allowed is 4MB.\n\nFor larger videos, please use YouTube URL instead.`)
+        e.target.value = '' // Clear the input
+        return
+      }
+
       setVideoFile(file)
       setFormData({ ...formData, videoType: 'upload' })
     }
@@ -323,7 +332,7 @@ export default function AdminVideosPage() {
                 {formData.videoType === 'upload' ? (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Upload Video File *
+                      Upload Video File * <span className="text-red-600 text-xs">(Max 4MB)</span>
                     </label>
                     <input
                       type="file"
@@ -332,9 +341,12 @@ export default function AdminVideosPage() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       required={!editingVideo}
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      For videos larger than 4MB, please use YouTube URL instead
+                    </p>
                     {videoFile && (
-                      <p className="mt-2 text-sm text-gray-600">
-                        Selected: {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
+                      <p className="mt-2 text-sm text-green-600 font-medium">
+                        ✓ Selected: {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
                       </p>
                     )}
                     {uploading && (

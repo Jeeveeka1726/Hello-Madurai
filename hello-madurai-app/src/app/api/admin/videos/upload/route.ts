@@ -3,11 +3,16 @@ import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 
+// Configure route for file uploads (4MB limit for Vercel free tier)
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const maxDuration = 60 // 60 seconds timeout
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
     const file = formData.get('video') as File
-    
+
     if (!file) {
       return NextResponse.json(
         { error: 'No video file provided' },
@@ -20,6 +25,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Invalid file type. Please upload a video file.' },
         { status: 400 }
+      )
+    }
+
+    // Validate file size (4MB limit for Vercel)
+    const maxSize = 4 * 1024 * 1024 // 4MB
+    if (file.size > maxSize) {
+      return NextResponse.json(
+        { error: `File size exceeds 4MB limit. Please use YouTube URL for larger videos.` },
+        { status: 413 }
       )
     }
 
@@ -56,14 +70,5 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
-
-// Increase the body size limit for video uploads
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '100mb',
-    },
-  },
 }
 
