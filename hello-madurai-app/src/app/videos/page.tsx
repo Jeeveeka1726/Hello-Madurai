@@ -12,11 +12,11 @@ interface Video {
   id: string
   title: string
   title_ta?: string
-  description: string
-  description_ta?: string
   videoUrl: string
+  videoType: string // "upload" or "youtube"
   thumbnailUrl?: string
   category: string
+  orderNumber: number
   duration?: string
   views: number
   likes: number
@@ -78,12 +78,10 @@ function VideosPageContent() {
   // Filter videos by category and search query
   const filteredVideos = videos.filter(video => {
     const matchesCategory = selectedCategory === 'all' || video.category === selectedCategory
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch = searchQuery === '' ||
       video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (video.title_ta && video.title_ta.includes(searchQuery)) ||
-      video.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (video.description_ta && video.description_ta.includes(searchQuery))
-    
+      (video.title_ta && video.title_ta.includes(searchQuery))
+
     return matchesCategory && matchesSearch
   })
 
@@ -176,15 +174,15 @@ function VideosPageContent() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredVideos.map((video) => {
-              const youtubeId = getYouTubeId(video.videoUrl)
               const videoTitle = language === 'ta' && video.title_ta ? video.title_ta : video.title
-              const videoDescription = language === 'ta' && video.description_ta ? video.description_ta : video.description
+              const isYouTube = video.videoType === 'youtube'
+              const youtubeId = isYouTube ? getYouTubeId(video.videoUrl) : null
 
               return (
                 <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200">
-                  {/* Video Thumbnail/Player */}
+                  {/* Video Player */}
                   <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
-                    {youtubeId ? (
+                    {isYouTube && youtubeId ? (
                       <iframe
                         src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1`}
                         title={videoTitle}
@@ -193,6 +191,18 @@ function VideosPageContent() {
                         allowFullScreen
                         onLoad={() => handleVideoView(video.id)}
                       />
+                    ) : video.videoType === 'upload' && video.videoUrl ? (
+                      <video
+                        controls
+                        className="w-full h-full"
+                        onPlay={() => handleVideoView(video.id)}
+                        poster={video.thumbnailUrl}
+                      >
+                        <source src={video.videoUrl} type="video/mp4" />
+                        <source src={video.videoUrl} type="video/webm" />
+                        <source src={video.videoUrl} type="video/ogg" />
+                        Your browser does not support the video tag.
+                      </video>
                     ) : video.thumbnailUrl ? (
                       <img
                         src={video.thumbnailUrl}
@@ -208,25 +218,17 @@ function VideosPageContent() {
 
                   <CardContent className="p-4">
                     {/* Title */}
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2" suppressHydrationWarning>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2" suppressHydrationWarning>
                       {videoTitle}
                     </h3>
 
-                    {/* Description */}
-                    <p className="text-gray-600 text-sm mb-3 line-clamp-2" suppressHydrationWarning>
-                      {videoDescription}
-                    </p>
-
-                    {/* Category Badge */}
-                    <div className="mb-3">
+                    {/* Category Badge & Stats */}
+                    <div className="flex items-center justify-between">
                       <span className="inline-block px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded">
                         {videoCategories.find(c => c.id === video.category)?.[language === 'ta' ? 'name_ta' : 'name'] || video.category}
                       </span>
-                    </div>
 
-                    {/* Stats */}
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-3 text-sm text-gray-500">
                         <div className="flex items-center">
                           <EyeIcon className="h-4 w-4 mr-1" />
                           <span>{video.views}</span>

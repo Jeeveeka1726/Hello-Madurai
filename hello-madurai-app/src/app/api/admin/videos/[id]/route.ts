@@ -15,11 +15,11 @@ export async function PUT(
       data: {
         title: body.title,
         title_ta: body.title_ta || null,
-        description: body.description,
-        description_ta: body.description_ta || null,
         videoUrl: body.videoUrl,
+        videoType: body.videoType || 'upload',
         thumbnailUrl: body.thumbnailUrl || null,
         category: body.category,
+        orderNumber: body.orderNumber || 0,
         duration: body.duration || null,
         featured: body.featured || false
       }

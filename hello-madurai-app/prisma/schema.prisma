@@ -353,11 +353,11 @@ model Video {
   id             String         @id @default(cuid())
   title          String
   title_ta       String?
-  description    String         @db.Text
-  description_ta String?        @db.Text
-  videoUrl       String
+  videoUrl       String         // Can be uploaded file path or YouTube URL
+  videoType      String         @default("upload") // "upload" or "youtube"
   thumbnailUrl   String?
   category       String
+  orderNumber    Int            @default(0) // For manual ordering
   duration       String?
   views          Int            @default(0)
   likes          Int            @default(0)

@@ -9,11 +9,11 @@ interface Video {
   id: string
   title: string
   title_ta?: string
-  description: string
-  description_ta?: string
   videoUrl: string
+  videoType: string // "upload" or "youtube"
   thumbnailUrl?: string
   category: string
+  orderNumber: number
   duration?: string
   views: number
   likes: number
@@ -50,17 +50,20 @@ export default function AdminVideosPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingVideo, setEditingVideo] = useState<Video | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [formData, setFormData] = useState({
     title: '',
     title_ta: '',
-    description: '',
-    description_ta: '',
     videoUrl: '',
+    videoType: 'upload', // 'upload' or 'youtube'
     thumbnailUrl: '',
     category: 'agri',
+    orderNumber: 0,
     duration: '',
     featured: false
   })
+  const [videoFile, setVideoFile] = useState<File | null>(null)
 
   useEffect(() => {
     fetchVideos()
@@ -80,34 +83,100 @@ export default function AdminVideosPage() {
     }
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Check if it's a video file
+      if (!file.type.startsWith('video/')) {
+        alert('Please select a valid video file')
+        return
+      }
+      setVideoFile(file)
+      setFormData({ ...formData, videoType: 'upload' })
+    }
+  }
+
+  const uploadVideoFile = async (file: File): Promise<string> => {
+    const formDataUpload = new FormData()
+    formDataUpload.append('video', file)
+
+    setUploading(true)
+    setUploadProgress(0)
+
+    try {
+      const xhr = new XMLHttpRequest()
+
+      return new Promise((resolve, reject) => {
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const progress = Math.round((e.loaded / e.total) * 100)
+            setUploadProgress(progress)
+          }
+        })
+
+        xhr.addEventListener('load', () => {
+          setUploading(false)
+          if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText)
+            resolve(response.url)
+          } else {
+            reject(new Error('Upload failed'))
+          }
+        })
+
+        xhr.addEventListener('error', () => {
+          setUploading(false)
+          reject(new Error('Upload failed'))
+        })
+
+        xhr.open('POST', '/api/admin/videos/upload')
+        xhr.send(formDataUpload)
+      })
+    } catch (error) {
+      setUploading(false)
+      throw error
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     try {
-      const url = editingVideo 
+      let videoUrl = formData.videoUrl
+
+      // If uploading a file, upload it first
+      if (formData.videoType === 'upload' && videoFile && !editingVideo) {
+        videoUrl = await uploadVideoFile(videoFile)
+      }
+
+      const url = editingVideo
         ? `/api/admin/videos/${editingVideo.id}`
         : '/api/admin/videos'
-      
+
       const method = editingVideo ? 'PUT' : 'POST'
-      
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          videoUrl
+        })
       })
 
       if (response.ok) {
         alert(editingVideo ? 'Video updated successfully!' : 'Video created successfully!')
         setShowForm(false)
         setEditingVideo(null)
+        setVideoFile(null)
         setFormData({
           title: '',
           title_ta: '',
-          description: '',
-          description_ta: '',
           videoUrl: '',
+          videoType: 'upload',
           thumbnailUrl: '',
           category: 'agri',
+          orderNumber: 0,
           duration: '',
           featured: false
         })
@@ -126,11 +195,11 @@ export default function AdminVideosPage() {
     setFormData({
       title: video.title,
       title_ta: video.title_ta || '',
-      description: video.description,
-      description_ta: video.description_ta || '',
       videoUrl: video.videoUrl,
+      videoType: video.videoType || 'upload',
       thumbnailUrl: video.thumbnailUrl || '',
       category: video.category,
+      orderNumber: video.orderNumber || 0,
       duration: video.duration || '',
       featured: video.featured
     })
@@ -169,14 +238,15 @@ export default function AdminVideosPage() {
               setFormData({
                 title: '',
                 title_ta: '',
-                description: '',
-                description_ta: '',
                 videoUrl: '',
+                videoType: 'upload',
                 thumbnailUrl: '',
                 category: 'agri',
+                orderNumber: 0,
                 duration: '',
                 featured: false
               })
+              setVideoFile(null)
             }}
             className="bg-blue-600 text-white hover:bg-blue-700"
           >
@@ -220,62 +290,82 @@ export default function AdminVideosPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Description (English) *
+                {/* Video Type Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Video Source *
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        value="upload"
+                        checked={formData.videoType === 'upload'}
+                        onChange={(e) => setFormData({ ...formData, videoType: e.target.value })}
+                        className="mr-2"
+                      />
+                      Upload Video File
                     </label>
-                    <textarea
-                      required
-                      rows={3}
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Description (Tamil)
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        value="youtube"
+                        checked={formData.videoType === 'youtube'}
+                        onChange={(e) => setFormData({ ...formData, videoType: e.target.value })}
+                        className="mr-2"
+                      />
+                      YouTube URL
                     </label>
-                    <textarea
-                      rows={3}
-                      value={formData.description_ta}
-                      onChange={(e) => setFormData({ ...formData, description_ta: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Video Upload or URL */}
+                {formData.videoType === 'upload' ? (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Video URL (YouTube) *
+                      Upload Video File *
+                    </label>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={handleFileChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      required={!editingVideo}
+                    />
+                    {videoFile && (
+                      <p className="mt-2 text-sm text-gray-600">
+                        Selected: {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
+                      </p>
+                    )}
+                    {uploading && (
+                      <div className="mt-2">
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                          <div
+                            className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          ></div>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">Uploading: {uploadProgress}%</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      YouTube URL *
                     </label>
                     <input
                       type="url"
-                      required
+                      required={formData.videoType === 'youtube'}
                       value={formData.videoUrl}
                       onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
                       placeholder="https://www.youtube.com/watch?v=..."
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
+                )}
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Thumbnail URL (Optional)
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.thumbnailUrl}
-                      onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Category *
@@ -292,6 +382,22 @@ export default function AdminVideosPage() {
                         </option>
                       ))}
                     </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Order Number *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      value={formData.orderNumber}
+                      onChange={(e) => setFormData({ ...formData, orderNumber: parseInt(e.target.value) || 0 })}
+                      placeholder="0"
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Lower numbers appear first</p>
                   </div>
 
                   <div>
@@ -356,8 +462,14 @@ export default function AdminVideosPage() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Order
+                      </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Title
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Type
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Category
@@ -376,11 +488,21 @@ export default function AdminVideosPage() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {videos.map((video) => (
                       <tr key={video.id}>
+                        <td className="px-4 py-4 whitespace-nowrap">
+                          <div className="text-sm font-bold text-gray-900">#{video.orderNumber}</div>
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{video.title}</div>
                           {video.title_ta && (
                             <div className="text-sm text-gray-500">{video.title_ta}</div>
                           )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            video.videoType === 'youtube' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                          }`}>
+                            {video.videoType === 'youtube' ? 'YouTube' : 'Upload'}
+                          </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
