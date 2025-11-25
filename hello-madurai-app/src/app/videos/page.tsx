@@ -27,6 +27,18 @@ interface Video {
   updatedAt: string
 }
 
+interface Ad {
+  id: string
+  title: string
+  title_ta?: string
+  imageUrl?: string
+  htmlCode?: string
+  link?: string
+  active: boolean
+  position: number
+  category?: string
+}
+
 // Video categories
 const videoCategories = [
   { id: 'all', name: 'All Videos', name_ta: 'அனைத்து வீடியோக்கள்' },
@@ -54,6 +66,7 @@ function VideosPageContent() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [videos, setVideos] = useState<Video[]>([])
+  const [ads, setAds] = useState<Ad[]>([])
   const [loading, setLoading] = useState(true)
 
   // Fetch videos from database
@@ -73,6 +86,28 @@ function VideosPageContent() {
     }
 
     fetchVideos()
+  }, [])
+
+  // Fetch ads for videos section
+  useEffect(() => {
+    const fetchAds = async () => {
+      try {
+        const response = await fetch('/api/ads/active?category=videos')
+        if (response.ok) {
+          const data = await response.json()
+          setAds(data)
+
+          // Track impressions for each ad
+          data.forEach((ad: Ad) => {
+            fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching ads:', error)
+      }
+    }
+
+    fetchAds()
   }, [])
 
   // Filter videos by category and search query
@@ -116,6 +151,71 @@ function VideosPageContent() {
     } catch (error) {
       console.error('Error incrementing view:', error)
     }
+  }
+
+  // Handle ad click
+  const handleAdClick = async (adId: string, link: string) => {
+    try {
+      await fetch(`/api/ads/${adId}/click`, { method: 'POST' })
+      window.open(link, '_blank', 'noopener,noreferrer')
+    } catch (error) {
+      console.error('Error tracking ad click:', error)
+    }
+  }
+
+  // Render ad component
+  const renderAd = (ad: Ad, index: number) => {
+    const adTitle = language === 'ta' && ad.title_ta ? ad.title_ta : ad.title
+
+    if (ad.htmlCode) {
+      // HTML/AdSense code
+      return (
+        <div key={`ad-${ad.id}-${index}`} className="col-span-full my-8">
+          <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
+            <p className="text-xs text-blue-700 mb-4 text-center font-bold">
+              📢 {language === 'ta' ? 'விளம்பரம்' : 'Advertisement'}
+            </p>
+            <div dangerouslySetInnerHTML={{ __html: ad.htmlCode }} />
+          </div>
+        </div>
+      )
+    } else if (ad.imageUrl) {
+      // Image ad with optional link
+      return (
+        <div key={`ad-${ad.id}-${index}`} className="col-span-full my-8">
+          <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
+            <p className="text-xs text-blue-700 mb-4 text-center font-bold">
+              📢 {language === 'ta' ? 'விளம்பரம்' : 'Advertisement'}
+            </p>
+            {ad.link ? (
+              <div
+                onClick={() => handleAdClick(ad.id, ad.link!)}
+                className="cursor-pointer hover:opacity-90 transition-opacity"
+              >
+                <img
+                  src={ad.imageUrl}
+                  alt={adTitle}
+                  className="w-full h-auto rounded-lg shadow-md max-w-4xl mx-auto"
+                  onError={(e) => {
+                    e.currentTarget.parentElement!.parentElement!.style.display = 'none'
+                  }}
+                />
+              </div>
+            ) : (
+              <img
+                src={ad.imageUrl}
+                alt={adTitle}
+                className="w-full h-auto rounded-lg shadow-md max-w-4xl mx-auto"
+                onError={(e) => {
+                  e.currentTarget.parentElement!.parentElement!.style.display = 'none'
+                }}
+              />
+            )}
+          </div>
+        </div>
+      )
+    }
+    return null
   }
 
   return (
@@ -173,76 +273,85 @@ function VideosPageContent() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredVideos.map((video) => {
+            {filteredVideos.map((video, index) => {
               const videoTitle = language === 'ta' && video.title_ta ? video.title_ta : video.title
               const isYouTube = video.videoType === 'youtube'
               const youtubeId = isYouTube ? getYouTubeId(video.videoUrl) : null
 
+              // Insert ad after every 6 videos (2 rows of 3)
+              const shouldShowAd = (index + 1) % 6 === 0 && ads.length > 0
+              const adIndex = Math.floor(index / 6) % ads.length
+
               return (
-                <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200">
-                  {/* Video Player */}
-                  <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
-                    {isYouTube && youtubeId ? (
-                      <iframe
-                        src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1`}
-                        title={videoTitle}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                        onLoad={() => handleVideoView(video.id)}
-                      />
-                    ) : video.videoType === 'upload' && video.videoUrl ? (
-                      <video
-                        controls
-                        className="w-full h-full"
-                        onPlay={() => handleVideoView(video.id)}
-                        poster={video.thumbnailUrl}
-                      >
-                        <source src={video.videoUrl} type="video/mp4" />
-                        <source src={video.videoUrl} type="video/webm" />
-                        <source src={video.videoUrl} type="video/ogg" />
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : video.thumbnailUrl ? (
-                      <img
-                        src={video.thumbnailUrl}
-                        alt={videoTitle}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white">
-                        <p>Video</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <CardContent className="p-4">
-                    {/* Title */}
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2" suppressHydrationWarning>
-                      {videoTitle}
-                    </h3>
-
-                    {/* Category Badge & Stats */}
-                    <div className="flex items-center justify-between">
-                      <span className="inline-block px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded">
-                        {videoCategories.find(c => c.id === video.category)?.[language === 'ta' ? 'name_ta' : 'name'] || video.category}
-                      </span>
-
-                      <div className="flex items-center space-x-3 text-sm text-gray-500">
-                        <div className="flex items-center">
-                          <EyeIcon className="h-4 w-4 mr-1" />
-                          <span>{video.views}</span>
+                <>
+                  <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200">
+                    {/* Video Player */}
+                    <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
+                      {isYouTube && youtubeId ? (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1`}
+                          title={videoTitle}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          onLoad={() => handleVideoView(video.id)}
+                        />
+                      ) : video.videoType === 'upload' && video.videoUrl ? (
+                        <video
+                          controls
+                          className="w-full h-full"
+                          onPlay={() => handleVideoView(video.id)}
+                          poster={video.thumbnailUrl}
+                        >
+                          <source src={video.videoUrl} type="video/mp4" />
+                          <source src={video.videoUrl} type="video/webm" />
+                          <source src={video.videoUrl} type="video/ogg" />
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : video.thumbnailUrl ? (
+                        <img
+                          src={video.thumbnailUrl}
+                          alt={videoTitle}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-white">
+                          <p>Video</p>
                         </div>
-                        {video.duration && (
-                          <div className="flex items-center">
-                            <ClockIcon className="h-4 w-4 mr-1" />
-                            <span>{video.duration}</span>
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
+
+                    <CardContent className="p-4">
+                      {/* Title */}
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2" suppressHydrationWarning>
+                        {videoTitle}
+                      </h3>
+
+                      {/* Category Badge & Stats */}
+                      <div className="flex items-center justify-between">
+                        <span className="inline-block px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded">
+                          {videoCategories.find(c => c.id === video.category)?.[language === 'ta' ? 'name_ta' : 'name'] || video.category}
+                        </span>
+
+                        <div className="flex items-center space-x-3 text-sm text-gray-500">
+                          <div className="flex items-center">
+                            <EyeIcon className="h-4 w-4 mr-1" />
+                            <span>{video.views}</span>
+                          </div>
+                          {video.duration && (
+                            <div className="flex items-center">
+                              <ClockIcon className="h-4 w-4 mr-1" />
+                              <span>{video.duration}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Show ad after every 6 videos */}
+                  {shouldShowAd && renderAd(ads[adIndex], adIndex)}
+                </>
               )
             })}
           </div>
