@@ -377,6 +377,25 @@ export default function AdminVideosPage() {
                   </div>
                 )}
 
+                {/* Thumbnail URL (Optional) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Thumbnail Image URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.thumbnailUrl}
+                    onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
+                    placeholder="https://example.com/thumbnail.jpg"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formData.videoType === 'youtube'
+                      ? 'Leave empty to use YouTube\'s auto-generated thumbnail'
+                      : 'Custom thumbnail for uploaded videos'}
+                  </p>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -312,21 +312,25 @@ function VideosPageContent() {
                         ) : (
                           // Show thumbnail with custom play button
                           <div
-                            className="relative w-full h-full cursor-pointer group"
+                            className="relative w-full h-full cursor-pointer group bg-gray-900"
                             onClick={() => handlePlayClick(video.id)}
                           >
                             <img
                               src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
                               alt={videoTitle}
                               className="w-full h-full object-contain"
+                              loading="lazy"
                               onError={(e) => {
                                 // Fallback to default YouTube thumbnail if custom fails
-                                e.currentTarget.src = getYouTubeThumbnail(youtubeId)
+                                const target = e.currentTarget
+                                if (!target.src.includes('img.youtube.com')) {
+                                  target.src = getYouTubeThumbnail(youtubeId)
+                                }
                               }}
                             />
                             {/* Custom Play Button Overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all">
-                              <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
+                            <div className="absolute inset-0 flex items-center justify-center group-hover:bg-black group-hover:bg-opacity-30 transition-all duration-300">
+                              <div className="w-20 h-20 bg-red-600 bg-opacity-90 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-opacity-100 transition-all duration-300 shadow-2xl">
                                 <svg
                                   className="w-10 h-10 text-white ml-1"
                                   fill="currentColor"
