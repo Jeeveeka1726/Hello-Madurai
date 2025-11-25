@@ -310,7 +310,7 @@ function VideosPageContent() {
                             allowFullScreen
                           />
                         ) : (
-                          // Show thumbnail with custom play button
+                          // Show thumbnail with subtle play button on hover
                           <div
                             className="relative w-full h-full cursor-pointer group bg-gray-900"
                             onClick={() => handlePlayClick(video.id)}
@@ -318,7 +318,7 @@ function VideosPageContent() {
                             <img
                               src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
                               alt={videoTitle}
-                              className="w-full h-full object-contain"
+                              className="w-full h-full object-contain transition-all duration-300 group-hover:brightness-75"
                               loading="lazy"
                               onError={(e) => {
                                 // Fallback to default YouTube thumbnail if custom fails
@@ -328,11 +328,11 @@ function VideosPageContent() {
                                 }
                               }}
                             />
-                            {/* Custom Play Button Overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center group-hover:bg-black group-hover:bg-opacity-30 transition-all duration-300">
-                              <div className="w-20 h-20 bg-red-600 bg-opacity-90 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-opacity-100 transition-all duration-300 shadow-2xl">
+                            {/* Subtle Play Button - Only visible on hover */}
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <div className="w-24 h-24 bg-black bg-opacity-70 rounded-full flex items-center justify-center backdrop-blur-sm border-4 border-white border-opacity-90 shadow-2xl">
                                 <svg
-                                  className="w-10 h-10 text-white ml-1"
+                                  className="w-12 h-12 text-white ml-1"
                                   fill="currentColor"
                                   viewBox="0 0 24 24"
                                 >
