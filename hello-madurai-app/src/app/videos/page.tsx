@@ -68,6 +68,7 @@ function VideosPageContent() {
   const [videos, setVideos] = useState<Video[]>([])
   const [ads, setAds] = useState<Ad[]>([])
   const [loading, setLoading] = useState(true)
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null)
 
   // Fetch videos from database
   useEffect(() => {
@@ -151,6 +152,17 @@ function VideosPageContent() {
     } catch (error) {
       console.error('Error incrementing view:', error)
     }
+  }
+
+  // Handle play button click for YouTube videos
+  const handlePlayClick = (videoId: string) => {
+    setPlayingVideoId(videoId)
+    handleVideoView(videoId)
+  }
+
+  // Get YouTube thumbnail URL
+  const getYouTubeThumbnail = (youtubeId: string): string => {
+    return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
   }
 
   // Handle ad click
@@ -288,14 +300,44 @@ function VideosPageContent() {
                     {/* Video Player */}
                     <div className="relative bg-black" style={{ aspectRatio: '16/9', maxHeight: '500px' }}>
                       {isYouTube && youtubeId ? (
-                        <iframe
-                          src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1`}
-                          title={videoTitle}
-                          className="w-full h-full object-contain"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                          allowFullScreen
-                          onLoad={() => handleVideoView(video.id)}
-                        />
+                        playingVideoId === video.id ? (
+                          // Show YouTube iframe when playing
+                          <iframe
+                            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+                            title={videoTitle}
+                            className="w-full h-full object-contain"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                          />
+                        ) : (
+                          // Show thumbnail with custom play button
+                          <div
+                            className="relative w-full h-full cursor-pointer group"
+                            onClick={() => handlePlayClick(video.id)}
+                          >
+                            <img
+                              src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
+                              alt={videoTitle}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                // Fallback to default YouTube thumbnail if custom fails
+                                e.currentTarget.src = getYouTubeThumbnail(youtubeId)
+                              }}
+                            />
+                            {/* Custom Play Button Overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all">
+                              <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
+                                <svg
+                                  className="w-10 h-10 text-white ml-1"
+                                  fill="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path d="M8 5v14l11-7z" />
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                        )
                       ) : video.videoType === 'upload' && video.videoUrl ? (
                         <video
                           controls
