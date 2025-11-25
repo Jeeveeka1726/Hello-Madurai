@@ -286,12 +286,12 @@ function VideosPageContent() {
                 <>
                   <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200">
                     {/* Video Player */}
-                    <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
+                    <div className="relative bg-black" style={{ aspectRatio: '16/9', maxHeight: '500px' }}>
                       {isYouTube && youtubeId ? (
                         <iframe
                           src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1`}
                           title={videoTitle}
-                          className="w-full h-full"
+                          className="w-full h-full object-contain"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                           allowFullScreen
                           onLoad={() => handleVideoView(video.id)}
@@ -299,7 +299,7 @@ function VideosPageContent() {
                       ) : video.videoType === 'upload' && video.videoUrl ? (
                         <video
                           controls
-                          className="w-full h-full"
+                          className="w-full h-full object-contain"
                           onPlay={() => handleVideoView(video.id)}
                           poster={video.thumbnailUrl}
                         >
@@ -312,7 +312,7 @@ function VideosPageContent() {
                         <img
                           src={video.thumbnailUrl}
                           alt={videoTitle}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-white">
