@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MagnifyingGlassIcon, EyeIcon, ClockIcon } from '@heroicons/react/24/outline'
+import { MagnifyingGlassIcon, EyeIcon, ClockIcon, ShareIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import NewspaperHeader from '@/components/NewspaperHeader'
@@ -165,6 +165,33 @@ function VideosPageContent() {
     return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
   }
 
+  // Handle share button click
+  const handleShare = async (video: Video) => {
+    const videoTitle = language === 'ta' && video.title_ta ? video.title_ta : video.title
+    const shareData = {
+      title: `${videoTitle} - Hello Madurai`,
+      text: `${t('videos.checkOut', 'Check out this video', 'இந்த வீடியோவைப் பார்க்கவும்')}: ${videoTitle}`,
+      url: window.location.origin + '/videos?id=' + video.id
+    }
+
+    try {
+      // Try native share API first (mobile)
+      if (navigator.share) {
+        await navigator.share(shareData)
+        // Track share
+        await fetch(`/api/videos/${video.id}/share`, { method: 'POST' }).catch(() => {})
+      } else {
+        // Fallback: Copy to clipboard
+        await navigator.clipboard.writeText(shareData.url)
+        alert(t('videos.linkCopied', 'Link copied to clipboard!', 'இணைப்பு நகலெடுக்கப்பட்டது!'))
+        // Track share
+        await fetch(`/api/videos/${video.id}/share`, { method: 'POST' }).catch(() => {})
+      }
+    } catch (error) {
+      console.error('Error sharing:', error)
+    }
+  }
+
   // Handle ad click
   const handleAdClick = async (adId: string, link: string) => {
     try {
@@ -284,21 +311,21 @@ function VideosPageContent() {
             </p>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
             {filteredVideos.map((video, index) => {
               const videoTitle = language === 'ta' && video.title_ta ? video.title_ta : video.title
               const isYouTube = video.videoType === 'youtube'
               const youtubeId = isYouTube ? getYouTubeId(video.videoUrl) : null
 
-              // Insert ad after every 6 videos (2 rows of 3)
-              const shouldShowAd = (index + 1) % 6 === 0 && ads.length > 0
-              const adIndex = Math.floor(index / 6) % ads.length
+              // Insert ad after every 4 videos (2 rows of 2 on desktop, 4 rows on mobile)
+              const shouldShowAd = (index + 1) % 4 === 0 && ads.length > 0
+              const adIndex = Math.floor(index / 4) % ads.length
 
               return (
                 <>
-                  <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200">
+                  <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-all bg-white border-gray-200">
                     {/* Video Player */}
-                    <div className="relative bg-black" style={{ aspectRatio: '16/9', maxHeight: '500px' }}>
+                    <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
                       {isYouTube && youtubeId ? (
                         playingVideoId === video.id ? (
                           // Show YouTube iframe when playing
@@ -367,19 +394,19 @@ function VideosPageContent() {
                       )}
                     </div>
 
-                    <CardContent className="p-4">
+                    <CardContent className="p-4 sm:p-5">
                       {/* Title */}
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2" suppressHydrationWarning>
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 line-clamp-2" suppressHydrationWarning>
                         {videoTitle}
                       </h3>
 
                       {/* Category Badge & Stats */}
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between mb-3">
                         <span className="inline-block px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded">
                           {videoCategories.find(c => c.id === video.category)?.[language === 'ta' ? 'name_ta' : 'name'] || video.category}
                         </span>
 
-                        <div className="flex items-center space-x-3 text-sm text-gray-500">
+                        <div className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm text-gray-500">
                           <div className="flex items-center">
                             <EyeIcon className="h-4 w-4 mr-1" />
                             <span>{video.views}</span>
@@ -392,10 +419,21 @@ function VideosPageContent() {
                           )}
                         </div>
                       </div>
+
+                      {/* Share Button */}
+                      <Button
+                        onClick={() => handleShare(video)}
+                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                      >
+                        <ShareIcon className="h-5 w-5" />
+                        <span suppressHydrationWarning>
+                          {t('videos.share', 'Share Video', 'பகிர்')}
+                        </span>
+                      </Button>
                     </CardContent>
                   </Card>
 
-                  {/* Show ad after every 6 videos */}
+                  {/* Show ad after every 4 videos */}
                   {shouldShowAd && renderAd(ads[adIndex], adIndex)}
                 </>
               )
