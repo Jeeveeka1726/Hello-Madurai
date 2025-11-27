@@ -322,14 +322,22 @@ function VideosPageContent() {
                 <>
                   <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-all bg-white border-gray-200">
                     {/* Video Player - Full Width, No Black Bars */}
-                    <div className="relative w-full overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+                    <div className="relative w-full bg-gray-900" style={{ paddingBottom: '56.25%', height: 0 }}>
                       {isYouTube && youtubeId ? (
                         playingVideoId === video.id ? (
-                          // Show YouTube iframe when playing
+                          // Show YouTube iframe when playing - FULL SIZE
                           <iframe
                             src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
                             title={videoTitle}
                             className="absolute top-0 left-0 w-full h-full border-0"
+                            style={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              width: '100%',
+                              height: '100%',
+                              border: 'none'
+                            }}
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowFullScreen
                           />
@@ -370,6 +378,13 @@ function VideosPageContent() {
                         <video
                           controls
                           className="absolute top-0 left-0 w-full h-full object-cover"
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%'
+                          }}
                           onPlay={() => handleVideoView(video.id)}
                           poster={video.thumbnailUrl}
                         >
