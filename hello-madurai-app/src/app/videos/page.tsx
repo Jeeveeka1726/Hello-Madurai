@@ -364,7 +364,7 @@ function VideosPageContent() {
                 <>
                   <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-all bg-white border-gray-200">
                     {/* Video Player - Full Width, No Black Bars */}
-                    <div className="relative w-full bg-gray-900" style={{ paddingBottom: '56.25%', height: 0 }}>
+                    <div className="relative w-full overflow-hidden" style={{ paddingBottom: '56.25%', height: 0 }}>
                       {isYouTube && youtubeId ? (
                         playingVideoId === video.id ? (
                           // Show YouTube iframe when playing - FULL SIZE
@@ -384,7 +384,7 @@ function VideosPageContent() {
                             allowFullScreen
                           />
                         ) : (
-                          // Show thumbnail with subtle play button on hover
+                          // Show thumbnail with transparent play button on hover
                           <div
                             className="absolute top-0 left-0 w-full h-full cursor-pointer group"
                             onClick={() => handlePlayClick(video.id)}
@@ -392,7 +392,7 @@ function VideosPageContent() {
                             <img
                               src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
                               alt={videoTitle}
-                              className="absolute top-0 left-0 w-full h-full object-cover transition-all duration-300 group-hover:brightness-75"
+                              className="absolute top-0 left-0 w-full h-full object-cover transition-all duration-300"
                               loading="lazy"
                               onError={(e) => {
                                 // Fallback to default YouTube thumbnail if custom fails
@@ -402,11 +402,14 @@ function VideosPageContent() {
                                 }
                               }}
                             />
-                            {/* Subtle Play Button - Only visible on hover */}
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-20">
-                              <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-2xl">
+                            {/* Transparent Play Button - Only visible on hover */}
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                              {/* Dark transparent overlay on hover */}
+                              <div className="absolute inset-0 bg-black opacity-30"></div>
+                              {/* Play button */}
+                              <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-black bg-opacity-60 rounded-full flex items-center justify-center backdrop-blur-sm border-3 sm:border-4 border-white border-opacity-80 shadow-2xl">
                                 <svg
-                                  className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-red-600 ml-0.5"
+                                  className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white ml-1"
                                   fill="currentColor"
                                   viewBox="0 0 24 24"
                                 >
