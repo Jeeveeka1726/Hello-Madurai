@@ -321,76 +321,74 @@ function VideosPageContent() {
               return (
                 <>
                   <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-all bg-white border-gray-200">
-                    {/* Video Player */}
-                    <div className="relative bg-black w-full" style={{ paddingBottom: '56.25%' }}>
-                      <div className="absolute inset-0">
-                        {isYouTube && youtubeId ? (
-                          playingVideoId === video.id ? (
-                            // Show YouTube iframe when playing
-                            <iframe
-                              src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
-                              title={videoTitle}
-                              className="absolute top-0 left-0 w-full h-full"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                              allowFullScreen
-                            />
-                          ) : (
-                            // Show thumbnail with subtle play button on hover
-                            <div
-                              className="absolute top-0 left-0 w-full h-full cursor-pointer group bg-gray-900"
-                              onClick={() => handlePlayClick(video.id)}
-                            >
-                              <img
-                                src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
-                                alt={videoTitle}
-                                className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-75"
-                                loading="lazy"
-                                onError={(e) => {
-                                  // Fallback to default YouTube thumbnail if custom fails
-                                  const target = e.currentTarget
-                                  if (!target.src.includes('img.youtube.com')) {
-                                    target.src = getYouTubeThumbnail(youtubeId)
-                                  }
-                                }}
-                              />
-                              {/* Subtle Play Button - Only visible on hover */}
-                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-black bg-opacity-70 rounded-full flex items-center justify-center backdrop-blur-sm border-2 sm:border-3 md:border-4 border-white border-opacity-90 shadow-2xl">
-                                  <svg
-                                    className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white ml-1"
-                                    fill="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path d="M8 5v14l11-7z" />
-                                  </svg>
-                                </div>
-                              </div>
-                            </div>
-                          )
-                        ) : video.videoType === 'upload' && video.videoUrl ? (
-                          <video
-                            controls
-                            className="absolute top-0 left-0 w-full h-full object-cover"
-                            onPlay={() => handleVideoView(video.id)}
-                            poster={video.thumbnailUrl}
-                          >
-                            <source src={video.videoUrl} type="video/mp4" />
-                            <source src={video.videoUrl} type="video/webm" />
-                            <source src={video.videoUrl} type="video/ogg" />
-                            Your browser does not support the video tag.
-                          </video>
-                        ) : video.thumbnailUrl ? (
-                          <img
-                            src={video.thumbnailUrl}
-                            alt={videoTitle}
-                            className="absolute top-0 left-0 w-full h-full object-cover"
+                    {/* Video Player - Full Width, No Black Bars */}
+                    <div className="relative w-full overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+                      {isYouTube && youtubeId ? (
+                        playingVideoId === video.id ? (
+                          // Show YouTube iframe when playing
+                          <iframe
+                            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+                            title={videoTitle}
+                            className="absolute top-0 left-0 w-full h-full border-0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
                           />
                         ) : (
-                          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-white">
-                            <p>Video</p>
+                          // Show thumbnail with subtle play button on hover
+                          <div
+                            className="absolute top-0 left-0 w-full h-full cursor-pointer group"
+                            onClick={() => handlePlayClick(video.id)}
+                          >
+                            <img
+                              src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
+                              alt={videoTitle}
+                              className="absolute top-0 left-0 w-full h-full object-cover transition-all duration-300 group-hover:brightness-75"
+                              loading="lazy"
+                              onError={(e) => {
+                                // Fallback to default YouTube thumbnail if custom fails
+                                const target = e.currentTarget
+                                if (!target.src.includes('img.youtube.com')) {
+                                  target.src = getYouTubeThumbnail(youtubeId)
+                                }
+                              }}
+                            />
+                            {/* Subtle Play Button - Only visible on hover */}
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-20">
+                              <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-2xl">
+                                <svg
+                                  className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-red-600 ml-0.5"
+                                  fill="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path d="M8 5v14l11-7z" />
+                                </svg>
+                              </div>
+                            </div>
                           </div>
-                        )}
-                      </div>
+                        )
+                      ) : video.videoType === 'upload' && video.videoUrl ? (
+                        <video
+                          controls
+                          className="absolute top-0 left-0 w-full h-full object-cover"
+                          onPlay={() => handleVideoView(video.id)}
+                          poster={video.thumbnailUrl}
+                        >
+                          <source src={video.videoUrl} type="video/mp4" />
+                          <source src={video.videoUrl} type="video/webm" />
+                          <source src={video.videoUrl} type="video/ogg" />
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : video.thumbnailUrl ? (
+                        <img
+                          src={video.thumbnailUrl}
+                          alt={videoTitle}
+                          className="absolute top-0 left-0 w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
+                          <p>Video</p>
+                        </div>
+                      )}
                     </div>
 
                     <CardContent className="p-3 sm:p-4">
@@ -419,32 +417,32 @@ function VideosPageContent() {
                         </div>
                       </div>
 
-                      {/* Share Buttons */}
-                      <div className="flex gap-2">
+                      {/* Share Buttons - Responsive */}
+                      <div className="flex gap-1.5 sm:gap-2">
                         {/* WhatsApp Share */}
                         <button
                           onClick={() => handleWhatsAppShare(video)}
-                          className="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm"
+                          className="flex-1 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-medium py-2 sm:py-2.5 px-1.5 sm:px-3 rounded-md sm:rounded-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5"
                           title="Share on WhatsApp"
+                          aria-label="Share on WhatsApp"
                         >
-                          <svg className="h-3 w-3 sm:h-4 sm:w-4" fill="currentColor" viewBox="0 0 24 24">
+                          <svg className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                           </svg>
-                          <span className="hidden xs:inline" suppressHydrationWarning>WhatsApp</span>
-                          <span className="xs:hidden" suppressHydrationWarning>WA</span>
+                          <span className="hidden sm:inline text-xs sm:text-sm font-semibold" suppressHydrationWarning>WhatsApp</span>
                         </button>
 
                         {/* Facebook Share */}
                         <button
                           onClick={() => handleFacebookShare(video)}
-                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 text-xs sm:text-sm"
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 sm:py-2.5 px-1.5 sm:px-3 rounded-md sm:rounded-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5"
                           title="Share on Facebook"
+                          aria-label="Share on Facebook"
                         >
-                          <svg className="h-3 w-3 sm:h-4 sm:w-4" fill="currentColor" viewBox="0 0 24 24">
+                          <svg className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                           </svg>
-                          <span className="hidden xs:inline" suppressHydrationWarning>Facebook</span>
-                          <span className="xs:hidden" suppressHydrationWarning>FB</span>
+                          <span className="hidden sm:inline text-xs sm:text-sm font-semibold" suppressHydrationWarning>Facebook</span>
                         </button>
                       </div>
                     </CardContent>
