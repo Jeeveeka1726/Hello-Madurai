@@ -322,73 +322,75 @@ function VideosPageContent() {
                 <>
                   <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-all bg-white border-gray-200">
                     {/* Video Player */}
-                    <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
-                      {isYouTube && youtubeId ? (
-                        playingVideoId === video.id ? (
-                          // Show YouTube iframe when playing
-                          <iframe
-                            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
-                            title={videoTitle}
-                            className="w-full h-full object-contain"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowFullScreen
-                          />
-                        ) : (
-                          // Show thumbnail with subtle play button on hover
-                          <div
-                            className="relative w-full h-full cursor-pointer group bg-gray-900"
-                            onClick={() => handlePlayClick(video.id)}
-                          >
-                            <img
-                              src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
-                              alt={videoTitle}
-                              className="w-full h-full object-contain transition-all duration-300 group-hover:brightness-75"
-                              loading="lazy"
-                              onError={(e) => {
-                                // Fallback to default YouTube thumbnail if custom fails
-                                const target = e.currentTarget
-                                if (!target.src.includes('img.youtube.com')) {
-                                  target.src = getYouTubeThumbnail(youtubeId)
-                                }
-                              }}
+                    <div className="relative bg-black w-full" style={{ paddingBottom: '56.25%' }}>
+                      <div className="absolute inset-0">
+                        {isYouTube && youtubeId ? (
+                          playingVideoId === video.id ? (
+                            // Show YouTube iframe when playing
+                            <iframe
+                              src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+                              title={videoTitle}
+                              className="absolute top-0 left-0 w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
                             />
-                            {/* Subtle Play Button - Only visible on hover */}
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <div className="w-24 h-24 bg-black bg-opacity-70 rounded-full flex items-center justify-center backdrop-blur-sm border-4 border-white border-opacity-90 shadow-2xl">
-                                <svg
-                                  className="w-12 h-12 text-white ml-1"
-                                  fill="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path d="M8 5v14l11-7z" />
-                                </svg>
+                          ) : (
+                            // Show thumbnail with subtle play button on hover
+                            <div
+                              className="absolute top-0 left-0 w-full h-full cursor-pointer group bg-gray-900"
+                              onClick={() => handlePlayClick(video.id)}
+                            >
+                              <img
+                                src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
+                                alt={videoTitle}
+                                className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-75"
+                                loading="lazy"
+                                onError={(e) => {
+                                  // Fallback to default YouTube thumbnail if custom fails
+                                  const target = e.currentTarget
+                                  if (!target.src.includes('img.youtube.com')) {
+                                    target.src = getYouTubeThumbnail(youtubeId)
+                                  }
+                                }}
+                              />
+                              {/* Subtle Play Button - Only visible on hover */}
+                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-black bg-opacity-70 rounded-full flex items-center justify-center backdrop-blur-sm border-2 sm:border-3 md:border-4 border-white border-opacity-90 shadow-2xl">
+                                  <svg
+                                    className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white ml-1"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M8 5v14l11-7z" />
+                                  </svg>
+                                </div>
                               </div>
                             </div>
+                          )
+                        ) : video.videoType === 'upload' && video.videoUrl ? (
+                          <video
+                            controls
+                            className="absolute top-0 left-0 w-full h-full object-cover"
+                            onPlay={() => handleVideoView(video.id)}
+                            poster={video.thumbnailUrl}
+                          >
+                            <source src={video.videoUrl} type="video/mp4" />
+                            <source src={video.videoUrl} type="video/webm" />
+                            <source src={video.videoUrl} type="video/ogg" />
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : video.thumbnailUrl ? (
+                          <img
+                            src={video.thumbnailUrl}
+                            alt={videoTitle}
+                            className="absolute top-0 left-0 w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-white">
+                            <p>Video</p>
                           </div>
-                        )
-                      ) : video.videoType === 'upload' && video.videoUrl ? (
-                        <video
-                          controls
-                          className="w-full h-full object-contain"
-                          onPlay={() => handleVideoView(video.id)}
-                          poster={video.thumbnailUrl}
-                        >
-                          <source src={video.videoUrl} type="video/mp4" />
-                          <source src={video.videoUrl} type="video/webm" />
-                          <source src={video.videoUrl} type="video/ogg" />
-                          Your browser does not support the video tag.
-                        </video>
-                      ) : video.thumbnailUrl ? (
-                        <img
-                          src={video.thumbnailUrl}
-                          alt={videoTitle}
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-white">
-                          <p>Video</p>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
 
                     <CardContent className="p-3 sm:p-4">
