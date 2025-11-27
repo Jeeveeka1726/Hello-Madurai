@@ -37,6 +37,8 @@ interface Ad {
   active: boolean
   position: number
   category?: string
+  impressions: number
+  clicks: number
 }
 
 // Video categories
@@ -207,10 +209,30 @@ function VideosPageContent() {
       // HTML/AdSense code
       return (
         <div key={`ad-${ad.id}-${index}`} className="col-span-full my-8">
-          <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
-            <p className="text-xs text-blue-700 mb-4 text-center font-bold">
-              📢 {language === 'ta' ? 'விளம்பரம்' : 'Advertisement'}
-            </p>
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
+            {/* Header with title and stats */}
+            <div className="flex flex-col sm:flex-row items-center justify-between mb-4 gap-2">
+              <p className="text-xs sm:text-sm text-blue-700 font-bold">
+                📢 {language === 'ta' ? 'விளம்பரம்' : 'Advertisement'}
+              </p>
+
+              {/* Stats */}
+              <div className="flex items-center gap-3 sm:gap-4 text-xs text-blue-600">
+                <div className="flex items-center gap-1">
+                  <EyeIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="font-medium">{ad.impressions.toLocaleString()}</span>
+                  <span className="hidden sm:inline text-blue-500">{language === 'ta' ? 'பார்வைகள்' : 'views'}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <svg className="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                  </svg>
+                  <span className="font-medium">{ad.clicks.toLocaleString()}</span>
+                  <span className="hidden sm:inline text-blue-500">{language === 'ta' ? 'கிளிக்குகள்' : 'clicks'}</span>
+                </div>
+              </div>
+            </div>
+
             <div dangerouslySetInnerHTML={{ __html: ad.htmlCode }} />
           </div>
         </div>
@@ -219,10 +241,30 @@ function VideosPageContent() {
       // Image ad with optional link
       return (
         <div key={`ad-${ad.id}-${index}`} className="col-span-full my-8">
-          <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
-            <p className="text-xs text-blue-700 mb-4 text-center font-bold">
-              📢 {language === 'ta' ? 'விளம்பரம்' : 'Advertisement'}
-            </p>
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
+            {/* Header with title and stats */}
+            <div className="flex flex-col sm:flex-row items-center justify-between mb-4 gap-2">
+              <p className="text-xs sm:text-sm text-blue-700 font-bold">
+                📢 {language === 'ta' ? 'விளம்பரம்' : 'Advertisement'}
+              </p>
+
+              {/* Stats */}
+              <div className="flex items-center gap-3 sm:gap-4 text-xs text-blue-600">
+                <div className="flex items-center gap-1">
+                  <EyeIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="font-medium">{ad.impressions.toLocaleString()}</span>
+                  <span className="hidden sm:inline text-blue-500">{language === 'ta' ? 'பார்வைகள்' : 'views'}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <svg className="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                  </svg>
+                  <span className="font-medium">{ad.clicks.toLocaleString()}</span>
+                  <span className="hidden sm:inline text-blue-500">{language === 'ta' ? 'கிளிக்குகள்' : 'clicks'}</span>
+                </div>
+              </div>
+            </div>
+
             {ad.link ? (
               <div
                 onClick={() => handleAdClick(ad.id, ad.link!)}
