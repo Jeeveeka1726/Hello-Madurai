@@ -308,15 +308,15 @@ function VideosPageContent() {
             </p>
           </div>
         ) : (
-          <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
             {filteredVideos.map((video, index) => {
               const videoTitle = language === 'ta' && video.title_ta ? video.title_ta : video.title
               const isYouTube = video.videoType === 'youtube'
               const youtubeId = isYouTube ? getYouTubeId(video.videoUrl) : null
 
-              // Insert ad after every 6 videos (2 rows of 3)
-              const shouldShowAd = (index + 1) % 6 === 0 && ads.length > 0
-              const adIndex = Math.floor(index / 6) % ads.length
+              // Insert ad after every 4 videos (2 rows of 2)
+              const shouldShowAd = (index + 1) % 4 === 0 && ads.length > 0
+              const adIndex = Math.floor(index / 4) % ads.length
 
               return (
                 <>
@@ -446,7 +446,7 @@ function VideosPageContent() {
                     </CardContent>
                   </Card>
 
-                  {/* Show ad after every 6 videos */}
+                  {/* Show ad after every 4 videos (2 rows of 2) */}
                   {shouldShowAd && renderAd(ads[adIndex], adIndex)}
                 </>
               )
