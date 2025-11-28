@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const videos = await prisma.video.findMany({
       orderBy: {
-        orderNumber: 'asc'
+        updatedAt: 'desc' // Latest updated videos first
       }
     })
 
