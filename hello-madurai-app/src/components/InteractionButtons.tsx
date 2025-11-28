@@ -501,7 +501,7 @@ export default function InteractionButtons({
       {/* Click outside to close share menu */}
       {showShareMenu && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-30 sm:bg-transparent sm:bg-opacity-0"
+          className="fixed inset-0 z-40 bg-transparent"
           onClick={() => setShowShareMenu(false)}
         />
       )}
