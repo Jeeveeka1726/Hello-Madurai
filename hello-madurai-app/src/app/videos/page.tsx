@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { MagnifyingGlassIcon, EyeIcon, ClockIcon, ShareIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
@@ -65,6 +66,7 @@ const videoCategories = [
 
 function VideosPageContent() {
   const { t, language } = useLanguage()
+  const router = useRouter()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [videos, setVideos] = useState<Video[]>([])
@@ -170,7 +172,7 @@ function VideosPageContent() {
   // Handle WhatsApp share - Opens WhatsApp directly (thumbnail fetched via Open Graph)
   const handleWhatsAppShare = async (video: Video) => {
     const videoTitle = language === 'ta' && video.title_ta ? video.title_ta : video.title
-    const shareUrl = window.location.origin + '/videos?id=' + video.id
+    const shareUrl = window.location.origin + '/videos/' + video.id
     const shareText = `${videoTitle} - Hello Madurai\n${shareUrl}`
 
     // Track share
@@ -182,7 +184,7 @@ function VideosPageContent() {
 
   // Handle Facebook share - Opens Facebook directly (thumbnail fetched via Open Graph)
   const handleFacebookShare = async (video: Video) => {
-    const shareUrl = window.location.origin + '/videos?id=' + video.id
+    const shareUrl = window.location.origin + '/videos/' + video.id
 
     // Track share
     await fetch(`/api/videos/${video.id}/share`, { method: 'POST' }).catch(() => {})
@@ -193,7 +195,7 @@ function VideosPageContent() {
 
   // Handle copy link
   const handleCopyLink = async (video: Video) => {
-    const shareUrl = window.location.origin + '/videos?id=' + video.id
+    const shareUrl = window.location.origin + '/videos/' + video.id
 
     try {
       await navigator.clipboard.writeText(shareUrl)
@@ -470,8 +472,12 @@ function VideosPageContent() {
                     </div>
 
                     <CardContent className="p-3 sm:p-4">
-                      {/* Title */}
-                      <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 mb-2 sm:mb-3 line-clamp-2" suppressHydrationWarning>
+                      {/* Title - Clickable */}
+                      <h3
+                        className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 mb-2 sm:mb-3 line-clamp-2 cursor-pointer hover:text-blue-600 transition-colors"
+                        suppressHydrationWarning
+                        onClick={() => router.push(`/videos/${video.id}`)}
+                      >
                         {videoTitle}
                       </h3>
 
