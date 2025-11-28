@@ -447,10 +447,10 @@ function VideosPageContent() {
                                 }
                               }}
                             />
-                            {/* Play Button - Always visible on mobile, hover on desktop */}
-                            <div className="absolute inset-0 flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300">
+                            {/* Play Button - Hidden by default, shows on hover */}
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                               {/* Dark transparent overlay */}
-                              <div className="absolute inset-0 bg-black opacity-20 sm:opacity-30"></div>
+                              <div className="absolute inset-0 bg-black opacity-30"></div>
                               {/* Play button */}
                               <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-black bg-opacity-60 rounded-full flex items-center justify-center backdrop-blur-sm border-3 sm:border-4 border-white border-opacity-80 shadow-2xl">
                                 <svg
