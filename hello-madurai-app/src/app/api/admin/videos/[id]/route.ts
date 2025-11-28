@@ -9,7 +9,7 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    
+
     const video = await prisma.video.update({
       where: { id },
       data: {
@@ -19,7 +19,6 @@ export async function PUT(
         videoType: body.videoType || 'upload',
         thumbnailUrl: body.thumbnailUrl || null,
         category: body.category,
-        orderNumber: body.orderNumber || 0,
         duration: body.duration || null,
         featured: body.featured || false
       }

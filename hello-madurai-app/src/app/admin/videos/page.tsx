@@ -59,7 +59,6 @@ export default function AdminVideosPage() {
     videoType: 'upload', // 'upload' or 'youtube'
     thumbnailUrl: '',
     category: 'agri',
-    orderNumber: 0,
     duration: '',
     featured: false
   })
@@ -208,7 +207,6 @@ export default function AdminVideosPage() {
       videoType: video.videoType || 'upload',
       thumbnailUrl: video.thumbnailUrl || '',
       category: video.category,
-      orderNumber: video.orderNumber || 0,
       duration: video.duration || '',
       featured: video.featured
     })
@@ -251,7 +249,6 @@ export default function AdminVideosPage() {
                 videoType: 'upload',
                 thumbnailUrl: '',
                 category: 'agri',
-                orderNumber: 0,
                 duration: '',
                 featured: false
               })
@@ -417,22 +414,6 @@ export default function AdminVideosPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Order Number *
-                    </label>
-                    <input
-                      type="number"
-                      required
-                      value={formData.orderNumber}
-                      onChange={(e) => setFormData({ ...formData, orderNumber: parseInt(e.target.value) || 0 })}
-                      placeholder="0"
-                      min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Lower numbers appear first</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       Duration (Optional)
                     </label>
                     <input
@@ -493,9 +474,6 @@ export default function AdminVideosPage() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Order
-                      </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Title
                       </th>
@@ -519,9 +497,6 @@ export default function AdminVideosPage() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {videos.map((video) => (
                       <tr key={video.id}>
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          <div className="text-sm font-bold text-gray-900">#{video.orderNumber}</div>
-                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{video.title}</div>
                           {video.title_ta && (
