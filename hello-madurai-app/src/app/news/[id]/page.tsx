@@ -79,13 +79,13 @@ function NewsDetailPageContent() {
           const allResponse = await fetch('/api/news')
           if (allResponse.ok) {
             const allData = await allResponse.json()
-            // Filter articles by same category, exclude current article, and get 6 related ones
+            // Filter articles by same category, exclude current article, and get 4 related ones (2x2 grid)
             const related = allData
               .filter((a: NewsArticle) =>
                 a.id !== newsId &&
                 a.category === articleData.category
               )
-              .slice(0, 6)
+              .slice(0, 4)
             setRelatedArticles(related)
           }
         }
@@ -325,13 +325,13 @@ function NewsDetailPageContent() {
           </div>
         </div>
 
-        {/* Related News */}
+        {/* Related News - 2x2 Grid */}
         {relatedArticles.length > 0 && (
           <div className="mt-8 sm:mt-12">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
               {t('news.relatedNews', 'Related News', 'தொடர்புடைய செய்திகள்')}
             </h2>
-            <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
               {relatedArticles.map((relatedArticle) => (
                   <Link key={relatedArticle.id} href={`/news/${relatedArticle.id}`}>
                     <Card className="hover:shadow-lg transition-shadow bg-white border-gray-200 h-full">
