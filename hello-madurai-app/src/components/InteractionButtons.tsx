@@ -410,7 +410,7 @@ export default function InteractionButtons({
 
         {/* Share Menu with Facebook & WhatsApp prominently */}
         {showShareMenu && (
-          <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10 min-w-[280px]">
+          <div className="fixed sm:absolute bottom-4 left-4 right-4 sm:bottom-auto sm:top-full sm:left-0 sm:right-auto sm:mt-2 bg-white rounded-lg shadow-2xl border border-gray-200 p-4 sm:p-4 z-50 sm:min-w-[280px] max-w-[400px] sm:max-w-none mx-auto sm:mx-0">
             {/* Main Share Options - Facebook & WhatsApp */}
             <div className="mb-3">
               <p className="text-sm font-semibold text-gray-700 mb-3">
@@ -425,7 +425,14 @@ export default function InteractionButtons({
                     const text = encodeURIComponent(`${title}\n\n${url}`)
                     const whatsappUrl = `https://wa.me/?text=${text}`
                     console.log('WhatsApp sharing:', title, url)
-                    window.open(whatsappUrl, '_blank')
+
+                    // iOS Safari compatibility - use location.href instead of window.open
+                    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                      window.location.href = whatsappUrl
+                    } else {
+                      window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
+                    }
+
                     handleShare('whatsapp')
                     setShowShareMenu(false)
                   }}
@@ -494,7 +501,7 @@ export default function InteractionButtons({
       {/* Click outside to close share menu */}
       {showShareMenu && (
         <div
-          className="fixed inset-0 z-5"
+          className="fixed inset-0 z-40 bg-black bg-opacity-50 sm:bg-transparent sm:bg-opacity-0"
           onClick={() => setShowShareMenu(false)}
         />
       )}
