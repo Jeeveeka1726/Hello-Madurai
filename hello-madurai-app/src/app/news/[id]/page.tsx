@@ -353,7 +353,7 @@ function NewsDetailPageContent() {
                         </div>
                       )}
                       <CardContent className="p-4">
-                        <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
+                        <h3 className="font-bold text-gray-900 mb-2">
                           {t(`news.${relatedArticle.id}.title`, relatedArticle.title, relatedArticle.title_ta)}
                         </h3>
                         <p className="text-gray-600 text-sm line-clamp-2">
