@@ -159,7 +159,13 @@ function VideosPageContent() {
   }
 
   // Handle play button click for YouTube videos
-  const handlePlayClick = (videoId: string) => {
+  const handlePlayClick = (videoId: string, event?: React.MouseEvent | React.TouchEvent) => {
+    // Prevent default behavior and stop propagation
+    if (event) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+
     setPlayingVideoId(videoId)
     handleVideoView(videoId)
   }
@@ -414,7 +420,9 @@ function VideosPageContent() {
                           // Show thumbnail with transparent play button on hover
                           <div
                             className="absolute top-0 left-0 w-full h-full cursor-pointer group"
-                            onClick={() => handlePlayClick(video.id)}
+                            onClick={(e) => handlePlayClick(video.id, e)}
+                            onTouchEnd={(e) => handlePlayClick(video.id, e)}
+                            style={{ WebkitTapHighlightColor: 'transparent' }}
                           >
                             <img
                               src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
@@ -439,10 +447,10 @@ function VideosPageContent() {
                                 }
                               }}
                             />
-                            {/* Transparent Play Button - Only visible on hover */}
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                              {/* Dark transparent overlay on hover */}
-                              <div className="absolute inset-0 bg-black opacity-30"></div>
+                            {/* Play Button - Always visible on mobile, hover on desktop */}
+                            <div className="absolute inset-0 flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300">
+                              {/* Dark transparent overlay */}
+                              <div className="absolute inset-0 bg-black opacity-20 sm:opacity-30"></div>
                               {/* Play button */}
                               <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-black bg-opacity-60 rounded-full flex items-center justify-center backdrop-blur-sm border-3 sm:border-4 border-white border-opacity-80 shadow-2xl">
                                 <svg
