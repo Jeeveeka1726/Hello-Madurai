@@ -370,7 +370,7 @@ function VideosPageContent() {
             </p>
           </div>
         ) : (
-          <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2">
             {filteredVideos.map((video, index) => {
               const videoTitle = language === 'ta' && video.title_ta ? video.title_ta : video.title
               const isYouTube = video.videoType === 'youtube'
@@ -382,7 +382,7 @@ function VideosPageContent() {
 
               return (
                 <>
-                  <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-all bg-white border-gray-200">
+                  <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-all bg-white border-gray-200 flex flex-col h-full">
                     {/* Video Player - Full Width, No Black Bars */}
                     <div className="relative w-full overflow-hidden" style={{ paddingBottom: '56.25%', height: 0 }}>
                       {isYouTube && youtubeId ? (
@@ -471,7 +471,7 @@ function VideosPageContent() {
                       )}
                     </div>
 
-                    <CardContent className="p-3 sm:p-4">
+                    <CardContent className="p-3 sm:p-4 flex flex-col flex-grow">
                       {/* Title - Clickable */}
                       <h3
                         className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 mb-2 sm:mb-3 line-clamp-2 cursor-pointer hover:text-blue-600 transition-colors"
@@ -502,7 +502,7 @@ function VideosPageContent() {
                       </div>
 
                       {/* Share Buttons - WhatsApp, Facebook, Copy Link */}
-                      <div className="flex gap-1.5 sm:gap-2">
+                      <div className="flex gap-1.5 sm:gap-2 mt-auto">
                         {/* WhatsApp Share */}
                         <button
                           onClick={() => handleWhatsAppShare(video)}
