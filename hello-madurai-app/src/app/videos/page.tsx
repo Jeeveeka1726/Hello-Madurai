@@ -398,44 +398,27 @@ function VideosPageContent() {
                 <>
                   <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-all bg-white border-gray-200 flex flex-col h-full">
                     {/* Video Player - Full Width, No Black Bars */}
-                    <div className="relative w-full bg-black" style={{ paddingBottom: '56.25%' }}>
+                    <div className="relative w-full aspect-video bg-black">
                       {isYouTube && youtubeId ? (
                         playingVideoId === video.id ? (
                           // Show YouTube iframe when playing - FULL SIZE
                           <iframe
                             src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
                             title={videoTitle}
-                            className="absolute top-0 left-0 w-full h-full"
-                            style={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              width: '100%',
-                              height: '100%',
-                              border: 0,
-                              objectFit: 'cover'
-                            }}
+                            className="absolute inset-0 w-full h-full"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowFullScreen
                           />
                         ) : (
                           // Show thumbnail with transparent play button on hover
                           <div
-                            className="absolute top-0 left-0 w-full h-full cursor-pointer group"
+                            className="absolute inset-0 w-full h-full cursor-pointer group"
                             onClick={() => handlePlayClick(video.id)}
                           >
                             <img
                               src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
                               alt={videoTitle}
                               className="w-full h-full object-cover"
-                              style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover'
-                              }}
                               loading="lazy"
                               onError={(e) => {
                                 // Fallback to default YouTube thumbnail if custom fails
@@ -465,14 +448,7 @@ function VideosPageContent() {
                       ) : video.videoType === 'upload' && video.videoUrl ? (
                         <video
                           controls
-                          className="absolute top-0 left-0 w-full h-full object-cover"
-                          style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%'
-                          }}
+                          className="absolute inset-0 w-full h-full object-cover"
                           onPlay={() => handleVideoView(video.id)}
                           poster={video.thumbnailUrl}
                         >
@@ -485,10 +461,10 @@ function VideosPageContent() {
                         <img
                           src={video.thumbnailUrl}
                           alt={videoTitle}
-                          className="absolute top-0 left-0 w-full h-full object-cover"
+                          className="absolute inset-0 w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
+                        <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
                           <p>Video</p>
                         </div>
                       )}
