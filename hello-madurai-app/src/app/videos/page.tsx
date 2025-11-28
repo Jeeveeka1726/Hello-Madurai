@@ -398,14 +398,15 @@ function VideosPageContent() {
                 <>
                   <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-all bg-white border-gray-200 flex flex-col h-full">
                     {/* Video Player - Full Width, No Black Bars */}
-                    <div className="relative w-full aspect-video bg-black">
+                    <div className="relative w-full aspect-video bg-black overflow-hidden">
                       {isYouTube && youtubeId ? (
                         playingVideoId === video.id ? (
                           // Show YouTube iframe when playing - FULL SIZE
                           <iframe
                             src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
                             title={videoTitle}
-                            className="absolute inset-0 w-full h-full"
+                            className="absolute inset-0 w-full h-full border-0"
+                            style={{ width: '100%', height: '100%' }}
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowFullScreen
                           />
@@ -419,6 +420,7 @@ function VideosPageContent() {
                               src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
                               alt={videoTitle}
                               className="absolute inset-0 w-full h-full object-cover"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                               loading="lazy"
                               onError={(e) => {
                                 // Fallback to default YouTube thumbnail if custom fails
@@ -449,6 +451,7 @@ function VideosPageContent() {
                         <video
                           controls
                           className="absolute inset-0 w-full h-full object-cover"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           onPlay={() => handleVideoView(video.id)}
                           poster={video.thumbnailUrl}
                         >
@@ -462,6 +465,7 @@ function VideosPageContent() {
                           src={video.thumbnailUrl}
                           alt={videoTitle}
                           className="absolute inset-0 w-full h-full object-cover"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
                       ) : (
                         <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
