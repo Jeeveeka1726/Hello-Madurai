@@ -395,3 +395,47 @@ model VideoShare {
 
   @@map("video_shares")
 }
+
+model RadioCategory {
+  id          String   @id @default(cuid())
+  name        String   // English name (Songs, God Songs, Speech, Comedy)
+  name_ta     String   // Tamil name (பாடல்கள், பக்தி பாடல்கள், சொற்பொழிவு, நகைச்சுவை)
+  slug        String   @unique // URL-friendly identifier
+  orderNumber Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  singers     Singer[]
+
+  @@map("radio_categories")
+}
+
+model Singer {
+  id         String        @id @default(cuid())
+  name       String        // Singer name
+  name_ta    String?       // Tamil name (optional)
+  imageUrl   String?       // 400x400px square image
+  categoryId String
+  category   RadioCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  songs      RadioSong[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([categoryId])
+  @@map("singers")
+}
+
+model RadioSong {
+  id        String   @id @default(cuid())
+  title     String   // Song title
+  title_ta  String?  // Tamil title (optional)
+  audioUrl  String   // Audio file URL
+  duration  String?  // Duration (e.g., "3:45")
+  plays     Int      @default(0)
+  singerId  String
+  singer    Singer   @relation(fields: [singerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([singerId])
+  @@map("radio_songs")
+}
