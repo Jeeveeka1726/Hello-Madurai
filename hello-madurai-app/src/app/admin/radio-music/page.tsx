@@ -47,10 +47,7 @@ interface RadioSong {
   singer?: Singer & { category?: RadioCategory }
 }
 
-type TabType = 'singers' | 'songs'
-
 export default function RadioMusicAdminPage() {
-  const [activeTab, setActiveTab] = useState<TabType>('singers')
   const [categories, setCategories] = useState<RadioCategory[]>([])
   const [singers, setSingers] = useState<Singer[]>([])
   const [songs, setSongs] = useState<RadioSong[]>([])
@@ -60,7 +57,7 @@ export default function RadioMusicAdminPage() {
   const [editingSinger, setEditingSinger] = useState<Singer | null>(null)
   const [editingSong, setEditingSong] = useState<RadioSong | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('')
-  const [selectedSinger, setSelectedSinger] = useState<string>('')
+  const [selectedSinger, setSelectedSinger] = useState<Singer | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
   const [singerFormData, setSingerFormData] = useState({
@@ -249,7 +246,7 @@ export default function RadioMusicAdminPage() {
   })
 
   const filteredSongs = songs.filter(song => {
-    const matchesSinger = !selectedSinger || song.singerId === selectedSinger
+    const matchesSinger = !selectedSinger || song.singerId === selectedSinger.id
     const matchesSearch = !searchQuery ||
       song.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       song.title_ta?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -274,39 +271,27 @@ export default function RadioMusicAdminPage() {
         <p className="text-gray-600 mt-2">Manage singers and their songs by category</p>
       </div>
 
-      {/* Tabs */}
-      <div className="mb-6 border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveTab('singers')}
-            className={`${
-              activeTab === 'singers'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
+      {/* Back Button (if singer selected) */}
+      {selectedSinger && (
+        <div className="mb-6">
+          <Button
+            onClick={() => {
+              setSelectedSinger(null)
+              setShowSongForm(false)
+              setEditingSong(null)
+            }}
+            className="bg-gray-200 text-gray-700 hover:bg-gray-300"
           >
-            <UserIcon className="h-5 w-5 mr-2" />
-            Singers ({singers.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('songs')}
-            className={`${
-              activeTab === 'songs'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
-          >
-            <MusicalNoteIcon className="h-5 w-5 mr-2" />
-            Songs ({songs.length})
-          </button>
-        </nav>
-      </div>
+            ← Back to Singers
+          </Button>
+        </div>
+      )}
 
-      {/* Singers Tab */}
-      {activeTab === 'singers' && (
+      {/* Singers View */}
+      {!selectedSinger && (
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Singers</h2>
+            <h2 className="text-xl font-semibold">Singers ({singers.length})</h2>
             <Button
               onClick={() => {
                 setShowSingerForm(!showSingerForm)
@@ -416,47 +401,55 @@ export default function RadioMusicAdminPage() {
             </div>
           )}
 
-          {/* Singers List */}
+          {/* Singers Grid */}
           {loading ? (
             <p className="text-center py-8 text-gray-500">Loading...</p>
           ) : filteredSingers.length === 0 ? (
             <p className="text-center py-8 text-gray-500">No singers found. Create your first singer!</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {filteredSingers.map((singer) => (
-                <div key={singer.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-4">
+                <div key={singer.id} className="group">
+                  {/* Square Image - Clickable */}
+                  <div
+                    onClick={() => setSelectedSinger(singer)}
+                    className="relative aspect-square mb-3 overflow-hidden rounded-lg bg-gray-200 cursor-pointer group-hover:ring-4 group-hover:ring-blue-300 transition-all"
+                  >
                     {singer.imageUrl ? (
                       <img
                         src={singer.imageUrl}
                         alt={singer.name}
-                        className="w-20 h-20 rounded-full object-cover"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
-                        <UserIcon className="h-10 w-10 text-gray-400" />
+                      <div className="w-full h-full flex items-center justify-center">
+                        <UserIcon className="h-1/2 w-1/2 text-gray-400" />
                       </div>
                     )}
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{singer.name}</h3>
-                      {singer.name_ta && <p className="text-sm text-gray-600">{singer.name_ta}</p>}
-                      <p className="text-xs text-gray-500 mt-1">{singer.category?.name}</p>
-                      <p className="text-xs text-gray-500">{singer._count?.songs || 0} songs</p>
-                    </div>
                   </div>
-                  <div className="flex gap-2 mt-4">
+
+                  {/* Singer Info */}
+                  <div className="text-center mb-2">
+                    <h3 className="font-semibold text-gray-900 truncate">{singer.name}</h3>
+                    {singer.name_ta && <p className="text-sm text-gray-600 truncate">{singer.name_ta}</p>}
+                    <p className="text-xs text-gray-500">{singer.category?.name}</p>
+                    <p className="text-xs text-blue-600 font-medium">{singer._count?.songs || 0} songs</p>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
                     <Button
                       onClick={() => handleEditSinger(singer)}
-                      className="flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100"
+                      className="flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs py-1"
                     >
-                      <PencilIcon className="h-4 w-4 mr-1" />
+                      <PencilIcon className="h-3 w-3 mr-1" />
                       Edit
                     </Button>
                     <Button
                       onClick={() => handleDeleteSinger(singer.id)}
-                      className="flex-1 bg-red-50 text-red-600 hover:bg-red-100"
+                      className="flex-1 bg-red-50 text-red-600 hover:bg-red-100 text-xs py-1"
                     >
-                      <TrashIcon className="h-4 w-4 mr-1" />
+                      <TrashIcon className="h-3 w-3 mr-1" />
                       Delete
                     </Button>
                   </div>
@@ -467,52 +460,38 @@ export default function RadioMusicAdminPage() {
         </Card>
       )}
 
-      {/* Songs Tab */}
-      {activeTab === 'songs' && (
+      {/* Songs View (when singer selected) */}
+      {selectedSinger && (
         <Card className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Songs</h2>
+          {/* Singer Header */}
+          <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200">
+            {selectedSinger.imageUrl ? (
+              <img
+                src={selectedSinger.imageUrl}
+                alt={selectedSinger.name}
+                className="w-24 h-24 rounded-lg object-cover"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-lg bg-gray-200 flex items-center justify-center">
+                <UserIcon className="h-12 w-12 text-gray-400" />
+              </div>
+            )}
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-gray-900">{selectedSinger.name}</h2>
+              {selectedSinger.name_ta && <p className="text-lg text-gray-600">{selectedSinger.name_ta}</p>}
+              <p className="text-sm text-gray-500">{selectedSinger.category?.name}</p>
+            </div>
             <Button
               onClick={() => {
                 setShowSongForm(!showSongForm)
                 setEditingSong(null)
-                setSongFormData({ title: '', title_ta: '', audioUrl: '', duration: '', singerId: singers[0]?.id || '' })
+                setSongFormData({ title: '', title_ta: '', audioUrl: '', duration: '', singerId: selectedSinger.id })
               }}
               className="bg-blue-600 text-white hover:bg-blue-700"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
               Add Song
             </Button>
-          </div>
-
-          {/* Filters */}
-          <div className="mb-6 flex gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Singer</label>
-              <select
-                value={selectedSinger}
-                onChange={(e) => setSelectedSinger(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">All Singers</option>
-                {singers.map(singer => (
-                  <option key={singer.id} value={singer.id}>{singer.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search songs..."
-                  className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                />
-                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
-              </div>
-            </div>
           </div>
 
           {/* Song Form */}
@@ -539,20 +518,7 @@ export default function RadioMusicAdminPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Singer *</label>
-                  <select
-                    required
-                    value={songFormData.singerId}
-                    onChange={(e) => setSongFormData({ ...songFormData, singerId: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Select Singer</option>
-                    {singers.map(singer => (
-                      <option key={singer.id} value={singer.id}>{singer.name} - {singer.category?.name}</option>
-                    ))}
-                  </select>
-                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Duration (e.g., 3:45)</label>
                   <input
@@ -596,60 +562,53 @@ export default function RadioMusicAdminPage() {
           {/* Songs List */}
           {loading ? (
             <p className="text-center py-8 text-gray-500">Loading...</p>
-          ) : filteredSongs.length === 0 ? (
-            <p className="text-center py-8 text-gray-500">No songs found. Create your first song!</p>
+          ) : songs.filter(s => s.singerId === selectedSinger.id).length === 0 ? (
+            <div className="text-center py-12">
+              <MusicalNoteIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">No songs yet. Add your first song!</p>
+            </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Singer</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plays</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredSongs.map((song) => (
-                    <tr key={song.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{song.title}</div>
-                        {song.title_ta && <div className="text-sm text-gray-500">{song.title_ta}</div>}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{song.singer?.name}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                          {song.singer?.category?.name}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {song.duration || '-'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {song.plays}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
+            <div className="space-y-3">
+              {songs
+                .filter(s => s.singerId === selectedSinger.id)
+                .map((song, index) => (
+                  <div key={song.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
+                    <div className="flex items-center gap-4">
+                      {/* Track Number */}
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <span className="text-blue-600 font-semibold">{index + 1}</span>
+                      </div>
+
+                      {/* Song Info */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-gray-900">{song.title}</h4>
+                        {song.title_ta && <p className="text-sm text-gray-600">{song.title_ta}</p>}
+                        <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+                          <span>⏱️ {song.duration || 'N/A'}</span>
+                          <span>▶️ {song.plays} plays</span>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex gap-2">
+                        <Button
                           onClick={() => handleEditSong(song)}
-                          className="text-blue-600 hover:text-blue-900 mr-4"
+                          className="bg-blue-50 text-blue-600 hover:bg-blue-100 text-sm py-2 px-3"
                         >
+                          <PencilIcon className="h-4 w-4 mr-1" />
                           Edit
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => handleDeleteSong(song.id)}
-                          className="text-red-600 hover:text-red-900"
+                          className="bg-red-50 text-red-600 hover:bg-red-100 text-sm py-2 px-3"
                         >
+                          <TrashIcon className="h-4 w-4 mr-1" />
                           Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
             </div>
           )}
         </Card>
