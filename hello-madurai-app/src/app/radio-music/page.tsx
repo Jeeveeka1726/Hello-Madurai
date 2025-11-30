@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Card } from '@/components/ui/card'
+import Card from '@/components/ui/Card'
 import { 
   MagnifyingGlassIcon, 
   PlayIcon, 

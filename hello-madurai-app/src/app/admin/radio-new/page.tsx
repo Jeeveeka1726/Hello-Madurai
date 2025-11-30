@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import Card from '@/components/ui/Card'
+import Button from '@/components/ui/Button'
 import { PlusIcon, PencilIcon, TrashIcon, MusicalNoteIcon, UserIcon } from '@heroicons/react/24/outline'
 
 interface RadioCategory {
