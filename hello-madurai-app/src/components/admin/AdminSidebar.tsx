@@ -54,9 +54,9 @@ const navigation = [
     icon: DocumentIcon
   },
   {
-    name: 'Radio',
-    name_ta: 'வானொலி',
-    href: '/admin/radio',
+    name: 'Radio Music',
+    name_ta: 'வானொலி இசை',
+    href: '/admin/radio-music',
     icon: ChartBarIcon
   },
   {
