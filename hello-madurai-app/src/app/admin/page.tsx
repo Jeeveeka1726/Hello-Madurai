@@ -338,12 +338,12 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
               </Link>
-              <Link href="/admin/radio">
+              <Link href="/admin/radio-music">
                 <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4 text-center">
                     <MicrophoneIcon className="h-8 w-8 text-blue-600 mx-auto mb-2" />
                     <p className="font-medium text-blue-900">
-                      {t('admin.addRadio', 'Manage Radio', 'வானொலி நிர்வகிக்க')}
+                      {t('admin.addRadio', 'Manage Radio Music', 'வானொலி இசை நிர்வகிக்க')}
                     </p>
                   </CardContent>
                 </Card>
