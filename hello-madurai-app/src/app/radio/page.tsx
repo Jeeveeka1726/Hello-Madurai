@@ -465,7 +465,7 @@ function RadioPageContent() {
 export default function RadioPage() {
   return (
     <div>
-      <NewspaperHeader showTagline={false} />
+      <NewspaperHeader showTagline={true} />
       <NewHeader />
       <RadioPageContent />
     </div>
