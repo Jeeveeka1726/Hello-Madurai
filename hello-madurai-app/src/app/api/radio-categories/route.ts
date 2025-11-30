@@ -19,9 +19,12 @@ export async function GET() {
       }
     })
 
+    console.log('[Radio API] Found categories:', categories.length)
+    console.log('[Radio API] Total singers:', categories.reduce((sum, cat) => sum + (cat.singers?.length || 0), 0))
+
     return NextResponse.json(categories || [], {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0'
       }
     })
   } catch (error) {
