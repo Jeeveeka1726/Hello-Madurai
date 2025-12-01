@@ -236,7 +236,8 @@ export default function RadioMusicAdminPage() {
       console.log('📤 Uploading audio file to Hostinger API...')
 
       // Use Hostinger upload API instead of Vercel
-      const uploadApiUrl = process.env.NEXT_PUBLIC_UPLOAD_API_URL || 'http://localhost:3001'
+      const uploadApiUrl = process.env.NEXT_PUBLIC_UPLOAD_API_URL || 'http://localhost:3002'
+      console.log('🔗 Upload API URL:', uploadApiUrl)
       const response = await fetch(`${uploadApiUrl}/upload/audio`, {
         method: 'POST',
         body: formData,

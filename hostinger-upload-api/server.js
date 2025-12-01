@@ -2,12 +2,18 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const { PrismaClient } = require('@prisma/client');
-const { parseBuffer } = require('music-metadata');
 require('dotenv').config();
 
 const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3001;
+
+// Dynamic import for music-metadata (ESM module)
+let parseBuffer;
+(async () => {
+  const musicMetadata = await import('music-metadata');
+  parseBuffer = musicMetadata.parseBuffer;
+})();
 
 // CORS configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'];
@@ -74,12 +80,14 @@ app.post('/upload/audio', upload.single('file'), async (req, res) => {
     // Get audio duration using music-metadata
     let duration = null;
     try {
-      const metadata = await parseBuffer(req.file.buffer, { mimeType: req.file.mimetype });
-      if (metadata.format.duration) {
-        const totalSeconds = Math.floor(metadata.format.duration);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      if (parseBuffer) {
+        const metadata = await parseBuffer(req.file.buffer, { mimeType: req.file.mimetype });
+        if (metadata.format.duration) {
+          const totalSeconds = Math.floor(metadata.format.duration);
+          const minutes = Math.floor(totalSeconds / 60);
+          const seconds = totalSeconds % 60;
+          duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
       }
     } catch (error) {
       console.warn('⚠️ Could not extract audio duration:', error.message);
