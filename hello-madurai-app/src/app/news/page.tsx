@@ -120,7 +120,15 @@ function NewsPageContent() {
         }
       `}</style>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl" suppressHydrationWarning>
+            {t('news.title', 'News', 'செய்திகள்')}
+          </h1>
+          <p className="mt-2 text-lg text-gray-600" suppressHydrationWarning>
+            {t('news.subtitle', 'Stay updated with the latest news and happenings in Madurai', 'மதுரையின் சமீபத்திய செய்திகள் மற்றும் நிகழ்வுகளுடன் புதுப்பித்த நிலையில் இருங்கள்')}
+          </p>
+        </div>
 
         {/* Loading State */}
         {loading && (

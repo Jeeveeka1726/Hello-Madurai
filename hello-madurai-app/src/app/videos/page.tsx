@@ -339,6 +339,16 @@ function VideosPageContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
       <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6">
+        {/* Header */}
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl" suppressHydrationWarning>
+            {t('videos.title', 'Videos', 'வீடியோக்கள்')}
+          </h1>
+          <p className="mt-2 text-lg text-gray-600" suppressHydrationWarning>
+            {t('videos.subtitle', 'Watch local stories, culture, and events from Madurai', 'மதுரையின் உள்ளூர் கதைகள், கலாச்சாரம் மற்றும் நிகழ்வுகளைப் பாருங்கள்')}
+          </p>
+        </div>
+
         {/* Search Box */}
         <div className="mb-4 sm:mb-6 md:mb-8">
           <div className="relative max-w-2xl mx-auto">
