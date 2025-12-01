@@ -27,6 +27,7 @@ interface Singer {
   name: string
   name_ta: string | null
   imageUrl: string | null
+  featured: boolean
   _count?: {
     songs: number
   }
@@ -257,10 +258,23 @@ function RadioPageContent() {
                           src={singer.imageUrl}
                           alt={singer.name}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.error('Failed to load singer image:', singer.imageUrl, 'for singer:', singer.name)
+                            e.currentTarget.style.display = 'none'
+                            const parent = e.currentTarget.parentElement
+                            if (parent) {
+                              parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="h-1/2 w-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>'
+                            }
+                          }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <UserIcon className="h-1/2 w-1/2 text-gray-400" />
+                        </div>
+                      )}
+                      {singer.featured && (
+                        <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 rounded-full p-1">
+                          <span className="text-xs font-bold">⭐</span>
                         </div>
                       )}
                     </div>
@@ -294,6 +308,14 @@ function RadioPageContent() {
                   src={selectedSinger.imageUrl}
                   alt={selectedSinger.name}
                   className="w-24 h-24 rounded-full object-cover"
+                  onError={(e) => {
+                    console.error('Failed to load singer detail image:', selectedSinger.imageUrl)
+                    e.currentTarget.style.display = 'none'
+                    const parent = e.currentTarget.parentElement
+                    if (parent) {
+                      parent.innerHTML = '<div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center"><svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>'
+                    }
+                  }}
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">

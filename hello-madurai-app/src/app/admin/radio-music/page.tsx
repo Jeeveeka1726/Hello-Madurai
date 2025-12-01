@@ -31,6 +31,7 @@ interface Singer {
   name: string
   name_ta: string | null
   imageUrl: string | null
+  featured: boolean
   categoryId: string
   category?: RadioCategory
   _count?: {
@@ -68,6 +69,7 @@ export default function RadioMusicAdminPage() {
     name: '',
     name_ta: '',
     imageUrl: '',
+    featured: false,
     categoryId: ''
   })
 
@@ -217,7 +219,7 @@ export default function RadioMusicAdminPage() {
         await fetchSingers()
         setShowSingerForm(false)
         setEditingSinger(null)
-        setSingerFormData({ name: '', name_ta: '', imageUrl: '', categoryId: categories[0]?.id || '' })
+        setSingerFormData({ name: '', name_ta: '', imageUrl: '', featured: false, categoryId: categories[0]?.id || '' })
         setImagePreview('') // Clear preview
         toast.success(editingSinger ? '✅ Singer updated!' : '✅ Singer created!')
       } else {
@@ -250,6 +252,7 @@ export default function RadioMusicAdminPage() {
       name: singer.name,
       name_ta: singer.name_ta || '',
       imageUrl: singer.imageUrl || '',
+      featured: singer.featured || false,
       categoryId: singer.categoryId
     })
     setImagePreview('') // Clear local preview when editing (will show saved image)
@@ -363,7 +366,7 @@ export default function RadioMusicAdminPage() {
               onClick={() => {
                 setShowSingerForm(!showSingerForm)
                 setEditingSinger(null)
-                setSingerFormData({ name: '', name_ta: '', imageUrl: '', categoryId: categories[0]?.id || '' })
+                setSingerFormData({ name: '', name_ta: '', imageUrl: '', featured: false, categoryId: categories[0]?.id || '' })
                 setImagePreview('') // Clear preview
               }}
               className="bg-blue-600 text-white hover:bg-blue-700"
@@ -439,6 +442,18 @@ export default function RadioMusicAdminPage() {
                       <option key={cat.id} value={cat.id}>{cat.name} ({cat.name_ta})</option>
                     ))}
                   </select>
+                </div>
+                <div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={singerFormData.featured}
+                      onChange={(e) => setSingerFormData({ ...singerFormData, featured: e.target.checked })}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Featured Singer ⭐</span>
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1 ml-6">Featured singers appear first in the list</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Singer Image (400x400px)</label>
@@ -520,7 +535,7 @@ export default function RadioMusicAdminPage() {
                   onClick={() => {
                     setShowSingerForm(false)
                     setEditingSinger(null)
-                    setSingerFormData({ name: '', name_ta: '', imageUrl: '', categoryId: categories[0]?.id || '' })
+                    setSingerFormData({ name: '', name_ta: '', imageUrl: '', featured: false, categoryId: categories[0]?.id || '' })
                     setImagePreview('') // Clear preview
                   }}
                   className="bg-gray-200 text-gray-700 hover:bg-gray-300"

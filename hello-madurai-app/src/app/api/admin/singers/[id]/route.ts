@@ -16,6 +16,7 @@ export async function PUT(
         name: body.name,
         name_ta: body.name_ta || null,
         imageUrl: body.imageUrl || null,
+        featured: body.featured !== undefined ? body.featured : false,
         categoryId: body.categoryId
       },
       include: {

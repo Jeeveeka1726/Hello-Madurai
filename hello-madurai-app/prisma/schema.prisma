@@ -414,6 +414,7 @@ model Singer {
   name       String        // Singer name
   name_ta    String?       // Tamil name (optional)
   imageUrl   String?       // 400x400px square image
+  featured   Boolean       @default(false) // Featured singer
   categoryId String
   category   RadioCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   songs      RadioSong[]
@@ -421,6 +422,7 @@ model Singer {
   updatedAt  DateTime      @updatedAt
 
   @@index([categoryId])
+  @@index([featured])
   @@map("singers")
 }
 

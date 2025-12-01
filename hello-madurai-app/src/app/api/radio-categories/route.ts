@@ -10,6 +10,10 @@ export async function GET() {
       },
       include: {
         singers: {
+          orderBy: [
+            { featured: 'desc' },  // Featured singers first
+            { updatedAt: 'desc' }  // Then latest updated first
+          ],
           include: {
             _count: {
               select: { songs: true }
@@ -21,6 +25,7 @@ export async function GET() {
 
     console.log('[Radio API] Found categories:', categories.length)
     console.log('[Radio API] Total singers:', categories.reduce((sum, cat) => sum + (cat.singers?.length || 0), 0))
+    console.log('[Radio API] Featured singers:', categories.reduce((sum, cat) => sum + (cat.singers?.filter(s => s.featured).length || 0), 0))
 
     return NextResponse.json(categories || [], {
       headers: {

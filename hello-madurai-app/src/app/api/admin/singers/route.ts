@@ -9,9 +9,10 @@ export async function GET(request: NextRequest) {
 
     const singers = await prisma.singer.findMany({
       where: categoryId ? { categoryId } : undefined,
-      orderBy: {
-        updatedAt: 'desc'
-      },
+      orderBy: [
+        { featured: 'desc' },  // Featured singers first
+        { updatedAt: 'desc' }  // Then latest updated first
+      ],
       include: {
         category: true,
         _count: {
@@ -40,6 +41,7 @@ export async function POST(request: NextRequest) {
         name: body.name,
         name_ta: body.name_ta || null,
         imageUrl: body.imageUrl || null,
+        featured: body.featured || false,
         categoryId: body.categoryId
       },
       include: {
