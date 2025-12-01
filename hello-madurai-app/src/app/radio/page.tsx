@@ -6,8 +6,7 @@ import {
   PauseIcon,
   SpeakerWaveIcon,
   MagnifyingGlassIcon,
-  UserIcon,
-  BackwardIcon
+  UserIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
@@ -82,31 +81,7 @@ function RadioPageContent() {
     fetchCategories()
   }, [])
 
-  // Fetch songs when singer is selected
-  useEffect(() => {
-    if (selectedSinger) {
-      const fetchSongs = async () => {
-        try {
-          const res = await fetch(`/api/radio-songs/${selectedSinger.id}`)
-          const data = await res.json()
-          setSongs(data)
-
-          // Auto-play first song if available
-          if (data && data.length > 0) {
-            setCurrentSong(data[0])
-            setIsMusicPlaying(true)
-            // Play will be triggered by the audio element's src change
-            setTimeout(() => {
-              musicAudioRef.current?.play()
-            }, 100)
-          }
-        } catch (error) {
-          console.error('Error fetching songs:', error)
-        }
-      }
-      fetchSongs()
-    }
-  }, [selectedSinger])
+  // Note: Songs are now fetched directly in handleSingerClick for immediate playback
 
   // Music player audio events
   useEffect(() => {
@@ -164,18 +139,30 @@ function RadioPageContent() {
     }
   }
 
-  const handleSingerClick = (singer: Singer) => {
-    setSelectedSinger(singer)
-    setSongs([])
+  const handleSingerClick = async (singer: Singer) => {
+    try {
+      // Fetch songs for this singer
+      const res = await fetch(`/api/radio-songs/${singer.id}`)
+      const data = await res.json()
+
+      if (data && data.length > 0) {
+        // Set the first song and auto-play
+        setCurrentSong(data[0])
+        setSongs(data)
+        setSelectedSinger(singer)
+        setIsMusicPlaying(true)
+
+        // Play the song
+        setTimeout(() => {
+          musicAudioRef.current?.play()
+        }, 100)
+      }
+    } catch (error) {
+      console.error('Error fetching songs:', error)
+    }
   }
 
-  const handleBackToSingers = () => {
-    setSelectedSinger(null)
-    setSongs([])
-    setCurrentSong(null)
-    setIsMusicPlaying(false)
-    musicAudioRef.current?.pause()
-  }
+
 
   const formatTime = (seconds: number) => {
     if (isNaN(seconds)) return '0:00'
@@ -250,156 +237,65 @@ function RadioPageContent() {
           </div>
         </div>
 
-        {/* Content Area */}
-        {!selectedSinger ? (
-          /* Singers Grid */
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              {language === 'ta' ? 'பாடல்கள்' : 'Songs'}
-            </h2>
-            {musicLoading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600">Loading...</p>
-              </div>
-            ) : filteredSingers.length === 0 ? (
-              <p className="text-center py-12 text-gray-500">
-                {language === 'ta' ? 'பாடல்கள் இல்லை' : 'No songs found'}
-              </p>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                {filteredSingers.map(singer => (
-                  <div
-                    key={singer.id}
-                    onClick={() => handleSingerClick(singer)}
-                    className="cursor-pointer group"
-                  >
-                    <div className="relative aspect-square mb-3 overflow-hidden rounded-full bg-gray-200 group-hover:ring-4 group-hover:ring-blue-300 transition-all">
-                      {singer.imageUrl ? (
-                        <img
-                          src={singer.imageUrl}
-                          alt={singer.name}
-                          className="w-full h-full object-contain"
-                          onError={(e) => {
-                            console.error('Failed to load singer image:', singer.imageUrl, 'for singer:', singer.name)
-                            e.currentTarget.style.display = 'none'
-                            const parent = e.currentTarget.parentElement
-                            if (parent) {
-                              parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="h-1/2 w-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>'
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <UserIcon className="h-1/2 w-1/2 text-gray-400" />
-                        </div>
-                      )}
-                      {singer.featured && (
-                        <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 rounded-full p-1">
-                          <span className="text-xs font-bold">⭐</span>
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="text-center font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                      {language === 'ta' && singer.name_ta ? singer.name_ta : singer.name}
-                    </h3>
-                    <p className="text-center text-sm text-gray-500">
-                      {singer._count?.songs || 0} {language === 'ta' ? 'பாடல்கள்' : 'songs'}
-                    </p>
+        {/* Content Area - Singers Grid (Always Visible) */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            {language === 'ta' ? 'பாடல்கள்' : 'Songs'}
+          </h2>
+          {musicLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading...</p>
+            </div>
+          ) : filteredSingers.length === 0 ? (
+            <p className="text-center py-12 text-gray-500">
+              {language === 'ta' ? 'பாடல்கள் இல்லை' : 'No songs found'}
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+              {filteredSingers.map(singer => (
+                <div
+                  key={singer.id}
+                  onClick={() => handleSingerClick(singer)}
+                  className="cursor-pointer group"
+                >
+                  <div className="relative aspect-square mb-3 overflow-hidden rounded-full bg-gray-200 group-hover:ring-4 group-hover:ring-blue-300 transition-all">
+                    {singer.imageUrl ? (
+                      <img
+                        src={singer.imageUrl}
+                        alt={singer.name}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          console.error('Failed to load singer image:', singer.imageUrl, 'for singer:', singer.name)
+                          e.currentTarget.style.display = 'none'
+                          const parent = e.currentTarget.parentElement
+                          if (parent) {
+                            parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="h-1/2 w-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>'
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <UserIcon className="h-1/2 w-1/2 text-gray-400" />
+                      </div>
+                    )}
+                    {singer.featured && (
+                      <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 rounded-full p-1">
+                        <span className="text-xs font-bold">⭐</span>
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          /* Songs List */
-          <div>
-            <div className="mb-6">
-              <button
-                onClick={handleBackToSingers}
-                className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2"
-              >
-                <BackwardIcon className="h-5 w-5" />
-                {language === 'ta' ? 'பாடகர்களுக்குத் திரும்பு' : 'Back to Singers'}
-              </button>
-            </div>
-
-            <div className="flex items-center gap-4 mb-6">
-              {selectedSinger.imageUrl ? (
-                <img
-                  src={selectedSinger.imageUrl}
-                  alt={selectedSinger.name}
-                  className="w-24 h-24 rounded-full object-contain bg-gray-100"
-                  onError={(e) => {
-                    console.error('Failed to load singer detail image:', selectedSinger.imageUrl)
-                    e.currentTarget.style.display = 'none'
-                    const parent = e.currentTarget.parentElement
-                    if (parent) {
-                      parent.innerHTML = '<div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center"><svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>'
-                    }
-                  }}
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
-                  <UserIcon className="h-12 w-12 text-gray-400" />
+                  <h3 className="text-center font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    {language === 'ta' && singer.name_ta ? singer.name_ta : singer.name}
+                  </h3>
+                  <p className="text-center text-sm text-gray-500">
+                    {singer._count?.songs || 0} {language === 'ta' ? 'பாடல்கள்' : 'songs'}
+                  </p>
                 </div>
-              )}
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900">
-                  {language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name}
-                </h2>
-                <p className="text-gray-600">
-                  {songs.length} {language === 'ta' ? 'பாடல்கள்' : 'songs'}
-                </p>
-              </div>
+              ))}
             </div>
-
-            {songs.length === 0 ? (
-              <p className="text-center py-12 text-gray-500">
-                {language === 'ta' ? 'பாடல்கள் இல்லை' : 'No songs available'}
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {songs.map((song, index) => (
-                  <Card
-                    key={song.id}
-                    className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${
-                      currentSong?.id === song.id ? 'bg-blue-50 border-blue-300' : ''
-                    }`}
-                    onClick={() => handlePlaySong(song)}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex-shrink-0">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                          currentSong?.id === song.id && isMusicPlaying
-                            ? 'bg-blue-600'
-                            : 'bg-gray-200'
-                        }`}>
-                          {currentSong?.id === song.id && isMusicPlaying ? (
-                            <PauseIcon className="h-6 w-6 text-white" />
-                          ) : (
-                            <PlayIcon className="h-6 w-6 text-gray-600" />
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 truncate">
-                          {language === 'ta' && song.title_ta ? song.title_ta : song.title}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {song.duration || '-'} • {song.plays} {language === 'ta' ? 'இயக்கங்கள்' : 'plays'}
-                        </p>
-                      </div>
-                      <div className="text-gray-400 text-lg font-semibold">
-                        {index + 1}
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Fixed Music Player */}
         {currentSong && (
