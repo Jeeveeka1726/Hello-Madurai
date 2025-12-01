@@ -349,6 +349,18 @@ model Image {
   @@map("images")
 }
 
+model Audio {
+  id        String   @id @default(cuid())
+  filename  String
+  data      Bytes
+  mimeType  String
+  size      Int
+  duration  String?  // Duration in format "MM:SS" or "HH:MM:SS"
+  createdAt DateTime @default(now())
+
+  @@map("audio_files")
+}
+
 model Video {
   id             String         @id @default(cuid())
   title          String

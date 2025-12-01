@@ -64,6 +64,8 @@ export default function RadioMusicAdminPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [uploadingImage, setUploadingImage] = useState(false)
   const [imagePreview, setImagePreview] = useState<string>('')
+  const [uploadingAudio, setUploadingAudio] = useState(false)
+  const [audioPreview, setAudioPreview] = useState<string>('')
 
   const [singerFormData, setSingerFormData] = useState({
     name: '',
@@ -203,6 +205,62 @@ export default function RadioMusicAdminPage() {
     }
   }
 
+  const handleAudioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('audio/')) {
+      toast.error('Please select an audio file')
+      return
+    }
+
+    // Validate file size (max 50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('Audio file size must be less than 50MB')
+      return
+    }
+
+    // Create local preview immediately
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setAudioPreview(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+
+    setUploadingAudio(true)
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      console.log('📤 Uploading audio file...')
+      const response = await fetch('/api/upload/radio-audio', {
+        method: 'POST',
+        body: formData,
+      })
+
+      console.log('📥 Upload response status:', response.status)
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('✅ Audio upload successful:', data)
+        setSongFormData({ ...songFormData, audioUrl: data.url })
+        toast.success('✅ Audio file uploaded successfully!')
+      } else {
+        const errorData = await response.json()
+        console.error('❌ Upload failed:', errorData)
+        toast.error(errorData.error || 'Failed to upload audio')
+        setAudioPreview('') // Clear preview on error
+      }
+    } catch (error) {
+      console.error('❌ Error uploading audio:', error)
+      toast.error('Error uploading audio file')
+      setAudioPreview('') // Clear preview on error
+    } finally {
+      setUploadingAudio(false)
+    }
+  }
+
   const handleSaveSinger = async () => {
     try {
       const url = editingSinger
@@ -276,6 +334,7 @@ export default function RadioMusicAdminPage() {
         setShowSongForm(false)
         setEditingSong(null)
         setSongFormData({ title: '', title_ta: '', audioUrl: '', duration: '', singerId: '' })
+        setAudioPreview('') // Clear audio preview
       }
     } catch (error) {
       console.error('Error saving song:', error)
@@ -675,15 +734,51 @@ export default function RadioMusicAdminPage() {
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Audio URL *</label>
-                  <input
-                    type="text"
-                    required
-                    value={songFormData.audioUrl}
-                    onChange={(e) => setSongFormData({ ...songFormData, audioUrl: e.target.value })}
-                    placeholder="https://..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Audio File * (MP3, WAV, OGG, AAC, M4A, FLAC)</label>
+                  <div className="space-y-3">
+                    {/* Upload Button */}
+                    <div>
+                      <input
+                        type="file"
+                        accept="audio/*"
+                        onChange={handleAudioUpload}
+                        className="hidden"
+                        id="audio-upload"
+                      />
+                      <label
+                        htmlFor="audio-upload"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer transition-colors"
+                      >
+                        <MusicalNoteIcon className="h-5 w-5" />
+                        {uploadingAudio ? 'Uploading...' : songFormData.audioUrl ? 'Change Audio File' : 'Upload Audio File'}
+                      </label>
+                      {uploadingAudio && (
+                        <span className="ml-3 text-sm text-gray-600">Uploading audio...</span>
+                      )}
+                    </div>
+
+                    {/* Audio Preview */}
+                    {(audioPreview || songFormData.audioUrl) && (
+                      <div className="border border-gray-300 rounded-md p-3 bg-gray-50">
+                        <audio
+                          controls
+                          src={audioPreview || songFormData.audioUrl}
+                          className="w-full"
+                          style={{ maxHeight: '54px' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAudioPreview('')
+                            setSongFormData({ ...songFormData, audioUrl: '' })
+                          }}
+                          className="mt-2 text-sm text-red-600 hover:text-red-700"
+                        >
+                          Remove Audio
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex gap-2 mt-4">
@@ -695,6 +790,7 @@ export default function RadioMusicAdminPage() {
                     setShowSongForm(false)
                     setEditingSong(null)
                     setSongFormData({ title: '', title_ta: '', audioUrl: '', duration: '', singerId: '' })
+                    setAudioPreview('') // Clear audio preview
                   }}
                   className="bg-gray-200 text-gray-700 hover:bg-gray-300"
                 >

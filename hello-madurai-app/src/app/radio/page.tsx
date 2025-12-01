@@ -90,6 +90,16 @@ function RadioPageContent() {
           const res = await fetch(`/api/radio-songs/${selectedSinger.id}`)
           const data = await res.json()
           setSongs(data)
+
+          // Auto-play first song if available
+          if (data && data.length > 0) {
+            setCurrentSong(data[0])
+            setIsMusicPlaying(true)
+            // Play will be triggered by the audio element's src change
+            setTimeout(() => {
+              musicAudioRef.current?.play()
+            }, 100)
+          }
         } catch (error) {
           console.error('Error fetching songs:', error)
         }
@@ -257,7 +267,7 @@ function RadioPageContent() {
                         <img
                           src={singer.imageUrl}
                           alt={singer.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                           onError={(e) => {
                             console.error('Failed to load singer image:', singer.imageUrl, 'for singer:', singer.name)
                             e.currentTarget.style.display = 'none'
@@ -307,7 +317,7 @@ function RadioPageContent() {
                 <img
                   src={selectedSinger.imageUrl}
                   alt={selectedSinger.name}
-                  className="w-24 h-24 rounded-full object-cover"
+                  className="w-24 h-24 rounded-full object-contain bg-gray-100"
                   onError={(e) => {
                     console.error('Failed to load singer detail image:', selectedSinger.imageUrl)
                     e.currentTarget.style.display = 'none'
