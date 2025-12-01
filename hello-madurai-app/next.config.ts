@@ -45,7 +45,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://www.instagram.com https://instagram.com;",
+            value: "frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://www.instagram.com https://instagram.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.google.com https://ep2.adtrafficquality.google https://tpc.googlesyndication.com;",
           },
         ],
       },
