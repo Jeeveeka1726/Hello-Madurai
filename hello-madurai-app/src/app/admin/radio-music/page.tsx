@@ -3,14 +3,16 @@
 import { useState, useEffect } from 'react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
-import { 
-  PlusIcon, 
-  PencilIcon, 
-  TrashIcon, 
-  MusicalNoteIcon, 
+import { toast } from 'react-hot-toast'
+import {
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  MusicalNoteIcon,
   UserIcon,
   MagnifyingGlassIcon,
-  XMarkIcon
+  XMarkIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline'
 
 interface RadioCategory {
@@ -59,6 +61,7 @@ export default function RadioMusicAdminPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [selectedSinger, setSelectedSinger] = useState<Singer | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   const [singerFormData, setSingerFormData] = useState({
     name: '',
@@ -141,6 +144,48 @@ export default function RadioMusicAdminPage() {
     }
   }
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB')
+      return
+    }
+
+    setUploadingImage(true)
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const response = await fetch('/api/upload/singer-image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setSingerFormData({ ...singerFormData, imageUrl: data.url })
+        toast.success('✅ Image uploaded successfully!')
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || 'Failed to upload image')
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast.error('Error uploading image')
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
   const handleSaveSinger = async () => {
     try {
       const url = editingSinger
@@ -158,9 +203,14 @@ export default function RadioMusicAdminPage() {
         setShowSingerForm(false)
         setEditingSinger(null)
         setSingerFormData({ name: '', name_ta: '', imageUrl: '', categoryId: categories[0]?.id || '' })
+        toast.success(editingSinger ? '✅ Singer updated!' : '✅ Singer created!')
+      } else {
+        const errorData = await res.json()
+        toast.error(errorData.error || 'Failed to save singer')
       }
     } catch (error) {
       console.error('Error saving singer:', error)
+      toast.error('Error saving singer')
     }
   }
 
@@ -373,14 +423,62 @@ export default function RadioMusicAdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Image URL (400x400px)</label>
-                  <input
-                    type="text"
-                    value={singerFormData.imageUrl}
-                    onChange={(e) => setSingerFormData({ ...singerFormData, imageUrl: e.target.value })}
-                    placeholder="https://..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Singer Image (400x400px)</label>
+
+                  {/* Image Preview */}
+                  {singerFormData.imageUrl && (
+                    <div className="mb-3">
+                      <img
+                        src={singerFormData.imageUrl}
+                        alt="Preview"
+                        className="w-32 h-32 object-cover rounded-lg border-2 border-gray-300"
+                      />
+                    </div>
+                  )}
+
+                  {/* Upload Button */}
+                  <div className="flex gap-2">
+                    <label className="flex-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={uploadingImage}
+                      />
+                      <div className={`flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                        uploadingImage
+                          ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
+                          : 'border-blue-300 bg-blue-50 hover:bg-blue-100'
+                      }`}>
+                        {uploadingImage ? (
+                          <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                            <span className="text-sm text-gray-600">Uploading...</span>
+                          </>
+                        ) : (
+                          <>
+                            <PhotoIcon className="h-5 w-5 text-blue-600" />
+                            <span className="text-sm font-medium text-blue-600">
+                              {singerFormData.imageUrl ? 'Change Image' : 'Upload Image'}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </label>
+
+                    {singerFormData.imageUrl && (
+                      <Button
+                        onClick={() => setSingerFormData({ ...singerFormData, imageUrl: '' })}
+                        className="bg-red-50 text-red-600 hover:bg-red-100"
+                      >
+                        <XMarkIcon className="h-5 w-5" />
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Recommended: 400x400px square image, max 5MB
+                  </p>
                 </div>
               </div>
               <div className="flex gap-2 mt-4">
