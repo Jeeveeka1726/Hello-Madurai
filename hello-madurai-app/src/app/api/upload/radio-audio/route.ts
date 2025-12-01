@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// Increase max duration for file uploads (Vercel)
+export const maxDuration = 60 // 60 seconds
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
@@ -32,11 +35,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate file size (max 100MB for audio)
-    const maxSize = 100 * 1024 * 1024 // 100MB
+    // Validate file size (max 50MB for audio - Vercel limit)
+    const maxSize = 50 * 1024 * 1024 // 50MB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: 'File too large. Maximum size is 100MB.' },
+        { error: 'File too large. Maximum size is 50MB due to Vercel serverless function limits.' },
         { status: 400 }
       )
     }
