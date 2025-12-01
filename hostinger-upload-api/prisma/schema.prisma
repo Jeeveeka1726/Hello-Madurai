@@ -1,0 +1,455 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model News {
+  id            String        @id @default(cuid())
+  title         String        @db.VarChar(500)
+  title_ta      String?       @db.VarChar(500)
+  content       String        @db.LongText
+  content_ta    String?       @db.LongText
+  excerpt       String        @db.Text
+  excerpt_ta    String?       @db.Text
+  category      String
+  author        String
+  featuredImage String?       @db.VarChar(500)
+  publishedAt   DateTime      @default(now())
+  views         Int           @default(0)
+  likes         Int           @default(0)
+  dislikes      Int           @default(0)
+  featured      Boolean       @default(false)
+  allowDownload Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  comments      NewsComment[]
+  shares        NewsShare[]
+
+  @@map("news")
+}
+
+model Event {
+  id             String    @id @default(cuid())
+  title          String
+  title_ta       String?
+  description    String    @db.Text
+  description_ta String?   @db.Text
+  location       String
+  location_ta    String?
+  featuredImage  String?   @db.Text
+  startDate      DateTime
+  endDate        DateTime?
+  category       String
+  status         String    @default("upcoming")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  duration       String?
+  phone          String?
+  views          Int       @default(0)
+  website        String?
+  endTime        String?
+  startTime      String?
+
+  @@map("events")
+}
+
+model RadioFolder {
+  id             String      @id @default(cuid())
+  name           String
+  name_ta        String?
+  description    String?
+  description_ta String?
+  coverImage     String?
+  featured       Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  radioShows     RadioShow[]
+
+  @@map("radio_folders")
+}
+
+model RadioShow {
+  id             String         @id @default(cuid())
+  title          String
+  title_ta       String?
+  description    String
+  description_ta String?
+  host           String
+  duration       String
+  audioUrl       String
+  featured       Boolean        @default(false)
+  plays          Int            @default(0)
+  publishedAt    DateTime       @default(now())
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  folderId       String
+  folder         RadioFolder    @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  comments       RadioComment[]
+  shares         RadioShare[]
+
+  @@map("radio_shows")
+}
+
+model Business {
+  id             String            @id @default(cuid())
+  name           String
+  name_ta        String?
+  description    String
+  description_ta String?
+  category       String
+  phone          String?
+  email          String?
+  website        String?
+  address        String
+  address_ta     String?
+  instagramUrl   String?
+  facebookUrl    String?
+  bookingUrl     String?
+  latitude       Float?
+  longitude      Float?
+  featured       Boolean           @default(false)
+  verified       Boolean           @default(false)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  comments       BusinessComment[]
+
+  @@map("businesses")
+}
+
+model MagazineCollection {
+  id             String     @id @default(cuid())
+  name           String
+  name_ta        String?
+  description    String?
+  description_ta String?
+  coverImage     String?
+  featured       Boolean    @default(false)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  magazines      Magazine[]
+
+  @@map("magazine_collections")
+}
+
+model Magazine {
+  id             String             @id @default(cuid())
+  title          String
+  title_ta       String?
+  description    String
+  description_ta String?
+  pdfUrl         String
+  coverImage     String?
+  featuredImage  String?
+  issueNumber    String
+  publishedAt    DateTime           @default(now())
+  downloads      Int                @default(0)
+  featured       Boolean            @default(false)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  collectionId   String
+  collection     MagazineCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@map("magazines")
+}
+
+model NewsComment {
+  id           String        @id @default(cuid())
+  content      String
+  author       String
+  email        String?
+  approved     Boolean       @default(false)
+  isAdminReply Boolean       @default(false)
+  newsId       String
+  parentId     String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  news         News          @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  parent       NewsComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies      NewsComment[] @relation("CommentReplies")
+
+  @@index([newsId])
+  @@index([approved])
+  @@index([parentId])
+  @@map("news_comments")
+}
+
+model NewsShare {
+  id        String   @id @default(cuid())
+  newsId    String
+  platform  String
+  userAgent String?
+  createdAt DateTime @default(now())
+  news      News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@map("news_shares")
+}
+
+model RadioComment {
+  id          String    @id @default(cuid())
+  content     String
+  author      String
+  email       String?
+  radioShowId String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  radioShow   RadioShow @relation(fields: [radioShowId], references: [id], onDelete: Cascade)
+
+  @@map("radio_comments")
+}
+
+model RadioShare {
+  id          String    @id @default(cuid())
+  radioShowId String
+  platform    String
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+  radioShow   RadioShow @relation(fields: [radioShowId], references: [id], onDelete: Cascade)
+
+  @@map("radio_shares")
+}
+
+model BusinessComment {
+  id         String   @id @default(cuid())
+  content    String
+  author     String
+  email      String?
+  rating     Int?
+  businessId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@map("business_comments")
+}
+
+model Helpline {
+  id             String   @id @default(cuid())
+  name           String
+  name_ta        String?
+  phone          String
+  category       String
+  description    String?
+  description_ta String?
+  featured       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("helplines")
+}
+
+model PopupAd {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  imageUrl    String?
+  actionUrl   String?
+  actionText  String?
+  active      Boolean   @default(true)
+  startDate   DateTime  @default(now())
+  endDate     DateTime?
+  impressions Int       @default(0)
+  clicks      Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("popup_ads")
+}
+
+model Subscription {
+  id         String   @id @default(cuid())
+  email      String?  @unique
+  phone      String?  @unique
+  name       String?
+  categories String
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("subscriptions")
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  title     String
+  message   String
+  category  String
+  targetUrl String?
+  sent      Boolean   @default(false)
+  sentAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("notifications")
+}
+
+model DiscountCard {
+  id        String          @id @default(cuid())
+  userId    String          @unique
+  userName  String
+  userEmail String?
+  userPhone String?
+  dCode     String          @unique
+  isActive  Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  usages    DiscountUsage[]
+
+  @@map("discount_cards")
+}
+
+model DiscountUsage {
+  id             String       @id @default(cuid())
+  cardId         String
+  businessName   String
+  businessPhone  String?
+  shopkeeperName String?
+  amount         Float?
+  usedAt         DateTime     @default(now())
+  createdAt      DateTime     @default(now())
+  card           DiscountCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@map("discount_usages")
+}
+
+model Ad {
+  id          String   @id @default(cuid())
+  title       String
+  title_ta    String?
+  imageUrl    String?
+  htmlCode    String?  @db.Text
+  link        String?
+  active      Boolean  @default(true)
+  position    Int      @default(0)
+  category    String?
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active])
+  @@index([position])
+  @@map("ads")
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  filename  String
+  data      Bytes
+  mimeType  String
+  size      Int
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+
+  @@map("images")
+}
+
+model Audio {
+  id        String   @id @default(cuid())
+  filename  String
+  data      Bytes
+  mimeType  String
+  size      Int
+  duration  String?  // Duration in format "MM:SS" or "HH:MM:SS"
+  createdAt DateTime @default(now())
+
+  @@map("audio_files")
+}
+
+model Video {
+  id             String         @id @default(cuid())
+  title          String
+  title_ta       String?
+  videoUrl       String         // Can be uploaded file path or YouTube URL
+  videoType      String         @default("upload") // "upload" or "youtube"
+  thumbnailUrl   String?
+  category       String
+  orderNumber    Int            @default(0) // For manual ordering
+  duration       String?
+  views          Int            @default(0)
+  likes          Int            @default(0)
+  dislikes       Int            @default(0)
+  featured       Boolean        @default(false)
+  publishedAt    DateTime       @default(now())
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  comments       VideoComment[]
+  shares         VideoShare[]
+
+  @@map("videos")
+}
+
+model VideoComment {
+  id        String   @id @default(cuid())
+  content   String
+  author    String
+  email     String?
+  videoId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@map("video_comments")
+}
+
+model VideoShare {
+  id        String   @id @default(cuid())
+  videoId   String
+  platform  String
+  userAgent String?
+  createdAt DateTime @default(now())
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@map("video_shares")
+}
+
+model RadioCategory {
+  id          String   @id @default(cuid())
+  name        String   // English name (Songs, God Songs, Speech, Comedy)
+  name_ta     String   // Tamil name (பாடல்கள், பக்தி பாடல்கள், சொற்பொழிவு, நகைச்சுவை)
+  slug        String   @unique // URL-friendly identifier
+  orderNumber Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  singers     Singer[]
+
+  @@map("radio_categories")
+}
+
+model Singer {
+  id         String        @id @default(cuid())
+  name       String        // Singer name
+  name_ta    String?       // Tamil name (optional)
+  imageUrl   String?       // 400x400px square image
+  featured   Boolean       @default(false) // Featured singer
+  categoryId String
+  category   RadioCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  songs      RadioSong[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([categoryId])
+  @@index([featured])
+  @@map("singers")
+}
+
+model RadioSong {
+  id        String   @id @default(cuid())
+  title     String   // Song title
+  title_ta  String?  // Tamil title (optional)
+  audioUrl  String   // Audio file URL
+  duration  String?  // Duration (e.g., "3:45")
+  plays     Int      @default(0)
+  singerId  String
+  singer    Singer   @relation(fields: [singerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([singerId])
+  @@map("radio_songs")
+}

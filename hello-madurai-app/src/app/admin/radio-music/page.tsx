@@ -215,9 +215,9 @@ export default function RadioMusicAdminPage() {
       return
     }
 
-    // Validate file size (max 50MB - Vercel limit)
-    if (file.size > 50 * 1024 * 1024) {
-      toast.error('Audio file size must be less than 50MB (Vercel limit)')
+    // Validate file size (max 100MB - Hostinger API)
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error('Audio file size must be less than 100MB')
       return
     }
 
@@ -233,8 +233,11 @@ export default function RadioMusicAdminPage() {
     formData.append('file', file)
 
     try {
-      console.log('📤 Uploading audio file...')
-      const response = await fetch('/api/upload/radio-audio', {
+      console.log('📤 Uploading audio file to Hostinger API...')
+
+      // Use Hostinger upload API instead of Vercel
+      const uploadApiUrl = process.env.NEXT_PUBLIC_UPLOAD_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${uploadApiUrl}/upload/audio`, {
         method: 'POST',
         body: formData,
       })
