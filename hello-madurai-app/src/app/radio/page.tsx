@@ -140,8 +140,20 @@ function RadioPageContent() {
   }
 
   const handleSingerClick = async (singer: Singer) => {
+    // If clicking the currently playing singer, toggle play/pause
+    if (selectedSinger?.id === singer.id && currentSong) {
+      if (isMusicPlaying) {
+        musicAudioRef.current?.pause()
+        setIsMusicPlaying(false)
+      } else {
+        musicAudioRef.current?.play()
+        setIsMusicPlaying(true)
+      }
+      return
+    }
+
+    // Otherwise, fetch and play songs for this singer
     try {
-      // Fetch songs for this singer
       const res = await fetch(`/api/radio-songs/${singer.id}`)
       const data = await res.json()
 
@@ -279,6 +291,24 @@ function RadioPageContent() {
                         <UserIcon className="h-1/2 w-1/2 text-gray-400" />
                       </div>
                     )}
+
+                    {/* Play/Pause Overlay - Show when this singer is currently playing */}
+                    {selectedSinger?.id === singer.id && currentSong && (
+                      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                        {isMusicPlaying ? (
+                          <div className="relative">
+                            {/* Animated music icon */}
+                            <SpeakerWaveIcon className="h-16 w-16 text-white animate-pulse" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <PauseIcon className="h-10 w-10 text-white opacity-80" />
+                            </div>
+                          </div>
+                        ) : (
+                          <PlayIcon className="h-16 w-16 text-white" />
+                        )}
+                      </div>
+                    )}
+
                     {singer.featured && (
                       <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 rounded-full p-1">
                         <span className="text-xs font-bold">⭐</span>
