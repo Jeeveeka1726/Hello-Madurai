@@ -32,11 +32,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate file size (max 50MB for audio)
-    const maxSize = 50 * 1024 * 1024 // 50MB
+    // Validate file size (max 100MB for audio)
+    const maxSize = 100 * 1024 * 1024 // 100MB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: 'File too large. Maximum size is 50MB.' },
+        { error: 'File too large. Maximum size is 100MB.' },
         { status: 400 }
       )
     }

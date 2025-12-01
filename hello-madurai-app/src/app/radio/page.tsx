@@ -294,17 +294,11 @@ function RadioPageContent() {
 
                     {/* Play/Pause Overlay - Show when this singer is currently playing */}
                     {selectedSinger?.id === singer.id && currentSong && (
-                      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
                         {isMusicPlaying ? (
-                          <div className="relative">
-                            {/* Animated music icon */}
-                            <SpeakerWaveIcon className="h-16 w-16 text-white animate-pulse" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <PauseIcon className="h-10 w-10 text-white opacity-80" />
-                            </div>
-                          </div>
+                          <PauseIcon className="h-16 w-16 text-white drop-shadow-lg" />
                         ) : (
-                          <PlayIcon className="h-16 w-16 text-white" />
+                          <PlayIcon className="h-16 w-16 text-white drop-shadow-lg" />
                         )}
                       </div>
                     )}

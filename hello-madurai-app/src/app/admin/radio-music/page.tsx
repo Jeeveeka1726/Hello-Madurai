@@ -215,9 +215,9 @@ export default function RadioMusicAdminPage() {
       return
     }
 
-    // Validate file size (max 50MB)
-    if (file.size > 50 * 1024 * 1024) {
-      toast.error('Audio file size must be less than 50MB')
+    // Validate file size (max 100MB)
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error('Audio file size must be less than 100MB')
       return
     }
 
