@@ -255,7 +255,7 @@ function RadioPageContent() {
           /* Singers Grid */
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              {language === 'ta' ? 'பாடகர்கள்' : 'Singers'}
+              {language === 'ta' ? 'பாடல்கள்' : 'Songs'}
             </h2>
             {musicLoading ? (
               <div className="text-center py-12">
@@ -264,7 +264,7 @@ function RadioPageContent() {
               </div>
             ) : filteredSingers.length === 0 ? (
               <p className="text-center py-12 text-gray-500">
-                {language === 'ta' ? 'பாடகர்கள் இல்லை' : 'No singers found'}
+                {language === 'ta' ? 'பாடல்கள் இல்லை' : 'No songs found'}
               </p>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
