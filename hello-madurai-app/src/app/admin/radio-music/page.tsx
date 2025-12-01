@@ -62,6 +62,7 @@ export default function RadioMusicAdminPage() {
   const [selectedSinger, setSelectedSinger] = useState<Singer | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string>('')
 
   const [singerFormData, setSingerFormData] = useState({
     name: '',
@@ -160,27 +161,41 @@ export default function RadioMusicAdminPage() {
       return
     }
 
+    // Create local preview immediately
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+
     setUploadingImage(true)
     const formData = new FormData()
     formData.append('file', file)
 
     try {
+      console.log('📤 Uploading singer image...')
       const response = await fetch('/api/upload/singer-image', {
         method: 'POST',
         body: formData,
       })
 
+      console.log('📥 Upload response status:', response.status)
+
       if (response.ok) {
         const data = await response.json()
+        console.log('✅ Upload successful:', data)
         setSingerFormData({ ...singerFormData, imageUrl: data.url })
-        toast.success('✅ Image uploaded successfully!')
+        toast.success('✅ Image uploaded and resized to 400x400px!')
       } else {
         const errorData = await response.json()
+        console.error('❌ Upload failed:', errorData)
         toast.error(errorData.error || 'Failed to upload image')
+        setImagePreview('') // Clear preview on error
       }
     } catch (error) {
-      console.error('Error uploading image:', error)
+      console.error('❌ Error uploading image:', error)
       toast.error('Error uploading image')
+      setImagePreview('') // Clear preview on error
     } finally {
       setUploadingImage(false)
     }
@@ -203,6 +218,7 @@ export default function RadioMusicAdminPage() {
         setShowSingerForm(false)
         setEditingSinger(null)
         setSingerFormData({ name: '', name_ta: '', imageUrl: '', categoryId: categories[0]?.id || '' })
+        setImagePreview('') // Clear preview
         toast.success(editingSinger ? '✅ Singer updated!' : '✅ Singer created!')
       } else {
         const errorData = await res.json()
@@ -236,6 +252,7 @@ export default function RadioMusicAdminPage() {
       imageUrl: singer.imageUrl || '',
       categoryId: singer.categoryId
     })
+    setImagePreview('') // Clear local preview when editing (will show saved image)
     setShowSingerForm(true)
   }
 
@@ -347,6 +364,7 @@ export default function RadioMusicAdminPage() {
                 setShowSingerForm(!showSingerForm)
                 setEditingSinger(null)
                 setSingerFormData({ name: '', name_ta: '', imageUrl: '', categoryId: categories[0]?.id || '' })
+                setImagePreview('') // Clear preview
               }}
               className="bg-blue-600 text-white hover:bg-blue-700"
             >
@@ -426,13 +444,22 @@ export default function RadioMusicAdminPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Singer Image (400x400px)</label>
 
                   {/* Image Preview */}
-                  {singerFormData.imageUrl && (
-                    <div className="mb-3">
+                  {(imagePreview || singerFormData.imageUrl) && (
+                    <div className="mb-3 relative">
                       <img
-                        src={singerFormData.imageUrl}
+                        src={imagePreview || singerFormData.imageUrl}
                         alt="Preview"
                         className="w-32 h-32 object-cover rounded-lg border-2 border-gray-300"
+                        onError={(e) => {
+                          console.error('Image failed to load:', imagePreview || singerFormData.imageUrl)
+                          e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="128" height="128"%3E%3Crect fill="%23ddd" width="128" height="128"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E'
+                        }}
                       />
+                      {uploadingImage && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -460,24 +487,28 @@ export default function RadioMusicAdminPage() {
                           <>
                             <PhotoIcon className="h-5 w-5 text-blue-600" />
                             <span className="text-sm font-medium text-blue-600">
-                              {singerFormData.imageUrl ? 'Change Image' : 'Upload Image'}
+                              {singerFormData.imageUrl || imagePreview ? 'Change Image' : 'Upload Image'}
                             </span>
                           </>
                         )}
                       </div>
                     </label>
 
-                    {singerFormData.imageUrl && (
+                    {(singerFormData.imageUrl || imagePreview) && (
                       <Button
-                        onClick={() => setSingerFormData({ ...singerFormData, imageUrl: '' })}
+                        onClick={() => {
+                          setSingerFormData({ ...singerFormData, imageUrl: '' })
+                          setImagePreview('')
+                        }}
                         className="bg-red-50 text-red-600 hover:bg-red-100"
+                        disabled={uploadingImage}
                       >
                         <XMarkIcon className="h-5 w-5" />
                       </Button>
                     )}
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    Recommended: 400x400px square image, max 5MB
+                    Recommended: 400x400px square image, max 5MB (JPEG, PNG, WebP)
                   </p>
                 </div>
               </div>
@@ -490,6 +521,7 @@ export default function RadioMusicAdminPage() {
                     setShowSingerForm(false)
                     setEditingSinger(null)
                     setSingerFormData({ name: '', name_ta: '', imageUrl: '', categoryId: categories[0]?.id || '' })
+                    setImagePreview('') // Clear preview
                   }}
                   className="bg-gray-200 text-gray-700 hover:bg-gray-300"
                 >
