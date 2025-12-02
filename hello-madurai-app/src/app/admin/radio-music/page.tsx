@@ -233,12 +233,10 @@ export default function RadioMusicAdminPage() {
     formData.append('file', file)
 
     try {
-      console.log('📤 Uploading audio file to Hostinger API...')
+      console.log('📤 Uploading audio file to Cloudinary...')
 
-      // Use Hostinger upload API instead of Vercel
-      const uploadApiUrl = process.env.NEXT_PUBLIC_UPLOAD_API_URL || 'http://localhost:3002'
-      console.log('🔗 Upload API URL:', uploadApiUrl)
-      const response = await fetch(`${uploadApiUrl}/upload/audio`, {
+      // Upload to Cloudinary via our API
+      const response = await fetch('/api/upload/radio-audio', {
         method: 'POST',
         body: formData,
       })

@@ -352,7 +352,9 @@ model Image {
 model Audio {
   id        String   @id @default(cuid())
   filename  String
-  data      Bytes
+  data      Bytes?   // Legacy: binary data (deprecated, use url instead)
+  url       String?  // Cloudinary URL (new uploads use this)
+  publicId  String?  // Cloudinary public ID for management
   mimeType  String
   size      Int
   duration  String?  // Duration in format "MM:SS" or "HH:MM:SS"

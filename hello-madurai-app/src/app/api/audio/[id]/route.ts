@@ -19,15 +19,28 @@ export async function GET(
       )
     }
 
-    // Return the audio file with appropriate headers
-    return new NextResponse(audio.data, {
-      headers: {
-        'Content-Type': audio.mimeType,
-        'Content-Length': audio.size.toString(),
-        'Cache-Control': 'public, max-age=31536000, immutable',
-        'Accept-Ranges': 'bytes'
-      }
-    })
+    // If audio has Cloudinary URL, redirect to it
+    if (audio.url) {
+      return NextResponse.redirect(audio.url)
+    }
+
+    // Legacy: If audio has binary data (old uploads), serve it
+    if (audio.data) {
+      return new NextResponse(audio.data, {
+        headers: {
+          'Content-Type': audio.mimeType,
+          'Content-Length': audio.size.toString(),
+          'Cache-Control': 'public, max-age=31536000, immutable',
+          'Accept-Ranges': 'bytes'
+        }
+      })
+    }
+
+    // No data available
+    return NextResponse.json(
+      { error: 'Audio data not available' },
+      { status: 404 }
+    )
   } catch (error) {
     console.error('Error serving audio:', error)
     return NextResponse.json(
