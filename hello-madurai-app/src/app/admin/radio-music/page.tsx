@@ -215,7 +215,7 @@ export default function RadioMusicAdminPage() {
       return
     }
 
-    // Validate file size (max 100MB - Hostinger API)
+    // Validate file size (max 100MB)
     if (file.size > 100 * 1024 * 1024) {
       toast.error('Audio file size must be less than 100MB')
       return
@@ -229,34 +229,74 @@ export default function RadioMusicAdminPage() {
     reader.readAsDataURL(file)
 
     setUploadingAudio(true)
-    const formData = new FormData()
-    formData.append('file', file)
 
     try {
-      console.log('📤 Uploading audio file to Cloudinary...')
+      console.log('📤 Uploading audio file to Cloudinary (direct upload)...')
+      console.log('📊 File size:', (file.size / 1024 / 1024).toFixed(2), 'MB')
 
-      // Upload to Cloudinary via our API
-      const response = await fetch('/api/upload/radio-audio', {
+      // Step 1: Get upload signature from our API
+      const signatureResponse = await fetch('/api/upload/radio-audio')
+      if (!signatureResponse.ok) {
+        throw new Error('Failed to get upload signature')
+      }
+      const { signature, timestamp, cloudName, apiKey, folder } = await signatureResponse.json()
+
+      console.log('🔑 Got upload signature, uploading directly to Cloudinary...')
+
+      // Step 2: Upload directly to Cloudinary (bypasses Vercel's 4.5MB limit)
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('signature', signature)
+      formData.append('timestamp', timestamp.toString())
+      formData.append('api_key', apiKey)
+      formData.append('folder', folder)
+      formData.append('resource_type', 'video') // 'video' works for audio
+
+      const cloudinaryResponse = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      )
+
+      if (!cloudinaryResponse.ok) {
+        const errorData = await cloudinaryResponse.json()
+        console.error('❌ Cloudinary upload failed:', errorData)
+        throw new Error(errorData.error?.message || 'Cloudinary upload failed')
+      }
+
+      const cloudinaryData = await cloudinaryResponse.json()
+      console.log('✅ Cloudinary upload successful:', cloudinaryData.public_id)
+
+      // Step 3: Save metadata to our database
+      const metadataResponse = await fetch('/api/upload/save-audio-metadata', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: cloudinaryData.secure_url,
+          publicId: cloudinaryData.public_id,
+          filename: file.name,
+          mimeType: file.type,
+          size: file.size,
+          duration: cloudinaryData.duration
+            ? `${Math.floor(cloudinaryData.duration / 60)}:${String(Math.floor(cloudinaryData.duration % 60)).padStart(2, '0')}`
+            : null,
+        }),
       })
 
-      console.log('📥 Upload response status:', response.status)
-
-      if (response.ok) {
-        const data = await response.json()
-        console.log('✅ Audio upload successful:', data)
-        setSongFormData({ ...songFormData, audioUrl: data.url })
-        toast.success('✅ Audio file uploaded successfully!')
-      } else {
-        const errorData = await response.json()
-        console.error('❌ Upload failed:', errorData)
-        toast.error(errorData.error || 'Failed to upload audio')
-        setAudioPreview('') // Clear preview on error
+      if (!metadataResponse.ok) {
+        throw new Error('Failed to save audio metadata')
       }
+
+      const metadataData = await metadataResponse.json()
+      console.log('✅ Metadata saved:', metadataData.id)
+
+      setSongFormData({ ...songFormData, audioUrl: cloudinaryData.secure_url })
+      toast.success('✅ Audio file uploaded successfully!')
     } catch (error) {
       console.error('❌ Error uploading audio:', error)
-      toast.error('Error uploading audio file')
+      toast.error(error instanceof Error ? error.message : 'Error uploading audio file')
       setAudioPreview('') // Clear preview on error
     } finally {
       setUploadingAudio(false)
