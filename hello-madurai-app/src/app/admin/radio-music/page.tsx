@@ -242,6 +242,7 @@ export default function RadioMusicAdminPage() {
       const { signature, timestamp, cloudName, apiKey, folder } = await signatureResponse.json()
 
       console.log('🔑 Got upload signature, uploading directly to Cloudinary...')
+      console.log('📋 Signature params:', { timestamp, folder })
 
       // Step 2: Upload directly to Cloudinary (bypasses Vercel's 4.5MB limit)
       const formData = new FormData()
@@ -250,7 +251,7 @@ export default function RadioMusicAdminPage() {
       formData.append('timestamp', timestamp.toString())
       formData.append('api_key', apiKey)
       formData.append('folder', folder)
-      formData.append('resource_type', 'video') // 'video' works for audio
+      // NOTE: Don't add resource_type here - it's already in the URL (/video/upload)
 
       const cloudinaryResponse = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
