@@ -45,7 +45,7 @@
 
 ### **Step 2: Add These Variables**
 
-Add **TWO** environment variables:
+Add **FIVE** environment variables:
 
 #### **Variable 1:**
 ```
@@ -55,11 +55,29 @@ Value: cloudinary://187251687769698:yf7cHBXxd4qOc3e3wQy-ct1BLqM@dbngxtspv
 
 #### **Variable 2:**
 ```
+Name: CLOUDINARY_CLOUD_NAME
+Value: dbngxtspv
+```
+
+#### **Variable 3:**
+```
+Name: CLOUDINARY_API_KEY
+Value: 187251687769698
+```
+
+#### **Variable 4:**
+```
+Name: CLOUDINARY_API_SECRET
+Value: yf7cHBXxd4qOc3e3wQy-ct1BLqM
+```
+
+#### **Variable 5:**
+```
 Name: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
 Value: dbngxtspv
 ```
 
-**Important:** Make sure to select **Production**, **Preview**, and **Development** for both variables!
+**Important:** Make sure to select **Production**, **Preview**, and **Development** for ALL variables!
 
 ### **Step 3: Redeploy**
 
