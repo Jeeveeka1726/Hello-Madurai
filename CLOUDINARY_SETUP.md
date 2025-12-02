@@ -14,11 +14,14 @@
   - `filename`, `mimeType`, `size`, `duration`: Metadata
 - Old binary uploads still work (backward compatible)
 
-### 3. **Updated Upload API**
-- Files now upload to Cloudinary (not database)
-- Increased limit from 50MB to **100MB**
-- Cloudinary extracts audio duration automatically
-- Only URL saved in database (not the file)
+### 3. **Implemented Direct Browser-to-Cloudinary Upload**
+- **IMPORTANT:** Files upload directly from browser to Cloudinary (bypasses Vercel's 4.5MB limit)
+- 3-step upload process:
+  1. Get upload signature from our API
+  2. Upload file directly to Cloudinary
+  3. Save metadata to our database
+- Increased limit from 50MB to **100MB+**
+- No more 413 "Payload Too Large" errors!
 
 ### 4. **Updated Playback API**
 - New uploads redirect to Cloudinary URL (fast CDN)
@@ -113,13 +116,20 @@ Value: dbngxtspv
 
 ## 🔍 How It Works Now:
 
-### **Upload Process:**
+### **Upload Process (Direct Browser Upload):**
 ```
 1. User selects audio file in admin panel
-2. File uploads to Cloudinary (cloud storage)
-3. Cloudinary returns URL: https://res.cloudinary.com/dbngxtspv/video/upload/...
-4. App saves URL in MySQL database (not the file)
-5. Done! ✅
+2. Browser requests upload signature from our API
+3. Browser uploads file DIRECTLY to Cloudinary (bypasses Vercel!)
+4. Cloudinary returns URL: https://res.cloudinary.com/dbngxtspv/video/upload/...
+5. Browser sends metadata to our API (tiny JSON payload)
+6. App saves URL in MySQL database (not the file)
+7. Done! ✅
+
+Why this works:
+- File never goes through Vercel (no 4.5MB limit!)
+- Only signature request and metadata save go through Vercel (tiny payloads)
+- Upload happens directly from browser to Cloudinary
 ```
 
 ### **Playback Process:**
