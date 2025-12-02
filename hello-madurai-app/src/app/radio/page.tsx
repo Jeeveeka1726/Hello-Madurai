@@ -56,6 +56,7 @@ function RadioPageContent() {
   
   // Music player state
   const [currentSong, setCurrentSong] = useState<RadioSong | null>(null)
+  const [currentSongIndex, setCurrentSongIndex] = useState(0)
   const [isMusicPlaying, setIsMusicPlaying] = useState(false)
   const [musicCurrentTime, setMusicCurrentTime] = useState(0)
   const [musicDuration, setMusicDuration] = useState(0)
@@ -83,6 +84,24 @@ function RadioPageContent() {
 
   // Note: Songs are now fetched directly in handleSingerClick for immediate playback
 
+  // Auto-play next song when current song ends
+  const playNextSong = () => {
+    if (songs.length === 0) return
+
+    const nextIndex = currentSongIndex + 1
+    if (nextIndex < songs.length) {
+      // Play next song
+      setCurrentSongIndex(nextIndex)
+      setCurrentSong(songs[nextIndex])
+      setIsMusicPlaying(true)
+    } else {
+      // Reached end of playlist, loop back to first song
+      setCurrentSongIndex(0)
+      setCurrentSong(songs[0])
+      setIsMusicPlaying(true)
+    }
+  }
+
   // Music player audio events
   useEffect(() => {
     const audio = musicAudioRef.current
@@ -93,6 +112,8 @@ function RadioPageContent() {
     const handleEnded = () => {
       setIsMusicPlaying(false)
       setMusicCurrentTime(0)
+      // Auto-play next song
+      playNextSong()
     }
 
     audio.addEventListener('timeupdate', updateTime)
@@ -104,7 +125,7 @@ function RadioPageContent() {
       audio.removeEventListener('loadedmetadata', updateDuration)
       audio.removeEventListener('ended', handleEnded)
     }
-  }, [])
+  }, [songs, currentSongIndex])
 
   // Auto-play when current song changes
   useEffect(() => {
@@ -127,7 +148,9 @@ function RadioPageContent() {
       }
     } else {
       // Play new song
+      const songIndex = songs.findIndex(s => s.id === song.id)
       setCurrentSong(song)
+      setCurrentSongIndex(songIndex >= 0 ? songIndex : 0)
       setIsMusicPlaying(true)
 
       // Increment play count
@@ -159,10 +182,13 @@ function RadioPageContent() {
 
       if (data && data.length > 0) {
         // Set the first song and auto-play
-        setCurrentSong(data[0])
         setSongs(data)
+        setCurrentSong(data[0])
+        setCurrentSongIndex(0)
         setSelectedSinger(singer)
         setIsMusicPlaying(true)
+
+        console.log(`🎵 Playing ${data.length} song(s) from ${singer.name}`)
 
         // Play the song
         setTimeout(() => {
@@ -333,11 +359,36 @@ function RadioPageContent() {
                   </h4>
                   <p className="text-sm text-gray-500 truncate">
                     {language === 'ta' && selectedSinger?.name_ta ? selectedSinger.name_ta : selectedSinger?.name}
+                    {songs.length > 1 && (
+                      <span className="ml-2 text-xs">
+                        ({currentSongIndex + 1}/{songs.length})
+                      </span>
+                    )}
                   </p>
                 </div>
 
                 {/* Controls */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => {
+                      if (currentSongIndex > 0) {
+                        const prevIndex = currentSongIndex - 1
+                        setCurrentSongIndex(prevIndex)
+                        setCurrentSong(songs[prevIndex])
+                        setIsMusicPlaying(true)
+                      }
+                    }}
+                    disabled={currentSongIndex === 0}
+                    className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:opacity-50 flex items-center justify-center transition-colors"
+                    title={language === 'ta' ? 'முந்தைய பாடல்' : 'Previous song'}
+                  >
+                    <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
+                    </svg>
+                  </button>
+
+                  {/* Play/Pause Button */}
                   <button
                     onClick={() => {
                       if (isMusicPlaying) {
@@ -355,6 +406,30 @@ function RadioPageContent() {
                     ) : (
                       <PlayIcon className="h-6 w-6 text-white ml-0.5" />
                     )}
+                  </button>
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => {
+                      if (currentSongIndex < songs.length - 1) {
+                        const nextIndex = currentSongIndex + 1
+                        setCurrentSongIndex(nextIndex)
+                        setCurrentSong(songs[nextIndex])
+                        setIsMusicPlaying(true)
+                      } else {
+                        // Loop back to first song
+                        setCurrentSongIndex(0)
+                        setCurrentSong(songs[0])
+                        setIsMusicPlaying(true)
+                      }
+                    }}
+                    disabled={songs.length === 0}
+                    className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:opacity-50 flex items-center justify-center transition-colors"
+                    title={language === 'ta' ? 'அடுத்த பாடல்' : 'Next song'}
+                  >
+                    <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" />
+                    </svg>
                   </button>
                 </div>
 
