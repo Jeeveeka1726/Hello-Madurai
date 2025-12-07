@@ -62,6 +62,7 @@ function DigitalFMPageContent() {
   const [allAudios, setAllAudios] = useState<RadioSong[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [ads, setAds] = useState<Ad[]>([])
   const [likedAudios, setLikedAudios] = useState<Set<string>>(new Set())
   
@@ -91,11 +92,38 @@ function DigitalFMPageContent() {
   useEffect(() => {
     const fetchAllAudios = async () => {
       try {
-        const res = await fetch('/api/radio-songs/all')
+        setLoading(true)
+        setError(null)
+
+        // Add timeout to prevent infinite loading
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 second timeout
+
+        const res = await fetch('/api/radio-songs/all', {
+          signal: controller.signal
+        })
+
+        clearTimeout(timeoutId)
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch audios: ${res.status}`)
+        }
+
         const data = await res.json()
-        setAllAudios(data)
+
+        if (data.error) {
+          throw new Error(data.error)
+        }
+
+        setAllAudios(Array.isArray(data) ? data : [])
       } catch (error) {
         console.error('Error fetching audios:', error)
+        if (error instanceof Error && error.name === 'AbortError') {
+          setError('Request timed out. Please check your connection and try again.')
+        } else {
+          setError(error instanceof Error ? error.message : 'Failed to load audios')
+        }
+        setAllAudios([])
       } finally {
         setLoading(false)
       }
@@ -376,7 +404,24 @@ function DigitalFMPageContent() {
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading...</p>
+              <p className="mt-4 text-gray-600">
+                {language === 'ta' ? 'ஏற்றுகிறது...' : 'Loading...'}
+              </p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="text-red-600 mb-4">
+                <svg className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                {language === 'ta' ? 'மீண்டும் முயற்சிக்கவும்' : 'Retry'}
+              </button>
             </div>
           ) : filteredAudios.length === 0 ? (
             <p className="text-center py-12 text-gray-500">
