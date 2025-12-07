@@ -54,8 +54,8 @@ const navigation = [
     icon: DocumentIcon
   },
   {
-    name: 'Radio Music',
-    name_ta: 'வானொலி இசை',
+    name: 'Digital FM',
+    name_ta: 'டிஜிட்டல் எஃப்.எம்',
     href: '/admin/radio-music',
     icon: ChartBarIcon
   },

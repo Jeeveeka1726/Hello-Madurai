@@ -447,6 +447,9 @@ model RadioSong {
   audioUrl  String   // Audio file URL
   duration  String?  // Duration (e.g., "3:45")
   plays     Int      @default(0)
+  likes     Int      @default(0)
+  shares    Int      @default(0)
+  comments  Int      @default(0)
   singerId  String
   singer    Singer   @relation(fields: [singerId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())

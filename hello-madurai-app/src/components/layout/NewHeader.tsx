@@ -31,7 +31,7 @@ export default function NewHeader() {
       href: '/events' 
     },
     {
-      name: t('nav.radio', 'Radio', 'வானொலி'),
+      name: t('nav.radio', 'Digital FM', 'டிஜிட்டல் எஃப்.எம்'),
       href: '/radio'
     },
     {

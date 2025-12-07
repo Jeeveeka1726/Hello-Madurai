@@ -6,19 +6,22 @@ import {
   PauseIcon,
   SpeakerWaveIcon,
   MagnifyingGlassIcon,
-  UserIcon
+  HeartIcon,
+  ShareIcon,
+  ChatBubbleLeftIcon
 } from '@heroicons/react/24/outline'
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import NewspaperHeader from '@/components/NewspaperHeader'
 import Card from '@/components/ui/Card'
+import { toast } from 'react-hot-toast'
 
 interface RadioCategory {
   id: string
   name: string
   name_ta: string
   slug: string
-  singers: Singer[]
 }
 
 interface Singer {
@@ -26,10 +29,6 @@ interface Singer {
   name: string
   name_ta: string | null
   imageUrl: string | null
-  featured: boolean
-  _count?: {
-    songs: number
-  }
   category?: RadioCategory
 }
 
@@ -40,131 +39,127 @@ interface RadioSong {
   audioUrl: string
   duration: string | null
   plays: number
+  likes: number
+  shares: number
+  comments: number
   singer?: Singer
 }
 
-function RadioPageContent() {
+interface Ad {
+  id: string
+  title: string
+  imageUrl?: string
+  htmlCode?: string
+  link?: string
+}
+
+function DigitalFMPageContent() {
   const { language } = useLanguage()
   
-  // Music state
+  // State
   const [categories, setCategories] = useState<RadioCategory[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<string>('')
-  const [selectedSinger, setSelectedSinger] = useState<Singer | null>(null)
-  const [songs, setSongs] = useState<RadioSong[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [allAudios, setAllAudios] = useState<RadioSong[]>([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [musicLoading, setMusicLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [ads, setAds] = useState<Ad[]>([])
+  const [likedAudios, setLikedAudios] = useState<Set<string>>(new Set())
   
   // Music player state
   const [currentSong, setCurrentSong] = useState<RadioSong | null>(null)
-  const [currentSongIndex, setCurrentSongIndex] = useState(0)
   const [isMusicPlaying, setIsMusicPlaying] = useState(false)
   const [musicCurrentTime, setMusicCurrentTime] = useState(0)
   const [musicDuration, setMusicDuration] = useState(0)
   const musicAudioRef = useRef<HTMLAudioElement>(null)
 
-  // Fetch music categories
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await fetch('/api/radio-categories')
         const data = await res.json()
         setCategories(data)
-        if (data.length > 0) {
-          setSelectedCategory(data[0].id)
-        }
       } catch (error) {
         console.error('Error fetching categories:', error)
-      } finally {
-        setMusicLoading(false)
       }
     }
 
     fetchCategories()
   }, [])
 
-  // Note: Songs are now fetched directly in handleSingerClick for immediate playback
-
-  // Auto-play next song when current song ends
-  const playNextSong = () => {
-    if (songs.length === 0) return
-
-    const nextIndex = currentSongIndex + 1
-    if (nextIndex < songs.length) {
-      // Play next song
-      setCurrentSongIndex(nextIndex)
-      setCurrentSong(songs[nextIndex])
-      setIsMusicPlaying(true)
-    } else {
-      // Reached end of playlist, loop back to first song
-      setCurrentSongIndex(0)
-      setCurrentSong(songs[0])
-      setIsMusicPlaying(true)
+  // Fetch all audios
+  useEffect(() => {
+    const fetchAllAudios = async () => {
+      try {
+        const res = await fetch('/api/radio-songs/all')
+        const data = await res.json()
+        setAllAudios(data)
+      } catch (error) {
+        console.error('Error fetching audios:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
-  // Music player audio events
+    fetchAllAudios()
+  }, [])
+
+  // Fetch ads
+  useEffect(() => {
+    const fetchAds = async () => {
+      try {
+        const response = await fetch('/api/ads/active?category=radio')
+        if (response.ok) {
+          const data = await response.json()
+          setAds(data)
+
+          // Track impressions for each ad
+          data.forEach((ad: Ad) => {
+            fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching ads:', error)
+      }
+    }
+
+    fetchAds()
+  }, [])
+
+  // Music player effects
   useEffect(() => {
     const audio = musicAudioRef.current
     if (!audio) return
 
-    const updateTime = () => setMusicCurrentTime(audio.currentTime)
-    const updateDuration = () => setMusicDuration(audio.duration)
-    const handleEnded = () => {
-      setIsMusicPlaying(false)
-      setMusicCurrentTime(0)
-      // Auto-play next song
-      playNextSong()
-    }
+    const handleTimeUpdate = () => setMusicCurrentTime(audio.currentTime)
+    const handleLoadedMetadata = () => setMusicDuration(audio.duration)
+    const handleEnded = () => setIsMusicPlaying(false)
 
-    audio.addEventListener('timeupdate', updateTime)
-    audio.addEventListener('loadedmetadata', updateDuration)
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata)
     audio.addEventListener('ended', handleEnded)
 
     return () => {
-      audio.removeEventListener('timeupdate', updateTime)
-      audio.removeEventListener('loadedmetadata', updateDuration)
+      audio.removeEventListener('timeupdate', handleTimeUpdate)
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
       audio.removeEventListener('ended', handleEnded)
     }
-  }, [songs, currentSongIndex])
+  }, [])
 
-  // Auto-play when current song changes
+  // Update audio source when current song changes
   useEffect(() => {
-    if (currentSong && musicAudioRef.current) {
-      musicAudioRef.current.src = currentSong.audioUrl
-      musicAudioRef.current.play()
+    const audio = musicAudioRef.current
+    if (!audio || !currentSong) return
+
+    audio.src = currentSong.audioUrl
+    if (isMusicPlaying) {
+      audio.play().catch(err => console.error('Error playing audio:', err))
     }
   }, [currentSong])
 
-  // Music handlers
-  const handlePlaySong = async (song: RadioSong) => {
-    if (currentSong?.id === song.id) {
-      // Toggle play/pause for current song
-      if (isMusicPlaying) {
-        musicAudioRef.current?.pause()
-        setIsMusicPlaying(false)
-      } else {
-        musicAudioRef.current?.play()
-        setIsMusicPlaying(true)
-      }
-    } else {
-      // Play new song
-      const songIndex = songs.findIndex(s => s.id === song.id)
-      setCurrentSong(song)
-      setCurrentSongIndex(songIndex >= 0 ? songIndex : 0)
-      setIsMusicPlaying(true)
-
-      // Increment play count
-      try {
-        await fetch(`/api/radio-songs/play/${song.id}`, { method: 'POST' })
-      } catch (error) {
-        console.error('Error incrementing play count:', error)
-      }
-    }
-  }
-
-  const handleSingerClick = async (singer: Singer) => {
-    // If clicking the currently playing singer, toggle play/pause
-    if (selectedSinger?.id === singer.id && currentSong) {
+  // Handle play audio
+  const handlePlayAudio = async (audio: RadioSong) => {
+    if (currentSong?.id === audio.id) {
       if (isMusicPlaying) {
         musicAudioRef.current?.pause()
         setIsMusicPlaying(false)
@@ -175,32 +170,80 @@ function RadioPageContent() {
       return
     }
 
-    // Otherwise, fetch and play songs for this singer
+    setCurrentSong(audio)
+    setIsMusicPlaying(true)
+
     try {
-      const res = await fetch(`/api/radio-songs/${singer.id}`)
-      const data = await res.json()
-
-      if (data && data.length > 0) {
-        // Set the first song and auto-play
-        setSongs(data)
-        setCurrentSong(data[0])
-        setCurrentSongIndex(0)
-        setSelectedSinger(singer)
-        setIsMusicPlaying(true)
-
-        console.log(`🎵 Playing ${data.length} song(s) from ${singer.name}`)
-
-        // Play the song
-        setTimeout(() => {
-          musicAudioRef.current?.play()
-        }, 100)
-      }
+      await fetch(`/api/radio-songs/${audio.id}/play`, { method: 'POST' })
+      setAllAudios(prev => prev.map(a =>
+        a.id === audio.id ? { ...a, plays: a.plays + 1 } : a
+      ))
     } catch (error) {
-      console.error('Error fetching songs:', error)
+      console.error('Error updating play count:', error)
+    }
+
+    setTimeout(() => {
+      musicAudioRef.current?.play()
+    }, 100)
+  }
+
+  // Handle like
+  const handleLike = async (audioId: string) => {
+    try {
+      const isLiked = likedAudios.has(audioId)
+      const method = isLiked ? 'DELETE' : 'POST'
+
+      await fetch(`/api/radio-songs/${audioId}/like`, { method })
+
+      setAllAudios(prev => prev.map(a =>
+        a.id === audioId ? { ...a, likes: isLiked ? a.likes - 1 : a.likes + 1 } : a
+      ))
+
+      setLikedAudios(prev => {
+        const newSet = new Set(prev)
+        if (isLiked) {
+          newSet.delete(audioId)
+        } else {
+          newSet.add(audioId)
+        }
+        return newSet
+      })
+
+      toast.success(isLiked
+        ? (language === 'ta' ? 'விருப்பம் நீக்கப்பட்டது' : 'Removed from favorites')
+        : (language === 'ta' ? 'விருப்பங்களில் சேர்க்கப்பட்டது' : 'Added to favorites')
+      )
+    } catch (error) {
+      console.error('Error liking audio:', error)
+      toast.error(language === 'ta' ? 'பிழை ஏற்பட்டது' : 'Error occurred')
     }
   }
 
+  // Handle share
+  const handleShare = async (audio: RadioSong) => {
+    try {
+      const url = `${window.location.origin}/radio?audio=${audio.id}`
+      const title = language === 'ta' && audio.title_ta ? audio.title_ta : audio.title
 
+      if (navigator.share) {
+        await navigator.share({
+          title: title,
+          text: `${language === 'ta' ? 'கேளுங்கள்' : 'Listen to'}: ${title}`,
+          url: url
+        })
+      } else {
+        await navigator.clipboard.writeText(url)
+        toast.success(language === 'ta' ? 'இணைப்பு நகலெடுக்கப்பட்டது' : 'Link copied to clipboard')
+      }
+
+      await fetch(`/api/radio-songs/${audio.id}/share`, { method: 'POST' })
+      setAllAudios(prev => prev.map(a =>
+        a.id === audio.id ? { ...a, shares: a.shares + 1 } : a
+      ))
+    } catch (error) {
+      console.error('Error sharing:', error)
+    }
+  }
 
   const formatTime = (seconds: number) => {
     if (isNaN(seconds)) return '0:00'
@@ -209,32 +252,76 @@ function RadioPageContent() {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  // Filter singers for music tab
-  const filteredSingers = categories
-    .find(cat => cat.id === selectedCategory)
-    ?.singers.filter(singer => {
-      if (!searchQuery) return true
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
+    return num.toString()
+  }
+
+  // Filter audios
+  const filteredAudios = allAudios.filter(audio => {
+    const matchesCategory = selectedCategory === 'all' || audio.singer?.category?.id === selectedCategory
+    const matchesSearch = !searchQuery ||
+      audio.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      audio.title_ta?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      audio.singer?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      audio.singer?.name_ta?.toLowerCase().includes(searchQuery.toLowerCase())
+
+    return matchesCategory && matchesSearch
+  })
+
+  // Render ad
+  const renderAd = (ad: Ad, index: number) => {
+    if (ad.htmlCode) {
       return (
-        singer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        singer.name_ta?.toLowerCase().includes(searchQuery.toLowerCase())
+        <div key={`ad-${ad.id}-${index}`} className="col-span-full my-8">
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
+            <div className="mb-4">
+              <p className="text-xs sm:text-sm text-blue-700 font-bold">
+                📢 {language === 'ta' ? 'விளம்பரம்' : 'Advertisement'}
+              </p>
+            </div>
+            <div dangerouslySetInnerHTML={{ __html: ad.htmlCode }} />
+          </div>
+        </div>
       )
-    }) || []
+    } else if (ad.imageUrl) {
+      return (
+        <div key={`ad-${ad.id}-${index}`} className="col-span-full my-8">
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
+            <div className="mb-4">
+              <p className="text-xs sm:text-sm text-blue-700 font-bold">
+                📢 {language === 'ta' ? 'விளம்பரம்' : 'Advertisement'}
+              </p>
+            </div>
+            {ad.link ? (
+              <a href={ad.link} target="_blank" rel="noopener noreferrer" className="block hover:opacity-90 transition-opacity">
+                <img src={ad.imageUrl} alt={ad.title} className="w-full h-auto rounded-lg shadow-md" />
+              </a>
+            ) : (
+              <img src={ad.imageUrl} alt={ad.title} className="w-full h-auto rounded-lg shadow-md" />
+            )}
+          </div>
+        </div>
+      )
+    }
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      {/* Hidden audio element */}
       <audio ref={musicAudioRef} />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl" suppressHydrationWarning>
-            {language === 'ta' ? 'ரேடியோ' : 'Radio'}
+          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-2" suppressHydrationWarning>
+            {language === 'ta' ? 'டிஜிட்டல் எஃப்.எம்' : 'Digital FM'}
           </h1>
-          <p className="mt-2 text-lg text-gray-600" suppressHydrationWarning>
+          <p className="text-lg text-gray-600 mb-1" suppressHydrationWarning>
             {language === 'ta'
-              ? 'மதுரையின் பாடல்கள், பக்தி பாடல்கள், சொற்பொழிவுகள் மற்றும் பொழுதுபோக்கு'
-              : 'Listen to songs, devotional music, speeches, and entertainment from Madurai'}
+              ? 'மதுரையின் வரலாறு, விவசாயம், தொழில் மற்றும் கதைகள்'
+              : 'Madurai – History, Agriculture, Industry & Stories'}
           </p>
         </div>
 
@@ -245,7 +332,7 @@ function RadioPageContent() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={language === 'ta' ? 'பாடகர்களைத் தேடுங்கள்...' : 'Search singers...'}
+              placeholder={language === 'ta' ? 'தேடுங்கள்...' : 'Search...'}
               className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <MagnifyingGlassIcon className="h-6 w-6 text-gray-400 absolute left-4 top-3.5" />
@@ -255,14 +342,20 @@ function RadioPageContent() {
         {/* Category Tabs */}
         <div className="mb-8 overflow-x-auto">
           <div className="flex gap-2 min-w-max justify-center">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap ${
+                selectedCategory === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              {language === 'ta' ? 'அனைத்தும்' : 'All'}
+            </button>
             {categories.map(category => (
               <button
                 key={category.id}
-                onClick={() => {
-                  setSelectedCategory(category.id)
-                  setSelectedSinger(null)
-                  setSongs([])
-                }}
+                onClick={() => setSelectedCategory(category.id)}
                 className={`px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap ${
                   selectedCategory === category.id
                     ? 'bg-blue-600 text-white'
@@ -275,74 +368,110 @@ function RadioPageContent() {
           </div>
         </div>
 
-        {/* Content Area - Singers Grid (Always Visible) */}
+        {/* Audios Grid */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            {language === 'ta' ? 'பாடல்கள்' : 'Songs'}
+            {language === 'ta' ? 'ஆடியோக்கள்' : 'Audios'}
           </h2>
-          {musicLoading ? (
+          {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading...</p>
             </div>
-          ) : filteredSingers.length === 0 ? (
+          ) : filteredAudios.length === 0 ? (
             <p className="text-center py-12 text-gray-500">
-              {language === 'ta' ? 'பாடல்கள் இல்லை' : 'No songs found'}
+              {language === 'ta' ? 'ஆடியோக்கள் இல்லை' : 'No audios found'}
             </p>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-              {filteredSingers.map(singer => (
-                <div
-                  key={singer.id}
-                  onClick={() => handleSingerClick(singer)}
-                  className="cursor-pointer group"
-                >
-                  <div className="relative aspect-square mb-3 overflow-hidden rounded-full bg-gray-200 group-hover:ring-4 group-hover:ring-blue-300 transition-all">
-                    {singer.imageUrl ? (
-                      <img
-                        src={singer.imageUrl}
-                        alt={singer.name}
-                        className="w-full h-full object-contain"
-                        onError={(e) => {
-                          console.error('Failed to load singer image:', singer.imageUrl, 'for singer:', singer.name)
-                          e.currentTarget.style.display = 'none'
-                          const parent = e.currentTarget.parentElement
-                          if (parent) {
-                            parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="h-1/2 w-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></div>'
-                          }
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <UserIcon className="h-1/2 w-1/2 text-gray-400" />
-                      </div>
-                    )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredAudios.map((audio, index) => {
+                const shouldShowAd = (index + 1) % 6 === 0 && ads.length > 0
+                const adIndex = Math.floor(index / 6) % ads.length
+                const isLiked = likedAudios.has(audio.id)
+                const isPlaying = currentSong?.id === audio.id && isMusicPlaying
 
-                    {/* Play/Pause Overlay - Show when this singer is currently playing */}
-                    {selectedSinger?.id === singer.id && currentSong && (
-                      <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                        {isMusicPlaying ? (
-                          <PauseIcon className="h-16 w-16 text-white drop-shadow-lg" />
-                        ) : (
-                          <PlayIcon className="h-16 w-16 text-white drop-shadow-lg" />
-                        )}
-                      </div>
-                    )}
+                return (
+                  <div key={audio.id}>
+                    <Card className="hover:shadow-lg transition-shadow">
+                      <div className="p-6">
+                        {/* Audio Info */}
+                        <div className="flex items-start gap-4 mb-4">
+                          {/* Play Button */}
+                          <button
+                            onClick={() => handlePlayAudio(audio)}
+                            className="flex-shrink-0 w-16 h-16 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center transition-colors"
+                          >
+                            {isPlaying ? (
+                              <PauseIcon className="h-8 w-8 text-white" />
+                            ) : (
+                              <PlayIcon className="h-8 w-8 text-white ml-1" />
+                            )}
+                          </button>
 
-                    {singer.featured && (
-                      <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 rounded-full p-1">
-                        <span className="text-xs font-bold">⭐</span>
+                          {/* Title and Singer */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-lg text-gray-900 truncate mb-1">
+                              {language === 'ta' && audio.title_ta ? audio.title_ta : audio.title}
+                            </h3>
+                            {audio.singer && (
+                              <p className="text-sm text-gray-600 truncate">
+                                {language === 'ta' && audio.singer.name_ta ? audio.singer.name_ta : audio.singer.name}
+                              </p>
+                            )}
+                            {audio.singer?.category && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                {language === 'ta' ? audio.singer.category.name_ta : audio.singer.category.name}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Interaction Buttons */}
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                          {/* Like Button */}
+                          <button
+                            onClick={() => handleLike(audio.id)}
+                            className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors"
+                          >
+                            {isLiked ? (
+                              <HeartIconSolid className="h-5 w-5 text-red-600" />
+                            ) : (
+                              <HeartIcon className="h-5 w-5" />
+                            )}
+                            <span className="text-sm font-medium">{formatNumber(audio.likes)}</span>
+                          </button>
+
+                          {/* Share Button */}
+                          <button
+                            onClick={() => handleShare(audio)}
+                            className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
+                          >
+                            <ShareIcon className="h-5 w-5" />
+                            <span className="text-sm font-medium">{formatNumber(audio.shares)}</span>
+                          </button>
+
+                          {/* Comments Button */}
+                          <button
+                            className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition-colors"
+                          >
+                            <ChatBubbleLeftIcon className="h-5 w-5" />
+                            <span className="text-sm font-medium">{formatNumber(audio.comments)}</span>
+                          </button>
+
+                          {/* Plays */}
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <SpeakerWaveIcon className="h-5 w-5" />
+                            <span className="text-sm font-medium">{formatNumber(audio.plays)}</span>
+                          </div>
+                        </div>
                       </div>
-                    )}
+                    </Card>
+
+                    {/* Insert ad after every 6 audios (3 rows in 2-column grid) */}
+                    {shouldShowAd && renderAd(ads[adIndex], adIndex)}
                   </div>
-                  <h3 className="text-center font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                    {language === 'ta' && singer.name_ta ? singer.name_ta : singer.name}
-                  </h3>
-                  <p className="text-center text-sm text-gray-500">
-                    {singer._count?.songs || 0} {language === 'ta' ? 'பாடல்கள்' : 'songs'}
-                  </p>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
@@ -358,80 +487,29 @@ function RadioPageContent() {
                     {language === 'ta' && currentSong.title_ta ? currentSong.title_ta : currentSong.title}
                   </h4>
                   <p className="text-sm text-gray-500 truncate">
-                    {language === 'ta' && selectedSinger?.name_ta ? selectedSinger.name_ta : selectedSinger?.name}
-                    {songs.length > 1 && (
-                      <span className="ml-2 text-xs">
-                        ({currentSongIndex + 1}/{songs.length})
-                      </span>
-                    )}
+                    {currentSong.singer && (language === 'ta' && currentSong.singer.name_ta ? currentSong.singer.name_ta : currentSong.singer?.name)}
                   </p>
                 </div>
 
-                {/* Controls */}
-                <div className="flex items-center gap-2">
-                  {/* Previous Button */}
-                  <button
-                    onClick={() => {
-                      if (currentSongIndex > 0) {
-                        const prevIndex = currentSongIndex - 1
-                        setCurrentSongIndex(prevIndex)
-                        setCurrentSong(songs[prevIndex])
-                        setIsMusicPlaying(true)
-                      }
-                    }}
-                    disabled={currentSongIndex === 0}
-                    className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:opacity-50 flex items-center justify-center transition-colors"
-                    title={language === 'ta' ? 'முந்தைய பாடல்' : 'Previous song'}
-                  >
-                    <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
-                    </svg>
-                  </button>
-
-                  {/* Play/Pause Button */}
-                  <button
-                    onClick={() => {
-                      if (isMusicPlaying) {
-                        musicAudioRef.current?.pause()
-                        setIsMusicPlaying(false)
-                      } else {
-                        musicAudioRef.current?.play()
-                        setIsMusicPlaying(true)
-                      }
-                    }}
-                    className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center transition-colors"
-                  >
-                    {isMusicPlaying ? (
-                      <PauseIcon className="h-6 w-6 text-white" />
-                    ) : (
-                      <PlayIcon className="h-6 w-6 text-white ml-0.5" />
-                    )}
-                  </button>
-
-                  {/* Next Button */}
-                  <button
-                    onClick={() => {
-                      if (currentSongIndex < songs.length - 1) {
-                        const nextIndex = currentSongIndex + 1
-                        setCurrentSongIndex(nextIndex)
-                        setCurrentSong(songs[nextIndex])
-                        setIsMusicPlaying(true)
-                      } else {
-                        // Loop back to first song
-                        setCurrentSongIndex(0)
-                        setCurrentSong(songs[0])
-                        setIsMusicPlaying(true)
-                      }
-                    }}
-                    disabled={songs.length === 0}
-                    className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:opacity-50 flex items-center justify-center transition-colors"
-                    title={language === 'ta' ? 'அடுத்த பாடல்' : 'Next song'}
-                  >
-                    <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" />
-                    </svg>
-                  </button>
-                </div>
+                {/* Play/Pause Button */}
+                <button
+                  onClick={() => {
+                    if (isMusicPlaying) {
+                      musicAudioRef.current?.pause()
+                      setIsMusicPlaying(false)
+                    } else {
+                      musicAudioRef.current?.play()
+                      setIsMusicPlaying(true)
+                    }
+                  }}
+                  className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center transition-colors"
+                >
+                  {isMusicPlaying ? (
+                    <PauseIcon className="h-6 w-6 text-white" />
+                  ) : (
+                    <PlayIcon className="h-6 w-6 text-white ml-0.5" />
+                  )}
+                </button>
 
                 {/* Progress Bar */}
                 <div className="flex-1 hidden md:flex items-center gap-3">
@@ -501,13 +579,14 @@ function RadioPageContent() {
   )
 }
 
-export default function RadioPage() {
+export default function DigitalFMPage() {
   return (
     <div>
       <NewspaperHeader showTagline={true} />
       <NewHeader />
-      <RadioPageContent />
+      <DigitalFMPageContent />
     </div>
   )
 }
+
 

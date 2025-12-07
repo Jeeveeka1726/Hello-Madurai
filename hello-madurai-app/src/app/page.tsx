@@ -31,10 +31,10 @@ export default function RootPage() {
       color: 'bg-red-500'
     },
     {
-      nameEn: 'Radio',
-      nameTa: 'வானொலி',
-      descEn: 'Listen to Hello Madurai Radio',
-      descTa: 'ஹலோ மதுரை வானொலியைக் கேளுங்கள்',
+      nameEn: 'Digital FM',
+      nameTa: 'டிஜிட்டல் எஃப்.எம்',
+      descEn: 'Listen to Digital FM',
+      descTa: 'டிஜிட்டல் எஃப்.எம் கேளுங்கள்',
       href: '/radio',
       icon: MicrophoneIcon,
       color: 'bg-green-500'

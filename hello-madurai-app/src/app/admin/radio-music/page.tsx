@@ -445,8 +445,8 @@ export default function RadioMusicAdminPage() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Radio Music Management</h1>
-        <p className="text-gray-600 mt-2">Manage singers and their songs by category</p>
+        <h1 className="text-3xl font-bold text-gray-900">Digital FM Management</h1>
+        <p className="text-gray-600 mt-2">Manage speakers and their audios by category</p>
       </div>
 
       {/* Back Button (if singer selected) */}
@@ -460,7 +460,7 @@ export default function RadioMusicAdminPage() {
             }}
             className="bg-gray-200 text-gray-700 hover:bg-gray-300"
           >
-            ← Back to Singers
+            ← Back to Speakers
           </Button>
         </div>
       )}
@@ -469,7 +469,7 @@ export default function RadioMusicAdminPage() {
       {!selectedSinger && (
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Singers ({singers.length})</h2>
+            <h2 className="text-xl font-semibold">Speakers ({singers.length})</h2>
             <Button
               onClick={() => {
                 setShowSingerForm(!showSingerForm)
@@ -480,7 +480,7 @@ export default function RadioMusicAdminPage() {
               className="bg-blue-600 text-white hover:bg-blue-700"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
-              Add Singer
+              Add Speaker
             </Button>
           </div>
 
@@ -506,7 +506,7 @@ export default function RadioMusicAdminPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search singers..."
+                  placeholder="Search speakers..."
                   className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
                 <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
@@ -517,7 +517,7 @@ export default function RadioMusicAdminPage() {
           {/* Singer Form */}
           {showSingerForm && (
             <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-semibold mb-4">{editingSinger ? 'Edit Singer' : 'Add New Singer'}</h3>
+              <h3 className="text-lg font-semibold mb-4">{editingSinger ? 'Edit Speaker' : 'Add New Speaker'}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Name (English) *</label>
@@ -559,12 +559,12 @@ export default function RadioMusicAdminPage() {
                       onChange={(e) => setSingerFormData({ ...singerFormData, featured: e.target.checked })}
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm font-medium text-gray-700">Featured Singer ⭐</span>
+                    <span className="text-sm font-medium text-gray-700">Featured Speaker ⭐</span>
                   </label>
-                  <p className="text-xs text-gray-500 mt-1 ml-6">Featured singers appear first in the list</p>
+                  <p className="text-xs text-gray-500 mt-1 ml-6">Featured speakers appear first in the list</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Singer Image (400x400px)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Speaker Image (400x400px)</label>
 
                   {/* Image Preview */}
                   {(imagePreview || singerFormData.imageUrl) && (
@@ -637,7 +637,7 @@ export default function RadioMusicAdminPage() {
               </div>
               <div className="flex gap-2 mt-4">
                 <Button onClick={handleSaveSinger} className="bg-blue-600 text-white hover:bg-blue-700">
-                  {editingSinger ? 'Update Singer' : 'Create Singer'}
+                  {editingSinger ? 'Update Speaker' : 'Create Speaker'}
                 </Button>
                 <Button
                   onClick={() => {
@@ -658,7 +658,7 @@ export default function RadioMusicAdminPage() {
           {loading ? (
             <p className="text-center py-8 text-gray-500">Loading...</p>
           ) : filteredSingers.length === 0 ? (
-            <p className="text-center py-8 text-gray-500">No singers found. Create your first singer!</p>
+            <p className="text-center py-8 text-gray-500">No speakers found. Create your first speaker!</p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {filteredSingers.map((singer) => (
@@ -686,7 +686,7 @@ export default function RadioMusicAdminPage() {
                     <h3 className="font-semibold text-gray-900 truncate">{singer.name}</h3>
                     {singer.name_ta && <p className="text-sm text-gray-600 truncate">{singer.name_ta}</p>}
                     <p className="text-xs text-gray-500">{singer.category?.name}</p>
-                    <p className="text-xs text-blue-600 font-medium">{singer._count?.songs || 0} songs</p>
+                    <p className="text-xs text-blue-600 font-medium">{singer._count?.songs || 0} audios</p>
                   </div>
 
                   {/* Action Buttons */}
@@ -743,14 +743,14 @@ export default function RadioMusicAdminPage() {
               className="bg-blue-600 text-white hover:bg-blue-700"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
-              Add Song
+              Add Audio
             </Button>
           </div>
 
           {/* Song Form */}
           {showSongForm && (
             <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-semibold mb-4">{editingSong ? 'Edit Song' : 'Add New Song'}</h3>
+              <h3 className="text-lg font-semibold mb-4">{editingSong ? 'Edit Audio' : 'Add New Audio'}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Title (English) *</label>
@@ -832,7 +832,7 @@ export default function RadioMusicAdminPage() {
               </div>
               <div className="flex gap-2 mt-4">
                 <Button onClick={handleSaveSong} className="bg-blue-600 text-white hover:bg-blue-700">
-                  {editingSong ? 'Update Song' : 'Create Song'}
+                  {editingSong ? 'Update Audio' : 'Create Audio'}
                 </Button>
                 <Button
                   onClick={() => {
@@ -855,7 +855,7 @@ export default function RadioMusicAdminPage() {
           ) : songs.filter(s => s.singerId === selectedSinger.id).length === 0 ? (
             <div className="text-center py-12">
               <MusicalNoteIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No songs yet. Add your first song!</p>
+              <p className="text-gray-500">No audios yet. Add your first audio!</p>
             </div>
           ) : (
             <div className="space-y-3">
