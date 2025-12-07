@@ -98,10 +98,16 @@ export default function RadioMusicAdminPage() {
       // If no categories, create default ones
       if (data.length === 0) {
         const defaultCategories = [
-          { name: 'Songs', name_ta: 'பாடல்கள்', slug: 'songs', orderNumber: 1 },
-          { name: 'God Songs', name_ta: 'பக்தி பாடல்கள்', slug: 'god-songs', orderNumber: 2 },
-          { name: 'Speech', name_ta: 'சொற்பொழிவு', slug: 'speech', orderNumber: 3 },
-          { name: 'Comedy', name_ta: 'நகைச்சுவை', slug: 'comedy', orderNumber: 4 }
+          { name: 'Talk', name_ta: 'பேசுவோம்', slug: 'talk', orderNumber: 1 },
+          { name: 'Agri', name_ta: 'விவசாயம்', slug: 'agri', orderNumber: 2 },
+          { name: 'Spirituality', name_ta: 'ஆன்மீகம்', slug: 'spirituality', orderNumber: 3 },
+          { name: 'Business', name_ta: 'தொழில்', slug: 'business', orderNumber: 4 },
+          { name: 'Medical', name_ta: 'மருத்துவம்', slug: 'medical', orderNumber: 5 },
+          { name: 'Education', name_ta: 'கல்வி', slug: 'education', orderNumber: 6 },
+          { name: 'Women', name_ta: 'மகளிர்', slug: 'women', orderNumber: 7 },
+          { name: 'Motors', name_ta: 'வாகனங்கள்', slug: 'motors', orderNumber: 8 },
+          { name: 'Job', name_ta: 'வேலை', slug: 'job', orderNumber: 9 },
+          { name: 'Law', name_ta: 'சட்டம்', slug: 'law', orderNumber: 10 }
         ]
 
         for (const cat of defaultCategories) {
