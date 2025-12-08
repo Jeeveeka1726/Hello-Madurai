@@ -181,6 +181,8 @@ function DigitalFMPageContent() {
             .catch(err => console.error('Error fetching like statuses:', err))
         } else {
           console.log('ℹ️ No saved state found, will show artist grid')
+          // Mark restoration as complete even if no state to restore
+          setStateRestored(true)
         }
 
         if (savedCurrentSong) {
@@ -201,6 +203,8 @@ function DigitalFMPageContent() {
         }
       } catch (error) {
         console.error('❌ Error restoring state:', error)
+        // Mark restoration as complete even on error
+        setStateRestored(true)
       }
     }
 

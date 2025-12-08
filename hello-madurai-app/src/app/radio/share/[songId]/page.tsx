@@ -22,11 +22,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://hellomadurai.com'
-    const imageUrl = song.singer.imageUrl || `${baseUrl}/logo.jpg`
+
+    // Ensure image URL is absolute
+    let imageUrl = song.singer.imageUrl || `${baseUrl}/logo.jpg`
+
+    // If the image URL is from Cloudinary or already absolute, use it as is
+    // Otherwise, make it absolute
+    if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+      imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`
+    }
+
+    console.log('🖼️ Share metadata for song:', song.title, 'Image URL:', imageUrl)
 
     return {
       title: `${song.title} - ${song.singer.name} | Hello Madurai Digital FM`,
       description: `Listen to ${song.title} by ${song.singer.name} on Hello Madurai Digital FM`,
+      metadataBase: new URL(baseUrl),
       openGraph: {
         title: `${song.title} - ${song.singer.name}`,
         description: `Listen to ${song.title} by ${song.singer.name} on Hello Madurai Digital FM`,
@@ -39,13 +50,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           }
         ],
         type: 'music.song',
-        url: `${baseUrl}/radio/share/${songId}`
+        url: `${baseUrl}/radio/share/${songId}`,
+        siteName: 'Hello Madurai'
       },
       twitter: {
         card: 'summary_large_image',
         title: `${song.title} - ${song.singer.name}`,
         description: `Listen to ${song.title} by ${song.singer.name} on Hello Madurai Digital FM`,
-        images: [imageUrl]
+        images: [imageUrl],
+        site: '@hellomadurai'
       }
     }
   } catch (error) {
