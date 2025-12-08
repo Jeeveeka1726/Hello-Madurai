@@ -95,6 +95,107 @@ function DigitalFMPageContent() {
   const [musicDuration, setMusicDuration] = useState(0)
   const musicAudioRef = useRef<HTMLAudioElement>(null)
 
+  // Save playback state to localStorage
+  useEffect(() => {
+    if (currentSong) {
+      localStorage.setItem('radio_current_song', JSON.stringify(currentSong))
+      localStorage.setItem('radio_is_playing', isMusicPlaying.toString())
+    }
+  }, [currentSong, isMusicPlaying])
+
+  // Save state before page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (currentSong && musicAudioRef.current) {
+        localStorage.setItem('radio_current_time', musicAudioRef.current.currentTime.toString())
+        localStorage.setItem('radio_is_playing', (!musicAudioRef.current.paused).toString())
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [currentSong])
+
+  // Save selected singer to localStorage
+  useEffect(() => {
+    if (selectedSinger) {
+      localStorage.setItem('radio_selected_singer', JSON.stringify(selectedSinger))
+      localStorage.setItem('radio_songs', JSON.stringify(songs))
+    } else {
+      localStorage.removeItem('radio_selected_singer')
+      localStorage.removeItem('radio_songs')
+    }
+  }, [selectedSinger, songs])
+
+  // Restore state on mount
+  useEffect(() => {
+    const restoreState = async () => {
+      try {
+        const savedSinger = localStorage.getItem('radio_selected_singer')
+        const savedSongs = localStorage.getItem('radio_songs')
+        const savedCurrentSong = localStorage.getItem('radio_current_song')
+        const savedTime = localStorage.getItem('radio_current_time')
+        const savedIsPlaying = localStorage.getItem('radio_is_playing')
+
+        if (savedSinger && savedSongs) {
+          const singer = JSON.parse(savedSinger)
+          const songsData = JSON.parse(savedSongs)
+
+          setSelectedSinger(singer)
+          setSongs(songsData)
+
+          // Restore like statuses
+          const songIds = songsData.map((song: RadioSong) => song.id)
+          const likeStatusRes = await fetch('/api/radio-songs/likes/batch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ songIds })
+          })
+          const likeStatuses = await likeStatusRes.json()
+
+          const newLikedSongs = new Set<string>()
+          const newLikeCounts: Record<string, number> = {}
+
+          Object.entries(likeStatuses).forEach(([songId, status]: [string, any]) => {
+            if (status.liked) {
+              newLikedSongs.add(songId)
+            }
+            newLikeCounts[songId] = status.likeCount
+          })
+
+          setLikedSongs(newLikedSongs)
+          setLikeCounts(newLikeCounts)
+        }
+
+        if (savedCurrentSong) {
+          const song = JSON.parse(savedCurrentSong)
+          setCurrentSong(song)
+
+          // Restore playback position
+          if (savedTime && musicAudioRef.current) {
+            const time = parseFloat(savedTime)
+            setTimeout(() => {
+              if (musicAudioRef.current) {
+                musicAudioRef.current.currentTime = time
+                setMusicCurrentTime(time)
+
+                // Restore playing state
+                if (savedIsPlaying === 'true') {
+                  musicAudioRef.current.play()
+                  setIsMusicPlaying(true)
+                }
+              }
+            }, 500)
+          }
+        }
+      } catch (error) {
+        console.error('Error restoring state:', error)
+      }
+    }
+
+    restoreState()
+  }, [])
+
   // Close share menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -198,7 +299,14 @@ function DigitalFMPageContent() {
     const audio = musicAudioRef.current
     if (!audio) return
 
-    const handleTimeUpdate = () => setMusicCurrentTime(audio.currentTime)
+    const handleTimeUpdate = () => {
+      const currentTime = audio.currentTime
+      setMusicCurrentTime(currentTime)
+      // Save playback position every second
+      if (currentSong && Math.floor(currentTime) % 1 === 0) {
+        localStorage.setItem('radio_current_time', currentTime.toString())
+      }
+    }
     const handleLoadedMetadata = () => setMusicDuration(audio.duration)
     const handleEnded = () => setIsMusicPlaying(false)
 
@@ -211,7 +319,7 @@ function DigitalFMPageContent() {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
       audio.removeEventListener('ended', handleEnded)
     }
-  }, [])
+  }, [currentSong])
 
   // Update audio source when current song changes
   useEffect(() => {
@@ -327,14 +435,22 @@ function DigitalFMPageContent() {
   const handleShare = async (song: RadioSong, platform: 'whatsapp' | 'facebook' | 'copy') => {
     const url = `${window.location.origin}/radio?song=${song.id}`
     const title = language === 'ta' && song.title_ta ? song.title_ta : song.title
+    const artistName = selectedSinger
+      ? (language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name)
+      : ''
+    const artistImage = selectedSinger?.imageUrl || ''
+
+    // Create share text with artist info
+    const shareText = `${title}\n${language === 'ta' ? 'கலைஞர்' : 'Artist'}: ${artistName}\n\n${url}`
 
     try {
       if (platform === 'whatsapp') {
-        window.open(`https://wa.me/?text=${encodeURIComponent(`${title} - ${url}`)}`, '_blank')
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank')
       } else if (platform === 'facebook') {
+        // Facebook Open Graph will automatically fetch the image from the page meta tags
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank')
       } else {
-        await navigator.clipboard.writeText(url)
+        await navigator.clipboard.writeText(shareText)
         toast.success(language === 'ta' ? 'இணைப்பு நகலெடுக்கப்பட்டது' : 'Link copied!')
       }
 
