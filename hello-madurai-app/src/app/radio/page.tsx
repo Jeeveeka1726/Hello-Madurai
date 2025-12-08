@@ -9,7 +9,8 @@ import {
   ShareIcon,
   ChatBubbleLeftIcon,
   UserIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -691,7 +692,7 @@ function DigitalFMPageContent() {
                 <p className="mt-4 text-gray-600">Loading...</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+              <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 ${currentSong ? 'pb-32' : ''}`}>
                 {filteredSingers.map((singer, index) => {
                   const shouldShowAd = (index + 1) % 15 === 0 && ads.length > 0 // After 3 rows (5 cols x 3 rows = 15)
                   const adIndex = Math.floor(index / 15) % ads.length
@@ -843,7 +844,7 @@ function DigitalFMPageContent() {
             )}
 
             {/* Audio List */}
-            <div className="space-y-4">
+            <div className={`space-y-4 ${currentSong ? 'pb-32' : ''}`}>
               {loadingSongs ? (
                 // Loading skeleton
                 Array.from({ length: 3 }).map((_, i) => (
@@ -1028,6 +1029,29 @@ function DigitalFMPageContent() {
                   />
                   <span className="text-sm text-gray-600">{formatTime(musicDuration)}</span>
                 </div>
+
+                {/* Close Button */}
+                <button
+                  onClick={() => {
+                    // Stop the audio
+                    if (musicAudioRef.current) {
+                      musicAudioRef.current.pause()
+                      musicAudioRef.current.currentTime = 0
+                    }
+                    // Clear the current song
+                    setCurrentSong(null)
+                    setIsMusicPlaying(false)
+                    setMusicCurrentTime(0)
+                    setMusicDuration(0)
+                    // Clear saved state
+                    localStorage.removeItem('radio_current_song')
+                    localStorage.removeItem('radio_current_time')
+                  }}
+                  className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                  title={language === 'ta' ? 'மூடு' : 'Close'}
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
               </div>
             </div>
           </div>
