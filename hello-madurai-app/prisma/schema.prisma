@@ -95,13 +95,47 @@ model RadioShow {
   @@map("radio_shows")
 }
 
+model DirectoryCategory {
+  id            String                 @id @default(cuid())
+  name          String                 // English name
+  name_ta       String                 // Tamil name
+  slug          String                 @unique
+  icon          String?                // Icon name or emoji
+  orderNumber   Int                    @default(0)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  subcategories DirectorySubcategory[]
+  businesses    Business[]
+
+  @@map("directory_categories")
+}
+
+model DirectorySubcategory {
+  id         String            @id @default(cuid())
+  name       String            // English name
+  name_ta    String            // Tamil name
+  slug       String            @unique
+  categoryId String
+  category   DirectoryCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  businesses Business[]
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@index([categoryId])
+  @@map("directory_subcategories")
+}
+
 model Business {
-  id             String            @id @default(cuid())
+  id             String                @id @default(cuid())
   name           String
   name_ta        String?
   description    String
   description_ta String?
-  category       String
+  category       String? // Legacy field - will be deprecated
+  categoryId     String?
+  mainCategory   DirectoryCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  subcategoryId  String?
+  subcategory    DirectorySubcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
   phone          String?
   email          String?
   website        String?
@@ -112,12 +146,14 @@ model Business {
   bookingUrl     String?
   latitude       Float?
   longitude      Float?
-  featured       Boolean           @default(false)
-  verified       Boolean           @default(false)
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  featured       Boolean               @default(false)
+  verified       Boolean               @default(false)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
   comments       BusinessComment[]
 
+  @@index([categoryId])
+  @@index([subcategoryId])
   @@map("businesses")
 }
 
