@@ -217,8 +217,8 @@ function DigitalFMPageContent() {
       if (data && data.length > 0) {
         setSongs(data)
         setSelectedSinger(singer)
-        setCurrentSong(data[0])
-        setIsMusicPlaying(true)
+        // Don't auto-play or set current song
+        setIsMusicPlaying(false)
 
         // Batch fetch like statuses for all songs in one API call
         const songIds = data.map((song: RadioSong) => song.id)
@@ -241,10 +241,6 @@ function DigitalFMPageContent() {
 
         setLikedSongs(newLikedSongs)
         setLikeCounts(newLikeCounts)
-
-        setTimeout(() => {
-          musicAudioRef.current?.play()
-        }, 100)
       }
     } catch (error) {
       console.error('Error fetching songs:', error)
@@ -532,27 +528,25 @@ function DigitalFMPageContent() {
               {language === 'ta' ? 'பின் செல்' : 'Back'}
             </button>
 
-            {/* Artist Info */}
-            <div className="flex items-center gap-4 mb-8 bg-white p-6 rounded-lg shadow">
+            {/* Artist Info - Centered */}
+            <div className="flex flex-col items-center text-center mb-8 bg-white p-8 rounded-lg shadow">
               {selectedSinger.imageUrl ? (
                 <img
                   src={selectedSinger.imageUrl}
                   alt={selectedSinger.name}
-                  className="w-24 h-24 rounded-full object-contain"
+                  className="w-32 h-32 rounded-full object-contain mb-4"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
-                  <UserIcon className="h-12 w-12 text-gray-400" />
+                <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center mb-4">
+                  <UserIcon className="h-16 w-16 text-gray-400" />
                 </div>
               )}
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name}
-                </h2>
-                <p className="text-gray-600">
-                  {songs.length} {language === 'ta' ? 'ஆடியோக்கள்' : 'audios'}
-                </p>
-              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                {language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name}
+              </h2>
+              <p className="text-gray-600 text-lg">
+                {songs.length} {language === 'ta' ? 'ஆடியோக்கள்' : 'audios'}
+              </p>
             </div>
 
             {/* Comments Toggle */}
@@ -665,7 +659,7 @@ function DigitalFMPageContent() {
                           {language === 'ta' && song.title_ta ? song.title_ta : song.title}
                         </h4>
                         <p className="text-sm text-gray-500">
-                          {song.duration || '0:00'} • {song.plays} {language === 'ta' ? 'பார்வைகள்' : 'plays'}
+                          {formatDate(song.createdAt)} • {song.duration || '0:00'} • {song.plays} {language === 'ta' ? 'பார்வைகள்' : 'plays'}
                         </p>
                       </div>
 
