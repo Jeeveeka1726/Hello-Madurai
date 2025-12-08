@@ -84,13 +84,30 @@ function DigitalFMPageContent() {
   const [newComment, setNewComment] = useState('')
   const [commentAuthor, setCommentAuthor] = useState('')
   const [showComments, setShowComments] = useState(false)
-  
+
+  // Share menu state
+  const [openShareMenu, setOpenShareMenu] = useState<string | null>(null)
+
   // Music player state
   const [currentSong, setCurrentSong] = useState<RadioSong | null>(null)
   const [isMusicPlaying, setIsMusicPlaying] = useState(false)
   const [musicCurrentTime, setMusicCurrentTime] = useState(0)
   const [musicDuration, setMusicDuration] = useState(0)
   const musicAudioRef = useRef<HTMLAudioElement>(null)
+
+  // Close share menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openShareMenu) {
+        setOpenShareMenu(null)
+      }
+    }
+
+    if (openShareMenu) {
+      document.addEventListener('click', handleClickOutside)
+      return () => document.removeEventListener('click', handleClickOutside)
+    }
+  }, [openShareMenu])
 
   // Initialize session (only once)
   useEffect(() => {
@@ -679,30 +696,50 @@ function DigitalFMPageContent() {
                         </button>
 
                         {/* Share */}
-                        <div className="relative group">
-                          <button className="text-gray-600 hover:text-blue-600">
+                        <div className="relative">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setOpenShareMenu(openShareMenu === song.id ? null : song.id)
+                            }}
+                            className="text-gray-600 hover:text-blue-600"
+                          >
                             <ShareIcon className="h-5 w-5" />
                           </button>
-                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                            <button
-                              onClick={() => handleShare(song, 'whatsapp')}
-                              className="w-full px-4 py-2 text-left hover:bg-gray-100 rounded-t-lg"
+                          {openShareMenu === song.id && (
+                            <div
+                              onClick={(e) => e.stopPropagation()}
+                              className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10"
                             >
-                              WhatsApp
-                            </button>
-                            <button
-                              onClick={() => handleShare(song, 'facebook')}
-                              className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                            >
-                              Facebook
-                            </button>
-                            <button
-                              onClick={() => handleShare(song, 'copy')}
-                              className="w-full px-4 py-2 text-left hover:bg-gray-100 rounded-b-lg"
-                            >
-                              {language === 'ta' ? 'இணைப்பை நகலெடு' : 'Copy Link'}
-                            </button>
-                          </div>
+                              <button
+                                onClick={() => {
+                                  handleShare(song, 'whatsapp')
+                                  setOpenShareMenu(null)
+                                }}
+                                className="w-full px-4 py-2 text-left hover:bg-gray-100 rounded-t-lg"
+                              >
+                                WhatsApp
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleShare(song, 'facebook')
+                                  setOpenShareMenu(null)
+                                }}
+                                className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                              >
+                                Facebook
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleShare(song, 'copy')
+                                  setOpenShareMenu(null)
+                                }}
+                                className="w-full px-4 py-2 text-left hover:bg-gray-100 rounded-b-lg"
+                              >
+                                {language === 'ta' ? 'இணைப்பை நகலெடு' : 'Copy Link'}
+                              </button>
+                            </div>
+                          )}
                         </div>
 
                         {/* Shares Count */}
