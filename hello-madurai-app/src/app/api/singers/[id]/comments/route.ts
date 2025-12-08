@@ -15,16 +15,18 @@ export async function GET(
   try {
     const { id: singerId } = await params
 
+    // Fetch top-level comments with their replies
     const comments = await prisma.singerComment.findMany({
-      where: { singerId },
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        content: true,
-        author: true,
-        createdAt: true,
-        updatedAt: true
-      }
+      where: {
+        singerId,
+        parentId: null // Only top-level comments
+      },
+      include: {
+        replies: {
+          orderBy: { createdAt: 'asc' }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
     })
 
     return NextResponse.json(comments)
@@ -48,7 +50,7 @@ export async function POST(
   try {
     const { id: singerId } = await params
     const body = await request.json()
-    const { content, author } = body
+    const { content, author, parentId, isAdminReply } = body
 
     // Validate input
     if (!content || !author) {
@@ -72,26 +74,32 @@ export async function POST(
       )
     }
 
-    // Get session token from cookie
-    const sessionToken = request.cookies.get('session_token')?.value
-    
-    if (!sessionToken) {
-      return NextResponse.json(
-        { error: 'No session found. Please refresh the page.' },
-        { status: 401 }
-      )
-    }
+    // For admin replies, skip session validation
+    let userId = null
+    if (!isAdminReply) {
+      // Get session token from cookie
+      const sessionToken = request.cookies.get('session_token')?.value
 
-    // Find user by session token
-    const user = await prisma.anonymousUser.findUnique({
-      where: { sessionToken }
-    })
+      if (!sessionToken) {
+        return NextResponse.json(
+          { error: 'No session found. Please refresh the page.' },
+          { status: 401 }
+        )
+      }
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Invalid session. Please refresh the page.' },
-        { status: 401 }
-      )
+      // Find user by session token
+      const user = await prisma.anonymousUser.findUnique({
+        where: { sessionToken }
+      })
+
+      if (!user) {
+        return NextResponse.json(
+          { error: 'Invalid session. Please refresh the page.' },
+          { status: 401 }
+        )
+      }
+
+      userId = user.id
     }
 
     // Verify singer exists
@@ -106,20 +114,18 @@ export async function POST(
       )
     }
 
-    // Create comment
+    // Create comment or reply
     const comment = await prisma.singerComment.create({
       data: {
         content: content.trim(),
         author: author.trim(),
-        userId: user.id,
-        singerId
+        userId: userId,
+        singerId,
+        parentId: parentId || null,
+        isAdminReply: isAdminReply || false
       },
-      select: {
-        id: true,
-        content: true,
-        author: true,
-        createdAt: true,
-        updatedAt: true
+      include: {
+        replies: true
       }
     })
 

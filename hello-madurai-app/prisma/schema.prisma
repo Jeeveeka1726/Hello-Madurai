@@ -490,17 +490,22 @@ model SongLike {
 
 // Comments on singer/artist page
 model SingerComment {
-  id        String        @id @default(cuid())
-  content   String        @db.Text
-  author    String // Display name entered by user
-  userId    String
-  singerId  String
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  user      AnonymousUser @relation(fields: [userId], references: [id], onDelete: Cascade)
-  singer    Singer        @relation(fields: [singerId], references: [id], onDelete: Cascade)
+  id           String          @id @default(cuid())
+  content      String          @db.Text
+  author       String // Display name entered by user
+  userId       String?
+  singerId     String
+  parentId     String? // For replies
+  isAdminReply Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  user         AnonymousUser?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  singer       Singer          @relation(fields: [singerId], references: [id], onDelete: Cascade)
+  parent       SingerComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies      SingerComment[] @relation("CommentReplies")
 
   @@index([userId])
   @@index([singerId])
+  @@index([parentId])
   @@map("singer_comments")
 }
