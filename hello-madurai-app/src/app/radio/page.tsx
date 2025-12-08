@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Head from 'next/head'
 import {
   PlayIcon,
   PauseIcon,
@@ -171,19 +172,15 @@ function DigitalFMPageContent() {
           const song = JSON.parse(savedCurrentSong)
           setCurrentSong(song)
 
-          // Restore playback position
+          // Restore playback position but DON'T auto-play
           if (savedTime && musicAudioRef.current) {
             const time = parseFloat(savedTime)
             setTimeout(() => {
               if (musicAudioRef.current) {
                 musicAudioRef.current.currentTime = time
                 setMusicCurrentTime(time)
-
-                // Restore playing state
-                if (savedIsPlaying === 'true') {
-                  musicAudioRef.current.play()
-                  setIsMusicPlaying(true)
-                }
+                // Don't auto-play - user must click play button
+                setIsMusicPlaying(false)
               }
             }, 500)
           }
@@ -543,10 +540,25 @@ function DigitalFMPageContent() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <audio ref={musicAudioRef} />
+    <>
+      {/* Dynamic Meta Tags for Sharing */}
+      {selectedSinger && currentSong && (
+        <Head>
+          <meta property="og:title" content={`${language === 'ta' && currentSong.title_ta ? currentSong.title_ta : currentSong.title} - ${language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name}`} />
+          <meta property="og:description" content={`Listen to ${language === 'ta' && currentSong.title_ta ? currentSong.title_ta : currentSong.title} by ${language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name} on Hello Madurai Digital FM`} />
+          <meta property="og:image" content={selectedSinger.imageUrl || '/logo.jpg'} />
+          <meta property="og:type" content="music.song" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={`${language === 'ta' && currentSong.title_ta ? currentSong.title_ta : currentSong.title} - ${language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name}`} />
+          <meta name="twitter:description" content={`Listen to ${language === 'ta' && currentSong.title_ta ? currentSong.title_ta : currentSong.title} by ${language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name} on Hello Madurai Digital FM`} />
+          <meta name="twitter:image" content={selectedSinger.imageUrl || '/logo.jpg'} />
+        </Head>
+      )}
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen bg-gray-50">
+        <audio ref={musicAudioRef} />
+
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl" suppressHydrationWarning>
@@ -930,16 +942,17 @@ function DigitalFMPageContent() {
             </div>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
 export default function DigitalFMPage() {
   return (
     <>
-      <NewHeader />
       <NewspaperHeader />
+      <NewHeader />
       <DigitalFMPageContent />
     </>
   )

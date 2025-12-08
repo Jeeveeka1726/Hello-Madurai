@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
+import NewspaperHeader from '@/components/NewspaperHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Comments from '@/components/Comments'
@@ -525,6 +526,7 @@ function DirectoryPageContent() {
 export default function DirectoryPage() {
   return (
     <div>
+      <NewspaperHeader showTagline={true} />
       <NewHeader />
       <DirectoryPageContent />
     </div>

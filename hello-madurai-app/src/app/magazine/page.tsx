@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { DocumentArrowDownIcon, EyeIcon, CalendarIcon, FolderIcon, ChevronRightIcon, StarIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
+import NewspaperHeader from '@/components/NewspaperHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
@@ -234,6 +235,7 @@ function MagazinePageContent() {
 export default function MagazinePage() {
   return (
     <div>
+      <NewspaperHeader showTagline={true} />
       <NewHeader />
       <MagazinePageContent />
     </div>
