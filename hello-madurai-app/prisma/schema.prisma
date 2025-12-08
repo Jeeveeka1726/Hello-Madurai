@@ -424,16 +424,17 @@ model RadioCategory {
 }
 
 model Singer {
-  id         String        @id @default(cuid())
-  name       String        // Singer name
-  name_ta    String?       // Tamil name (optional)
-  imageUrl   String?       // 400x400px square image
-  featured   Boolean       @default(false) // Featured singer
+  id         String          @id @default(cuid())
+  name       String          // Singer name
+  name_ta    String?         // Tamil name (optional)
+  imageUrl   String?         // 400x400px square image
+  featured   Boolean         @default(false) // Featured singer
   categoryId String
-  category   RadioCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category   RadioCategory   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   songs      RadioSong[]
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  comments   SingerComment[]
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 
   @@index([categoryId])
   @@index([featured])
@@ -441,20 +442,65 @@ model Singer {
 }
 
 model RadioSong {
-  id        String   @id @default(cuid())
-  title     String   // Song title
-  title_ta  String?  // Tamil title (optional)
-  audioUrl  String   // Audio file URL
-  duration  String?  // Duration (e.g., "3:45")
-  plays     Int      @default(0)
-  likes     Int      @default(0)
-  shares    Int      @default(0)
-  comments  Int      @default(0)
+  id        String     @id @default(cuid())
+  title     String     // Song title
+  title_ta  String?    // Tamil title (optional)
+  audioUrl  String     // Audio file URL
+  duration  String?    // Duration (e.g., "3:45")
+  plays     Int        @default(0)
+  shares    Int        @default(0)
   singerId  String
-  singer    Singer   @relation(fields: [singerId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  singer    Singer     @relation(fields: [singerId], references: [id], onDelete: Cascade)
+  likes     SongLike[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   @@index([singerId])
   @@map("radio_songs")
+}
+
+// Anonymous user model for tracking interactions
+model AnonymousUser {
+  id           String          @id @default(cuid())
+  sessionToken String          @unique // Unique session token stored in cookie
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  lastSeenAt   DateTime        @default(now())
+  likes        SongLike[]
+  comments     SingerComment[]
+
+  @@index([sessionToken])
+  @@map("anonymous_users")
+}
+
+// Track which user liked which song
+model SongLike {
+  id        String        @id @default(cuid())
+  userId    String
+  songId    String
+  createdAt DateTime      @default(now())
+  user      AnonymousUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  song      RadioSong     @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, songId]) // One like per user per song
+  @@index([userId])
+  @@index([songId])
+  @@map("song_likes")
+}
+
+// Comments on singer/artist page
+model SingerComment {
+  id        String        @id @default(cuid())
+  content   String        @db.Text
+  author    String // Display name entered by user
+  userId    String
+  singerId  String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  user      AnonymousUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  singer    Singer        @relation(fields: [singerId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([singerId])
+  @@map("singer_comments")
 }
