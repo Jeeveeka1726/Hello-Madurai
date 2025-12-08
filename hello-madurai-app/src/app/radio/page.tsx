@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import Head from 'next/head'
 import {
   PlayIcon,
   PauseIcon,
@@ -128,7 +127,7 @@ function DigitalFMPageContent() {
     }
   }, [selectedSinger, songs])
 
-  // Restore state on mount
+  // Restore state on mount - BEFORE categories load
   useEffect(() => {
     const restoreState = async () => {
       try {
@@ -136,36 +135,39 @@ function DigitalFMPageContent() {
         const savedSongs = localStorage.getItem('radio_songs')
         const savedCurrentSong = localStorage.getItem('radio_current_song')
         const savedTime = localStorage.getItem('radio_current_time')
-        const savedIsPlaying = localStorage.getItem('radio_is_playing')
 
         if (savedSinger && savedSongs) {
           const singer = JSON.parse(savedSinger)
           const songsData = JSON.parse(savedSongs)
 
+          // Set state immediately to prevent showing artist grid
           setSelectedSinger(singer)
           setSongs(songsData)
+          setLoading(false) // Stop loading immediately
 
-          // Restore like statuses
+          // Restore like statuses in background
           const songIds = songsData.map((song: RadioSong) => song.id)
-          const likeStatusRes = await fetch('/api/radio-songs/likes/batch', {
+          fetch('/api/radio-songs/likes/batch', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ songIds })
           })
-          const likeStatuses = await likeStatusRes.json()
+            .then(res => res.json())
+            .then(likeStatuses => {
+              const newLikedSongs = new Set<string>()
+              const newLikeCounts: Record<string, number> = {}
 
-          const newLikedSongs = new Set<string>()
-          const newLikeCounts: Record<string, number> = {}
+              Object.entries(likeStatuses).forEach(([songId, status]: [string, any]) => {
+                if (status.liked) {
+                  newLikedSongs.add(songId)
+                }
+                newLikeCounts[songId] = status.likeCount
+              })
 
-          Object.entries(likeStatuses).forEach(([songId, status]: [string, any]) => {
-            if (status.liked) {
-              newLikedSongs.add(songId)
-            }
-            newLikeCounts[songId] = status.likeCount
-          })
-
-          setLikedSongs(newLikedSongs)
-          setLikeCounts(newLikeCounts)
+              setLikedSongs(newLikedSongs)
+              setLikeCounts(newLikeCounts)
+            })
+            .catch(err => console.error('Error fetching like statuses:', err))
         }
 
         if (savedCurrentSong) {
@@ -179,10 +181,9 @@ function DigitalFMPageContent() {
               if (musicAudioRef.current) {
                 musicAudioRef.current.currentTime = time
                 setMusicCurrentTime(time)
-                // Don't auto-play - user must click play button
                 setIsMusicPlaying(false)
               }
-            }, 500)
+            }, 300)
           }
         }
       } catch (error) {
@@ -191,6 +192,31 @@ function DigitalFMPageContent() {
     }
 
     restoreState()
+  }, [])
+
+  // Handle song query parameter from share links
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const songId = urlParams.get('song')
+
+    if (songId && !selectedSinger) {
+      // Fetch the song and its singer
+      fetch(`/api/radio-songs/${songId}`)
+        .then(res => res.json())
+        .then(async (song) => {
+          if (song && song.singer) {
+            // Fetch all songs by this singer
+            const songsRes = await fetch(`/api/radio-songs/singer/${song.singerId}`)
+            const songsData = await songsRes.json()
+
+            setSelectedSinger(song.singer)
+            setSongs(songsData)
+            setCurrentSong(song)
+            setLoading(false)
+          }
+        })
+        .catch(err => console.error('Error loading shared song:', err))
+    }
   }, [])
 
   // Close share menu when clicking outside
@@ -237,13 +263,18 @@ function DigitalFMPageContent() {
         const res = await fetch('/api/radio-categories')
         const data = await res.json()
         setCategories(data)
-        if (data.length > 0) {
+
+        // Only set selected category if not already restored from localStorage
+        if (data.length > 0 && !selectedSinger) {
           setSelectedCategory(data[0].id)
         }
       } catch (error) {
         console.error('Error fetching categories:', error)
       } finally {
-        setLoading(false)
+        // Only set loading to false if we didn't restore state
+        if (!selectedSinger) {
+          setLoading(false)
+        }
       }
     }
     fetchCategories()
@@ -430,22 +461,22 @@ function DigitalFMPageContent() {
   }
 
   const handleShare = async (song: RadioSong, platform: 'whatsapp' | 'facebook' | 'copy') => {
-    const url = `${window.location.origin}/radio?song=${song.id}`
+    // Use the share page URL which has proper Open Graph meta tags
+    const shareUrl = `${window.location.origin}/radio/share/${song.id}`
     const title = language === 'ta' && song.title_ta ? song.title_ta : song.title
     const artistName = selectedSinger
       ? (language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name)
       : ''
-    const artistImage = selectedSinger?.imageUrl || ''
 
     // Create share text with artist info
-    const shareText = `${title}\n${language === 'ta' ? 'கலைஞர்' : 'Artist'}: ${artistName}\n\n${url}`
+    const shareText = `${title}\n${language === 'ta' ? 'கலைஞர்' : 'Artist'}: ${artistName}\n\n${shareUrl}`
 
     try {
       if (platform === 'whatsapp') {
         window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank')
       } else if (platform === 'facebook') {
-        // Facebook Open Graph will automatically fetch the image from the page meta tags
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank')
+        // Facebook will fetch Open Graph meta tags from the share page
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank')
       } else {
         await navigator.clipboard.writeText(shareText)
         toast.success(language === 'ta' ? 'இணைப்பு நகலெடுக்கப்பட்டது' : 'Link copied!')
@@ -461,6 +492,9 @@ function DigitalFMPageContent() {
     } catch (error) {
       console.error('Error sharing:', error)
     }
+
+    // Close the share menu
+    setOpenShareMenu(null)
   }
 
   const handleSubmitComment = async () => {
@@ -540,23 +574,8 @@ function DigitalFMPageContent() {
   )
 
   return (
-    <>
-      {/* Dynamic Meta Tags for Sharing */}
-      {selectedSinger && currentSong && (
-        <Head>
-          <meta property="og:title" content={`${language === 'ta' && currentSong.title_ta ? currentSong.title_ta : currentSong.title} - ${language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name}`} />
-          <meta property="og:description" content={`Listen to ${language === 'ta' && currentSong.title_ta ? currentSong.title_ta : currentSong.title} by ${language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name} on Hello Madurai Digital FM`} />
-          <meta property="og:image" content={selectedSinger.imageUrl || '/logo.jpg'} />
-          <meta property="og:type" content="music.song" />
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:title" content={`${language === 'ta' && currentSong.title_ta ? currentSong.title_ta : currentSong.title} - ${language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name}`} />
-          <meta name="twitter:description" content={`Listen to ${language === 'ta' && currentSong.title_ta ? currentSong.title_ta : currentSong.title} by ${language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name} on Hello Madurai Digital FM`} />
-          <meta name="twitter:image" content={selectedSinger.imageUrl || '/logo.jpg'} />
-        </Head>
-      )}
-
-      <div className="min-h-screen bg-gray-50">
-        <audio ref={musicAudioRef} />
+    <div className="min-h-screen bg-gray-50">
+      <audio ref={musicAudioRef} />
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -944,7 +963,7 @@ function DigitalFMPageContent() {
         )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
