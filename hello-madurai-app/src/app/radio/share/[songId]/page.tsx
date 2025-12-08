@@ -3,13 +3,14 @@ import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 
 type Props = {
-  params: { songId: string }
+  params: Promise<{ songId: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
+    const { songId } = await params
     const song = await prisma.radioSong.findUnique({
-      where: { id: params.songId },
+      where: { id: songId },
       include: { singer: true }
     })
 
@@ -37,7 +38,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             alt: song.singer.name
           }
         ],
-        type: 'music.song'
+        type: 'music.song',
+        url: `${baseUrl}/radio/share/${songId}`
       },
       twitter: {
         card: 'summary_large_image',
@@ -56,7 +58,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function SharePage({ params }: Props) {
+  const { songId } = await params
   // Redirect to the main radio page with the song ID
-  redirect(`/radio?song=${params.songId}`)
+  redirect(`/radio?song=${songId}`)
 }
 

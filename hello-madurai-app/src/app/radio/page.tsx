@@ -78,7 +78,8 @@ function DigitalFMPageContent() {
   const [sessionToken, setSessionToken] = useState<string | null>(null)
   const [likedSongs, setLikedSongs] = useState<Set<string>>(new Set())
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({})
-  
+  const [stateRestored, setStateRestored] = useState(false)
+
   // Comments state
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
@@ -136,13 +137,22 @@ function DigitalFMPageContent() {
         const savedCurrentSong = localStorage.getItem('radio_current_song')
         const savedTime = localStorage.getItem('radio_current_time')
 
+        console.log('🔄 Attempting to restore state...', {
+          hasSinger: !!savedSinger,
+          hasSongs: !!savedSongs,
+          hasCurrentSong: !!savedCurrentSong
+        })
+
         if (savedSinger && savedSongs) {
           const singer = JSON.parse(savedSinger)
           const songsData = JSON.parse(savedSongs)
 
+          console.log('✅ Restoring artist view:', singer.name, 'with', songsData.length, 'songs')
+
           // Set state immediately to prevent showing artist grid
           setSelectedSinger(singer)
           setSongs(songsData)
+          setStateRestored(true)
           setLoading(false) // Stop loading immediately
 
           // Restore like statuses in background
@@ -168,6 +178,8 @@ function DigitalFMPageContent() {
               setLikeCounts(newLikeCounts)
             })
             .catch(err => console.error('Error fetching like statuses:', err))
+        } else {
+          console.log('ℹ️ No saved state found, will show artist grid')
         }
 
         if (savedCurrentSong) {
@@ -187,7 +199,7 @@ function DigitalFMPageContent() {
           }
         }
       } catch (error) {
-        console.error('Error restoring state:', error)
+        console.error('❌ Error restoring state:', error)
       }
     }
 
@@ -264,21 +276,27 @@ function DigitalFMPageContent() {
         const data = await res.json()
         setCategories(data)
 
-        // Only set selected category if not already restored from localStorage
-        if (data.length > 0 && !selectedSinger) {
+        console.log('📂 Categories loaded:', data.length, 'categories')
+
+        // Only set selected category if state was NOT restored
+        if (data.length > 0 && !stateRestored) {
           setSelectedCategory(data[0].id)
+          console.log('📌 Selected first category:', data[0].name)
         }
       } catch (error) {
         console.error('Error fetching categories:', error)
       } finally {
         // Only set loading to false if we didn't restore state
-        if (!selectedSinger) {
+        if (!stateRestored) {
           setLoading(false)
+          console.log('✅ Loading complete - showing artist grid')
+        } else {
+          console.log('✅ Loading complete - artist view already restored')
         }
       }
     }
     fetchCategories()
-  }, [])
+  }, [stateRestored])
 
   // Fetch ads
   useEffect(() => {
@@ -681,9 +699,14 @@ function DigitalFMPageContent() {
             {/* Back Button */}
             <button
               onClick={() => {
+                console.log('🔙 Going back to artist grid')
                 setSelectedSinger(null)
                 setSongs([])
                 setShowComments(false)
+                setStateRestored(false)
+                // Clear localStorage when going back
+                localStorage.removeItem('radio_selected_singer')
+                localStorage.removeItem('radio_songs')
               }}
               className="mb-6 flex items-center gap-2 text-blue-600 hover:text-blue-700"
             >
