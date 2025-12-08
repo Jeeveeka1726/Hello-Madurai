@@ -73,6 +73,7 @@ function DigitalFMPageContent() {
   const [songs, setSongs] = useState<RadioSong[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [loadingSongs, setLoadingSongs] = useState(false)
   const [ads, setAds] = useState<Ad[]>([])
   const [sessionToken, setSessionToken] = useState<string | null>(null)
   const [likedSongs, setLikedSongs] = useState<Set<string>>(new Set())
@@ -91,13 +92,22 @@ function DigitalFMPageContent() {
   const [musicDuration, setMusicDuration] = useState(0)
   const musicAudioRef = useRef<HTMLAudioElement>(null)
 
-  // Initialize session
+  // Initialize session (only once)
   useEffect(() => {
     const initSession = async () => {
       try {
+        // Check if we already have a session token cached
+        const cachedToken = sessionStorage.getItem('session_token')
+        if (cachedToken) {
+          setSessionToken(cachedToken)
+          return
+        }
+
         const res = await fetch('/api/auth/session')
         const data = await res.json()
         setSessionToken(data.sessionToken)
+        // Cache the session token
+        sessionStorage.setItem('session_token', data.sessionToken)
       } catch (error) {
         console.error('Error initializing session:', error)
       }
@@ -132,9 +142,14 @@ function DigitalFMPageContent() {
         if (response.ok) {
           const data = await response.json()
           setAds(data)
-          data.forEach((ad: Ad) => {
-            fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
-          })
+          // Track impressions asynchronously without blocking
+          if (data.length > 0) {
+            setTimeout(() => {
+              data.forEach((ad: Ad) => {
+                fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
+              })
+            }, 0)
+          }
         }
       } catch (error) {
         console.error('Error fetching ads:', error)
@@ -143,10 +158,9 @@ function DigitalFMPageContent() {
     fetchAds()
   }, [])
 
-  // Fetch comments when singer is selected
+  // Fetch comments only when user opens comments section (lazy loading)
   useEffect(() => {
-    if (!selectedSinger) {
-      setComments([])
+    if (!selectedSinger || !showComments) {
       return
     }
 
@@ -160,7 +174,7 @@ function DigitalFMPageContent() {
       }
     }
     fetchComments()
-  }, [selectedSinger])
+  }, [selectedSinger, showComments])
 
   // Music player effects
   useEffect(() => {
@@ -195,6 +209,7 @@ function DigitalFMPageContent() {
 
   // Handlers
   const handleSingerClick = async (singer: Singer) => {
+    setLoadingSongs(true)
     try {
       const res = await fetch(`/api/radio-songs/singer/${singer.id}`)
       const data = await res.json()
@@ -205,21 +220,23 @@ function DigitalFMPageContent() {
         setCurrentSong(data[0])
         setIsMusicPlaying(true)
 
-        // Fetch like status for all songs
-        const likeStatuses = await Promise.all(
-          data.map((song: RadioSong) =>
-            fetch(`/api/radio-songs/${song.id}/like`).then(r => r.json())
-          )
-        )
+        // Batch fetch like statuses for all songs in one API call
+        const songIds = data.map((song: RadioSong) => song.id)
+        const likeStatusRes = await fetch('/api/radio-songs/likes/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ songIds })
+        })
+        const likeStatuses = await likeStatusRes.json()
 
         const newLikedSongs = new Set<string>()
         const newLikeCounts: Record<string, number> = {}
 
-        likeStatuses.forEach((status, index) => {
+        Object.entries(likeStatuses).forEach(([songId, status]: [string, any]) => {
           if (status.liked) {
-            newLikedSongs.add(data[index].id)
+            newLikedSongs.add(songId)
           }
-          newLikeCounts[data[index].id] = status.likeCount
+          newLikeCounts[songId] = status.likeCount
         })
 
         setLikedSongs(newLikedSongs)
@@ -231,6 +248,9 @@ function DigitalFMPageContent() {
       }
     } catch (error) {
       console.error('Error fetching songs:', error)
+      toast.error(language === 'ta' ? 'பிழை ஏற்பட்டது' : 'Error loading songs')
+    } finally {
+      setLoadingSongs(false)
     }
   }
 
@@ -602,12 +622,30 @@ function DigitalFMPageContent() {
 
             {/* Audio List */}
             <div className="space-y-4">
-              {songs.map(song => {
-                const isLiked = likedSongs.has(song.id)
-                const likeCount = likeCounts[song.id] || 0
+              {loadingSongs ? (
+                // Loading skeleton
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="bg-white p-4 rounded-lg shadow animate-pulse">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 bg-gray-300 rounded-full"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      </div>
+                      <div className="flex gap-3">
+                        <div className="w-8 h-8 bg-gray-300 rounded"></div>
+                        <div className="w-8 h-8 bg-gray-300 rounded"></div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                songs.map(song => {
+                  const isLiked = likedSongs.has(song.id)
+                  const likeCount = likeCounts[song.id] || 0
 
-                return (
-                  <div key={song.id} className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow">
+                  return (
+                    <div key={song.id} className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
                       {/* Play Button */}
                       <button
@@ -679,7 +717,8 @@ function DigitalFMPageContent() {
                     </div>
                   </div>
                 )
-              })}
+              })
+              )}
             </div>
           </div>
         )}
