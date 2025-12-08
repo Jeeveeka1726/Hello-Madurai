@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { ChatBubbleLeftRightIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
 
@@ -143,16 +141,14 @@ export default function RadioCommentsPage() {
       </h1>
 
       {comments.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center text-gray-500">
-            {language === 'ta' ? 'கருத்துகள் இல்லை' : 'No comments yet'}
-          </CardContent>
-        </Card>
+        <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+          {language === 'ta' ? 'கருத்துகள் இல்லை' : 'No comments yet'}
+        </div>
       ) : (
         <div className="space-y-4">
           {comments.map((comment) => (
-            <Card key={comment.id} className="bg-white border-gray-200">
-              <CardContent className="p-6">
+            <div key={comment.id} className="bg-white border border-gray-200 rounded-lg shadow">
+              <div className="p-6">
                 {/* Artist Info */}
                 <div className="mb-4 pb-4 border-b border-gray-200">
                   <div className="flex items-center gap-3">
@@ -234,20 +230,18 @@ export default function RadioCommentsPage() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         <div className="flex gap-2 mt-3">
-                          <Button
-                            size="sm"
+                          <button
                             onClick={() => handleReply(comment.id)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium"
                           >
                             {language === 'ta' ? 'அனுப்பு' : 'Send'}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
+                          </button>
+                          <button
                             onClick={() => setReplyingTo(null)}
+                            className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-md text-sm font-medium"
                           >
                             {language === 'ta' ? 'ரத்து செய்' : 'Cancel'}
-                          </Button>
+                          </button>
                         </div>
                       </div>
                     )}
@@ -255,28 +249,24 @@ export default function RadioCommentsPage() {
 
                   {/* Actions */}
                   <div className="flex flex-col space-y-2 ml-4">
-                    <Button
-                      size="sm"
-                      variant="outline"
+                    <button
                       onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                      className="text-blue-600 hover:text-blue-700"
+                      className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded border border-gray-300"
                       title={language === 'ta' ? 'பதிலளி' : 'Reply'}
                     >
                       <ChatBubbleLeftRightIcon className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
+                    </button>
+                    <button
                       onClick={() => handleDelete(comment.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded border border-gray-300"
                       title={language === 'ta' ? 'நீக்கு' : 'Delete'}
                     >
                       <TrashIcon className="h-4 w-4" />
-                    </Button>
+                    </button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}
