@@ -353,16 +353,45 @@ function DigitalFMPageContent() {
         localStorage.setItem('radio_current_time', currentTime.toString())
       }
     }
-    const handleLoadedMetadata = () => setMusicDuration(audio.duration)
+
+    const handleLoadedMetadata = () => {
+      if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
+        setMusicDuration(audio.duration)
+        console.log('🎵 Audio duration loaded:', audio.duration, 'seconds')
+      }
+    }
+
+    const handleDurationChange = () => {
+      if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
+        setMusicDuration(audio.duration)
+        console.log('🎵 Audio duration changed:', audio.duration, 'seconds')
+      }
+    }
+
+    const handleCanPlay = () => {
+      if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
+        setMusicDuration(audio.duration)
+      }
+    }
+
     const handleEnded = () => setIsMusicPlaying(false)
 
     audio.addEventListener('timeupdate', handleTimeUpdate)
     audio.addEventListener('loadedmetadata', handleLoadedMetadata)
+    audio.addEventListener('durationchange', handleDurationChange)
+    audio.addEventListener('canplay', handleCanPlay)
     audio.addEventListener('ended', handleEnded)
+
+    // Check if duration is already available
+    if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
+      setMusicDuration(audio.duration)
+    }
 
     return () => {
       audio.removeEventListener('timeupdate', handleTimeUpdate)
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
+      audio.removeEventListener('durationchange', handleDurationChange)
+      audio.removeEventListener('canplay', handleCanPlay)
       audio.removeEventListener('ended', handleEnded)
     }
   }, [currentSong])
@@ -372,7 +401,13 @@ function DigitalFMPageContent() {
     const audio = musicAudioRef.current
     if (!audio || !currentSong) return
 
+    // Reset duration when changing songs
+    setMusicDuration(0)
+    setMusicCurrentTime(0)
+
     audio.src = currentSong.audioUrl
+    audio.load() // Force load the new audio
+
     if (isMusicPlaying) {
       audio.play().catch(err => console.error('Error playing audio:', err))
     }
@@ -427,8 +462,15 @@ function DigitalFMPageContent() {
         musicAudioRef.current?.pause()
         setIsMusicPlaying(false)
       } else {
-        musicAudioRef.current?.play()
-        setIsMusicPlaying(true)
+        const audio = musicAudioRef.current
+        if (audio) {
+          try {
+            await audio.play()
+            setIsMusicPlaying(true)
+          } catch (error) {
+            console.error('Error playing audio:', error)
+          }
+        }
       }
     } else {
       setCurrentSong(song)
@@ -683,7 +725,7 @@ function DigitalFMPageContent() {
                           {language === 'ta' && singer.name_ta ? singer.name_ta : singer.name}
                         </h3>
                         <p className="text-center text-sm text-gray-500">
-                          {singer._count?.songs || 0} {language === 'ta' ? 'ஆடியோக்கள்' : 'audios'}
+                          {singer._count?.songs || 0} {language === 'ta' ? 'ஆடியோக்கள்' : 'Audios'}
                         </p>
                       </div>
                       {shouldShowAd && renderAd(ads[adIndex], index)}
@@ -731,7 +773,7 @@ function DigitalFMPageContent() {
                 {language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name}
               </h2>
               <p className="text-gray-600 text-lg">
-                {songs.length} {language === 'ta' ? 'ஆடியோக்கள்' : 'audios'}
+                {songs.length} {language === 'ta' ? 'ஆடியோக்கள்' : 'Audios'}
               </p>
             </div>
 
@@ -930,13 +972,20 @@ function DigitalFMPageContent() {
               <div className="flex items-center gap-4">
                 {/* Play/Pause */}
                 <button
-                  onClick={() => {
+                  onClick={async () => {
+                    const audio = musicAudioRef.current
+                    if (!audio) return
+
                     if (isMusicPlaying) {
-                      musicAudioRef.current?.pause()
+                      audio.pause()
                       setIsMusicPlaying(false)
                     } else {
-                      musicAudioRef.current?.play()
-                      setIsMusicPlaying(true)
+                      try {
+                        await audio.play()
+                        setIsMusicPlaying(true)
+                      } catch (error) {
+                        console.error('Error playing audio:', error)
+                      }
                     }
                   }}
                   className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-full hover:bg-blue-700"
