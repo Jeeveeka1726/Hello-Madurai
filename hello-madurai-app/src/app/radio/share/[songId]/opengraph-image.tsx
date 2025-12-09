@@ -37,24 +37,34 @@ export default async function Image({ params }: { params: Promise<{ songId: stri
       throw new Error('Invalid song data')
     }
 
-    // Get image URL - Cloudinary URLs are already absolute
+    // Get image URL - convert relative URLs to absolute
     let imageUrl = song.singer.imageUrl
 
     // If no image, use default
     if (!imageUrl) {
       imageUrl = `${baseUrl}/logo.jpg`
+    } else if (imageUrl.startsWith('/api/')) {
+      // Convert relative database image URLs to absolute URLs
+      imageUrl = `${baseUrl}${imageUrl}`
     }
 
     console.log('🖼️ OG Image - Using image URL:', imageUrl)
 
     // Fetch the image as a buffer for better compatibility
     let imageBuffer: ArrayBuffer | null = null
-    if (imageUrl && imageUrl.startsWith('http')) {
+    if (imageUrl) {
       try {
-        const imgResponse = await fetch(imageUrl)
+        const imgResponse = await fetch(imageUrl, {
+          cache: 'no-store',
+          headers: {
+            'Accept': 'image/*',
+          }
+        })
         if (imgResponse.ok) {
           imageBuffer = await imgResponse.arrayBuffer()
-          console.log('✅ OG Image - Successfully fetched image buffer')
+          console.log('✅ OG Image - Successfully fetched image buffer, size:', imageBuffer.byteLength)
+        } else {
+          console.error('❌ OG Image - Failed to fetch image, status:', imgResponse.status)
         }
       } catch (err) {
         console.error('❌ OG Image - Failed to fetch image:', err)
