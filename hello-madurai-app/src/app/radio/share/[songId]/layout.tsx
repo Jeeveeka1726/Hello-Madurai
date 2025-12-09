@@ -36,36 +36,21 @@ export async function generateMetadata({
     const artistName = song.singer.name_ta || song.singer.name
     const description = `Listen to ${title} by ${artistName} on Hello Madurai Digital FM`
 
-    // Generate absolute URL for artist image
-    // Try multiple environment variables and fallback to production URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
-      || process.env.NEXT_PUBLIC_SITE_URL
-      || process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : 'https://hellomadurai.com'
-
+    // Generate absolute URL for artist image (same pattern as news/events)
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hellomadurai.com'
     const imageUrl = song.singer.imageUrl
       ? (song.singer.imageUrl.startsWith('http')
         ? song.singer.imageUrl
         : `${baseUrl}${song.singer.imageUrl}`)
       : `${baseUrl}/logo.jpg`
 
-    console.log('🖼️ FM Share Metadata (layout.tsx):', {
+    console.log('🖼️ FM Share Metadata:', {
       songId,
       title,
       artist: artistName,
       imageUrl,
-      baseUrl,
-      rawImageUrl: song.singer.imageUrl,
-      env: {
-        NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
-        NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-        VERCEL_URL: process.env.VERCEL_URL
-      }
+      baseUrl
     })
-
-    // Use API route for OG image generation
-    const ogImageUrl = `${baseUrl}/api/og/radio/${songId}`
 
     return {
       title: `${title} - ${artistName} | Hello Madurai Digital FM`,
@@ -75,9 +60,9 @@ export async function generateMetadata({
         description: 'Hello Madurai Digital FM',
         images: [
           {
-            url: ogImageUrl,
-            width: 1200,
-            height: 630,
+            url: imageUrl,
+            width: 1280,
+            height: 720,
             alt: `${artistName} - ${title}`,
           },
         ],
@@ -89,7 +74,7 @@ export async function generateMetadata({
         card: 'summary_large_image',
         title: `${title} - ${artistName}`,
         description: 'Hello Madurai Digital FM',
-        images: [ogImageUrl],
+        images: [imageUrl],
       },
     }
   } catch (error) {
