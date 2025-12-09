@@ -19,14 +19,25 @@ export default async function Image({ params }: { params: Promise<{ songId: stri
     })
 
     if (!response.ok) {
+      console.error('Failed to fetch song:', response.status, response.statusText)
       throw new Error('Song not found')
     }
 
     const song = await response.json()
+    console.log('Song data:', JSON.stringify(song, null, 2))
 
     if (!song || !song.singer) {
+      console.error('Invalid song data:', song)
       throw new Error('Invalid song data')
     }
+
+    // Ensure image URL is absolute
+    let imageUrl = song.singer.imageUrl
+    if (imageUrl && !imageUrl.startsWith('http')) {
+      imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`
+    }
+
+    console.log('Using image URL:', imageUrl)
 
     // Create image with artist photo
     return new ImageResponse(
@@ -44,7 +55,7 @@ export default async function Image({ params }: { params: Promise<{ songId: stri
             padding: 40,
           }}
         >
-          {song.singer.imageUrl && (
+          {imageUrl && (
             <div
               style={{
                 display: 'flex',
@@ -53,14 +64,16 @@ export default async function Image({ params }: { params: Promise<{ songId: stri
                 marginBottom: 30,
               }}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={song.singer.imageUrl}
+                src={imageUrl}
                 alt={song.singer.name}
                 width={400}
                 height={400}
                 style={{
                   borderRadius: '50%',
                   border: '8px solid white',
+                  objectFit: 'cover',
                 }}
               />
             </div>

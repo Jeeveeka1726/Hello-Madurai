@@ -276,7 +276,7 @@ function DigitalFMPageContent() {
     initSession()
   }, [])
 
-  // Fetch categories
+  // Fetch categories and all songs for search
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -291,6 +291,12 @@ function DigitalFMPageContent() {
           setSelectedCategory(data[0].id)
           console.log('📌 Selected first category:', data[0].name)
         }
+
+        // Load all songs for search functionality
+        const allSongsRes = await fetch('/api/radio-songs')
+        const allSongsData = await allSongsRes.json()
+        setSongs(allSongsData)
+        console.log('🎵 All songs loaded for search:', allSongsData.length, 'songs')
       } catch (error) {
         console.error('Error fetching categories:', error)
       } finally {
@@ -362,10 +368,39 @@ function DigitalFMPageContent() {
       }
     }
 
+    const updateSongDuration = async (durationInSeconds: number) => {
+      if (!currentSong) return
+
+      // Format duration as MM:SS
+      const minutes = Math.floor(durationInSeconds / 60)
+      const seconds = Math.floor(durationInSeconds % 60)
+      const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`
+
+      // Update in database if not already set or different
+      if (!currentSong.duration || currentSong.duration !== formattedDuration) {
+        try {
+          await fetch(`/api/radio-songs/${currentSong.id}/duration`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ duration: formattedDuration })
+          })
+
+          // Update local state
+          setCurrentSong(prev => prev ? { ...prev, duration: formattedDuration } : null)
+          setSongs(prev => prev.map(s =>
+            s.id === currentSong.id ? { ...s, duration: formattedDuration } : s
+          ))
+        } catch (error) {
+          console.error('Error updating song duration:', error)
+        }
+      }
+    }
+
     const handleLoadedMetadata = () => {
       if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
         setMusicDuration(audio.duration)
         console.log('🎵 Audio duration loaded:', audio.duration, 'seconds')
+        updateSongDuration(audio.duration)
       }
     }
 
@@ -373,12 +408,14 @@ function DigitalFMPageContent() {
       if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
         setMusicDuration(audio.duration)
         console.log('🎵 Audio duration changed:', audio.duration, 'seconds')
+        updateSongDuration(audio.duration)
       }
     }
 
     const handleCanPlay = () => {
       if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
         setMusicDuration(audio.duration)
+        updateSongDuration(audio.duration)
       }
     }
 
@@ -617,16 +654,47 @@ function DigitalFMPageContent() {
     })
   }
 
-  // Filter singers
-  const filteredSingers = categories
-    .find(cat => cat.id === selectedCategory)
-    ?.singers.filter(singer => {
-      if (!searchQuery) return true
-      return (
-        singer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        singer.name_ta?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    }) || []
+  // Enhanced filter - search across all categories and include song content
+  const getFilteredSingers = () => {
+    if (!searchQuery) {
+      // No search query - show singers from selected category
+      return categories
+        .find(cat => cat.id === selectedCategory)
+        ?.singers || []
+    }
+
+    // Search query exists - search across ALL categories
+    const query = searchQuery.toLowerCase()
+    const allSingers: Singer[] = []
+    const matchedSingerIds = new Set<string>()
+
+    categories.forEach(category => {
+      category.singers.forEach(singer => {
+        // Check if singer name matches
+        const singerNameMatch =
+          singer.name.toLowerCase().includes(query) ||
+          singer.name_ta?.toLowerCase().includes(query)
+
+        // Check if any song title matches
+        const songMatch = songs.some(song =>
+          song.singerId === singer.id && (
+            song.title.toLowerCase().includes(query) ||
+            song.title_ta?.toLowerCase().includes(query)
+          )
+        )
+
+        // Add singer if name or song matches (avoid duplicates)
+        if ((singerNameMatch || songMatch) && !matchedSingerIds.has(singer.id)) {
+          matchedSingerIds.add(singer.id)
+          allSingers.push(singer)
+        }
+      })
+    })
+
+    return allSingers
+  }
+
+  const filteredSingers = getFilteredSingers()
 
   // Render ad
   const renderAd = (ad: Ad, index: number) => (
@@ -671,11 +739,28 @@ function DigitalFMPageContent() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={language === 'ta' ? 'தேடுங்கள்...' : 'Search...'}
+                  placeholder={language === 'ta'
+                    ? 'கலைஞர்கள் அல்லது பாடல்களைத் தேடுங்கள்...'
+                    : 'Search artists or songs across all categories...'}
                   className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <MagnifyingGlassIcon className="h-6 w-6 text-gray-400 absolute left-4 top-3.5" />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600"
+                  >
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                )}
               </div>
+              {searchQuery && (
+                <p className="text-center text-sm text-gray-500 mt-2">
+                  {language === 'ta'
+                    ? `"${searchQuery}" க்கான முடிவுகள் - அனைத்து வகைகளிலும் தேடப்பட்டது`
+                    : `Results for "${searchQuery}" - searched across all categories`}
+                </p>
+              )}
             </div>
 
             {/* Category Tabs */}
