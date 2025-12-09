@@ -70,14 +70,6 @@ export async function generateMetadata({
       openGraph: {
         title: `${title} - ${artistName}`,
         description: 'Hello Madurai Digital FM',
-        images: [
-          {
-            url: imageUrl,
-            width: 1280,
-            height: 720,
-            alt: `${artistName} - ${title}`,
-          },
-        ],
         type: 'music.song',
         siteName: 'Hello Madurai',
         url: `${baseUrl}/radio/share/${songId}`,
@@ -86,7 +78,6 @@ export async function generateMetadata({
         card: 'summary_large_image',
         title: `${title} - ${artistName}`,
         description: 'Hello Madurai Digital FM',
-        images: [imageUrl],
       },
     }
   } catch (error) {
