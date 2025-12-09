@@ -220,6 +220,29 @@ function DigitalFMPageContent() {
     restoreState()
   }, [])
 
+  // Handle browser back/forward button
+  useEffect(() => {
+    const handlePopState = () => {
+      const artistSlug = new URLSearchParams(window.location.search).get('artist')
+
+      if (!artistSlug) {
+        // User navigated back to main /radio page
+        console.log('🔙 Browser back button - clearing artist view')
+        setSelectedSinger(null)
+        setSongs([])
+        setShowComments(false)
+        setCurrentSong(null)
+        setIsMusicPlaying(false)
+        localStorage.removeItem('radio_selected_singer')
+        localStorage.removeItem('radio_songs')
+        localStorage.removeItem('radio_current_song')
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
   // Handle artist slug from URL parameter
   useEffect(() => {
     const artistSlug = searchParams.get('artist')
@@ -302,6 +325,11 @@ function DigitalFMPageContent() {
       } else {
         console.log('❌ Singer not found for slug:', artistSlug)
       }
+    } else if (!artistSlug && selectedSinger) {
+      // URL has no artist param but we have a selected singer - clear it
+      console.log('🔄 No artist in URL, clearing selected singer')
+      setSelectedSinger(null)
+      setSongs([])
     }
   }, [searchParams, categories, allSongs, language, selectedSinger])
 
@@ -580,9 +608,9 @@ function DigitalFMPageContent() {
     setLoadingSongs(true)
 
     // Update URL immediately for better perceived performance
-    // Use replaceState to avoid adding to browser history
+    // Use pushState to ADD to browser history (so back button works)
     if (singer.slug) {
-      window.history.replaceState({}, '', `/radio?artist=${singer.slug}`)
+      window.history.pushState({}, '', `/radio?artist=${singer.slug}`)
     }
 
     try {
@@ -1101,24 +1129,8 @@ function DigitalFMPageContent() {
             <button
               onClick={() => {
                 console.log('🔙 Going back to artist grid')
-                // Clear all state
-                setSelectedSinger(null)
-                setSongs([])
-                setShowComments(false)
-                setStateRestored(false)
-                setCurrentSong(null)
-                setIsMusicPlaying(false)
-
-                // Clear localStorage
-                localStorage.removeItem('radio_selected_singer')
-                localStorage.removeItem('radio_songs')
-                localStorage.removeItem('radio_current_song')
-
-                // Navigate to clean /radio URL - use replaceState to avoid adding history entry
-                window.history.replaceState({}, '', '/radio')
-
-                // Force re-render by updating a key state
-                setSelectedCategory(categories.length > 0 ? categories[0].id : '')
+                // Use browser's back button - this will trigger popstate event
+                window.history.back()
               }}
               className="mb-6 flex items-center gap-2 text-blue-600 hover:text-blue-700"
             >
