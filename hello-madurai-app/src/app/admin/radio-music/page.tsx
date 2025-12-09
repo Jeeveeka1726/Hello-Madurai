@@ -12,7 +12,8 @@ import {
   UserIcon,
   MagnifyingGlassIcon,
   XMarkIcon,
-  PhotoIcon
+  PhotoIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
 
 interface RadioCategory {
@@ -50,6 +51,18 @@ interface RadioSong {
   singer?: Singer & { category?: RadioCategory }
 }
 
+interface Comment {
+  id: string
+  content: string
+  author: string
+  createdAt: string
+  isAdminReply: boolean
+  replies: Comment[]
+  _count: {
+    replies: number
+  }
+}
+
 export default function RadioMusicAdminPage() {
   const [categories, setCategories] = useState<RadioCategory[]>([])
   const [singers, setSingers] = useState<Singer[]>([])
@@ -66,6 +79,10 @@ export default function RadioMusicAdminPage() {
   const [imagePreview, setImagePreview] = useState<string>('')
   const [uploadingAudio, setUploadingAudio] = useState(false)
   const [audioPreview, setAudioPreview] = useState<string>('')
+  const [comments, setComments] = useState<Comment[]>([])
+  const [loadingComments, setLoadingComments] = useState(false)
+  const [replyingTo, setReplyingTo] = useState<string | null>(null)
+  const [replyContent, setReplyContent] = useState<Record<string, string>>({})
 
   const [singerFormData, setSingerFormData] = useState({
     name: '',
@@ -88,6 +105,12 @@ export default function RadioMusicAdminPage() {
     fetchSingers()
     fetchSongs()
   }, [])
+
+  useEffect(() => {
+    if (selectedSinger) {
+      fetchComments()
+    }
+  }, [selectedSinger])
 
   const initializeCategories = async () => {
     try {
@@ -413,6 +436,87 @@ export default function RadioMusicAdminPage() {
       singerId: song.singerId
     })
     setShowSongForm(true)
+  }
+
+  const fetchComments = async () => {
+    if (!selectedSinger) return
+
+    setLoadingComments(true)
+    try {
+      const response = await fetch(`/api/singers/${selectedSinger.id}/comments`)
+      const data = await response.json()
+      setComments(data || [])
+    } catch (error) {
+      console.error('Error fetching comments:', error)
+      toast.error('Failed to fetch comments')
+    } finally {
+      setLoadingComments(false)
+    }
+  }
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!confirm('Are you sure you want to delete this comment and all its replies?')) return
+
+    try {
+      const response = await fetch(`/api/admin/radio-comments/${commentId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        await fetchComments()
+        toast.success('Comment deleted!')
+      } else {
+        toast.error('Failed to delete comment')
+      }
+    } catch (error) {
+      console.error('Error deleting comment:', error)
+      toast.error('An error occurred')
+    }
+  }
+
+  const handleReplyToComment = async (commentId: string) => {
+    const content = replyContent[commentId]?.trim()
+    if (!content) {
+      toast.error('Please enter a reply')
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/radio-comments/${commentId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          author: 'Hello Madurai Admin',
+          content: content.trim(),
+        }),
+      })
+
+      if (response.ok) {
+        await fetchComments()
+        setReplyContent({ ...replyContent, [commentId]: '' })
+        setReplyingTo(null)
+        toast.success('Reply sent successfully!')
+      } else {
+        const error = await response.json()
+        toast.error(error.error || 'Failed to send reply')
+      }
+    } catch (error) {
+      console.error('Error sending reply:', error)
+      toast.error('An error occurred')
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 
   const filteredSingers = singers.filter(singer => {
@@ -901,6 +1005,107 @@ export default function RadioMusicAdminPage() {
                 ))}
             </div>
           )}
+
+          {/* Comments Section */}
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            <div className="flex items-center gap-2 mb-6">
+              <ChatBubbleLeftRightIcon className="h-6 w-6 text-gray-700" />
+              <h3 className="text-xl font-semibold text-gray-900">
+                Comments ({comments.length})
+              </h3>
+            </div>
+
+            {loadingComments ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="mt-2 text-gray-500">Loading comments...</p>
+              </div>
+            ) : comments.length === 0 ? (
+              <p className="text-center py-8 text-gray-500">No comments yet</p>
+            ) : (
+              <div className="space-y-4">
+                {comments.map((comment) => (
+                  <div key={comment.id} className="bg-gray-50 rounded-lg p-4">
+                    {/* Main Comment */}
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-gray-900">{comment.author}</span>
+                          {comment.isAdminReply && (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Admin</span>
+                          )}
+                          <span className="text-sm text-gray-500">{formatDate(comment.createdAt)}</span>
+                        </div>
+                        <p className="text-gray-700">{comment.content}</p>
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        <Button
+                          onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                          className="bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs py-1 px-2"
+                        >
+                          Reply
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteComment(comment.id)}
+                          className="bg-red-50 text-red-600 hover:bg-red-100 text-xs py-1 px-2"
+                        >
+                          <TrashIcon className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Reply Form */}
+                    {replyingTo === comment.id && (
+                      <div className="mt-3 ml-4 pl-4 border-l-2 border-blue-300">
+                        <textarea
+                          value={replyContent[comment.id] || ''}
+                          onChange={(e) => setReplyContent({ ...replyContent, [comment.id]: e.target.value })}
+                          placeholder="Write your reply..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          rows={3}
+                        />
+                        <div className="flex gap-2 mt-2">
+                          <Button
+                            onClick={() => handleReplyToComment(comment.id)}
+                            className="bg-blue-600 text-white hover:bg-blue-700 text-xs py-1 px-3"
+                          >
+                            Send Reply
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setReplyingTo(null)
+                              setReplyContent({ ...replyContent, [comment.id]: '' })
+                            }}
+                            className="bg-gray-200 text-gray-700 hover:bg-gray-300 text-xs py-1 px-3"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Replies */}
+                    {comment.replies && comment.replies.length > 0 && (
+                      <div className="mt-3 ml-4 pl-4 border-l-2 border-gray-300 space-y-3">
+                        {comment.replies.map((reply) => (
+                          <div key={reply.id} className="bg-white rounded p-3">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-semibold text-gray-900 text-sm">{reply.author}</span>
+                              {reply.isAdminReply && (
+                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Admin</span>
+                              )}
+                              <span className="text-xs text-gray-500">{formatDate(reply.createdAt)}</span>
+                            </div>
+                            <p className="text-gray-700 text-sm">{reply.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </Card>
       )}
     </div>
