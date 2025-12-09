@@ -667,11 +667,6 @@ function DigitalFMPageContent() {
   }
 
   const handleLike = async (songId: string) => {
-    if (!sessionToken) {
-      toast.error(language === 'ta' ? 'தயவுசெய்து பக்கத்தை புதுப்பிக்கவும்' : 'Please refresh the page')
-      return
-    }
-
     const isLiked = likedSongs.has(songId)
     const method = isLiked ? 'DELETE' : 'POST'
 
@@ -695,34 +690,27 @@ function DigitalFMPageContent() {
     }))
 
     try {
-      const res = await fetch(`/api/radio-songs/${songId}/like`, { method })
-      const data = await res.json()
+      const res = await fetch(`/api/radio-songs/${songId}/like`, {
+        method,
+        credentials: 'include' // Ensure cookies are sent
+      })
 
-      if (res.ok) {
-        // Update with actual count from server
-        setLikeCounts(prev => ({
-          ...prev,
-          [songId]: data.likeCount
-        }))
-      } else {
-        // Revert on error
-        setLikedSongs(prev => {
-          const newSet = new Set(prev)
-          if (isLiked) {
-            newSet.add(songId)
-          } else {
-            newSet.delete(songId)
-          }
-          return newSet
-        })
-        setLikeCounts(prev => ({
-          ...prev,
-          [songId]: currentCount
-        }))
-        toast.error(language === 'ta' ? 'பிழை ஏற்பட்டது' : 'Error occurred')
+      if (!res.ok) {
+        const data = await res.json()
+        console.error('❌ Like API error:', data)
+        throw new Error(data.error || 'Failed to update like')
       }
+
+      const data = await res.json()
+      console.log('✅ Like updated:', { songId, liked: data.liked, count: data.likeCount })
+
+      // Update with actual count from server
+      setLikeCounts(prev => ({
+        ...prev,
+        [songId]: data.likeCount
+      }))
     } catch (error) {
-      console.error('Error toggling like:', error)
+      console.error('❌ Error toggling like:', error)
       // Revert on error
       setLikedSongs(prev => {
         const newSet = new Set(prev)
