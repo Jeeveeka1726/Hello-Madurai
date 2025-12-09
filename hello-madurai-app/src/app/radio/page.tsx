@@ -580,8 +580,9 @@ function DigitalFMPageContent() {
     setLoadingSongs(true)
 
     // Update URL immediately for better perceived performance
+    // Use replaceState to avoid adding to browser history
     if (singer.slug) {
-      router.replace(`/radio?artist=${singer.slug}`, { scroll: false })
+      window.history.replaceState({}, '', `/radio?artist=${singer.slug}`)
     }
 
     try {
@@ -1100,15 +1101,24 @@ function DigitalFMPageContent() {
             <button
               onClick={() => {
                 console.log('🔙 Going back to artist grid')
+                // Clear all state
                 setSelectedSinger(null)
                 setSongs([])
                 setShowComments(false)
                 setStateRestored(false)
-                // Clear URL parameter - use replace to avoid adding to history
-                router.replace('/radio', { scroll: false })
-                // Clear localStorage when going back
+                setCurrentSong(null)
+                setIsMusicPlaying(false)
+
+                // Clear localStorage
                 localStorage.removeItem('radio_selected_singer')
                 localStorage.removeItem('radio_songs')
+                localStorage.removeItem('radio_current_song')
+
+                // Navigate to clean /radio URL
+                window.history.pushState({}, '', '/radio')
+
+                // Force re-render by updating a key state
+                setSelectedCategory(categories.length > 0 ? categories[0].id : '')
               }}
               className="mb-6 flex items-center gap-2 text-blue-600 hover:text-blue-700"
             >
