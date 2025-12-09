@@ -463,6 +463,7 @@ model Singer {
   id         String          @id @default(cuid())
   name       String          // Singer name
   name_ta    String?         // Tamil name (optional)
+  slug       String?         @unique // URL-friendly slug for persistent URLs
   imageUrl   String?         // 400x400px square image
   featured   Boolean         @default(false) // Featured singer
   categoryId String
@@ -474,6 +475,7 @@ model Singer {
 
   @@index([categoryId])
   @@index([featured])
+  @@index([slug])
   @@map("singers")
 }
 

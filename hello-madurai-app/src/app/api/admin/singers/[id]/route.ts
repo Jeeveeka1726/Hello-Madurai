@@ -9,12 +9,39 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    
+
+    // Get current singer to check if name changed
+    const currentSinger = await prisma.singer.findUnique({ where: { id } })
+
+    let slug = currentSinger?.slug
+
+    // If name changed, regenerate slug
+    if (currentSinger && body.name !== currentSinger.name) {
+      slug = body.name
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+        .trim()
+
+      // Check if slug already exists (excluding current singer)
+      let counter = 1
+      let uniqueSlug = slug
+      while (true) {
+        const existing = await prisma.singer.findUnique({ where: { slug: uniqueSlug } })
+        if (!existing || existing.id === id) break
+        uniqueSlug = `${slug}-${counter}`
+        counter++
+      }
+      slug = uniqueSlug
+    }
+
     const singer = await prisma.singer.update({
       where: { id },
       data: {
         name: body.name,
         name_ta: body.name_ta || null,
+        slug: slug || undefined,
         imageUrl: body.imageUrl || null,
         featured: body.featured !== undefined ? body.featured : false,
         categoryId: body.categoryId

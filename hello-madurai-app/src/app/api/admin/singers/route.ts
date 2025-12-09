@@ -36,10 +36,27 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
+    // Generate slug from name
+    let slug = body.name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .trim()
+
+    // Check if slug already exists and make it unique
+    let counter = 1
+    let uniqueSlug = slug
+    while (await prisma.singer.findUnique({ where: { slug: uniqueSlug } })) {
+      uniqueSlug = `${slug}-${counter}`
+      counter++
+    }
+
     const singer = await prisma.singer.create({
       data: {
         name: body.name,
         name_ta: body.name_ta || null,
+        slug: uniqueSlug,
         imageUrl: body.imageUrl || null,
         featured: body.featured || false,
         categoryId: body.categoryId

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   PlayIcon,
   PauseIcon,
@@ -30,6 +31,7 @@ interface Singer {
   id: string
   name: string
   name_ta: string | null
+  slug: string | null
   imageUrl: string | null
   featured: boolean
   _count?: {
@@ -68,12 +70,15 @@ interface Comment {
 
 function DigitalFMPageContent() {
   const { language } = useLanguage()
-  
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
   // State
   const [categories, setCategories] = useState<RadioCategory[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [selectedSinger, setSelectedSinger] = useState<Singer | null>(null)
   const [songs, setSongs] = useState<RadioSong[]>([])
+  const [allSongs, setAllSongs] = useState<RadioSong[]>([]) // All songs for search
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [loadingSongs, setLoadingSongs] = useState(false)
@@ -214,6 +219,27 @@ function DigitalFMPageContent() {
     restoreState()
   }, [])
 
+  // Handle artist slug from URL parameter
+  useEffect(() => {
+    const artistSlug = searchParams.get('artist')
+
+    if (artistSlug && categories.length > 0 && !selectedSinger) {
+      // Find singer by slug across all categories
+      let foundSinger: Singer | null = null
+      for (const category of categories) {
+        const singer = category.singers.find(s => s.slug === artistSlug)
+        if (singer) {
+          foundSinger = singer
+          break
+        }
+      }
+
+      if (foundSinger) {
+        handleSingerClick(foundSinger)
+      }
+    }
+  }, [searchParams, categories])
+
   // Handle song query parameter from share links
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -295,7 +321,7 @@ function DigitalFMPageContent() {
         // Load all songs for search functionality
         const allSongsRes = await fetch('/api/radio-songs')
         const allSongsData = await allSongsRes.json()
-        setSongs(allSongsData)
+        setAllSongs(allSongsData)
         console.log('🎵 All songs loaded for search:', allSongsData.length, 'songs')
       } catch (error) {
         console.error('Error fetching categories:', error)
@@ -379,17 +405,23 @@ function DigitalFMPageContent() {
       // Update in database if not already set or different
       if (!currentSong.duration || currentSong.duration !== formattedDuration) {
         try {
-          await fetch(`/api/radio-songs/${currentSong.id}/duration`, {
+          const response = await fetch(`/api/radio-songs/${currentSong.id}/duration`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ duration: formattedDuration })
           })
 
-          // Update local state
-          setCurrentSong(prev => prev ? { ...prev, duration: formattedDuration } : null)
-          setSongs(prev => prev.map(s =>
-            s.id === currentSong.id ? { ...s, duration: formattedDuration } : s
-          ))
+          if (response.ok) {
+            // Update local state
+            setCurrentSong(prev => prev ? { ...prev, duration: formattedDuration } : null)
+            setSongs(prev => prev.map(s =>
+              s.id === currentSong.id ? { ...s, duration: formattedDuration } : s
+            ))
+            // Also update allSongs for search
+            setAllSongs(prev => prev.map(s =>
+              s.id === currentSong.id ? { ...s, duration: formattedDuration } : s
+            ))
+          }
         } catch (error) {
           console.error('Error updating song duration:', error)
         }
@@ -466,10 +498,21 @@ function DigitalFMPageContent() {
       const data = await res.json()
 
       if (data && data.length > 0) {
-        setSongs(data)
+        // Merge with existing duration data from allSongs
+        const mergedData = data.map((song: RadioSong) => {
+          const existingSong = allSongs.find(s => s.id === song.id)
+          return existingSong && existingSong.duration ? existingSong : song
+        })
+
+        setSongs(mergedData)
         setSelectedSinger(singer)
         // Don't auto-play or set current song
         setIsMusicPlaying(false)
+
+        // Update URL with singer slug
+        if (singer.slug) {
+          router.push(`/radio?artist=${singer.slug}`, { scroll: false })
+        }
 
         // Batch fetch like statuses for all songs in one API call
         const songIds = data.map((song: RadioSong) => song.id)
@@ -676,7 +719,7 @@ function DigitalFMPageContent() {
           singer.name_ta?.toLowerCase().includes(query)
 
         // Check if any song title matches
-        const songMatch = songs.some(song =>
+        const songMatch = allSongs.some(song =>
           song.singerId === singer.id && (
             song.title.toLowerCase().includes(query) ||
             song.title_ta?.toLowerCase().includes(query)
@@ -844,6 +887,8 @@ function DigitalFMPageContent() {
                 setSongs([])
                 setShowComments(false)
                 setStateRestored(false)
+                // Clear URL parameter
+                router.push('/radio', { scroll: false })
                 // Clear localStorage when going back
                 localStorage.removeItem('radio_selected_singer')
                 localStorage.removeItem('radio_songs')
