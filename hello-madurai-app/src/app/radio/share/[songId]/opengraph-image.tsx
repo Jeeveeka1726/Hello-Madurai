@@ -15,7 +15,8 @@ export default async function Image({ params }: { params: Promise<{ songId: stri
     // Fetch song data from API instead of using Prisma (to reduce bundle size)
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://hellomadurai.com'
     const response = await fetch(`${baseUrl}/api/radio-songs/${songId}`, {
-      cache: 'no-store'
+      cache: 'no-store',
+      next: { revalidate: 0 }
     })
 
     if (!response.ok) {
@@ -24,20 +25,41 @@ export default async function Image({ params }: { params: Promise<{ songId: stri
     }
 
     const song = await response.json()
-    console.log('Song data:', JSON.stringify(song, null, 2))
+    console.log('🎵 OG Image - Song data:', {
+      id: song.id,
+      title: song.title,
+      singer: song.singer?.name,
+      imageUrl: song.singer?.imageUrl
+    })
 
     if (!song || !song.singer) {
       console.error('Invalid song data:', song)
       throw new Error('Invalid song data')
     }
 
-    // Ensure image URL is absolute
+    // Get image URL - Cloudinary URLs are already absolute
     let imageUrl = song.singer.imageUrl
-    if (imageUrl && !imageUrl.startsWith('http')) {
-      imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`
+
+    // If no image, use default
+    if (!imageUrl) {
+      imageUrl = `${baseUrl}/logo.jpg`
     }
 
-    console.log('Using image URL:', imageUrl)
+    console.log('🖼️ OG Image - Using image URL:', imageUrl)
+
+    // Fetch the image as a buffer for better compatibility
+    let imageBuffer: ArrayBuffer | null = null
+    if (imageUrl && imageUrl.startsWith('http')) {
+      try {
+        const imgResponse = await fetch(imageUrl)
+        if (imgResponse.ok) {
+          imageBuffer = await imgResponse.arrayBuffer()
+          console.log('✅ OG Image - Successfully fetched image buffer')
+        }
+      } catch (err) {
+        console.error('❌ OG Image - Failed to fetch image:', err)
+      }
+    }
 
     // Create image with artist photo
     return new ImageResponse(
@@ -55,7 +77,7 @@ export default async function Image({ params }: { params: Promise<{ songId: stri
             padding: 40,
           }}
         >
-          {imageUrl && (
+          {imageBuffer && (
             <div
               style={{
                 display: 'flex',
@@ -66,10 +88,11 @@ export default async function Image({ params }: { params: Promise<{ songId: stri
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={imageUrl}
+                // @ts-ignore
+                src={imageBuffer}
                 alt={song.singer.name}
-                width={400}
-                height={400}
+                width={300}
+                height={300}
                 style={{
                   borderRadius: '50%',
                   border: '8px solid white',

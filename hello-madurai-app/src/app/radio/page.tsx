@@ -235,10 +235,49 @@ function DigitalFMPageContent() {
       }
 
       if (foundSinger) {
-        handleSingerClick(foundSinger)
+        // Directly load singer's songs without calling handleSingerClick to avoid dependency issues
+        setLoadingSongs(true)
+        fetch(`/api/radio-songs/singer/${foundSinger.id}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.length > 0) {
+              // Merge with existing duration data from allSongs
+              const mergedData = data.map((song: RadioSong) => {
+                const existingSong = allSongs.find(s => s.id === song.id)
+                return existingSong && existingSong.duration ? existingSong : song
+              })
+
+              setSongs(mergedData)
+              setSelectedSinger(foundSinger)
+              setIsMusicPlaying(false)
+
+              // Batch fetch like statuses
+              const userId = sessionStorage.getItem('anonymousUserId')
+              if (userId && mergedData.length > 0) {
+                const songIds = mergedData.map((s: RadioSong) => s.id)
+                fetch('/api/radio-songs/likes/batch', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ songIds, userId })
+                })
+                  .then(res => res.json())
+                  .then(likeData => {
+                    setLikedSongs(new Set(likeData.likedSongIds))
+                  })
+                  .catch(err => console.error('Error fetching likes:', err))
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching songs:', error)
+            toast.error(language === 'ta' ? 'பிழை ஏற்பட்டது' : 'Error loading songs')
+          })
+          .finally(() => {
+            setLoadingSongs(false)
+          })
       }
     }
-  }, [searchParams, categories])
+  }, [searchParams, categories, allSongs, language])
 
   // Handle song query parameter from share links
   useEffect(() => {
@@ -713,16 +752,8 @@ function DigitalFMPageContent() {
           singer.name.toLowerCase().includes(query) ||
           singer.name_ta?.toLowerCase().includes(query)
 
-        // Check if any song title matches
-        const songMatch = allSongs.some(song =>
-          song.singerId === singer.id && (
-            song.title.toLowerCase().includes(query) ||
-            song.title_ta?.toLowerCase().includes(query)
-          )
-        )
-
-        // Add singer if name or song matches (avoid duplicates)
-        if ((singerNameMatch || songMatch) && !matchedSingerIds.has(singer.id)) {
+        // Add singer if name matches (prioritize artist matches)
+        if (singerNameMatch && !matchedSingerIds.has(singer.id)) {
           matchedSingerIds.add(singer.id)
           allSingers.push(singer)
         }
@@ -732,7 +763,19 @@ function DigitalFMPageContent() {
     return allSingers
   }
 
+  // Get matching songs for search
+  const getFilteredSongs = () => {
+    if (!searchQuery) return []
+
+    const query = searchQuery.toLowerCase()
+    return allSongs.filter(song =>
+      song.title.toLowerCase().includes(query) ||
+      song.title_ta?.toLowerCase().includes(query)
+    )
+  }
+
   const filteredSingers = getFilteredSingers()
+  const filteredSongs = getFilteredSongs()
 
   // Render ad
   const renderAd = (ad: Ad, index: number) => (
@@ -827,48 +870,135 @@ function DigitalFMPageContent() {
                 <p className="mt-4 text-gray-600">Loading...</p>
               </div>
             ) : (
-              <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 ${currentSong ? 'pb-32' : ''}`}>
-                {filteredSingers.map((singer, index) => {
-                  const shouldShowAd = (index + 1) % 15 === 0 && ads.length > 0 // After 3 rows (5 cols x 3 rows = 15)
-                  const adIndex = Math.floor(index / 15) % ads.length
-
-                  return (
-                    <>
-                      <div
-                        key={singer.id}
-                        onClick={() => handleSingerClick(singer)}
-                        className="cursor-pointer group"
-                      >
-                        <div className="relative aspect-square mb-3 overflow-hidden rounded-full bg-gray-200 group-hover:ring-4 group-hover:ring-blue-300 transition-all">
-                          {singer.imageUrl ? (
-                            <img
-                              src={singer.imageUrl}
-                              alt={singer.name}
-                              className="w-full h-full object-contain"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <UserIcon className="h-1/2 w-1/2 text-gray-400" />
-                            </div>
-                          )}
-                          {singer.featured && (
-                            <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 rounded-full p-1">
-                              <span className="text-xs font-bold">⭐</span>
-                            </div>
-                          )}
+              <>
+                {/* Artists Section - Show when searching */}
+                {searchQuery && filteredSingers.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      {language === 'ta' ? 'கலைஞர்கள்' : 'Artists'} ({filteredSingers.length})
+                    </h3>
+                    <div className="flex gap-4 overflow-x-auto pb-4">
+                      {filteredSingers.map((singer) => (
+                        <div
+                          key={singer.id}
+                          onClick={() => handleSingerClick(singer)}
+                          className="cursor-pointer group flex-shrink-0"
+                        >
+                          <div className="relative w-24 h-24 mb-2 overflow-hidden rounded-full bg-gray-200 group-hover:ring-4 group-hover:ring-blue-300 transition-all">
+                            {singer.imageUrl ? (
+                              <img
+                                src={singer.imageUrl}
+                                alt={singer.name}
+                                className="w-full h-full object-contain"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <UserIcon className="h-12 w-12 text-gray-400" />
+                              </div>
+                            )}
+                          </div>
+                          <p className="text-center text-sm font-medium text-gray-900 w-24 truncate">
+                            {language === 'ta' && singer.name_ta ? singer.name_ta : singer.name}
+                          </p>
                         </div>
-                        <h3 className="text-center font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                          {language === 'ta' && singer.name_ta ? singer.name_ta : singer.name}
-                        </h3>
-                        <p className="text-center text-sm text-gray-500">
-                          {singer._count?.songs || 0} {language === 'ta' ? 'ஆடியோக்கள்' : 'Audios'}
-                        </p>
-                      </div>
-                      {shouldShowAd && renderAd(ads[adIndex], index)}
-                    </>
-                  )
-                })}
-              </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Songs Section - Show when searching */}
+                {searchQuery && filteredSongs.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      {language === 'ta' ? 'ஆடியோ கோப்புகள்' : 'Audio Files'} ({filteredSongs.length})
+                    </h3>
+                    <div className="space-y-3">
+                      {filteredSongs.map((song) => (
+                        <div
+                          key={song.id}
+                          onClick={() => {
+                            setCurrentSong(song)
+                            setIsMusicPlaying(true)
+                          }}
+                          className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer flex items-center gap-4"
+                        >
+                          <div className="flex-shrink-0">
+                            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                              <MusicalNoteIcon className="h-6 w-6 text-blue-600" />
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-gray-900 truncate">
+                              {language === 'ta' && song.title_ta ? song.title_ta : song.title}
+                            </h4>
+                            <p className="text-sm text-gray-500">
+                              {song.singer?.name} • {song.duration || '0:00'} • {song.plays} {language === 'ta' ? 'பார்வைகள்' : 'plays'}
+                            </p>
+                          </div>
+                          <div className="flex-shrink-0">
+                            <PlayIcon className="h-8 w-8 text-blue-600" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Regular Artist Grid - Show when not searching */}
+                {!searchQuery && (
+                  <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 ${currentSong ? 'pb-32' : ''}`}>
+                    {filteredSingers.map((singer, index) => {
+                      const shouldShowAd = (index + 1) % 15 === 0 && ads.length > 0
+                      const adIndex = Math.floor(index / 15) % ads.length
+
+                      return (
+                        <>
+                          <div
+                            key={singer.id}
+                            onClick={() => handleSingerClick(singer)}
+                            className="cursor-pointer group"
+                          >
+                            <div className="relative aspect-square mb-3 overflow-hidden rounded-full bg-gray-200 group-hover:ring-4 group-hover:ring-blue-300 transition-all">
+                              {singer.imageUrl ? (
+                                <img
+                                  src={singer.imageUrl}
+                                  alt={singer.name}
+                                  className="w-full h-full object-contain"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <UserIcon className="h-1/2 w-1/2 text-gray-400" />
+                                </div>
+                              )}
+                              {singer.featured && (
+                                <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 rounded-full p-1">
+                                  <span className="text-xs font-bold">⭐</span>
+                                </div>
+                              )}
+                            </div>
+                            <h3 className="text-center font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                              {language === 'ta' && singer.name_ta ? singer.name_ta : singer.name}
+                            </h3>
+                            <p className="text-center text-sm text-gray-500">
+                              {singer._count?.songs || 0} {language === 'ta' ? 'ஆடியோக்கள்' : 'Audios'}
+                            </p>
+                          </div>
+                          {shouldShowAd && renderAd(ads[adIndex], index)}
+                        </>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* No Results Message */}
+                {searchQuery && filteredSingers.length === 0 && filteredSongs.length === 0 && (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500">
+                      {language === 'ta' ? 'முடிவுகள் இல்லை' : 'No results found'}
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </>
         ) : (
@@ -1235,21 +1365,28 @@ function DigitalFMPageContent() {
   )
 }
 
+// Wrapper component to handle Suspense boundary
+function DigitalFMPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading Digital FM...</p>
+        </div>
+      </div>
+    }>
+      <DigitalFMPageContent />
+    </Suspense>
+  )
+}
+
 export default function DigitalFMPage() {
   return (
     <>
       <NewspaperHeader />
       <NewHeader />
-      <Suspense fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading Digital FM...</p>
-          </div>
-        </div>
-      }>
-        <DigitalFMPageContent />
-      </Suspense>
+      <DigitalFMPageWrapper />
     </>
   )
 }
