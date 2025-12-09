@@ -35,12 +35,18 @@ export async function generateMetadata({
     const title = song.title_ta || song.title
     const artistName = song.singer.name_ta || song.singer.name
     const description = `Listen to ${title} by ${artistName} on Hello Madurai Digital FM`
-    
+
     // Generate absolute URL for artist image
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://hellomadurai.com'
-    const imageUrl = song.singer.imageUrl 
-      ? (song.singer.imageUrl.startsWith('http') 
-        ? song.singer.imageUrl 
+    // Try multiple environment variables and fallback to production URL
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+      || process.env.NEXT_PUBLIC_SITE_URL
+      || process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'https://hellomadurai.com'
+
+    const imageUrl = song.singer.imageUrl
+      ? (song.singer.imageUrl.startsWith('http')
+        ? song.singer.imageUrl
         : `${baseUrl}${song.singer.imageUrl}`)
       : `${baseUrl}/logo.jpg`
 
@@ -49,7 +55,13 @@ export async function generateMetadata({
       title,
       artist: artistName,
       imageUrl,
-      baseUrl
+      baseUrl,
+      rawImageUrl: song.singer.imageUrl,
+      env: {
+        NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+        NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+        VERCEL_URL: process.env.VERCEL_URL
+      }
     })
 
     return {

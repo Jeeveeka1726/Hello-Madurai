@@ -36,7 +36,12 @@ export default async function SharePage({ params }: Props) {
   const artistName = song.singer.name_ta || song.singer.name
 
   // Generate absolute URL for artist image
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://hellomadurai.com'
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+    || process.env.NEXT_PUBLIC_SITE_URL
+    || process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'https://hellomadurai.com'
+
   const imageUrl = song.singer.imageUrl
     ? (song.singer.imageUrl.startsWith('http')
       ? song.singer.imageUrl
