@@ -11,7 +11,8 @@ import {
   ChatBubbleLeftIcon,
   UserIcon,
   ArrowLeftIcon,
-  XMarkIcon
+  XMarkIcon,
+  MusicalNoteIcon
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import { useLanguage } from '@/contexts/LanguageContext'
