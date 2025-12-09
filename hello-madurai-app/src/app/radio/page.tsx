@@ -1114,8 +1114,8 @@ function DigitalFMPageContent() {
                 localStorage.removeItem('radio_songs')
                 localStorage.removeItem('radio_current_song')
 
-                // Navigate to clean /radio URL
-                window.history.pushState({}, '', '/radio')
+                // Navigate to clean /radio URL - use replaceState to avoid adding history entry
+                window.history.replaceState({}, '', '/radio')
 
                 // Force re-render by updating a key state
                 setSelectedCategory(categories.length > 0 ? categories[0].id : '')
