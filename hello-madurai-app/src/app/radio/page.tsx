@@ -263,17 +263,27 @@ function DigitalFMPageContent() {
               console.log('✅ Restored artist view with', mergedData.length, 'songs')
 
               // Batch fetch like statuses
-              const userId = sessionStorage.getItem('anonymousUserId')
-              if (userId && mergedData.length > 0) {
+              if (mergedData.length > 0) {
                 const songIds = mergedData.map((s: RadioSong) => s.id)
                 fetch('/api/radio-songs/likes/batch', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ songIds, userId })
+                  body: JSON.stringify({ songIds })
                 })
                   .then(res => res.json())
-                  .then(likeData => {
-                    setLikedSongs(new Set(likeData.likedSongIds))
+                  .then(likeStatuses => {
+                    const newLikedSongs = new Set<string>()
+                    const newLikeCounts: Record<string, number> = {}
+
+                    Object.entries(likeStatuses).forEach(([songId, status]: [string, any]) => {
+                      if (status.liked) {
+                        newLikedSongs.add(songId)
+                      }
+                      newLikeCounts[songId] = status.likeCount
+                    })
+
+                    setLikedSongs(newLikedSongs)
+                    setLikeCounts(newLikeCounts)
                   })
                   .catch(err => console.error('Error fetching likes:', err))
               }
@@ -357,15 +367,15 @@ function DigitalFMPageContent() {
     initSession()
   }, [])
 
-  // Fetch all data in parallel for faster loading
+  // Fetch only essential data on page load (categories and ads)
+  // Songs are loaded on-demand when clicking an artist
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch categories, songs, and ads in parallel
-        const [categoriesRes, allSongsRes, adsRes] = await Promise.all([
-          fetch('/api/radio-categories'),
-          fetch('/api/radio-songs'),
-          fetch('/api/ads/active?category=radio')
+        // Only fetch categories and ads - skip all songs for faster initial load
+        const [categoriesRes, adsRes] = await Promise.all([
+          fetch('/api/radio-categories', { cache: 'no-store' }),
+          fetch('/api/ads/active?category=radio', { cache: 'no-store' })
         ])
 
         // Check for errors
@@ -373,27 +383,20 @@ function DigitalFMPageContent() {
           console.error('❌ Categories API failed:', categoriesRes.status, categoriesRes.statusText)
           throw new Error('Failed to fetch categories')
         }
-        if (!allSongsRes.ok) {
-          console.error('❌ Songs API failed:', allSongsRes.status, allSongsRes.statusText)
-        }
 
-        const [categoriesData, allSongsData, adsData] = await Promise.all([
+        const [categoriesData, adsData] = await Promise.all([
           categoriesRes.json(),
-          allSongsRes.ok ? allSongsRes.json() : [],
           adsRes.ok ? adsRes.json() : []
         ])
 
         // Ensure we have arrays
         const safeCategories = Array.isArray(categoriesData) ? categoriesData : []
-        const safeSongs = Array.isArray(allSongsData) ? allSongsData : []
         const safeAds = Array.isArray(adsData) ? adsData : []
 
         setCategories(safeCategories)
-        setAllSongs(safeSongs)
         setAds(safeAds)
 
         console.log('📂 Categories loaded:', safeCategories.length, 'categories')
-        console.log('🎵 All songs loaded for search:', safeSongs.length, 'songs')
         console.log('📢 Ads loaded:', safeAds.length, 'ads')
 
         // Only set selected category if state was NOT restored
@@ -415,7 +418,6 @@ function DigitalFMPageContent() {
         toast.error(language === 'ta' ? 'தரவு ஏற்ற முடியவில்லை' : 'Failed to load data')
         // Set empty arrays to prevent crashes
         setCategories([])
-        setAllSongs([])
         setAds([])
       } finally {
         // Only set loading to false if we didn't restore state
@@ -429,6 +431,21 @@ function DigitalFMPageContent() {
     }
     fetchData()
   }, [stateRestored, language])
+
+  // Lazy load all songs only when search is initiated
+  useEffect(() => {
+    if (searchQuery && allSongs.length === 0) {
+      console.log('🔍 Loading all songs for search...')
+      fetch('/api/radio-songs', { cache: 'no-store' })
+        .then(res => res.json())
+        .then(data => {
+          const safeSongs = Array.isArray(data) ? data : []
+          setAllSongs(safeSongs)
+          console.log('🎵 All songs loaded for search:', safeSongs.length, 'songs')
+        })
+        .catch(err => console.error('Error loading songs for search:', err))
+    }
+  }, [searchQuery, allSongs.length])
 
   // Fetch comments only when user opens comments section (lazy loading)
   useEffect(() => {
@@ -561,12 +578,19 @@ function DigitalFMPageContent() {
   // Handlers
   const handleSingerClick = async (singer: Singer) => {
     setLoadingSongs(true)
+
+    // Update URL immediately for better perceived performance
+    if (singer.slug) {
+      router.replace(`/radio?artist=${singer.slug}`, { scroll: false })
+    }
+
     try {
-      const res = await fetch(`/api/radio-songs/singer/${singer.id}`)
-      const data = await res.json()
+      // Fetch songs first
+      const songsRes = await fetch(`/api/radio-songs/singer/${singer.id}`, { cache: 'no-store' })
+      const data = await songsRes.json()
 
       if (data && data.length > 0) {
-        // Merge with existing duration data from allSongs
+        // Merge with existing duration data from allSongs if available
         const mergedData = data.map((song: RadioSong) => {
           const existingSong = allSongs.find(s => s.id === song.id)
           return existingSong && existingSong.duration ? existingSong : song
@@ -574,35 +598,36 @@ function DigitalFMPageContent() {
 
         setSongs(mergedData)
         setSelectedSinger(singer)
-        // Don't auto-play or set current song
         setIsMusicPlaying(false)
 
-        // Update URL with singer slug - use replace to avoid adding to history
-        if (singer.slug) {
-          router.replace(`/radio?artist=${singer.slug}`, { scroll: false })
-        }
-
-        // Batch fetch like statuses for all songs in one API call
+        // Fetch like statuses for these songs
         const songIds = data.map((song: RadioSong) => song.id)
-        const likeStatusRes = await fetch('/api/radio-songs/likes/batch', {
+
+        fetch('/api/radio-songs/likes/batch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ songIds })
         })
-        const likeStatuses = await likeStatusRes.json()
+          .then(res => res.json())
+          .then(likeStatuses => {
+            const newLikedSongs = new Set<string>()
+            const newLikeCounts: Record<string, number> = {}
 
-        const newLikedSongs = new Set<string>()
-        const newLikeCounts: Record<string, number> = {}
+            Object.entries(likeStatuses).forEach(([songId, status]: [string, any]) => {
+              if (status.liked) {
+                newLikedSongs.add(songId)
+              }
+              newLikeCounts[songId] = status.likeCount
+            })
 
-        Object.entries(likeStatuses).forEach(([songId, status]: [string, any]) => {
-          if (status.liked) {
-            newLikedSongs.add(songId)
-          }
-          newLikeCounts[songId] = status.likeCount
-        })
-
-        setLikedSongs(newLikedSongs)
-        setLikeCounts(newLikeCounts)
+            setLikedSongs(newLikedSongs)
+            setLikeCounts(newLikeCounts)
+          })
+          .catch(err => console.error('Error fetching likes:', err))
+      } else {
+        setSongs([])
+        setSelectedSinger(singer)
+        setIsMusicPlaying(false)
       }
     } catch (error) {
       console.error('Error fetching songs:', error)
