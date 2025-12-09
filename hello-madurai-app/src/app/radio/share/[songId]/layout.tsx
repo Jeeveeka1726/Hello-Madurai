@@ -36,10 +36,9 @@ export async function generateMetadata({
     const artistName = song.singer.name_ta || song.singer.name
     const description = `Listen to ${title} by ${artistName} on Hello Madurai Digital FM`
 
-    // CRITICAL: Use Vercel URL, not hellomadurai.com (which points to different server)
-    // hellomadurai.com → LiteSpeed/Hostinger static site (no API routes) ❌
-    // hello-madurai-c5xr.vercel.app → Vercel deployment (has API routes) ✅
-    const baseUrl = 'https://hello-madurai-c5xr.vercel.app'
+    // Use environment variable or fallback to Vercel URL
+    // Once hellomadurai.com DNS points to Vercel, set NEXT_PUBLIC_SITE_URL=https://hellomadurai.com
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hello-madurai-c5xr.vercel.app'
     const imageUrl = song.singer.imageUrl
       ? (song.singer.imageUrl.startsWith('http')
         ? song.singer.imageUrl
