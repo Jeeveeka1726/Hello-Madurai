@@ -83,6 +83,8 @@ export default function RadioMusicAdminPage() {
   const [loadingComments, setLoadingComments] = useState(false)
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const [replyContent, setReplyContent] = useState<Record<string, string>>({})
+  const [fetchingDurations, setFetchingDurations] = useState(false)
+  const [durationProgress, setDurationProgress] = useState({ current: 0, total: 0 })
 
   const [singerFormData, setSingerFormData] = useState({
     name: '',
@@ -519,6 +521,83 @@ export default function RadioMusicAdminPage() {
     })
   }
 
+  const fetchAllDurations = async () => {
+    if (!selectedSinger) {
+      toast.error('Please select an artist first')
+      return
+    }
+
+    const songsToUpdate = filteredSongs.filter(song => !song.duration || song.duration === '0:00')
+
+    if (songsToUpdate.length === 0) {
+      toast.success('All songs already have duration set!')
+      return
+    }
+
+    if (!confirm(`Fetch duration for ${songsToUpdate.length} songs? This may take a few minutes.`)) {
+      return
+    }
+
+    setFetchingDurations(true)
+    setDurationProgress({ current: 0, total: songsToUpdate.length })
+
+    let successCount = 0
+    let failCount = 0
+
+    for (let i = 0; i < songsToUpdate.length; i++) {
+      const song = songsToUpdate[i]
+      setDurationProgress({ current: i + 1, total: songsToUpdate.length })
+
+      try {
+        // Create audio element to load metadata
+        const audio = new Audio()
+
+        // Wait for metadata to load
+        const duration = await new Promise<number>((resolve, reject) => {
+          audio.addEventListener('loadedmetadata', () => {
+            resolve(audio.duration)
+          })
+          audio.addEventListener('error', (e) => {
+            reject(new Error('Failed to load audio'))
+          })
+          audio.src = song.audioUrl
+          audio.load()
+        })
+
+        // Format duration as MM:SS
+        const minutes = Math.floor(duration / 60)
+        const seconds = Math.floor(duration % 60)
+        const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`
+
+        // Update in database
+        const response = await fetch(`/api/radio-songs/${song.id}/duration`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ duration: formattedDuration })
+        })
+
+        if (response.ok) {
+          successCount++
+          console.log(`✅ Updated duration for "${song.title}": ${formattedDuration}`)
+        } else {
+          failCount++
+          console.error(`❌ Failed to update duration for "${song.title}"`)
+        }
+      } catch (error) {
+        failCount++
+        console.error(`❌ Error fetching duration for "${song.title}":`, error)
+      }
+    }
+
+    setFetchingDurations(false)
+    setDurationProgress({ current: 0, total: 0 })
+
+    // Refresh songs list
+    await fetchSongs()
+
+    toast.success(`✅ Updated ${successCount} songs${failCount > 0 ? `, ${failCount} failed` : ''}`)
+  }
+
   const filteredSingers = singers.filter(singer => {
     const matchesCategory = !selectedCategory || singer.categoryId === selectedCategory
     const matchesSearch = !searchQuery ||
@@ -838,17 +917,36 @@ export default function RadioMusicAdminPage() {
               {selectedSinger.name_ta && <p className="text-lg text-gray-600">{selectedSinger.name_ta}</p>}
               <p className="text-sm text-gray-500">{selectedSinger.category?.name}</p>
             </div>
-            <Button
-              onClick={() => {
-                setShowSongForm(!showSongForm)
-                setEditingSong(null)
-                setSongFormData({ title: '', title_ta: '', audioUrl: '', duration: '', singerId: selectedSinger.id })
-              }}
-              className="bg-blue-600 text-white hover:bg-blue-700"
-            >
-              <PlusIcon className="h-5 w-5 mr-2" />
-              Add Audio
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={fetchAllDurations}
+                disabled={fetchingDurations}
+                className="bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-400"
+              >
+                {fetchingDurations ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    {durationProgress.current}/{durationProgress.total}
+                  </>
+                ) : (
+                  <>
+                    <MusicalNoteIcon className="h-5 w-5 mr-2" />
+                    Fetch Durations
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowSongForm(!showSongForm)
+                  setEditingSong(null)
+                  setSongFormData({ title: '', title_ta: '', audioUrl: '', duration: '', singerId: selectedSinger.id })
+                }}
+                className="bg-blue-600 text-white hover:bg-blue-700"
+              >
+                <PlusIcon className="h-5 w-5 mr-2" />
+                Add Audio
+              </Button>
+            </div>
           </div>
 
           {/* Song Form */}
