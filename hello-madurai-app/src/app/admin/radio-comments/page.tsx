@@ -84,20 +84,14 @@ export default function RadioCommentsPage() {
     }
 
     try {
-      const comment = comments.find(c => c.id === commentId)
-      if (!comment) return
-
-      const response = await fetch(`/api/singers/${comment.singer.id}/comments`, {
+      const response = await fetch(`/api/admin/radio-comments/${commentId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          singerId: comment.singer.id,
-          parentId: commentId,
-          author: 'Hello Madurai',
+          author: 'Hello Madurai Admin',
           content: content.trim(),
-          isAdminReply: true,
         }),
       })
 
@@ -107,7 +101,8 @@ export default function RadioCommentsPage() {
         setReplyingTo(null)
         toast.success(language === 'ta' ? 'பதில் வெற்றிகரமாக அனுப்பப்பட்டது!' : 'Reply sent successfully!')
       } else {
-        toast.error(language === 'ta' ? 'பதில் அனுப்ப முடியவில்லை' : 'Failed to send reply')
+        const error = await response.json()
+        toast.error(error.error || (language === 'ta' ? 'பதில் அனுப்ப முடியவில்லை' : 'Failed to send reply'))
       }
     } catch (error) {
       console.error('Error sending reply:', error)

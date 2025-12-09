@@ -302,29 +302,48 @@ function DigitalFMPageContent() {
     initSession()
   }, [])
 
-  // Fetch categories and all songs for search
+  // Fetch all data in parallel for faster loading
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch('/api/radio-categories')
-        const data = await res.json()
-        setCategories(data)
+        // Fetch categories, songs, and ads in parallel
+        const [categoriesRes, allSongsRes, adsRes] = await Promise.all([
+          fetch('/api/radio-categories'),
+          fetch('/api/radio-songs'),
+          fetch('/api/ads/active?category=radio')
+        ])
 
-        console.log('📂 Categories loaded:', data.length, 'categories')
+        const [categoriesData, allSongsData, adsData] = await Promise.all([
+          categoriesRes.json(),
+          allSongsRes.json(),
+          adsRes.ok ? adsRes.json() : []
+        ])
+
+        setCategories(categoriesData)
+        setAllSongs(allSongsData)
+        setAds(adsData)
+
+        console.log('📂 Categories loaded:', categoriesData.length, 'categories')
+        console.log('🎵 All songs loaded for search:', allSongsData.length, 'songs')
+        console.log('📢 Ads loaded:', adsData.length, 'ads')
 
         // Only set selected category if state was NOT restored
-        if (data.length > 0 && !stateRestored) {
-          setSelectedCategory(data[0].id)
-          console.log('📌 Selected first category:', data[0].name)
+        if (categoriesData.length > 0 && !stateRestored) {
+          setSelectedCategory(categoriesData[0].id)
+          console.log('📌 Selected first category:', categoriesData[0].name)
         }
 
-        // Load all songs for search functionality
-        const allSongsRes = await fetch('/api/radio-songs')
-        const allSongsData = await allSongsRes.json()
-        setAllSongs(allSongsData)
-        console.log('🎵 All songs loaded for search:', allSongsData.length, 'songs')
+        // Track ad impressions asynchronously without blocking
+        if (adsData.length > 0) {
+          setTimeout(() => {
+            adsData.forEach((ad: Ad) => {
+              fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
+            })
+          }, 0)
+        }
       } catch (error) {
-        console.error('Error fetching categories:', error)
+        console.error('Error fetching data:', error)
+        toast.error(language === 'ta' ? 'தரவு ஏற்ற முடியவில்லை' : 'Failed to load data')
       } finally {
         // Only set loading to false if we didn't restore state
         if (!stateRestored) {
@@ -335,32 +354,8 @@ function DigitalFMPageContent() {
         }
       }
     }
-    fetchCategories()
-  }, [stateRestored])
-
-  // Fetch ads
-  useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const response = await fetch('/api/ads/active?category=radio')
-        if (response.ok) {
-          const data = await response.json()
-          setAds(data)
-          // Track impressions asynchronously without blocking
-          if (data.length > 0) {
-            setTimeout(() => {
-              data.forEach((ad: Ad) => {
-                fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
-              })
-            }, 0)
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching ads:', error)
-      }
-    }
-    fetchAds()
-  }, [])
+    fetchData()
+  }, [stateRestored, language])
 
   // Fetch comments only when user opens comments section (lazy loading)
   useEffect(() => {
