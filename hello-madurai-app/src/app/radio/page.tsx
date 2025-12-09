@@ -650,28 +650,68 @@ function DigitalFMPageContent() {
     const isLiked = likedSongs.has(songId)
     const method = isLiked ? 'DELETE' : 'POST'
 
+    // Optimistic UI update - update immediately before API call
+    setLikedSongs(prev => {
+      const newSet = new Set(prev)
+      if (isLiked) {
+        newSet.delete(songId)
+      } else {
+        newSet.add(songId)
+      }
+      return newSet
+    })
+
+    // Optimistically update count
+    const currentCount = likeCounts[songId] || 0
+    const optimisticCount = isLiked ? Math.max(0, currentCount - 1) : currentCount + 1
+    setLikeCounts(prev => ({
+      ...prev,
+      [songId]: optimisticCount
+    }))
+
     try {
       const res = await fetch(`/api/radio-songs/${songId}/like`, { method })
       const data = await res.json()
 
       if (res.ok) {
-        setLikedSongs(prev => {
-          const newSet = new Set(prev)
-          if (isLiked) {
-            newSet.delete(songId)
-          } else {
-            newSet.add(songId)
-          }
-          return newSet
-        })
-
+        // Update with actual count from server
         setLikeCounts(prev => ({
           ...prev,
           [songId]: data.likeCount
         }))
+      } else {
+        // Revert on error
+        setLikedSongs(prev => {
+          const newSet = new Set(prev)
+          if (isLiked) {
+            newSet.add(songId)
+          } else {
+            newSet.delete(songId)
+          }
+          return newSet
+        })
+        setLikeCounts(prev => ({
+          ...prev,
+          [songId]: currentCount
+        }))
+        toast.error(language === 'ta' ? 'பிழை ஏற்பட்டது' : 'Error occurred')
       }
     } catch (error) {
       console.error('Error toggling like:', error)
+      // Revert on error
+      setLikedSongs(prev => {
+        const newSet = new Set(prev)
+        if (isLiked) {
+          newSet.add(songId)
+        } else {
+          newSet.delete(songId)
+        }
+        return newSet
+      })
+      setLikeCounts(prev => ({
+        ...prev,
+        [songId]: currentCount
+      }))
       toast.error(language === 'ta' ? 'பிழை ஏற்பட்டது' : 'Error occurred')
     }
   }
@@ -1051,8 +1091,8 @@ function DigitalFMPageContent() {
                 setSongs([])
                 setShowComments(false)
                 setStateRestored(false)
-                // Clear URL parameter
-                router.push('/radio', { scroll: false })
+                // Clear URL parameter - use replace to avoid adding to history
+                router.replace('/radio', { scroll: false })
                 // Clear localStorage when going back
                 localStorage.removeItem('radio_selected_singer')
                 localStorage.removeItem('radio_songs')
