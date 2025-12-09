@@ -23,30 +23,39 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://hellomadurai.com'
 
+    // Prefer Tamil titles
+    const title = song.title_ta || song.title
+    const artistName = song.singer.name_ta || song.singer.name
+
     // Ensure image URL is absolute
     let imageUrl = song.singer.imageUrl || `${baseUrl}/logo.jpg`
 
-    // If the image URL is from Cloudinary or already absolute, use it as is
-    // Otherwise, make it absolute
+    // Convert relative URLs to absolute
     if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
       imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`
     }
 
-    console.log('🖼️ Share metadata for song:', song.title, 'Image URL:', imageUrl)
+    console.log('🖼️ FM Share Metadata:', {
+      title,
+      artist: artistName,
+      imageUrl,
+      songId
+    })
 
     return {
-      title: `${song.title} - ${song.singer.name} | Hello Madurai Digital FM`,
-      description: `Listen to ${song.title} by ${song.singer.name} on Hello Madurai Digital FM`,
+      title: `${title} - ${artistName} | Hello Madurai Digital FM`,
+      description: `Listen to ${title} by ${artistName} on Hello Madurai Digital FM`,
       metadataBase: new URL(baseUrl),
       openGraph: {
-        title: `${song.title} - ${song.singer.name}`,
-        description: `Listen to ${song.title} by ${song.singer.name} on Hello Madurai Digital FM`,
+        title: `${title} - ${artistName}`,
+        description: `Hello Madurai Digital FM`,
         images: [
           {
             url: imageUrl,
-            width: 400,
-            height: 400,
-            alt: song.singer.name
+            width: 1200,
+            height: 630,
+            alt: `${artistName} - ${title}`,
+            type: 'image/jpeg'
           }
         ],
         type: 'music.song',
@@ -55,14 +64,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
       twitter: {
         card: 'summary_large_image',
-        title: `${song.title} - ${song.singer.name}`,
-        description: `Listen to ${song.title} by ${song.singer.name} on Hello Madurai Digital FM`,
+        title: `${title} - ${artistName}`,
+        description: `Hello Madurai Digital FM`,
         images: [imageUrl],
         site: '@hellomadurai'
       }
     }
   } catch (error) {
-    console.error('Error generating metadata:', error)
+    console.error('❌ Error generating FM share metadata:', error)
     return {
       title: 'Hello Madurai Digital FM',
       description: 'Listen to Digital FM on Hello Madurai'

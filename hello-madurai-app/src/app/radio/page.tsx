@@ -577,9 +577,9 @@ function DigitalFMPageContent() {
         // Don't auto-play or set current song
         setIsMusicPlaying(false)
 
-        // Update URL with singer slug
+        // Update URL with singer slug - use replace to avoid adding to history
         if (singer.slug) {
-          router.push(`/radio?artist=${singer.slug}`, { scroll: false })
+          router.replace(`/radio?artist=${singer.slug}`, { scroll: false })
         }
 
         // Batch fetch like statuses for all songs in one API call
