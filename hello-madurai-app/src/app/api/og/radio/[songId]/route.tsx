@@ -1,15 +1,13 @@
 import { ImageResponse } from 'next/og'
 import { prisma } from '@/lib/prisma'
+import { NextRequest } from 'next/server'
 
-export const runtime = 'edge'
-export const alt = 'Hello Madurai Digital FM'
-export const size = {
-  width: 1200,
-  height: 630,
-}
-export const contentType = 'image/png'
+export const runtime = 'nodejs' // Use Node.js runtime instead of edge
 
-export default async function Image({ params }: { params: Promise<{ songId: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ songId: string }> }
+) {
   const { songId } = await params
 
   try {
@@ -51,7 +49,8 @@ export default async function Image({ params }: { params: Promise<{ songId: stri
           </div>
         ),
         {
-          ...size,
+          width: 1200,
+          height: 630,
         }
       )
     }
@@ -160,7 +159,8 @@ export default async function Image({ params }: { params: Promise<{ songId: stri
         </div>
       ),
       {
-        ...size,
+        width: 1200,
+        height: 630,
       }
     )
   } catch (error) {
@@ -189,7 +189,8 @@ export default async function Image({ params }: { params: Promise<{ songId: stri
         </div>
       ),
       {
-        ...size,
+        width: 1200,
+        height: 630,
       }
     )
   }

@@ -64,12 +64,23 @@ export async function generateMetadata({
       }
     })
 
+    // Use API route for OG image generation
+    const ogImageUrl = `${baseUrl}/api/og/radio/${songId}`
+
     return {
       title: `${title} - ${artistName} | Hello Madurai Digital FM`,
       description,
       openGraph: {
         title: `${title} - ${artistName}`,
         description: 'Hello Madurai Digital FM',
+        images: [
+          {
+            url: ogImageUrl,
+            width: 1200,
+            height: 630,
+            alt: `${artistName} - ${title}`,
+          },
+        ],
         type: 'music.song',
         siteName: 'Hello Madurai',
         url: `${baseUrl}/radio/share/${songId}`,
@@ -78,6 +89,7 @@ export async function generateMetadata({
         card: 'summary_large_image',
         title: `${title} - ${artistName}`,
         description: 'Hello Madurai Digital FM',
+        images: [ogImageUrl],
       },
     }
   } catch (error) {
