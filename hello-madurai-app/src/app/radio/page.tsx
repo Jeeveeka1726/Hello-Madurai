@@ -224,24 +224,34 @@ function DigitalFMPageContent() {
   useEffect(() => {
     const artistSlug = searchParams.get('artist')
 
-    if (artistSlug && categories.length > 0 && !selectedSinger) {
+    if (artistSlug && Array.isArray(categories) && categories.length > 0 && !selectedSinger) {
+      console.log('🔍 Restoring artist from URL:', artistSlug)
+
       // Find singer by slug across all categories
       let foundSinger: Singer | null = null
       for (const category of categories) {
-        const singer = category.singers.find(s => s.slug === artistSlug)
-        if (singer) {
-          foundSinger = singer
-          break
+        if (category.singers && Array.isArray(category.singers)) {
+          const singer = category.singers.find(s => s.slug === artistSlug)
+          if (singer) {
+            foundSinger = singer
+            console.log('✅ Found singer:', singer.name)
+            break
+          }
         }
       }
 
       if (foundSinger) {
         // Directly load singer's songs without calling handleSingerClick to avoid dependency issues
         setLoadingSongs(true)
+        setSelectedSinger(foundSinger)
+
         fetch(`/api/radio-songs/singer/${foundSinger.id}`)
-          .then(res => res.json())
+          .then(res => {
+            if (!res.ok) throw new Error('Failed to fetch songs')
+            return res.json()
+          })
           .then(data => {
-            if (data && data.length > 0) {
+            if (data && Array.isArray(data) && data.length > 0) {
               // Merge with existing duration data from allSongs
               const mergedData = data.map((song: RadioSong) => {
                 const existingSong = allSongs.find(s => s.id === song.id)
@@ -249,8 +259,8 @@ function DigitalFMPageContent() {
               })
 
               setSongs(mergedData)
-              setSelectedSinger(foundSinger)
               setIsMusicPlaying(false)
+              console.log('✅ Restored artist view with', mergedData.length, 'songs')
 
               // Batch fetch like statuses
               const userId = sessionStorage.getItem('anonymousUserId')
@@ -267,18 +277,23 @@ function DigitalFMPageContent() {
                   })
                   .catch(err => console.error('Error fetching likes:', err))
               }
+            } else {
+              setSongs([])
             }
           })
           .catch(error => {
-            console.error('Error fetching songs:', error)
+            console.error('❌ Error fetching songs:', error)
             toast.error(language === 'ta' ? 'பிழை ஏற்பட்டது' : 'Error loading songs')
+            setSongs([])
           })
           .finally(() => {
             setLoadingSongs(false)
           })
+      } else {
+        console.log('❌ Singer not found for slug:', artistSlug)
       }
     }
-  }, [searchParams, categories, allSongs, language])
+  }, [searchParams, categories, allSongs, language, selectedSinger])
 
   // Handle song query parameter from share links
   useEffect(() => {
@@ -353,37 +368,55 @@ function DigitalFMPageContent() {
           fetch('/api/ads/active?category=radio')
         ])
 
+        // Check for errors
+        if (!categoriesRes.ok) {
+          console.error('❌ Categories API failed:', categoriesRes.status, categoriesRes.statusText)
+          throw new Error('Failed to fetch categories')
+        }
+        if (!allSongsRes.ok) {
+          console.error('❌ Songs API failed:', allSongsRes.status, allSongsRes.statusText)
+        }
+
         const [categoriesData, allSongsData, adsData] = await Promise.all([
           categoriesRes.json(),
-          allSongsRes.json(),
+          allSongsRes.ok ? allSongsRes.json() : [],
           adsRes.ok ? adsRes.json() : []
         ])
 
-        setCategories(categoriesData)
-        setAllSongs(allSongsData)
-        setAds(adsData)
+        // Ensure we have arrays
+        const safeCategories = Array.isArray(categoriesData) ? categoriesData : []
+        const safeSongs = Array.isArray(allSongsData) ? allSongsData : []
+        const safeAds = Array.isArray(adsData) ? adsData : []
 
-        console.log('📂 Categories loaded:', categoriesData.length, 'categories')
-        console.log('🎵 All songs loaded for search:', allSongsData.length, 'songs')
-        console.log('📢 Ads loaded:', adsData.length, 'ads')
+        setCategories(safeCategories)
+        setAllSongs(safeSongs)
+        setAds(safeAds)
+
+        console.log('📂 Categories loaded:', safeCategories.length, 'categories')
+        console.log('🎵 All songs loaded for search:', safeSongs.length, 'songs')
+        console.log('📢 Ads loaded:', safeAds.length, 'ads')
 
         // Only set selected category if state was NOT restored
-        if (categoriesData.length > 0 && !stateRestored) {
-          setSelectedCategory(categoriesData[0].id)
-          console.log('📌 Selected first category:', categoriesData[0].name)
+        if (safeCategories.length > 0 && !stateRestored) {
+          setSelectedCategory(safeCategories[0].id)
+          console.log('📌 Selected first category:', safeCategories[0].name)
         }
 
         // Track ad impressions asynchronously without blocking
-        if (adsData.length > 0) {
+        if (safeAds.length > 0) {
           setTimeout(() => {
-            adsData.forEach((ad: Ad) => {
+            safeAds.forEach((ad: Ad) => {
               fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
             })
           }, 0)
         }
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error('❌ Error fetching data:', error)
         toast.error(language === 'ta' ? 'தரவு ஏற்ற முடியவில்லை' : 'Failed to load data')
+        // Set empty arrays to prevent crashes
+        setCategories([])
+        setAllSongs([])
+        setAds([])
       } finally {
         // Only set loading to false if we didn't restore state
         if (!stateRestored) {
@@ -734,11 +767,14 @@ function DigitalFMPageContent() {
 
   // Enhanced filter - search across all categories and include song content
   const getFilteredSingers = () => {
+    if (!Array.isArray(categories) || categories.length === 0) {
+      return []
+    }
+
     if (!searchQuery) {
       // No search query - show singers from selected category
-      return categories
-        .find(cat => cat.id === selectedCategory)
-        ?.singers || []
+      const category = categories.find(cat => cat.id === selectedCategory)
+      return category?.singers || []
     }
 
     // Search query exists - search across ALL categories
@@ -747,18 +783,20 @@ function DigitalFMPageContent() {
     const matchedSingerIds = new Set<string>()
 
     categories.forEach(category => {
-      category.singers.forEach(singer => {
-        // Check if singer name matches
-        const singerNameMatch =
-          singer.name.toLowerCase().includes(query) ||
-          singer.name_ta?.toLowerCase().includes(query)
+      if (category.singers && Array.isArray(category.singers)) {
+        category.singers.forEach(singer => {
+          // Check if singer name matches
+          const singerNameMatch =
+            singer.name.toLowerCase().includes(query) ||
+            singer.name_ta?.toLowerCase().includes(query)
 
-        // Add singer if name matches (prioritize artist matches)
-        if (singerNameMatch && !matchedSingerIds.has(singer.id)) {
-          matchedSingerIds.add(singer.id)
-          allSingers.push(singer)
-        }
-      })
+          // Add singer if name matches (prioritize artist matches)
+          if (singerNameMatch && !matchedSingerIds.has(singer.id)) {
+            matchedSingerIds.add(singer.id)
+            allSingers.push(singer)
+          }
+        })
+      }
     })
 
     return allSingers
@@ -766,7 +804,7 @@ function DigitalFMPageContent() {
 
   // Get matching songs for search
   const getFilteredSongs = () => {
-    if (!searchQuery) return []
+    if (!searchQuery || !Array.isArray(allSongs)) return []
 
     const query = searchQuery.toLowerCase()
     return allSongs.filter(song =>
