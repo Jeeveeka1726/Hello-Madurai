@@ -44,19 +44,28 @@ export default async function SharePage({ params }: Props) {
       : `${baseUrl}${song.singer.imageUrl}`)
     : `${baseUrl}/logo.jpg`
 
+  console.log('🎵 FM Share Page:', {
+    songId,
+    title,
+    artistName,
+    imageUrl,
+    baseUrl
+  })
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
         {/* Content */}
         <div className="p-8 text-center">
           {/* Artist Image - Moved above content */}
-          <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden shadow-xl">
+          <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden shadow-xl bg-gray-100">
             <Image
               src={imageUrl}
               alt={artistName}
               fill
               className="object-cover"
               priority
+              unoptimized
             />
           </div>
 
