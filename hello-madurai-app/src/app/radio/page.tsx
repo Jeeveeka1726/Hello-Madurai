@@ -338,7 +338,7 @@ function DigitalFMPageContent() {
     const urlParams = new URLSearchParams(window.location.search)
     const songId = urlParams.get('song')
 
-    if (songId && !selectedSinger) {
+    if (songId) {
       console.log('🔗 Loading shared song:', songId)
       // Fetch the song and its singer
       fetch(`/api/radio-songs/${songId}`)
@@ -354,6 +354,7 @@ function DigitalFMPageContent() {
             setSongs(songsData)
             setCurrentSong(song)
             setLoading(false)
+            setLoadingSongs(false)
 
             // Scroll to the song after a short delay to ensure DOM is ready
             setTimeout(() => {
@@ -366,8 +367,10 @@ function DigitalFMPageContent() {
                 setTimeout(() => {
                   songElement.classList.remove('ring-4', 'ring-blue-400', 'ring-opacity-50')
                 }, 3000)
+              } else {
+                console.log('⚠️ Song element not found:', `song-${songId}`)
               }
-            }, 500)
+            }, 1000)
           }
         })
         .catch(err => console.error('Error loading shared song:', err))
