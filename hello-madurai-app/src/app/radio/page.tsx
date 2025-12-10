@@ -339,11 +339,13 @@ function DigitalFMPageContent() {
     const songId = urlParams.get('song')
 
     if (songId && !selectedSinger) {
+      console.log('🔗 Loading shared song:', songId)
       // Fetch the song and its singer
       fetch(`/api/radio-songs/${songId}`)
         .then(res => res.json())
         .then(async (song) => {
           if (song && song.singer) {
+            console.log('✅ Found shared song:', song.title, 'by', song.singer.name)
             // Fetch all songs by this singer
             const songsRes = await fetch(`/api/radio-songs/singer/${song.singerId}`)
             const songsData = await songsRes.json()
@@ -352,6 +354,20 @@ function DigitalFMPageContent() {
             setSongs(songsData)
             setCurrentSong(song)
             setLoading(false)
+
+            // Scroll to the song after a short delay to ensure DOM is ready
+            setTimeout(() => {
+              const songElement = document.getElementById(`song-${songId}`)
+              if (songElement) {
+                console.log('📍 Scrolling to shared song')
+                songElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                // Add a highlight effect
+                songElement.classList.add('ring-4', 'ring-blue-400', 'ring-opacity-50')
+                setTimeout(() => {
+                  songElement.classList.remove('ring-4', 'ring-blue-400', 'ring-opacity-50')
+                }, 3000)
+              }
+            }, 500)
           }
         })
         .catch(err => console.error('Error loading shared song:', err))
@@ -1286,7 +1302,11 @@ function DigitalFMPageContent() {
                   const likeCount = likeCounts[song.id] || 0
 
                   return (
-                    <div key={song.id} className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow">
+                    <div
+                      key={song.id}
+                      id={`song-${song.id}`}
+                      className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-all"
+                    >
                     <div className="flex items-center gap-4">
                       {/* Play Button */}
                       <button
