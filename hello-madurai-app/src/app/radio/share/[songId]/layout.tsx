@@ -63,9 +63,10 @@ export async function generateMetadata({
         images: [
           {
             url: imageUrl,
-            width: 1280,
-            height: 720,
+            width: 1200,
+            height: 630,
             alt: `${artistName} - ${title}`,
+            type: 'image/webp',
           },
         ],
         type: 'music.song',
@@ -76,7 +77,14 @@ export async function generateMetadata({
         card: 'summary_large_image',
         title: `${title} - ${artistName}`,
         description: 'Hello Madurai Digital FM',
-        images: [imageUrl],
+        images: {
+          url: imageUrl,
+          alt: `${artistName} - ${title}`,
+        },
+      },
+      other: {
+        'og:image:secure_url': imageUrl,
+        'og:image:type': 'image/webp',
       },
     }
   } catch (error) {
