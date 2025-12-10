@@ -176,7 +176,7 @@ export default function AdminDashboard() {
     { id: 'notifications', name: t('admin.tabs.notifications', 'Notifications', 'அறிவிப்புகள்'), icon: BellIcon },
     { id: 'news', name: t('admin.tabs.news', 'News', 'செய்திகள்'), icon: NewspaperIcon },
     { id: 'events', name: t('admin.tabs.events', 'Events', 'நிகழ்வுகள்'), icon: CalendarIcon },
-    { id: 'directory', name: t('admin.tabs.directory', 'Directory', 'முகவரி நூல்'), icon: BuildingOfficeIcon },
+    { id: 'directory', name: t('admin.tabs.directory', 'Directory', 'வணிக முகவரி'), icon: BuildingOfficeIcon },
     { id: 'users', name: t('admin.tabs.users', 'Users', 'பயனர்கள்'), icon: UserGroupIcon }
   ]
 

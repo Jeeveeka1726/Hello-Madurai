@@ -50,7 +50,7 @@ export default function RootPage() {
     },
     {
       nameEn: 'Directory',
-      nameTa: 'முகவரி நூல்',
+      nameTa: 'வணிக முகவரி',
       descEn: 'Business listings and contacts',
       descTa: 'வணிக பட்டியல்கள் மற்றும் தொடர்புகள்',
       href: '/directory',

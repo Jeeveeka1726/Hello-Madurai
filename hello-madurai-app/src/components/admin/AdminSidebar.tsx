@@ -43,7 +43,7 @@ const navigation = [
   },
   {
     name: 'Directory',
-    name_ta: 'முகவரி நூல்',
+    name_ta: 'வணிக முகவரி',
     href: '/admin/directory',
     icon: BuildingOfficeIcon
   },
