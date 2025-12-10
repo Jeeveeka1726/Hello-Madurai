@@ -19,7 +19,7 @@ declare global {
   }
 }
 
-// Initialize language from pre-loaded value or default to 'en'
+// Initialize language from pre-loaded value or default to 'ta' (Tamil)
 const getInitialLanguage = (): Language => {
   if (typeof window !== 'undefined') {
     try {
@@ -38,12 +38,12 @@ const getInitialLanguage = (): Language => {
       console.error('Error reading language:', error)
     }
   }
-  console.log('🔧 getInitialLanguage - using default: en')
-  return 'en'
+  console.log('🔧 getInitialLanguage - using default: ta (Tamil)')
+  return 'ta'
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('en')
+  const [language, setLanguageState] = useState<Language>('ta')
   const [isClient, setIsClient] = useState(false)
 
   // Load language from localStorage on mount - CLIENT SIDE ONLY
@@ -59,9 +59,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
           console.log('🌐 [MOUNT] Setting language to:', savedLang)
           setLanguageState(savedLang)
         } else {
-          console.log('🌐 [MOUNT] No saved language, defaulting to: en')
-          // Set default to English
-          localStorage.setItem('hello-madurai-language', 'en')
+          console.log('🌐 [MOUNT] No saved language, defaulting to: ta (Tamil)')
+          // Set default to Tamil
+          localStorage.setItem('hello-madurai-language', 'ta')
         }
       } catch (error) {
         console.error('❌ Error loading language from localStorage:', error)

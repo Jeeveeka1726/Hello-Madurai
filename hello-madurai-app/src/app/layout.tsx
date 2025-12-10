@@ -33,7 +33,7 @@ export default function RootLayout({
         <script
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var savedLang=localStorage.getItem('hello-madurai-language');console.log('🔧 Pre-load script - savedLang:',savedLang);if(savedLang==='ta'||savedLang==='en'){window.__HELLO_MADURAI_LANG__=savedLang;console.log('🔧 Pre-load script - set window.__HELLO_MADURAI_LANG__ to:',savedLang);}else{console.log('🔧 Pre-load script - no valid language found');}}catch(e){console.error('Error loading language:',e);}})();`,
+            __html: `(function(){try{var savedLang=localStorage.getItem('hello-madurai-language');console.log('🔧 Pre-load script - savedLang:',savedLang);if(savedLang==='ta'||savedLang==='en'){window.__HELLO_MADURAI_LANG__=savedLang;console.log('🔧 Pre-load script - set window.__HELLO_MADURAI_LANG__ to:',savedLang);}else{console.log('🔧 Pre-load script - defaulting to Tamil');window.__HELLO_MADURAI_LANG__='ta';localStorage.setItem('hello-madurai-language','ta');}}catch(e){console.error('Error loading language:',e);}})();`,
           }}
         />
         <script
