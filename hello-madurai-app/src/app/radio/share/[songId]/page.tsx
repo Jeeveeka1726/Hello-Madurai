@@ -47,20 +47,19 @@ export default async function SharePage({ params }: Props) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
-        {/* Artist Image */}
-        <div className="relative w-full h-80 bg-gradient-to-br from-blue-100 to-purple-100">
-          <Image
-            src={imageUrl}
-            alt={artistName}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-        </div>
-
         {/* Content */}
         <div className="p-8 text-center">
+          {/* Artist Image - Moved above content */}
+          <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden shadow-xl">
+            <Image
+              src={imageUrl}
+              alt={artistName}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+
           {/* Song Title */}
           <h1 className="text-3xl font-bold mb-3 text-gray-800 leading-tight">
             {title}
