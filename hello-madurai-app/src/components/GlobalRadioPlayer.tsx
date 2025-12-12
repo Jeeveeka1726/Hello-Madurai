@@ -127,12 +127,13 @@ export default function GlobalRadioPlayer() {
             {/* Play/Pause Button */}
             <button
               onClick={togglePlayPause}
-              className="w-10 h-10 rounded-full bg-white text-purple-600 flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+              className="w-10 h-10 rounded-full bg-yellow-400 text-purple-900 flex items-center justify-center hover:bg-yellow-300 hover:scale-110 transition-all shadow-lg"
+              aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
-                <PauseIcon className="w-5 h-5" />
+                <PauseIcon className="w-5 h-5 fill-purple-900" />
               ) : (
-                <PlayIcon className="w-5 h-5 ml-0.5" />
+                <PlayIcon className="w-5 h-5 ml-0.5 fill-purple-900" />
               )}
             </button>
 
@@ -140,8 +141,9 @@ export default function GlobalRadioPlayer() {
             <button
               onClick={handleClose}
               className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+              aria-label="Close player"
             >
-              <XMarkIcon className="w-5 h-5" />
+              <XMarkIcon className="w-5 h-5 text-white" />
             </button>
           </div>
         </div>
