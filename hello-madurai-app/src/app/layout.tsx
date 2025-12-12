@@ -4,7 +4,9 @@ import "./globals.css";
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import { AdminProvider } from '@/contexts/AdminContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import { RadioPlayerProvider } from '@/contexts/RadioPlayerContext'
 import PopupAds from '@/components/PopupAds'
+import GlobalRadioPlayer from '@/components/GlobalRadioPlayer'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -46,8 +48,11 @@ export default function RootLayout({
         <ThemeProvider>
           <LanguageProvider>
             <AdminProvider>
-              {children}
-              <PopupAds />
+              <RadioPlayerProvider>
+                {children}
+                <PopupAds />
+                <GlobalRadioPlayer />
+              </RadioPlayerProvider>
             </AdminProvider>
           </LanguageProvider>
         </ThemeProvider>

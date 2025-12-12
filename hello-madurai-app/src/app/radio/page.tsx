@@ -16,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { useRadioPlayer } from '@/contexts/RadioPlayerContext'
 import NewHeader from '@/components/layout/NewHeader'
 import NewspaperHeader from '@/components/NewspaperHeader'
 import { toast } from 'react-hot-toast'
@@ -74,6 +75,20 @@ function DigitalFMPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
+  // Use global radio player
+  const {
+    currentSong,
+    isPlaying: isMusicPlaying,
+    currentTime: musicCurrentTime,
+    duration: musicDuration,
+    playSong,
+    pauseSong,
+    resumeSong,
+    togglePlayPause,
+    seekTo,
+    setCurrentSong
+  } = useRadioPlayer()
+
   // State
   const [categories, setCategories] = useState<RadioCategory[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('')
@@ -99,33 +114,7 @@ function DigitalFMPageContent() {
   // Share menu state
   const [openShareMenu, setOpenShareMenu] = useState<string | null>(null)
 
-  // Music player state
-  const [currentSong, setCurrentSong] = useState<RadioSong | null>(null)
-  const [isMusicPlaying, setIsMusicPlaying] = useState(false)
-  const [musicCurrentTime, setMusicCurrentTime] = useState(0)
-  const [musicDuration, setMusicDuration] = useState(0)
-  const musicAudioRef = useRef<HTMLAudioElement>(null)
-
-  // Save playback state to localStorage
-  useEffect(() => {
-    if (currentSong) {
-      localStorage.setItem('radio_current_song', JSON.stringify(currentSong))
-      localStorage.setItem('radio_is_playing', isMusicPlaying.toString())
-    }
-  }, [currentSong, isMusicPlaying])
-
-  // Save state before page unload
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (currentSong && musicAudioRef.current) {
-        localStorage.setItem('radio_current_time', musicAudioRef.current.currentTime.toString())
-        localStorage.setItem('radio_is_playing', (!musicAudioRef.current.paused).toString())
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [currentSong])
+  // Note: Playback state is now managed by global RadioPlayerContext
 
   // Save selected singer to localStorage
   useEffect(() => {
@@ -194,22 +183,8 @@ function DigitalFMPageContent() {
           setStateRestored(true)
         }
 
-        if (savedCurrentSong) {
-          const song = JSON.parse(savedCurrentSong)
-          setCurrentSong(song)
-
-          // Restore playback position but DON'T auto-play
-          if (savedTime && musicAudioRef.current) {
-            const time = parseFloat(savedTime)
-            setTimeout(() => {
-              if (musicAudioRef.current) {
-                musicAudioRef.current.currentTime = time
-                setMusicCurrentTime(time)
-                setIsMusicPlaying(false)
-              }
-            }, 300)
-          }
-        }
+        // Current song is now managed by global RadioPlayerContext
+        // No need to restore here
       } catch (error) {
         console.error('❌ Error restoring state:', error)
         // Mark restoration as complete even on error
@@ -512,115 +487,8 @@ function DigitalFMPageContent() {
     fetchComments()
   }, [selectedSinger, showComments])
 
-  // Music player effects
-  useEffect(() => {
-    const audio = musicAudioRef.current
-    if (!audio) return
-
-    const handleTimeUpdate = () => {
-      const currentTime = audio.currentTime
-      setMusicCurrentTime(currentTime)
-      // Save playback position every second
-      if (currentSong && Math.floor(currentTime) % 1 === 0) {
-        localStorage.setItem('radio_current_time', currentTime.toString())
-      }
-    }
-
-    const updateSongDuration = async (durationInSeconds: number) => {
-      if (!currentSong) return
-
-      // Format duration as MM:SS
-      const minutes = Math.floor(durationInSeconds / 60)
-      const seconds = Math.floor(durationInSeconds % 60)
-      const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`
-
-      // Update in database if not already set or different
-      if (!currentSong.duration || currentSong.duration !== formattedDuration) {
-        try {
-          const response = await fetch(`/api/radio-songs/${currentSong.id}/duration`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ duration: formattedDuration })
-          })
-
-          if (response.ok) {
-            // Update local state
-            setCurrentSong(prev => prev ? { ...prev, duration: formattedDuration } : null)
-            setSongs(prev => prev.map(s =>
-              s.id === currentSong.id ? { ...s, duration: formattedDuration } : s
-            ))
-            // Also update allSongs for search
-            setAllSongs(prev => prev.map(s =>
-              s.id === currentSong.id ? { ...s, duration: formattedDuration } : s
-            ))
-          }
-        } catch (error) {
-          console.error('Error updating song duration:', error)
-        }
-      }
-    }
-
-    const handleLoadedMetadata = () => {
-      if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
-        setMusicDuration(audio.duration)
-        console.log('🎵 Audio duration loaded:', audio.duration, 'seconds')
-        updateSongDuration(audio.duration)
-      }
-    }
-
-    const handleDurationChange = () => {
-      if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
-        setMusicDuration(audio.duration)
-        console.log('🎵 Audio duration changed:', audio.duration, 'seconds')
-        updateSongDuration(audio.duration)
-      }
-    }
-
-    const handleCanPlay = () => {
-      if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
-        setMusicDuration(audio.duration)
-        updateSongDuration(audio.duration)
-      }
-    }
-
-    const handleEnded = () => setIsMusicPlaying(false)
-
-    audio.addEventListener('timeupdate', handleTimeUpdate)
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata)
-    audio.addEventListener('durationchange', handleDurationChange)
-    audio.addEventListener('canplay', handleCanPlay)
-    audio.addEventListener('ended', handleEnded)
-
-    // Check if duration is already available
-    if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
-      setMusicDuration(audio.duration)
-    }
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate)
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
-      audio.removeEventListener('durationchange', handleDurationChange)
-      audio.removeEventListener('canplay', handleCanPlay)
-      audio.removeEventListener('ended', handleEnded)
-    }
-  }, [currentSong])
-
-  // Update audio source when current song changes
-  useEffect(() => {
-    const audio = musicAudioRef.current
-    if (!audio || !currentSong) return
-
-    // Reset duration when changing songs
-    setMusicDuration(0)
-    setMusicCurrentTime(0)
-
-    audio.src = currentSong.audioUrl
-    audio.load() // Force load the new audio
-
-    if (isMusicPlaying) {
-      audio.play().catch(err => console.error('Error playing audio:', err))
-    }
-  }, [currentSong])
+  // Note: Audio playback is now managed by global RadioPlayerContext
+  // Duration update logic is handled there as well
 
   // Handlers
   const handleSingerClick = async (singer: Singer) => {
@@ -687,30 +555,11 @@ function DigitalFMPageContent() {
 
   const handlePlaySong = async (song: RadioSong) => {
     if (currentSong?.id === song.id) {
-      if (isMusicPlaying) {
-        musicAudioRef.current?.pause()
-        setIsMusicPlaying(false)
-      } else {
-        const audio = musicAudioRef.current
-        if (audio) {
-          try {
-            await audio.play()
-            setIsMusicPlaying(true)
-          } catch (error) {
-            console.error('Error playing audio:', error)
-          }
-        }
-      }
+      // Toggle play/pause for current song
+      togglePlayPause()
     } else {
-      setCurrentSong(song)
-      setIsMusicPlaying(true)
-
-      // Increment play count
-      try {
-        await fetch(`/api/radio-songs/${song.id}/play`, { method: 'POST' })
-      } catch (error) {
-        console.error('Error incrementing play count:', error)
-      }
+      // Play new song using global player
+      playSong(song)
     }
   }
 
@@ -937,8 +786,8 @@ function DigitalFMPageContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <audio ref={musicAudioRef} />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      {/* Audio is now managed by global RadioPlayerContext */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 pb-32">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl" suppressHydrationWarning>
@@ -1407,96 +1256,7 @@ function DigitalFMPageContent() {
           </div>
         )}
 
-        {/* Fixed Music Player */}
-        {currentSong && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-            <div className="mx-auto max-w-7xl px-4 py-4">
-              <div className="flex items-center gap-4">
-                {/* Play/Pause */}
-                <button
-                  onClick={async () => {
-                    const audio = musicAudioRef.current
-                    if (!audio) return
-
-                    if (isMusicPlaying) {
-                      audio.pause()
-                      setIsMusicPlaying(false)
-                    } else {
-                      try {
-                        await audio.play()
-                        setIsMusicPlaying(true)
-                      } catch (error) {
-                        console.error('Error playing audio:', error)
-                      }
-                    }
-                  }}
-                  className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-full hover:bg-blue-700"
-                >
-                  {isMusicPlaying ? (
-                    <PauseIcon className="h-5 w-5" />
-                  ) : (
-                    <PlayIcon className="h-5 w-5" />
-                  )}
-                </button>
-
-                {/* Song Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 truncate">
-                    {language === 'ta' && currentSong.title_ta ? currentSong.title_ta : currentSong.title}
-                  </p>
-                  <p className="text-sm text-gray-500 truncate">
-                    {currentSong.singer && (language === 'ta' && currentSong.singer.name_ta
-                      ? currentSong.singer.name_ta
-                      : currentSong.singer.name)}
-                  </p>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="flex-1 flex items-center gap-2">
-                  <span className="text-sm text-gray-600">{formatTime(musicCurrentTime)}</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max={musicDuration || 0}
-                    value={musicCurrentTime}
-                    onChange={(e) => {
-                      const time = parseFloat(e.target.value)
-                      setMusicCurrentTime(time)
-                      if (musicAudioRef.current) {
-                        musicAudioRef.current.currentTime = time
-                      }
-                    }}
-                    className="flex-1"
-                  />
-                  <span className="text-sm text-gray-600">{formatTime(musicDuration)}</span>
-                </div>
-
-                {/* Close Button */}
-                <button
-                  onClick={() => {
-                    // Stop the audio
-                    if (musicAudioRef.current) {
-                      musicAudioRef.current.pause()
-                      musicAudioRef.current.currentTime = 0
-                    }
-                    // Clear the current song
-                    setCurrentSong(null)
-                    setIsMusicPlaying(false)
-                    setMusicCurrentTime(0)
-                    setMusicDuration(0)
-                    // Clear saved state
-                    localStorage.removeItem('radio_current_song')
-                    localStorage.removeItem('radio_current_time')
-                  }}
-                  className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
-                  title={language === 'ta' ? 'மூடு' : 'Close'}
-                >
-                  <XMarkIcon className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Music Player is now global - shown at bottom of all pages via GlobalRadioPlayer component */}
       </div>
     </div>
   )
