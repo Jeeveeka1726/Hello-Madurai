@@ -7,13 +7,13 @@ import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 
 export default function GlobalRadioPlayer() {
-  const { currentSong, isPlaying, currentTime, duration, togglePlayPause, seekTo, setCurrentSong } = useRadioPlayer()
+  const { currentSong, isPlaying, currentTime, duration, togglePlayPause, seekTo, setCurrentSong, pauseSong, audioRef } = useRadioPlayer()
   const { language } = useLanguage()
   const pathname = usePathname()
   const router = useRouter()
 
-  // Don't show on radio page itself
-  if (pathname === '/radio' || !currentSong) {
+  // Don't show if no song is playing
+  if (!currentSong) {
     return null
   }
 
@@ -35,6 +35,14 @@ export default function GlobalRadioPlayer() {
   }
 
   const handleClose = () => {
+    // Stop the audio first
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+    }
+    pauseSong()
+
+    // Clear the song and localStorage
     setCurrentSong(null)
     localStorage.removeItem('radio_current_song')
     localStorage.removeItem('radio_current_time')
@@ -42,7 +50,10 @@ export default function GlobalRadioPlayer() {
   }
 
   const handleOpenRadio = () => {
-    router.push('/radio')
+    // Only navigate if not already on radio page
+    if (pathname !== '/radio') {
+      router.push('/radio')
+    }
   }
 
   return (
