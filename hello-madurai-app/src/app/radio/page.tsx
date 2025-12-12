@@ -206,11 +206,9 @@ function DigitalFMPageContent() {
         setSelectedSinger(null)
         setSongs([])
         setShowComments(false)
-        setCurrentSong(null)
-        setIsMusicPlaying(false)
+        // Note: currentSong is managed by global RadioPlayerContext
         localStorage.removeItem('radio_selected_singer')
         localStorage.removeItem('radio_songs')
-        localStorage.removeItem('radio_current_song')
       }
     }
 
@@ -257,7 +255,6 @@ function DigitalFMPageContent() {
               })
 
               setSongs(mergedData)
-              setIsMusicPlaying(false)
               console.log('✅ Restored artist view with', mergedData.length, 'songs')
 
               // Batch fetch like statuses
@@ -514,7 +511,6 @@ function DigitalFMPageContent() {
 
         setSongs(mergedData)
         setSelectedSinger(singer)
-        setIsMusicPlaying(false)
 
         // Fetch like statuses for these songs
         const songIds = data.map((song: RadioSong) => song.id)
@@ -543,7 +539,6 @@ function DigitalFMPageContent() {
       } else {
         setSongs([])
         setSelectedSinger(singer)
-        setIsMusicPlaying(false)
       }
     } catch (error) {
       console.error('Error fetching songs:', error)
@@ -906,8 +901,7 @@ function DigitalFMPageContent() {
                         <div
                           key={song.id}
                           onClick={() => {
-                            setCurrentSong(song)
-                            setIsMusicPlaying(true)
+                            playSong(song)
                           }}
                           className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer flex items-center gap-4"
                         >
