@@ -268,19 +268,6 @@ function DirectoryPageContent() {
                 {t('directory.selectCategory', 'Select Category', 'வகையைத் தேர்ந்தெடுக்கவும்')}
               </h2>
               <div className="flex flex-wrap gap-3 justify-center">
-                <button
-                  onClick={() => {
-                    setSelectedCategory(null)
-                    setSelectedSubcategory(null)
-                  }}
-                  className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                    !selectedCategory
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg scale-105'
-                      : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-purple-400 hover:shadow-md'
-                  }`}
-                >
-                  {t('directory.allCategories', 'All Categories', 'அனைத்து வகைகள்')}
-                </button>
                 {categories.map((category) => (
                   <button
                     key={category.id}
@@ -290,8 +277,8 @@ function DirectoryPageContent() {
                     }}
                     className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
                       selectedCategory === category.id
-                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg scale-105'
-                        : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-purple-400 hover:shadow-md'
+                        ? 'bg-blue-600 text-white shadow-lg scale-105'
+                        : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400 hover:shadow-md'
                     }`}
                   >
                     {category.icon && <span className="text-xl">{category.icon}</span>}
@@ -323,23 +310,23 @@ function DirectoryPageContent() {
                       onClick={() => setSelectedSubcategory(subcategory.id)}
                       className={`p-4 rounded-xl border-2 transition-all hover:shadow-lg ${
                         selectedSubcategory === subcategory.id
-                          ? 'border-purple-600 bg-purple-50 shadow-md'
-                          : 'border-gray-200 bg-white hover:border-purple-300'
+                          ? 'border-blue-600 bg-blue-50 shadow-md'
+                          : 'border-gray-200 bg-white hover:border-blue-300'
                       }`}
                     >
                       <div className="flex flex-col items-center text-center gap-2">
                         {/* Icon placeholder - you can add custom icons here */}
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
                           selectedSubcategory === subcategory.id
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gradient-to-br from-purple-100 to-pink-100 text-purple-600'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600'
                         }`}>
                           🏢
                         </div>
                         <div>
                           <p className={`font-medium text-sm ${
                             selectedSubcategory === subcategory.id
-                              ? 'text-purple-900'
+                              ? 'text-blue-900'
                               : 'text-gray-900'
                           }`}>
                             {language === 'ta' ? subcategory.name_ta : subcategory.name}

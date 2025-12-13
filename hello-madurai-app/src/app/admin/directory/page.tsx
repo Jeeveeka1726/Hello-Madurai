@@ -16,6 +16,23 @@ import {
   GlobeAltIcon
 } from '@heroicons/react/24/outline'
 
+interface Subcategory {
+  id: string
+  name: string
+  name_ta: string
+  slug: string
+  categoryId: string
+}
+
+interface Category {
+  id: string
+  name: string
+  name_ta: string
+  slug: string
+  icon?: string
+  subcategories: Subcategory[]
+}
+
 interface Business {
   id: string
   name: string
@@ -23,6 +40,10 @@ interface Business {
   description: string
   description_ta: string
   category: string
+  categoryId?: string
+  subcategoryId?: string
+  mainCategory?: Category
+  subcategory?: Subcategory
   address: string
   address_ta: string
   phone: string
@@ -34,19 +55,10 @@ interface Business {
   updatedAt: string
 }
 
-const businessCategories = [
-  { id: 'restaurant', name: 'Restaurant', name_ta: 'உணவகம்' },
-  { id: 'retail', name: 'Retail', name_ta: 'சில்லறை' },
-  { id: 'service', name: 'Service', name_ta: 'சேவை' },
-  { id: 'healthcare', name: 'Healthcare', name_ta: 'சுகாதாரம்' },
-  { id: 'education', name: 'Education', name_ta: 'கல்வி' },
-  { id: 'automotive', name: 'Automotive', name_ta: 'வாகன சேவை' },
-  { id: 'other', name: 'Other', name_ta: 'மற்றவை' }
-]
-
 export default function AdminDirectoryPage() {
   const { isAdmin, isLoading } = useAdmin()
   const [businesses, setBusinesses] = useState<Business[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingBusiness, setEditingBusiness] = useState<Business | null>(null)
@@ -55,7 +67,9 @@ export default function AdminDirectoryPage() {
     name_ta: '',
     description: '',
     description_ta: '',
-    category: 'restaurant',
+    category: '',
+    categoryId: '',
+    subcategoryId: '',
     address: '',
     address_ta: '',
     phone: '',
@@ -67,8 +81,21 @@ export default function AdminDirectoryPage() {
   useEffect(() => {
     if (isAdmin) {
       fetchBusinesses()
+      fetchCategories()
     }
   }, [isAdmin])
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/admin/directory-categories')
+      if (response.ok) {
+        const data = await response.json()
+        setCategories(data.categories || [])
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
 
   const fetchBusinesses = async () => {
     try {
@@ -136,6 +163,8 @@ export default function AdminDirectoryPage() {
       description: business.description,
       description_ta: business.description_ta,
       category: business.category,
+      categoryId: business.categoryId || '',
+      subcategoryId: business.subcategoryId || '',
       address: business.address,
       address_ta: business.address_ta,
       phone: business.phone,
@@ -196,7 +225,9 @@ export default function AdminDirectoryPage() {
                 name_ta: '',
                 description: '',
                 description_ta: '',
-                category: 'restaurant',
+                category: '',
+                categoryId: '',
+                subcategoryId: '',
                 address: '',
                 address_ta: '',
                 phone: '',
@@ -260,18 +291,19 @@ export default function AdminDirectoryPage() {
                   />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Category */}
+                    {/* Main Category */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <TranslatedText>Category</TranslatedText>
+                        <TranslatedText>Main Category</TranslatedText>
                       </label>
                       <select
-                        value={formData.category}
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        value={formData.categoryId}
+                        onChange={(e) => setFormData({ ...formData, categoryId: e.target.value, subcategoryId: '' })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         required
                       >
-                        {businessCategories.map((category) => (
+                        <option value="">Select Category</option>
+                        {categories.map((category) => (
                           <option key={category.id} value={category.id}>
                             {category.name}
                           </option>
@@ -279,6 +311,30 @@ export default function AdminDirectoryPage() {
                       </select>
                     </div>
 
+                    {/* Subcategory */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <TranslatedText>Subcategory</TranslatedText>
+                      </label>
+                      <select
+                        value={formData.subcategoryId}
+                        onChange={(e) => setFormData({ ...formData, subcategoryId: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        disabled={!formData.categoryId}
+                      >
+                        <option value="">Select Subcategory (Optional)</option>
+                        {formData.categoryId && categories
+                          .find(cat => cat.id === formData.categoryId)
+                          ?.subcategories.map((subcategory) => (
+                            <option key={subcategory.id} value={subcategory.id}>
+                              {subcategory.name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Phone */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
