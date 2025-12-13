@@ -20,6 +20,31 @@ import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Comments from '@/components/Comments'
 
+interface Subcategory {
+  id: string
+  name: string
+  name_ta: string
+  slug: string
+  categoryId: string
+  _count?: {
+    businesses: number
+  }
+}
+
+interface Category {
+  id: string
+  name: string
+  name_ta: string
+  slug: string
+  icon?: string
+  orderNumber: number
+  subcategories: Subcategory[]
+  _count?: {
+    businesses: number
+    subcategories: number
+  }
+}
+
 interface Business {
   id: string
   name: string
@@ -27,12 +52,16 @@ interface Business {
   description: string
   description_ta?: string
   category: string
+  categoryId?: string
+  subcategoryId?: string
+  mainCategory?: Category
+  subcategory?: Subcategory
   address: string
   address_ta?: string
   phone: string
   email?: string
   website?: string
-  
+
   // New business features
   videoUrl?: string
   instagramUrl?: string
@@ -40,7 +69,7 @@ interface Business {
   bookingUrl?: string
   latitude?: number
   longitude?: number
-  
+
   featured: boolean
   verified: boolean
   createdAt: string
@@ -57,58 +86,66 @@ interface BusinessComment {
 }
 
 function DirectoryPageContent() {
-  const { t } = useLanguage()
-  const [selectedCategory, setSelectedCategory] = useState('all')
+  const { t, language } = useLanguage()
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [businesses, setBusinesses] = useState<Business[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [showComments, setShowComments] = useState(false)
   const [commentsBusinessId, setCommentsBusinessId] = useState<string>('')
 
-  // Fetch businesses from database
+  // Fetch categories and businesses from database
   useEffect(() => {
-    const fetchBusinesses = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/directory')
-        if (response.ok) {
-          const data = await response.json()
-          setBusinesses(data)
-        } else {
-          console.error('Failed to fetch businesses')
+        const [categoriesRes, businessesRes] = await Promise.all([
+          fetch('/api/directory-categories'),
+          fetch('/api/directory')
+        ])
+
+        if (categoriesRes.ok) {
+          const categoriesData = await categoriesRes.json()
+          setCategories(categoriesData.categories || [])
+        }
+
+        if (businessesRes.ok) {
+          const businessesData = await businessesRes.json()
+          setBusinesses(businessesData)
         }
       } catch (error) {
-        console.error('Error fetching businesses:', error)
+        console.error('Error fetching data:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchBusinesses()
+    fetchData()
   }, [])
 
-  const categories = [
-    { id: 'all', name: t('directory.categories.all', 'All Categories', 'அனைத்து வகைகள்') },
-    { id: 'healthcare', name: t('directory.categories.healthcare', 'Healthcare', 'சுகாதாரம்') },
-    { id: 'education', name: t('directory.categories.education', 'Education', 'கல்வி') },
-    { id: 'restaurant', name: t('directory.categories.restaurant', 'Restaurants', 'உணவகங்கள்') },
-    { id: 'automotive', name: t('directory.categories.automotive', 'Automotive', 'வாகன சேவை') },
-    { id: 'retail', name: t('directory.categories.retail', 'Retail', 'சில்லறை') },
-    { id: 'service', name: t('directory.categories.service', 'Services', 'சேவைகள்') },
-    { id: 'other', name: t('directory.categories.other', 'Other', 'மற்றவை') }
-  ]
-
   const filteredBusinesses = businesses.filter(business => {
-    const matchesCategory = selectedCategory === 'all' || business.category === selectedCategory
-    const matchesSearch = searchTerm === '' || 
+    // Filter by category
+    const matchesCategory = !selectedCategory || business.categoryId === selectedCategory
+
+    // Filter by subcategory
+    const matchesSubcategory = !selectedSubcategory || business.subcategoryId === selectedSubcategory
+
+    // Filter by search term
+    const matchesSearch = searchTerm === '' ||
       business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (business.name_ta && business.name_ta.includes(searchTerm)) ||
       business.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (business.description_ta && business.description_ta.includes(searchTerm))
-    return matchesCategory && matchesSearch
+
+    return matchesCategory && matchesSubcategory && matchesSearch
   })
 
   const featuredBusinesses = filteredBusinesses.filter(business => business.featured)
   const regularBusinesses = filteredBusinesses.filter(business => !business.featured)
+
+  // Get selected category object
+  const selectedCategoryObj = categories.find(cat => cat.id === selectedCategory)
 
   const handleCall = (phone: string) => {
     window.location.href = `tel:${phone}`
@@ -225,24 +262,100 @@ function DirectoryPageContent() {
               </div>
             </div>
 
-            {/* Category Filter */}
+            {/* Main Categories */}
             <div className="mb-8">
-              <div className="flex flex-wrap gap-2 justify-center">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 text-center">
+                {t('directory.selectCategory', 'Select Category', 'வகையைத் தேர்ந்தெடுக்கவும்')}
+              </h2>
+              <div className="flex flex-wrap gap-3 justify-center">
+                <button
+                  onClick={() => {
+                    setSelectedCategory(null)
+                    setSelectedSubcategory(null)
+                  }}
+                  className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                    !selectedCategory
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg scale-105'
+                      : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-purple-400 hover:shadow-md'
+                  }`}
+                >
+                  {t('directory.allCategories', 'All Categories', 'அனைத்து வகைகள்')}
+                </button>
                 {categories.map((category) => (
-                  <Button
+                  <button
                     key={category.id}
-                    variant={selectedCategory === category.id ? "primary" : "outline"}
-                    onClick={() => setSelectedCategory(category.id)}
-                    className={selectedCategory === category.id 
-                      ? "bg-primary-600 text-white" 
-                      : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-                    }
+                    onClick={() => {
+                      setSelectedCategory(category.id)
+                      setSelectedSubcategory(null)
+                    }}
+                    className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                      selectedCategory === category.id
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg scale-105'
+                        : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-purple-400 hover:shadow-md'
+                    }`}
                   >
-                    {category.name}
-                  </Button>
+                    {category.icon && <span className="text-xl">{category.icon}</span>}
+                    <span>{language === 'ta' ? category.name_ta : category.name}</span>
+                    {category._count && category._count.businesses > 0 && (
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        selectedCategory === category.id
+                          ? 'bg-white/20'
+                          : 'bg-gray-200'
+                      }`}>
+                        {category._count.businesses}
+                      </span>
+                    )}
+                  </button>
                 ))}
               </div>
             </div>
+
+            {/* Subcategories */}
+            {selectedCategoryObj && selectedCategoryObj.subcategories.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+                  {t('directory.selectSubcategory', 'Select Subcategory', 'துணை வகையைத் தேர்ந்தெடுக்கவும்')}
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {selectedCategoryObj.subcategories.map((subcategory) => (
+                    <button
+                      key={subcategory.id}
+                      onClick={() => setSelectedSubcategory(subcategory.id)}
+                      className={`p-4 rounded-xl border-2 transition-all hover:shadow-lg ${
+                        selectedSubcategory === subcategory.id
+                          ? 'border-purple-600 bg-purple-50 shadow-md'
+                          : 'border-gray-200 bg-white hover:border-purple-300'
+                      }`}
+                    >
+                      <div className="flex flex-col items-center text-center gap-2">
+                        {/* Icon placeholder - you can add custom icons here */}
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
+                          selectedSubcategory === subcategory.id
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gradient-to-br from-purple-100 to-pink-100 text-purple-600'
+                        }`}>
+                          🏢
+                        </div>
+                        <div>
+                          <p className={`font-medium text-sm ${
+                            selectedSubcategory === subcategory.id
+                              ? 'text-purple-900'
+                              : 'text-gray-900'
+                          }`}>
+                            {language === 'ta' ? subcategory.name_ta : subcategory.name}
+                          </p>
+                          {subcategory._count && subcategory._count.businesses > 0 && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {subcategory._count.businesses} {language === 'ta' ? 'வணிகங்கள்' : 'businesses'}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Featured Businesses */}
             {featuredBusinesses.length > 0 && (

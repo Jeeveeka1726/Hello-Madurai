@@ -48,6 +48,12 @@ const navigation = [
     icon: BuildingOfficeIcon
   },
   {
+    name: 'Categories',
+    name_ta: 'வகைகள்',
+    href: '/admin/directory-categories',
+    icon: BuildingOfficeIcon
+  },
+  {
     name: 'E-Papers',
     name_ta: 'பத்திரிகைகள்',
     href: '/admin/magazines',
