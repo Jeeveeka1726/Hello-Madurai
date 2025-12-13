@@ -263,39 +263,52 @@ function DirectoryPageContent() {
             </div>
 
             {/* Main Categories */}
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 text-center">
-                {t('directory.selectCategory', 'Select Category', 'வகையைத் தேர்ந்தெடுக்கவும்')}
-              </h2>
-              <div className="flex flex-wrap gap-3 justify-center">
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => {
-                      setSelectedCategory(category.id)
-                      setSelectedSubcategory(null)
-                    }}
-                    className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                      selectedCategory === category.id
-                        ? 'bg-blue-600 text-white shadow-lg scale-105'
-                        : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400 hover:shadow-md'
-                    }`}
-                  >
-                    {category.icon && <span className="text-xl">{category.icon}</span>}
-                    <span>{language === 'ta' ? category.name_ta : category.name}</span>
-                    {category._count && category._count.businesses > 0 && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+            {!loading && categories.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 text-center">
+                  {t('directory.selectCategory', 'Select Category', 'வகையைத் தேர்ந்தெடுக்கவும்')}
+                </h2>
+                <div className="flex flex-wrap gap-3 justify-center">
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => {
+                        setSelectedCategory(category.id)
+                        setSelectedSubcategory(null)
+                      }}
+                      className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
                         selectedCategory === category.id
-                          ? 'bg-white/20'
-                          : 'bg-gray-200'
-                      }`}>
-                        {category._count.businesses}
-                      </span>
-                    )}
-                  </button>
-                ))}
+                          ? 'bg-blue-600 text-white shadow-lg scale-105'
+                          : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400 hover:shadow-md'
+                      }`}
+                    >
+                      {category.icon && <span className="text-xl">{category.icon}</span>}
+                      <span>{language === 'ta' ? category.name_ta : category.name}</span>
+                      {category._count && category._count.businesses > 0 && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          selectedCategory === category.id
+                            ? 'bg-white/20'
+                            : 'bg-gray-200'
+                        }`}>
+                          {category._count.businesses}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* No categories message */}
+            {!loading && categories.length === 0 && (
+              <div className="mb-8 text-center py-8 bg-blue-50 rounded-lg">
+                <p className="text-gray-600">
+                  {language === 'ta'
+                    ? 'வகைகள் இன்னும் சேர்க்கப்படவில்லை'
+                    : 'No categories added yet'}
+                </p>
+              </div>
+            )}
 
             {/* Subcategories */}
             {selectedCategoryObj && selectedCategoryObj.subcategories.length > 0 && (
