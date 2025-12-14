@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
         bookingUrl: body.bookingUrl,
         latitude: body.latitude ? parseFloat(body.latitude) : undefined,
         longitude: body.longitude ? parseFloat(body.longitude) : undefined,
+        orderNumber: body.orderNumber || 0,
         featured: body.featured || false,
         verified: body.verified || false
       },

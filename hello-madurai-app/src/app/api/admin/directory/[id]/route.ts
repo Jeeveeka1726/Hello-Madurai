@@ -25,6 +25,7 @@ export async function PUT(
         phone: data.phone,
         email: data.email || undefined,
         website: data.website || undefined,
+        orderNumber: data.orderNumber !== undefined ? data.orderNumber : 0,
         featured: data.featured || false,
         image: data.image || undefined
       },

@@ -49,6 +49,7 @@ interface Business {
   phone: string
   email?: string
   website?: string
+  orderNumber: number
   featured: boolean
   verified: boolean
   createdAt: string
@@ -75,6 +76,7 @@ export default function AdminDirectoryPage() {
     phone: '',
     email: '',
     website: '',
+    orderNumber: 0,
     featured: false
   })
 
@@ -139,12 +141,15 @@ export default function AdminDirectoryPage() {
           name_ta: '',
           description: '',
           description_ta: '',
-          category: 'restaurant',
+          category: '',
+          categoryId: '',
+          subcategoryId: '',
           address: '',
           address_ta: '',
           phone: '',
           email: '',
           website: '',
+          orderNumber: 0,
           featured: false
         })
       }
@@ -170,6 +175,7 @@ export default function AdminDirectoryPage() {
       phone: business.phone,
       email: business.email || '',
       website: business.website || '',
+      orderNumber: business.orderNumber || 0,
       featured: business.featured
     })
     setShowForm(true)
@@ -233,6 +239,7 @@ export default function AdminDirectoryPage() {
                 phone: '',
                 email: '',
                 website: '',
+                orderNumber: 0,
                 featured: false
               })
             }}
@@ -379,6 +386,24 @@ export default function AdminDirectoryPage() {
                         placeholder="https://example.com"
                       />
                     </div>
+                  </div>
+
+                  {/* Order Number */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <TranslatedText>Display Order</TranslatedText>
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.orderNumber}
+                      onChange={(e) => setFormData({ ...formData, orderNumber: parseInt(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="0"
+                      min="0"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Lower numbers appear first. Use 0 for default order.
+                    </p>
                   </div>
 
                   {/* Featured */}

@@ -139,10 +139,13 @@ function DirectoryPageContent() {
       (business.description_ta && business.description_ta.includes(searchTerm))
 
     return matchesCategory && matchesSubcategory && matchesSearch
+  }).sort((a, b) => {
+    // Sort by orderNumber (ascending), then by name
+    if (a.orderNumber !== b.orderNumber) {
+      return a.orderNumber - b.orderNumber
+    }
+    return a.name.localeCompare(b.name)
   })
-
-  const featuredBusinesses = filteredBusinesses.filter(business => business.featured)
-  const regularBusinesses = filteredBusinesses.filter(business => !business.featured)
 
   // Get selected category object
   const selectedCategoryObj = categories.find(cat => cat.id === selectedCategory)
@@ -357,198 +360,16 @@ function DirectoryPageContent() {
               </div>
             )}
 
-            {/* Featured Businesses */}
-            {featuredBusinesses.length > 0 && (
-              <div className="mb-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  {t('directory.featured', 'Featured Businesses', 'சிறப்பு வணிகங்கள்')}
-                </h2>
-                <div className="grid gap-8 lg:grid-cols-2">
-                  {featuredBusinesses.map((business) => (
-                    <Card key={business.id} className="overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200">
-                      <div className="aspect-w-16 aspect-h-9 bg-gradient-to-br from-primary-100 to-secondary-100">
-                        <div className="flex items-center justify-center">
-                          <div className="text-center">
-                            <div className="text-4xl mb-2">🏢</div>
-                            <p className="text-sm text-gray-600 capitalize">
-                              {business.category}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <CardContent className="p-6">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
-                            {t('directory.featured', 'Featured', 'சிறப்பு')}
-                          </span>
-                          {business.verified && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              {t('directory.verified', 'Verified', 'சரிபார்க்கப்பட்டது')}
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
-                          {business.name}
-                        </h3>
-                        {business.name_ta && (
-                          <h4 className="text-lg text-gray-600 mb-3">
-                            {business.name_ta}
-                          </h4>
-                        )}
-                        <p className="text-gray-600 mb-4">
-                          {business.description}
-                        </p>
-                        <div className="space-y-2 mb-4 text-sm text-gray-600">
-                          <div className="flex items-center">
-                            <MapPinIcon className="h-4 w-4 mr-2 text-gray-400" />
-                            {business.address}
-                          </div>
-                          <div className="flex items-center">
-                            <PhoneIcon className="h-4 w-4 mr-2 text-gray-400" />
-                            {business.phone}
-                          </div>
-                          {business.email && (
-                            <div className="flex items-center">
-                              <EnvelopeIcon className="h-4 w-4 mr-2 text-gray-400" />
-                              {business.email}
-                            </div>
-                          )}
-                          {business.website && (
-                            <div className="flex items-center">
-                              <GlobeAltIcon className="h-4 w-4 mr-2 text-gray-400" />
-                              <span className="line-clamp-1">{business.website}</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          <Button onClick={() => handleCall(business.phone)} className="flex-1 min-w-[100px]">
-                            <PhoneIcon className="h-4 w-4 mr-2" />
-                            {t('directory.call', 'Call', 'அழை')}
-                          </Button>
-                          
-                          {business.videoUrl && (
-                            <Button 
-                              variant="outline" 
-                              onClick={() => handleVideo(business.videoUrl!)}
-                              className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-                            >
-                              <DocumentIcon className="h-4 w-4 mr-2" />
-                              {t('directory.video', 'Video', 'வீடியோ')}
-                            </Button>
-                          )}
-                          
-                          <Button 
-                            variant="outline" 
-                            onClick={() => handleDirections(business)}
-                            className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-                          >
-                            <MapPinIcon className="h-4 w-4 mr-2" />
-                            {t('directory.directions', 'Directions', 'திசைகள்')}
-                          </Button>
-                          
-                          {business.website && (
-                            <Button 
-                              variant="outline" 
-                              onClick={() => handleWebsite(business.website!)}
-                              className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-                            >
-                              <GlobeAltIcon className="h-4 w-4 mr-2" />
-                              {t('directory.website', 'Website', 'வலைத்தளம்')}
-                            </Button>
-                          )}
-                          
-                          {business.bookingUrl && (
-                            <Button 
-                              variant="outline" 
-                              onClick={() => handleBooking(business.bookingUrl!)}
-                              className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-                            >
-                              <CalendarIcon className="h-4 w-4 mr-2" />
-                              {t('directory.booking', 'Book', 'முன்பதிவு')}
-                            </Button>
-                          )}
-                        </div>
-                        
-                        {/* Social and Action Buttons */}
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {business.instagramUrl && (
-                            <Button 
-                              size="sm"
-                              variant="outline" 
-                              onClick={() => handleInstagram(business.instagramUrl!)}
-                              className="bg-gradient-to-r from-blue-500 to-pink-500 text-white border-0 hover:from-blue-600 hover:to-pink-600"
-                            >
-                              📷 Instagram
-                            </Button>
-                          )}
-                          
-                          {business.facebookUrl && (
-                            <Button 
-                              size="sm"
-                              variant="outline" 
-                              onClick={() => handleFacebook(business.facebookUrl!)}
-                              className="bg-blue-600 text-white border-0 hover:bg-blue-700"
-                            >
-                              📘 Facebook
-                            </Button>
-                          )}
-                          
-                          <Button 
-                            size="sm"
-                            variant="outline" 
-                            onClick={() => handleDownload(business)}
-                            className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-                          >
-                            <ArrowDownTrayIcon className="h-3 w-3 mr-1" />
-                            {t('directory.download', 'Download', 'பதிவிறக்கம்')}
-                          </Button>
-                          
-                          <Button 
-                            size="sm"
-                            variant="outline" 
-                            onClick={() => handleShare(business)}
-                            className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-                          >
-                            <ShareIcon className="h-3 w-3 mr-1" />
-                            {t('directory.share', 'Share', 'பகிர்')}
-                          </Button>
-                          
-                          <Button 
-                            size="sm"
-                            variant="outline" 
-                            onClick={() => openComments(business.id)}
-                            className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-                          >
-                            <ChatBubbleLeftIcon className="h-3 w-3 mr-1" />
-                            {t('directory.reviews', 'Reviews', 'மதிப்புரைகள்')} ({business.comments?.length || 0})
-                          </Button>
-                          
-                          <Link href={`/directory/${business.id}`}>
-                            <Button 
-                              size="sm"
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              {t('directory.viewProfile', 'View Profile', 'சுயவிவரம் பார்க்க')}
-                            </Button>
-                          </Link>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* All Businesses */}
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                {selectedCategory === 'all' 
-                  ? t('directory.allBusinesses', 'All Businesses', 'அனைத்து வணிகங்கள்')
-                  : categories.find(cat => cat.id === selectedCategory)?.name
+                {selectedCategory
+                  ? (language === 'ta' ? selectedCategoryObj?.name_ta : selectedCategoryObj?.name)
+                  : t('directory.allBusinesses', 'All Businesses', 'அனைத்து வணிகங்கள்')
                 }
               </h2>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {(selectedCategory === 'all' ? regularBusinesses : filteredBusinesses.filter(b => !b.featured)).map((business) => (
+                {filteredBusinesses.map((business) => (
                   <Card key={business.id} className="hover:shadow-lg transition-shadow bg-white border-gray-200">
                     <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200">
                       <div className="flex items-center justify-center">
