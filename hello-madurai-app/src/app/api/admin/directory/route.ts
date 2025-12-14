@@ -6,6 +6,10 @@ export async function GET() {
   try {
     // Fetch all businesses from Hostinger MySQL
     const businesses = await prisma.business.findMany({
+      include: {
+        mainCategory: true,
+        subcategory: true
+      },
       orderBy: {
         createdAt: 'desc'
       }
@@ -27,9 +31,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
 
     // Validate required fields
-    if (!body.name || !body.category || !body.address) {
+    if (!body.name || !body.address) {
       return NextResponse.json(
-        { error: 'Name, category, and address are required' },
+        { error: 'Name and address are required' },
         { status: 400 }
       )
     }
@@ -41,7 +45,9 @@ export async function POST(request: NextRequest) {
         name_ta: body.name_ta,
         description: body.description || '',
         description_ta: body.description_ta,
-        category: body.category,
+        category: body.category || '',
+        categoryId: body.categoryId || null,
+        subcategoryId: body.subcategoryId || null,
         phone: body.phone,
         email: body.email,
         website: body.website,
@@ -55,6 +61,10 @@ export async function POST(request: NextRequest) {
         longitude: body.longitude ? parseFloat(body.longitude) : undefined,
         featured: body.featured || false,
         verified: body.verified || false
+      },
+      include: {
+        mainCategory: true,
+        subcategory: true
       }
     })
 

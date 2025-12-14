@@ -503,11 +503,18 @@ export default function AdminDirectoryPage() {
                             </p>
                           )}
                           <div className="flex items-center space-x-2 mb-2">
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              {businessCategories.find(cat => cat.id === business.category)?.name || business.category}
-                            </span>
+                            {business.mainCategory && (
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {business.mainCategory.name}
+                              </span>
+                            )}
+                            {business.subcategory && (
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                {business.subcategory.name}
+                              </span>
+                            )}
                             {business.featured && (
-                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-blue-800">
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                 Featured
                               </span>
                             )}

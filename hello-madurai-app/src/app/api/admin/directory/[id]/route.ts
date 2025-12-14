@@ -17,7 +17,9 @@ export async function PUT(
         name_ta: data.name_ta || undefined,
         description: data.description || undefined,
         description_ta: data.description_ta || undefined,
-        category: data.category,
+        category: data.category || '',
+        categoryId: data.categoryId || null,
+        subcategoryId: data.subcategoryId || null,
         address: data.address,
         address_ta: data.address_ta || undefined,
         phone: data.phone,
@@ -25,9 +27,13 @@ export async function PUT(
         website: data.website || undefined,
         featured: data.featured || false,
         image: data.image || undefined
+      },
+      include: {
+        mainCategory: true,
+        subcategory: true
       }
     })
-    
+
     return NextResponse.json(business)
   } catch (error) {
     console.error('Error updating business:', error)
