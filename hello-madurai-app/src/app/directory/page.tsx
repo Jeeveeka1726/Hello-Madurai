@@ -25,6 +25,7 @@ interface Subcategory {
   name: string
   name_ta: string
   slug: string
+  icon?: string
   categoryId: string
   _count?: {
     businesses: number
@@ -36,7 +37,6 @@ interface Category {
   name: string
   name_ta: string
   slug: string
-  icon?: string
   orderNumber: number
   subcategories: Subcategory[]
   _count?: {
@@ -64,13 +64,15 @@ interface Business {
 
   // New business features
   videoUrl?: string
+  youtubeUrl?: string
   instagramUrl?: string
   facebookUrl?: string
   bookingUrl?: string
   latitude?: number
   longitude?: number
+  orderNumber: number
+  hasProfile: boolean
 
-  featured: boolean
   verified: boolean
   createdAt: string
   updatedAt: string
@@ -107,7 +109,13 @@ function DirectoryPageContent() {
 
         if (categoriesRes.ok) {
           const categoriesData = await categoriesRes.json()
-          setCategories(categoriesData.categories || [])
+          // Sort categories alphabetically by name
+          const sortedCategories = (categoriesData.categories || []).sort((a: Category, b: Category) => {
+            const nameA = language === 'ta' ? a.name_ta : a.name
+            const nameB = language === 'ta' ? b.name_ta : b.name
+            return nameA.localeCompare(nameB)
+          })
+          setCategories(sortedCategories)
         }
 
         if (businessesRes.ok) {
@@ -122,7 +130,7 @@ function DirectoryPageContent() {
     }
 
     fetchData()
-  }, [])
+  }, [language])
 
   const filteredBusinesses = businesses.filter(business => {
     // Filter by category
@@ -285,7 +293,6 @@ function DirectoryPageContent() {
                           : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400 hover:shadow-md'
                       }`}
                     >
-                      {category.icon && <span className="text-xl">{category.icon}</span>}
                       <span>{language === 'ta' ? category.name_ta : category.name}</span>
                       {category._count && category._count.businesses > 0 && (
                         <span className={`text-xs px-2 py-0.5 rounded-full ${
@@ -331,13 +338,13 @@ function DirectoryPageContent() {
                       }`}
                     >
                       <div className="flex flex-col items-center text-center gap-2">
-                        {/* Icon placeholder - you can add custom icons here */}
+                        {/* Icon from database */}
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
                           selectedSubcategory === subcategory.id
                             ? 'bg-blue-600 text-white'
                             : 'bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600'
                         }`}>
-                          🏢
+                          {subcategory.icon || '🏢'}
                         </div>
                         <div>
                           <p className={`font-medium text-sm ${
@@ -360,7 +367,7 @@ function DirectoryPageContent() {
               </div>
             )}
 
-            {/* All Businesses */}
+            {/* Businesses */}
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 {selectedCategory
@@ -370,64 +377,147 @@ function DirectoryPageContent() {
               </h2>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {filteredBusinesses.map((business) => (
-                  <Card key={business.id} className="hover:shadow-lg transition-shadow bg-white border-gray-200">
-                    <div className="aspect-w-16 aspect-h-10 bg-gradient-to-br from-gray-100 to-gray-200">
-                      <div className="flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="text-3xl mb-1">🏢</div>
-                          <p className="text-xs text-gray-500 capitalize">
-                            {business.category}
-                          </p>
+                  <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
+                    <CardContent className="p-6">
+                      {/* Category Badge */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          {business.subcategory?.icon && (
+                            <span className="text-2xl">{business.subcategory.icon}</span>
+                          )}
+                          <span className="text-sm text-gray-600 font-medium">
+                            {language === 'ta'
+                              ? (business.mainCategory?.name_ta || business.category)
+                              : (business.mainCategory?.name || business.category)
+                            }
+                          </span>
                         </div>
-                      </div>
-                    </div>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs text-gray-500 capitalize">
-                          {business.category}
-                        </span>
                         {business.verified && (
-                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                            {t('directory.verified', 'Verified', 'சரிபார்க்கப்பட்டது')}
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
+                            ✓ {t('directory.verified', 'Verified', 'சரிபார்க்கப்பட்டது')}
                           </span>
                         )}
                       </div>
-                      <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
-                        {business.name}
+
+                      {/* Business Name */}
+                      <h3 className="font-bold text-xl text-gray-900 mb-2">
+                        {language === 'ta' && business.name_ta ? business.name_ta : business.name}
                       </h3>
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                        {business.description}
+
+                      {/* Description */}
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                        {language === 'ta' && business.description_ta ? business.description_ta : business.description}
                       </p>
-                      <div className="space-y-1 mb-3 text-xs text-gray-600">
-                        <div className="flex items-center">
-                          <MapPinIcon className="h-3 w-3 mr-1 text-gray-400" />
-                          <span className="line-clamp-1">{business.address}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <PhoneIcon className="h-3 w-3 mr-1 text-gray-400" />
-                          <span>{business.phone}</span>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button 
-                          size="sm" 
-                          onClick={() => handleCall(business.phone)} 
-                          className="flex-1 text-xs"
+
+                      {/* Clickable Contact Info */}
+                      <div className="space-y-2 mb-4 text-sm">
+                        {/* Address - Clickable for directions */}
+                        <button
+                          onClick={() => handleDirections(business)}
+                          className="flex items-start gap-2 text-gray-700 hover:text-blue-600 transition-colors w-full text-left group"
                         >
-                          <PhoneIcon className="h-3 w-3 mr-1" />
-                          {t('directory.call', 'Call', 'அழை')}
-                        </Button>
-                        {business.email && (
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            onClick={() => handleEmail(business.email!)}
-                            className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 text-xs"
+                          <MapPinIcon className="h-4 w-4 mt-0.5 flex-shrink-0 group-hover:text-blue-600" />
+                          <span className="line-clamp-2">
+                            {language === 'ta' && business.address_ta ? business.address_ta : business.address}
+                          </span>
+                        </button>
+
+                        {/* Phone - Clickable to call */}
+                        {business.phone && (
+                          <a
+                            href={`tel:${business.phone}`}
+                            className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors"
                           >
-                            <EnvelopeIcon className="h-3 w-3" />
-                          </Button>
+                            <PhoneIcon className="h-4 w-4 flex-shrink-0" />
+                            <span>{business.phone}</span>
+                          </a>
+                        )}
+
+                        {/* Email - Clickable to email */}
+                        {business.email && (
+                          <a
+                            href={`mailto:${business.email}`}
+                            className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors"
+                          >
+                            <EnvelopeIcon className="h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">{business.email}</span>
+                          </a>
+                        )}
+
+                        {/* Website - Clickable to open */}
+                        {business.website && (
+                          <a
+                            href={business.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors"
+                          >
+                            <GlobeAltIcon className="h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">{business.website}</span>
+                          </a>
                         )}
                       </div>
+
+                      {/* Action Buttons Grid */}
+                      <div className="grid grid-cols-2 gap-2 mb-3">
+                        {/* Instagram */}
+                        {business.instagramUrl && (
+                          <button
+                            onClick={() => handleInstagram(business.instagramUrl!)}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                          >
+                            Instagram
+                          </button>
+                        )}
+
+                        {/* Facebook */}
+                        {business.facebookUrl && (
+                          <button
+                            onClick={() => handleFacebook(business.facebookUrl!)}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                          >
+                            Facebook
+                          </button>
+                        )}
+
+                        {/* YouTube */}
+                        {business.youtubeUrl && (
+                          <button
+                            onClick={() => window.open(business.youtubeUrl, '_blank')}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                          >
+                            Youtube
+                          </button>
+                        )}
+
+                        {/* Booking */}
+                        {business.bookingUrl && (
+                          <button
+                            onClick={() => handleBooking(business.bookingUrl!)}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                          >
+                            Booking
+                          </button>
+                        )}
+
+                        {/* Share */}
+                        <button
+                          onClick={() => handleShare(business)}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        >
+                          Share
+                        </button>
+                      </div>
+
+                      {/* View Profile Button - Only if hasProfile is true */}
+                      {business.hasProfile && (
+                        <Link
+                          href={`/directory/${business.id}`}
+                          className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm font-medium"
+                        >
+                          View Profile
+                        </Link>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
