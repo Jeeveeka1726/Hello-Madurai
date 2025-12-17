@@ -43,7 +43,7 @@ export default function NewHeader() {
       href: '/magazine'
     },
     {
-      name: t('nav.directory', 'Directory', 'வணிக அடைவு'),
+      name: t('nav.directory', 'Directory', 'வணிக முகவரி'),
       href: '/directory'
     },
   ]

@@ -18,7 +18,7 @@ export default function Footer() {
     { name: 'magazine', href: '/magazine' },
     { name: 'radio', href: '/radio' },
     { name: 'videos', href: '/videos' },
-    { name: 'tourism', href: '/tourism' },
+    { name: 'helpline', href: '/helpline' },
   ]
 
   const socialLinks = [
@@ -102,7 +102,7 @@ export default function Footer() {
                     className="text-gray-400 hover:text-white transition-colors duration-200"
                     suppressHydrationWarning
                   >
-                    {t(`nav.${link.name}`, link.name, link.name)}
+                    {t(`nav.${link.name}`, link.name.charAt(0).toUpperCase() + link.name.slice(1), link.name)}
                   </Link>
                 </li>
               ))}
@@ -122,7 +122,7 @@ export default function Footer() {
                     className="text-gray-400 hover:text-white transition-colors duration-200"
                     suppressHydrationWarning
                   >
-                    {t(`nav.${service.name}`, service.name, service.name)}
+                    {t(`nav.${service.name}`, service.name.charAt(0).toUpperCase() + service.name.slice(1), service.name)}
                   </Link>
                 </li>
               ))}

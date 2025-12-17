@@ -232,7 +232,7 @@ function DirectoryPageContent() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-            {t('directory.title', 'Business Directory', 'வணிக அடைவு')}
+            {t('directory.title', 'Business Directory', 'வணிக முகவரி')}
           </h1>
           <p className="mt-2 text-lg text-gray-600">
             {t('directory.subtitle', 'Find local businesses and services in Madurai', 'மதுரையில் உள்ளூர் வணிகங்கள் மற்றும் சேவைகளைக் கண்டறியுங்கள்')}

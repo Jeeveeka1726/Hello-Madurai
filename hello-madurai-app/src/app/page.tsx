@@ -88,7 +88,7 @@ export default function RootPage() {
       nameEn: 'Discount Card',
       nameTa: 'தள்ளுபடி அட்டை',
       descEn: 'Get discounts across Madurai',
-      descTa: 'மதுரை முழுவதும் தள்ளுபடி பெறுங்கள்',
+      descTa: 'நமது வணிக வாடிக்கையாளர்களின் தள்ளுபடிகளைப் பெறுங்கள்',
       href: '/discount',
       icon: CreditCardIcon,
       color: 'bg-yellow-500'
