@@ -54,13 +54,14 @@ export async function POST(request: NextRequest) {
         address: body.address,
         address_ta: body.address_ta,
         videoUrl: body.videoUrl,
+        youtubeUrl: body.youtubeUrl,
         instagramUrl: body.instagramUrl,
         facebookUrl: body.facebookUrl,
         bookingUrl: body.bookingUrl,
         latitude: body.latitude ? parseFloat(body.latitude) : undefined,
         longitude: body.longitude ? parseFloat(body.longitude) : undefined,
         orderNumber: body.orderNumber || 0,
-        featured: body.featured || false,
+        hasProfile: body.hasProfile || false,
         verified: body.verified || false
       },
       include: {

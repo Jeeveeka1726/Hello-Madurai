@@ -49,8 +49,15 @@ interface Business {
   phone: string
   email?: string
   website?: string
+  videoUrl?: string
+  youtubeUrl?: string
+  instagramUrl?: string
+  facebookUrl?: string
+  bookingUrl?: string
+  latitude?: number
+  longitude?: number
   orderNumber: number
-  featured: boolean
+  hasProfile: boolean
   verified: boolean
   createdAt: string
   updatedAt: string
@@ -76,8 +83,16 @@ export default function AdminDirectoryPage() {
     phone: '',
     email: '',
     website: '',
+    videoUrl: '',
+    youtubeUrl: '',
+    instagramUrl: '',
+    facebookUrl: '',
+    bookingUrl: '',
+    latitude: '',
+    longitude: '',
     orderNumber: 0,
-    featured: false
+    hasProfile: false,
+    verified: false
   })
 
   useEffect(() => {
@@ -149,8 +164,16 @@ export default function AdminDirectoryPage() {
           phone: '',
           email: '',
           website: '',
+          videoUrl: '',
+          youtubeUrl: '',
+          instagramUrl: '',
+          facebookUrl: '',
+          bookingUrl: '',
+          latitude: '',
+          longitude: '',
           orderNumber: 0,
-          featured: false
+          hasProfile: false,
+          verified: false
         })
       }
     } catch (error) {
@@ -175,8 +198,16 @@ export default function AdminDirectoryPage() {
       phone: business.phone,
       email: business.email || '',
       website: business.website || '',
+      videoUrl: business.videoUrl || '',
+      youtubeUrl: business.youtubeUrl || '',
+      instagramUrl: business.instagramUrl || '',
+      facebookUrl: business.facebookUrl || '',
+      bookingUrl: business.bookingUrl || '',
+      latitude: business.latitude?.toString() || '',
+      longitude: business.longitude?.toString() || '',
       orderNumber: business.orderNumber || 0,
-      featured: business.featured
+      hasProfile: business.hasProfile || false,
+      verified: business.verified || false
     })
     setShowForm(true)
   }
@@ -239,8 +270,16 @@ export default function AdminDirectoryPage() {
                 phone: '',
                 email: '',
                 website: '',
+                videoUrl: '',
+                youtubeUrl: '',
+                instagramUrl: '',
+                facebookUrl: '',
+                bookingUrl: '',
+                latitude: '',
+                longitude: '',
                 orderNumber: 0,
-                featured: false
+                hasProfile: false,
+                verified: false
               })
             }}
           >
@@ -388,6 +427,98 @@ export default function AdminDirectoryPage() {
                     </div>
                   </div>
 
+                  {/* Social Media & Additional URLs */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Instagram URL */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Instagram URL (Optional)
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.instagramUrl}
+                        onChange={(e) => setFormData({ ...formData, instagramUrl: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="https://instagram.com/..."
+                      />
+                    </div>
+
+                    {/* Facebook URL */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Facebook URL (Optional)
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.facebookUrl}
+                        onChange={(e) => setFormData({ ...formData, facebookUrl: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="https://facebook.com/..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* YouTube URL */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        YouTube URL (Optional)
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.youtubeUrl}
+                        onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="https://youtube.com/..."
+                      />
+                    </div>
+
+                    {/* Booking URL */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Booking URL (Optional)
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.bookingUrl}
+                        onChange={(e) => setFormData({ ...formData, bookingUrl: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="https://booking.com/..."
+                      />
+                    </div>
+                  </div>
+
+                  {/* Location Coordinates */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Latitude */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Latitude (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.latitude}
+                        onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="9.9252"
+                      />
+                    </div>
+
+                    {/* Longitude */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Longitude (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.longitude}
+                        onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="78.1198"
+                      />
+                    </div>
+                  </div>
+
                   {/* Order Number */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -406,18 +537,36 @@ export default function AdminDirectoryPage() {
                     </p>
                   </div>
 
-                  {/* Featured */}
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="featured"
-                      checked={formData.featured}
-                      onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="featured" className="ml-2 block text-sm text-gray-700">
-                      <TranslatedText>Featured Business</TranslatedText>
-                    </label>
+                  {/* Checkboxes */}
+                  <div className="space-y-3">
+                    {/* Has Profile */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="hasProfile"
+                        checked={formData.hasProfile}
+                        onChange={(e) => setFormData({ ...formData, hasProfile: e.target.checked })}
+                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="hasProfile" className="ml-2 block text-sm text-gray-700">
+                        <TranslatedText>Has Profile Page</TranslatedText>
+                        <span className="text-xs text-gray-500 ml-2">(Show "View Profile" button)</span>
+                      </label>
+                    </div>
+
+                    {/* Verified */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="verified"
+                        checked={formData.verified}
+                        onChange={(e) => setFormData({ ...formData, verified: e.target.checked })}
+                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="verified" className="ml-2 block text-sm text-gray-700">
+                        <TranslatedText>Verified Business</TranslatedText>
+                      </label>
+                    </div>
                   </div>
 
                   {/* Form Actions */}
@@ -464,13 +613,13 @@ export default function AdminDirectoryPage() {
           <Card className="bg-white border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <BuildingOfficeIcon className="h-8 w-8 text-blue-600" />
+                <BuildingOfficeIcon className="h-8 w-8 text-purple-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">
-                    <TranslatedText>Featured</TranslatedText>
+                    <TranslatedText>With Profile</TranslatedText>
                   </p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {businesses.filter(b => b.featured).length}
+                    {businesses.filter(b => b.hasProfile).length}
                   </p>
                 </div>
               </div>
@@ -538,9 +687,9 @@ export default function AdminDirectoryPage() {
                                 {business.subcategory.name}
                               </span>
                             )}
-                            {business.featured && (
-                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                Featured
+                            {business.hasProfile && (
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                Has Profile
                               </span>
                             )}
                             {business.verified && (

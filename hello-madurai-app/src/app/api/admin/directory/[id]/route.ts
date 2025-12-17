@@ -25,8 +25,16 @@ export async function PUT(
         phone: data.phone,
         email: data.email || undefined,
         website: data.website || undefined,
+        videoUrl: data.videoUrl || undefined,
+        youtubeUrl: data.youtubeUrl || undefined,
+        instagramUrl: data.instagramUrl || undefined,
+        facebookUrl: data.facebookUrl || undefined,
+        bookingUrl: data.bookingUrl || undefined,
+        latitude: data.latitude ? parseFloat(data.latitude) : undefined,
+        longitude: data.longitude ? parseFloat(data.longitude) : undefined,
         orderNumber: data.orderNumber !== undefined ? data.orderNumber : 0,
-        featured: data.featured || false,
+        hasProfile: data.hasProfile !== undefined ? data.hasProfile : false,
+        verified: data.verified !== undefined ? data.verified : false,
         image: data.image || undefined
       },
       include: {
