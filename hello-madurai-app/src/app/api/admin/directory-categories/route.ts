@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, name_ta, slug, icon, orderNumber } = body
+    const { name, name_ta, slug, orderNumber } = body
 
     if (!name || !name_ta || !slug) {
       return NextResponse.json(
@@ -56,7 +56,6 @@ export async function POST(request: NextRequest) {
         name,
         name_ta,
         slug,
-        icon: icon || null,
         orderNumber: orderNumber || 0
       },
       include: {

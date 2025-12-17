@@ -100,7 +100,6 @@ model DirectoryCategory {
   name          String                 // English name
   name_ta       String                 // Tamil name
   slug          String                 @unique
-  icon          String?                // Icon name or emoji
   orderNumber   Int                    @default(0)
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
@@ -115,6 +114,7 @@ model DirectorySubcategory {
   name       String            // English name
   name_ta    String            // Tamil name
   slug       String            @unique
+  icon       String?           // Emoji icon
   categoryId String
   category   DirectoryCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   businesses Business[]
@@ -144,10 +144,11 @@ model Business {
   instagramUrl   String?
   facebookUrl    String?
   bookingUrl     String?
+  youtubeUrl     String?
   latitude       Float?
   longitude      Float?
   orderNumber    Int                   @default(0)
-  featured       Boolean               @default(false)
+  hasProfile     Boolean               @default(false) // Whether to show View Profile button
   verified       Boolean               @default(false)
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt

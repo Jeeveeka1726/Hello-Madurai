@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, name_ta, slug, categoryId } = body
+    const { name, name_ta, slug, icon, categoryId } = body
 
     if (!name || !name_ta || !slug || !categoryId) {
       return NextResponse.json(
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
         name,
         name_ta,
         slug,
+        icon: icon || null,
         categoryId
       },
       include: {

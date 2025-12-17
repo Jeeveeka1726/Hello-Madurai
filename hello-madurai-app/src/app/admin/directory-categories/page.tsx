@@ -17,6 +17,7 @@ interface Subcategory {
   name: string
   name_ta: string
   slug: string
+  icon?: string
   categoryId: string
   _count?: {
     businesses: number
@@ -28,7 +29,6 @@ interface Category {
   name: string
   name_ta: string
   slug: string
-  icon?: string
   orderNumber: number
   subcategories: Subcategory[]
   _count?: {
@@ -50,7 +50,6 @@ export default function DirectoryCategoriesPage() {
     name: '',
     name_ta: '',
     slug: '',
-    icon: '',
     orderNumber: 0
   })
 
@@ -62,6 +61,7 @@ export default function DirectoryCategoriesPage() {
     name: '',
     name_ta: '',
     slug: '',
+    icon: '',
     categoryId: ''
   })
 
@@ -112,9 +112,9 @@ export default function DirectoryCategoriesPage() {
         await fetchCategories()
         setShowCategoryForm(false)
         setEditingCategory(null)
-        setCategoryForm({ name: '', name_ta: '', slug: '', icon: '', orderNumber: 0 })
-        toast.success(language === 'ta' 
-          ? (editingCategory ? 'வகை புதுப்பிக்கப்பட்டது!' : 'வகை சேர்க்கப்பட்டது!') 
+        setCategoryForm({ name: '', name_ta: '', slug: '', orderNumber: 0 })
+        toast.success(language === 'ta'
+          ? (editingCategory ? 'வகை புதுப்பிக்கப்பட்டது!' : 'வகை சேர்க்கப்பட்டது!')
           : (editingCategory ? 'Category updated!' : 'Category added!')
         )
       } else {
@@ -147,9 +147,9 @@ export default function DirectoryCategoriesPage() {
         await fetchCategories()
         setShowSubcategoryForm(false)
         setEditingSubcategory(null)
-        setSubcategoryForm({ name: '', name_ta: '', slug: '', categoryId: '' })
-        toast.success(language === 'ta' 
-          ? (editingSubcategory ? 'துணை வகை புதுப்பிக்கப்பட்டது!' : 'துணை வகை சேர்க்கப்பட்டது!') 
+        setSubcategoryForm({ name: '', name_ta: '', slug: '', icon: '', categoryId: '' })
+        toast.success(language === 'ta'
+          ? (editingSubcategory ? 'துணை வகை புதுப்பிக்கப்பட்டது!' : 'துணை வகை சேர்க்கப்பட்டது!')
           : (editingSubcategory ? 'Subcategory updated!' : 'Subcategory added!')
         )
       } else {
@@ -215,12 +215,11 @@ export default function DirectoryCategoriesPage() {
         name: category.name,
         name_ta: category.name_ta,
         slug: category.slug,
-        icon: category.icon || '',
         orderNumber: category.orderNumber
       })
     } else {
       setEditingCategory(null)
-      setCategoryForm({ name: '', name_ta: '', slug: '', icon: '', orderNumber: 0 })
+      setCategoryForm({ name: '', name_ta: '', slug: '', orderNumber: 0 })
     }
     setShowCategoryForm(true)
   }
@@ -233,11 +232,12 @@ export default function DirectoryCategoriesPage() {
         name: subcategory.name,
         name_ta: subcategory.name_ta,
         slug: subcategory.slug,
+        icon: subcategory.icon || '',
         categoryId: subcategory.categoryId
       })
     } else {
       setEditingSubcategory(null)
-      setSubcategoryForm({ name: '', name_ta: '', slug: '', categoryId })
+      setSubcategoryForm({ name: '', name_ta: '', slug: '', icon: '', categoryId })
     }
     setShowSubcategoryForm(true)
   }
@@ -290,12 +290,9 @@ export default function DirectoryCategoriesPage() {
                     </button>
                     <FolderIcon className="h-6 w-6 text-blue-600" />
                     <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-lg">
-                          {language === 'ta' ? category.name_ta : category.name}
-                        </h3>
-                        {category.icon && <span className="text-xl">{category.icon}</span>}
-                      </div>
+                      <h3 className="font-semibold text-lg">
+                        {language === 'ta' ? category.name_ta : category.name}
+                      </h3>
                       <p className="text-sm text-gray-500">
                         {category._count?.subcategories || 0} {language === 'ta' ? 'துணை வகைகள்' : 'subcategories'} • {' '}
                         {category._count?.businesses || 0} {language === 'ta' ? 'வணிகங்கள்' : 'businesses'}
@@ -342,13 +339,18 @@ export default function DirectoryCategoriesPage() {
                           key={subcategory.id}
                           className="flex items-center justify-between bg-white p-3 rounded border border-gray-200"
                         >
-                          <div>
-                            <h4 className="font-medium">
-                              {language === 'ta' ? subcategory.name_ta : subcategory.name}
-                            </h4>
-                            <p className="text-sm text-gray-500">
-                              {subcategory._count?.businesses || 0} {language === 'ta' ? 'வணிகங்கள்' : 'businesses'}
-                            </p>
+                          <div className="flex items-center gap-3">
+                            {subcategory.icon && (
+                              <span className="text-2xl">{subcategory.icon}</span>
+                            )}
+                            <div>
+                              <h4 className="font-medium">
+                                {language === 'ta' ? subcategory.name_ta : subcategory.name}
+                              </h4>
+                              <p className="text-sm text-gray-500">
+                                {subcategory._count?.businesses || 0} {language === 'ta' ? 'வணிகங்கள்' : 'businesses'}
+                              </p>
+                            </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <button
@@ -428,18 +430,6 @@ export default function DirectoryCategoriesPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {language === 'ta' ? 'ஐகான் (விருப்பம்)' : 'Icon (Optional)'}
-                  </label>
-                  <input
-                    type="text"
-                    value={categoryForm.icon}
-                    onChange={(e) => setCategoryForm({ ...categoryForm, icon: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="🏥 🎓 🍽️"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     {language === 'ta' ? 'வரிசை எண்' : 'Order Number'}
                   </label>
                   <input
@@ -448,6 +438,9 @@ export default function DirectoryCategoriesPage() {
                     onChange={(e) => setCategoryForm({ ...categoryForm, orderNumber: parseInt(e.target.value) || 0 })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {language === 'ta' ? 'குறைந்த எண்கள் முதலில் காட்டப்படும்' : 'Lower numbers appear first'}
+                  </p>
                 </div>
                 <div className="flex gap-3 pt-4">
                   <button
@@ -521,6 +514,33 @@ export default function DirectoryCategoriesPage() {
                     placeholder="hospitals, clinics, etc."
                     required
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {language === 'ta' ? 'ஐகான் (விருப்பம்)' : 'Icon (Optional)'}
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={subcategoryForm.icon}
+                      onChange={(e) => setSubcategoryForm({ ...subcategoryForm, icon: e.target.value })}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="🏥 🎓 🍽️"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const emoji = prompt(language === 'ta' ? 'எமோஜியை உள்ளிடவும்:' : 'Enter emoji:')
+                        if (emoji) setSubcategoryForm({ ...subcategoryForm, icon: emoji })
+                      }}
+                      className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+                    >
+                      😀
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {language === 'ta' ? 'எமோஜி ஐகானை உள்ளிடவும்' : 'Enter an emoji icon'}
+                  </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">

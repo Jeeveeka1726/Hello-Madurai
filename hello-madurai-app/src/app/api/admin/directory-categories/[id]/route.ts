@@ -9,7 +9,7 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    const { name, name_ta, slug, icon, orderNumber } = body
+    const { name, name_ta, slug, orderNumber } = body
 
     if (!name || !name_ta || !slug) {
       return NextResponse.json(
@@ -39,7 +39,6 @@ export async function PUT(
         name,
         name_ta,
         slug,
-        icon: icon || null,
         orderNumber: orderNumber || 0
       },
       include: {
