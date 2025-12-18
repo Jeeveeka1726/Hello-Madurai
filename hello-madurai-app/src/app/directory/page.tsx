@@ -116,6 +116,11 @@ function DirectoryPageContent() {
             return nameA.localeCompare(nameB)
           })
           setCategories(sortedCategories)
+
+          // Auto-select first category if none selected
+          if (sortedCategories.length > 0 && !selectedCategory) {
+            setSelectedCategory(sortedCategories[0].id)
+          }
         }
 
         if (businessesRes.ok) {
@@ -368,13 +373,11 @@ function DirectoryPageContent() {
             )}
 
             {/* Businesses */}
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                {selectedCategory
-                  ? (language === 'ta' ? selectedCategoryObj?.name_ta : selectedCategoryObj?.name)
-                  : t('directory.allBusinesses', 'All Businesses', 'அனைத்து வணிகங்கள்')
-                }
-              </h2>
+            {selectedCategoryObj && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  {language === 'ta' ? selectedCategoryObj.name_ta : selectedCategoryObj.name}
+                </h2>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {filteredBusinesses.map((business) => (
                   <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
@@ -522,15 +525,16 @@ function DirectoryPageContent() {
                   </Card>
                 ))}
               </div>
-            </div>
 
-            {/* No businesses message */}
-            {!loading && filteredBusinesses.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-500">
-                  {t('directory.noBusinesses', 'No businesses found matching your criteria', 'உங்கள் அளவுகோலுக்கு பொருந்தும் வணிகங்கள் எதுவும் கிடைக்கவில்லை')}
-                </p>
-              </div>
+              {/* No businesses message */}
+              {filteredBusinesses.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">
+                    {t('directory.noBusinesses', 'No businesses found matching your criteria', 'உங்கள் அளவுகோலுக்கு பொருந்தும் வணிகங்கள் எதுவும் கிடைக்கவில்லை')}
+                  </p>
+                </div>
+              )}
+            </div>
             )}
           </>
         )}
