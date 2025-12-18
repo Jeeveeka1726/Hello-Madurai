@@ -2,15 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { 
-  PlusIcon, 
-  PencilIcon, 
+import {
+  PlusIcon,
+  PencilIcon,
   TrashIcon,
   FolderIcon,
   ChevronDownIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
+import EmojiPicker from '@/components/admin/EmojiPicker'
 
 interface Subcategory {
   id: string
@@ -473,27 +474,13 @@ export default function DirectoryCategoriesPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {language === 'ta' ? 'ஐகான் (விருப்பம்)' : 'Icon (Optional)'}
                   </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={subcategoryForm.icon}
-                      onChange={(e) => setSubcategoryForm({ ...subcategoryForm, icon: e.target.value })}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="🏥 🎓 🍽️"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const emoji = prompt(language === 'ta' ? 'எமோஜியை உள்ளிடவும்:' : 'Enter emoji:')
-                        if (emoji) setSubcategoryForm({ ...subcategoryForm, icon: emoji })
-                      }}
-                      className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
-                    >
-                      😀
-                    </button>
-                  </div>
+                  <EmojiPicker
+                    value={subcategoryForm.icon}
+                    onChange={(emoji) => setSubcategoryForm({ ...subcategoryForm, icon: emoji })}
+                    placeholder="🏥 🎓 🍽️"
+                  />
                   <p className="text-xs text-gray-500 mt-1">
-                    {language === 'ta' ? 'எமோஜி ஐகானை உள்ளிடவும்' : 'Enter an emoji icon'}
+                    {language === 'ta' ? 'எமோஜி ஐகானை தேர்ந்தெடுக்கவும் அல்லது உள்ளிடவும்' : 'Choose or enter an emoji icon'}
                   </p>
                 </div>
                 <div>

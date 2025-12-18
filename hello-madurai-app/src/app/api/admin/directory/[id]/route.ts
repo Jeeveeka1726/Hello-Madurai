@@ -8,10 +8,9 @@ export async function PUT(
   try {
     const { id } = await params
     const data = await request.json()
-    const businessId = parseInt(id)
-    
+
     const business = await prisma.business.update({
-      where: { id: businessId },
+      where: { id: id },
       data: {
         name: data.name,
         name_ta: data.name_ta || undefined,
@@ -56,12 +55,11 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    const businessId = parseInt(id)
-    
+
     await prisma.business.delete({
-      where: { id: businessId }
+      where: { id: id }
     })
-    
+
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting business:', error)
