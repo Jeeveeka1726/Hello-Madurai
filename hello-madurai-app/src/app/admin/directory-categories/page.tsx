@@ -29,7 +29,6 @@ interface Category {
   name: string
   name_ta: string
   slug: string
-  orderNumber: number
   subcategories: Subcategory[]
   _count?: {
     businesses: number
@@ -49,8 +48,7 @@ export default function DirectoryCategoriesPage() {
   const [categoryForm, setCategoryForm] = useState({
     name: '',
     name_ta: '',
-    slug: '',
-    orderNumber: 0
+    slug: ''
   })
 
   // Subcategory form state
@@ -112,7 +110,7 @@ export default function DirectoryCategoriesPage() {
         await fetchCategories()
         setShowCategoryForm(false)
         setEditingCategory(null)
-        setCategoryForm({ name: '', name_ta: '', slug: '', orderNumber: 0 })
+        setCategoryForm({ name: '', name_ta: '', slug: '' })
         toast.success(language === 'ta'
           ? (editingCategory ? 'வகை புதுப்பிக்கப்பட்டது!' : 'வகை சேர்க்கப்பட்டது!')
           : (editingCategory ? 'Category updated!' : 'Category added!')
@@ -214,12 +212,11 @@ export default function DirectoryCategoriesPage() {
       setCategoryForm({
         name: category.name,
         name_ta: category.name_ta,
-        slug: category.slug,
-        orderNumber: category.orderNumber
+        slug: category.slug
       })
     } else {
       setEditingCategory(null)
-      setCategoryForm({ name: '', name_ta: '', slug: '', orderNumber: 0 })
+      setCategoryForm({ name: '', name_ta: '', slug: '' })
     }
     setShowCategoryForm(true)
   }
@@ -427,19 +424,8 @@ export default function DirectoryCategoriesPage() {
                     placeholder="healthcare, education, etc."
                     required
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {language === 'ta' ? 'வரிசை எண்' : 'Order Number'}
-                  </label>
-                  <input
-                    type="number"
-                    value={categoryForm.orderNumber}
-                    onChange={(e) => setCategoryForm({ ...categoryForm, orderNumber: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
                   <p className="text-xs text-gray-500 mt-1">
-                    {language === 'ta' ? 'குறைந்த எண்கள் முதலில் காட்டப்படும்' : 'Lower numbers appear first'}
+                    {language === 'ta' ? 'வகைகள் அகரவரிசைப்படி காட்டப்படும்' : 'Categories are displayed alphabetically'}
                   </p>
                 </div>
                 <div className="flex gap-3 pt-4">

@@ -100,7 +100,6 @@ model DirectoryCategory {
   name          String                 // English name
   name_ta       String                 // Tamil name
   slug          String                 @unique
-  orderNumber   Int                    @default(0)
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
   subcategories DirectorySubcategory[]
