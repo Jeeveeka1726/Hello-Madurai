@@ -9,26 +9,11 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    const { name, name_ta, slug, icon, categoryId } = body
+    const { name, name_ta, icon, categoryId } = body
 
-    if (!name || !name_ta || !slug || !categoryId) {
+    if (!name || !name_ta || !categoryId) {
       return NextResponse.json(
-        { error: 'Name, Tamil name, slug, and category are required' },
-        { status: 400 }
-      )
-    }
-
-    // Check if slug is taken by another subcategory
-    const existing = await prisma.directorySubcategory.findFirst({
-      where: {
-        slug,
-        NOT: { id }
-      }
-    })
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'A subcategory with this slug already exists' },
+        { error: 'Name, Tamil name, and category are required' },
         { status: 400 }
       )
     }
@@ -38,7 +23,6 @@ export async function PUT(
       data: {
         name,
         name_ta,
-        slug,
         icon: icon || null,
         categoryId
       },

@@ -16,7 +16,6 @@ interface Subcategory {
   id: string
   name: string
   name_ta: string
-  slug: string
   icon?: string
   categoryId: string
   _count?: {
@@ -28,7 +27,6 @@ interface Category {
   id: string
   name: string
   name_ta: string
-  slug: string
   subcategories: Subcategory[]
   _count?: {
     businesses: number
@@ -47,8 +45,7 @@ export default function DirectoryCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [categoryForm, setCategoryForm] = useState({
     name: '',
-    name_ta: '',
-    slug: ''
+    name_ta: ''
   })
 
   // Subcategory form state
@@ -58,7 +55,6 @@ export default function DirectoryCategoriesPage() {
   const [subcategoryForm, setSubcategoryForm] = useState({
     name: '',
     name_ta: '',
-    slug: '',
     icon: '',
     categoryId: ''
   })
@@ -110,7 +106,7 @@ export default function DirectoryCategoriesPage() {
         await fetchCategories()
         setShowCategoryForm(false)
         setEditingCategory(null)
-        setCategoryForm({ name: '', name_ta: '', slug: '' })
+        setCategoryForm({ name: '', name_ta: '' })
         toast.success(language === 'ta'
           ? (editingCategory ? 'வகை புதுப்பிக்கப்பட்டது!' : 'வகை சேர்க்கப்பட்டது!')
           : (editingCategory ? 'Category updated!' : 'Category added!')
@@ -145,7 +141,7 @@ export default function DirectoryCategoriesPage() {
         await fetchCategories()
         setShowSubcategoryForm(false)
         setEditingSubcategory(null)
-        setSubcategoryForm({ name: '', name_ta: '', slug: '', icon: '', categoryId: '' })
+        setSubcategoryForm({ name: '', name_ta: '', icon: '', categoryId: '' })
         toast.success(language === 'ta'
           ? (editingSubcategory ? 'துணை வகை புதுப்பிக்கப்பட்டது!' : 'துணை வகை சேர்க்கப்பட்டது!')
           : (editingSubcategory ? 'Subcategory updated!' : 'Subcategory added!')
@@ -211,12 +207,11 @@ export default function DirectoryCategoriesPage() {
       setEditingCategory(category)
       setCategoryForm({
         name: category.name,
-        name_ta: category.name_ta,
-        slug: category.slug
+        name_ta: category.name_ta
       })
     } else {
       setEditingCategory(null)
-      setCategoryForm({ name: '', name_ta: '', slug: '' })
+      setCategoryForm({ name: '', name_ta: '' })
     }
     setShowCategoryForm(true)
   }
@@ -228,13 +223,12 @@ export default function DirectoryCategoriesPage() {
       setSubcategoryForm({
         name: subcategory.name,
         name_ta: subcategory.name_ta,
-        slug: subcategory.slug,
         icon: subcategory.icon || '',
         categoryId: subcategory.categoryId
       })
     } else {
       setEditingSubcategory(null)
-      setSubcategoryForm({ name: '', name_ta: '', slug: '', icon: '', categoryId })
+      setSubcategoryForm({ name: '', name_ta: '', icon: '', categoryId })
     }
     setShowSubcategoryForm(true)
   }
@@ -411,19 +405,6 @@ export default function DirectoryCategoriesPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {language === 'ta' ? 'ஸ்லக்' : 'Slug'}
-                  </label>
-                  <input
-                    type="text"
-                    value={categoryForm.slug}
-                    onChange={(e) => setCategoryForm({ ...categoryForm, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="healthcare, education, etc."
-                    required
-                  />
                   <p className="text-xs text-gray-500 mt-1">
                     {language === 'ta' ? 'வகைகள் அகரவரிசைப்படி காட்டப்படும்' : 'Categories are displayed alphabetically'}
                   </p>
@@ -485,19 +466,6 @@ export default function DirectoryCategoriesPage() {
                     value={subcategoryForm.name_ta}
                     onChange={(e) => setSubcategoryForm({ ...subcategoryForm, name_ta: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {language === 'ta' ? 'ஸ்லக்' : 'Slug'}
-                  </label>
-                  <input
-                    type="text"
-                    value={subcategoryForm.slug}
-                    onChange={(e) => setSubcategoryForm({ ...subcategoryForm, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="hospitals, clinics, etc."
                     required
                   />
                 </div>

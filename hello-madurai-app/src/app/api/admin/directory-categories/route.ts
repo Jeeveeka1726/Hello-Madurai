@@ -30,23 +30,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, name_ta, slug } = body
+    const { name, name_ta } = body
 
-    if (!name || !name_ta || !slug) {
+    if (!name || !name_ta) {
       return NextResponse.json(
-        { error: 'Name, Tamil name, and slug are required' },
-        { status: 400 }
-      )
-    }
-
-    // Check if slug already exists
-    const existing = await prisma.directoryCategory.findUnique({
-      where: { slug }
-    })
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'A category with this slug already exists' },
+        { error: 'Name and Tamil name are required' },
         { status: 400 }
       )
     }
@@ -54,8 +42,7 @@ export async function POST(request: NextRequest) {
     const category = await prisma.directoryCategory.create({
       data: {
         name,
-        name_ta,
-        slug
+        name_ta
       },
       include: {
         subcategories: true,

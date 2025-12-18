@@ -5,23 +5,11 @@ import prisma from '@/lib/prisma'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, name_ta, slug, icon, categoryId } = body
+    const { name, name_ta, icon, categoryId } = body
 
-    if (!name || !name_ta || !slug || !categoryId) {
+    if (!name || !name_ta || !categoryId) {
       return NextResponse.json(
-        { error: 'Name, Tamil name, slug, and category are required' },
-        { status: 400 }
-      )
-    }
-
-    // Check if slug already exists
-    const existing = await prisma.directorySubcategory.findUnique({
-      where: { slug }
-    })
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'A subcategory with this slug already exists' },
+        { error: 'Name, Tamil name, and category are required' },
         { status: 400 }
       )
     }
@@ -42,7 +30,6 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         name_ta,
-        slug,
         icon: icon || null,
         categoryId
       },

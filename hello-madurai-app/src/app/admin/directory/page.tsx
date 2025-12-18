@@ -20,7 +20,6 @@ interface Subcategory {
   id: string
   name: string
   name_ta: string
-  slug: string
   categoryId: string
 }
 
@@ -28,8 +27,6 @@ interface Category {
   id: string
   name: string
   name_ta: string
-  slug: string
-  icon?: string
   subcategories: Subcategory[]
 }
 

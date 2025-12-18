@@ -99,7 +99,6 @@ model DirectoryCategory {
   id            String                 @id @default(cuid())
   name          String                 // English name
   name_ta       String                 // Tamil name
-  slug          String                 @unique
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
   subcategories DirectorySubcategory[]
@@ -112,7 +111,6 @@ model DirectorySubcategory {
   id         String            @id @default(cuid())
   name       String            // English name
   name_ta    String            // Tamil name
-  slug       String            @unique
   icon       String?           // Emoji icon
   categoryId String
   category   DirectoryCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
