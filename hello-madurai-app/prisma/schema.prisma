@@ -142,10 +142,12 @@ model Business {
   facebookUrl    String?
   bookingUrl     String?
   youtubeUrl     String?
-  latitude       Float?
-  longitude      Float?
   orderNumber    Int                   @default(0)
   hasProfile     Boolean               @default(false) // Whether to show View Profile button
+  profileContent String?               @db.LongText // Rich text content for profile page
+  profileContent_ta String?            @db.LongText // Tamil rich text content for profile page
+  profileImage   String?               // Profile image URL
+  profileVideo   String?               // Profile video URL (YouTube, etc.)
   verified       Boolean               @default(false)
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt

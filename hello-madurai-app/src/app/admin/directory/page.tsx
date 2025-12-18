@@ -6,6 +6,8 @@ import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import TranslatedText from '@/components/TranslatedText'
 import BilingualField from '@/components/admin/BilingualField'
+import RichTextEditor from '@/components/admin/RichTextEditor'
+import FileUpload from '@/components/admin/FileUpload'
 import { 
   BuildingOfficeIcon, 
   PlusIcon, 
@@ -46,15 +48,16 @@ interface Business {
   phone: string
   email?: string
   website?: string
-  videoUrl?: string
   youtubeUrl?: string
   instagramUrl?: string
   facebookUrl?: string
   bookingUrl?: string
-  latitude?: number
-  longitude?: number
   orderNumber: number
   hasProfile: boolean
+  profileContent?: string
+  profileContent_ta?: string
+  profileImage?: string
+  profileVideo?: string
   verified: boolean
   createdAt: string
   updatedAt: string
@@ -80,15 +83,16 @@ export default function AdminDirectoryPage() {
     phone: '',
     email: '',
     website: '',
-    videoUrl: '',
     youtubeUrl: '',
     instagramUrl: '',
     facebookUrl: '',
     bookingUrl: '',
-    latitude: '',
-    longitude: '',
     orderNumber: 0,
     hasProfile: false,
+    profileContent: '',
+    profileContent_ta: '',
+    profileImage: '',
+    profileVideo: '',
     verified: false
   })
 
@@ -161,15 +165,16 @@ export default function AdminDirectoryPage() {
           phone: '',
           email: '',
           website: '',
-          videoUrl: '',
           youtubeUrl: '',
           instagramUrl: '',
           facebookUrl: '',
           bookingUrl: '',
-          latitude: '',
-          longitude: '',
           orderNumber: 0,
           hasProfile: false,
+          profileContent: '',
+          profileContent_ta: '',
+          profileImage: '',
+          profileVideo: '',
           verified: false
         })
       }
@@ -195,15 +200,16 @@ export default function AdminDirectoryPage() {
       phone: business.phone,
       email: business.email || '',
       website: business.website || '',
-      videoUrl: business.videoUrl || '',
       youtubeUrl: business.youtubeUrl || '',
       instagramUrl: business.instagramUrl || '',
       facebookUrl: business.facebookUrl || '',
       bookingUrl: business.bookingUrl || '',
-      latitude: business.latitude?.toString() || '',
-      longitude: business.longitude?.toString() || '',
       orderNumber: business.orderNumber || 0,
       hasProfile: business.hasProfile || false,
+      profileContent: business.profileContent || '',
+      profileContent_ta: business.profileContent_ta || '',
+      profileImage: business.profileImage || '',
+      profileVideo: business.profileVideo || '',
       verified: business.verified || false
     })
     setShowForm(true)
@@ -485,36 +491,7 @@ export default function AdminDirectoryPage() {
                     </div>
                   </div>
 
-                  {/* Location Coordinates */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Latitude */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Latitude (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.latitude}
-                        onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="9.9252"
-                      />
-                    </div>
 
-                    {/* Longitude */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Longitude (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.longitude}
-                        onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="78.1198"
-                      />
-                    </div>
-                  </div>
 
                   {/* Order Number */}
                   <div>
@@ -565,6 +542,69 @@ export default function AdminDirectoryPage() {
                       </label>
                     </div>
                   </div>
+
+                  {/* Profile Content - Only show if hasProfile is checked */}
+                  {formData.hasProfile && (
+                    <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <h3 className="text-lg font-medium text-blue-900 mb-4">
+                        <TranslatedText>Profile Page Content</TranslatedText>
+                      </h3>
+
+                      {/* Profile Image Upload */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <TranslatedText>Profile Image</TranslatedText>
+                        </label>
+                        <FileUpload
+                          onUpload={(url) => setFormData({ ...formData, profileImage: url })}
+                          currentFile={formData.profileImage}
+                          accept="image/*"
+                          maxSize={5}
+                          folder="business-profiles"
+                        />
+                      </div>
+
+                      {/* Profile Video URL */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <TranslatedText>Profile Video URL</TranslatedText>
+                          <span className="text-xs text-gray-500 ml-2">(YouTube, Vimeo, etc.)</span>
+                        </label>
+                        <input
+                          type="url"
+                          value={formData.profileVideo}
+                          onChange={(e) => setFormData({ ...formData, profileVideo: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          placeholder="https://www.youtube.com/watch?v=..."
+                        />
+                      </div>
+
+                      {/* Profile Content - English */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Profile Content (English) *
+                        </label>
+                        <RichTextEditor
+                          value={formData.profileContent}
+                          onChange={(value) => setFormData({ ...formData, profileContent: value })}
+                          placeholder="Write detailed profile content in English..."
+                        />
+                      </div>
+
+                      {/* Profile Content - Tamil */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          விவரக்குறிப்பு உள்ளடக்கம் (Tamil) *
+                        </label>
+                        <RichTextEditor
+                          value={formData.profileContent_ta}
+                          onChange={(value) => setFormData({ ...formData, profileContent_ta: value })}
+                          placeholder="தமிழில் விரிவான விவரக்குறிப்பு உள்ளடக்கத்தை எழுதுங்கள்..."
+                          className="font-tamil"
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Form Actions */}
                   <div className="flex space-x-3 pt-4">
@@ -644,7 +684,7 @@ export default function AdminDirectoryPage() {
         <Card className="bg-white border-gray-200">
           <CardHeader>
             <CardTitle className="text-gray-900">
-              <TranslatedText>All Businesses</TranslatedText>
+              <TranslatedText>Business Directory</TranslatedText>
             </CardTitle>
           </CardHeader>
           <CardContent>

@@ -25,17 +25,17 @@ export async function PUT(
         phone: data.phone,
         email: data.email || undefined,
         website: data.website || undefined,
-        videoUrl: data.videoUrl || undefined,
         youtubeUrl: data.youtubeUrl || undefined,
         instagramUrl: data.instagramUrl || undefined,
         facebookUrl: data.facebookUrl || undefined,
         bookingUrl: data.bookingUrl || undefined,
-        latitude: data.latitude ? parseFloat(data.latitude) : undefined,
-        longitude: data.longitude ? parseFloat(data.longitude) : undefined,
         orderNumber: data.orderNumber !== undefined ? data.orderNumber : 0,
         hasProfile: data.hasProfile !== undefined ? data.hasProfile : false,
-        verified: data.verified !== undefined ? data.verified : false,
-        image: data.image || undefined
+        profileContent: data.profileContent || undefined,
+        profileContent_ta: data.profileContent_ta || undefined,
+        profileImage: data.profileImage || undefined,
+        profileVideo: data.profileVideo || undefined,
+        verified: data.verified !== undefined ? data.verified : false
       },
       include: {
         mainCategory: true,
