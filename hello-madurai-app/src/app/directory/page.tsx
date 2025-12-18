@@ -382,7 +382,7 @@ function DirectoryPageContent() {
                       {/* Category Badge */}
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                          {business.subcategory?.icon && (
+                          {business.subcategory && business.subcategory.icon && (
                             <span className="text-2xl">{business.subcategory.icon}</span>
                           )}
                           <span className="text-sm text-gray-600 font-medium">

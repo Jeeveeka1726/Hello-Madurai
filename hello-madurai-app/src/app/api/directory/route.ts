@@ -5,8 +5,12 @@ export async function GET() {
   try {
     // Fetch all businesses from Hostinger MySQL
     const businesses = await prisma.business.findMany({
+      include: {
+        mainCategory: true,
+        subcategory: true
+      },
       orderBy: {
-        createdAt: 'desc'
+        orderNumber: 'asc'
       }
     })
 
