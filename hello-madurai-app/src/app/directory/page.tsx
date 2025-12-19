@@ -441,7 +441,7 @@ function DirectoryPageContent() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
                   {language === 'ta' ? selectedCategoryObj.name_ta : selectedCategoryObj.name}
                 </h2>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
                 {filteredBusinesses.map((business) => (
                   <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
                     <CardContent className="p-6">
