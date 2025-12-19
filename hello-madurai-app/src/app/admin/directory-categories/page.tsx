@@ -222,10 +222,10 @@ export default function DirectoryCategoriesPage() {
     if (subcategory) {
       setEditingSubcategory(subcategory)
       setSubcategoryForm({
-        name: subcategory.name,
-        name_ta: subcategory.name_ta,
-        icon: subcategory.icon || '',
-        categoryId: subcategory.categoryId
+        name: subcategory.name || '',
+        name_ta: subcategory.name_ta || '',
+        icon: (subcategory && subcategory.icon) ? subcategory.icon : '',
+        categoryId: subcategory.categoryId || categoryId
       })
     } else {
       setEditingSubcategory(null)
@@ -332,7 +332,7 @@ export default function DirectoryCategoriesPage() {
                           className="flex items-center justify-between bg-white p-3 rounded border border-gray-200"
                         >
                           <div className="flex items-center gap-3">
-                            {subcategory.icon && (
+                            {subcategory && subcategory.icon && (
                               <span className="text-2xl">{subcategory.icon}</span>
                             )}
                             <div>
