@@ -312,40 +312,123 @@ export default function AdminDirectoryPage() {
                   {/* Main Image/Video Section */}
                   <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
                     <h3 className="text-lg font-medium text-green-900 mb-4">
-                      <TranslatedText>Main Business Image/Video</TranslatedText>
+                      <TranslatedText>Main Business Media</TranslatedText>
+                      <span className="text-sm font-normal text-green-700 block">Choose either image OR video (not both)</span>
                     </h3>
 
-                    {/* Main Image Upload */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <TranslatedText>Main Business Image</TranslatedText>
-                        <span className="text-xs text-gray-500 ml-2">(Recommended: 1280x720px)</span>
+                    {/* Media Type Selection */}
+                    <div className="flex space-x-4 mb-4">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="mediaType"
+                          value="image"
+                          checked={formData.mainImage && !formData.mainVideoUrl}
+                          onChange={() => setFormData({ ...formData, mainVideoUrl: '' })}
+                          className="mr-2"
+                        />
+                        <span className="text-sm font-medium text-gray-700">Image</span>
                       </label>
-                      <FileUpload
-                        label="Main Business Image"
-                        fileType="image"
-                        currentFile={formData.mainImage}
-                        onFileUpload={(url) => setFormData({ ...formData, mainImage: url })}
-                        onUrlChange={(url) => setFormData({ ...formData, mainImage: url })}
-                        accept="image/*"
-                        maxSize={5}
-                      />
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="mediaType"
+                          value="video"
+                          checked={formData.mainVideoUrl && !formData.mainImage}
+                          onChange={() => setFormData({ ...formData, mainImage: '' })}
+                          className="mr-2"
+                        />
+                        <span className="text-sm font-medium text-gray-700">Video</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="mediaType"
+                          value="none"
+                          checked={!formData.mainImage && !formData.mainVideoUrl}
+                          onChange={() => setFormData({ ...formData, mainImage: '', mainVideoUrl: '' })}
+                          className="mr-2"
+                        />
+                        <span className="text-sm font-medium text-gray-700">None</span>
+                      </label>
                     </div>
 
-                    {/* Main Video URL */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <TranslatedText>Main Business Video URL</TranslatedText>
-                        <span className="text-xs text-gray-500 ml-2">(YouTube, Vimeo, etc.)</span>
-                      </label>
-                      <input
-                        type="url"
-                        value={formData.mainVideoUrl}
-                        onChange={(e) => setFormData({ ...formData, mainVideoUrl: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="https://www.youtube.com/watch?v=..."
-                      />
-                    </div>
+                    {/* Main Image Upload - Only show if image is selected or no media type chosen */}
+                    {(!formData.mainVideoUrl) && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <TranslatedText>Main Business Image</TranslatedText>
+                          <span className="text-xs text-gray-500 ml-2">(Recommended: 1280x720px)</span>
+                        </label>
+                        <FileUpload
+                          label="Main Business Image"
+                          fileType="image"
+                          currentFile={formData.mainImage}
+                          onFileUpload={(url) => setFormData({ ...formData, mainImage: url, mainVideoUrl: '' })}
+                          onUrlChange={(url) => setFormData({ ...formData, mainImage: url, mainVideoUrl: '' })}
+                          accept="image/*"
+                          maxSize={5}
+                        />
+                        {formData.mainImage && (
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, mainImage: '' })}
+                            className="mt-2 text-sm text-red-600 hover:text-red-800"
+                          >
+                            Remove Image
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Main Video URL - Only show if video is selected or no media type chosen */}
+                    {(!formData.mainImage) && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <TranslatedText>Main Business Video URL</TranslatedText>
+                          <span className="text-xs text-gray-500 ml-2">(YouTube, Vimeo, etc.)</span>
+                        </label>
+                        <input
+                          type="url"
+                          value={formData.mainVideoUrl}
+                          onChange={(e) => setFormData({ ...formData, mainVideoUrl: e.target.value, mainImage: '' })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          placeholder="https://www.youtube.com/watch?v=..."
+                        />
+                        {formData.mainVideoUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, mainVideoUrl: '' })}
+                            className="mt-2 text-sm text-red-600 hover:text-red-800"
+                          >
+                            Remove Video URL
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Current Media Preview */}
+                    {(formData.mainImage || formData.mainVideoUrl) && (
+                      <div className="mt-4 p-3 bg-white rounded-lg border">
+                        <p className="text-sm font-medium text-gray-700 mb-2">Current Media:</p>
+                        {formData.mainImage && (
+                          <div className="flex items-center space-x-2">
+                            <img src={formData.mainImage} alt="Preview" className="w-16 h-16 object-cover rounded" />
+                            <span className="text-sm text-gray-600">Image uploaded</span>
+                          </div>
+                        )}
+                        {formData.mainVideoUrl && (
+                          <div className="flex items-center space-x-2">
+                            <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center">
+                              <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                              </svg>
+                            </div>
+                            <span className="text-sm text-gray-600">Video URL: {formData.mainVideoUrl.substring(0, 50)}...</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Business Name */}

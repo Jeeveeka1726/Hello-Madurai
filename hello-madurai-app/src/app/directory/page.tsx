@@ -512,15 +512,15 @@ function DirectoryPageContent() {
                               })()}
                             </div>
                           ) : (
-                            // Show image with play button overlay or just image
+                            // Show image or video thumbnail (exclusive)
                             <div className="relative">
                               {business.mainImage ? (
+                                // Show image only (no video overlay since they're exclusive now)
                                 <img
                                   src={business.mainImage}
                                   alt={business.name}
-                                  className="w-full h-48 object-cover rounded-lg cursor-pointer"
+                                  className="w-full h-48 object-cover rounded-lg"
                                   loading="lazy"
-                                  onClick={() => business.mainVideoUrl && handleVideoPlay(business.id)}
                                 />
                               ) : business.mainVideoUrl ? (
                                 // Show video thumbnail if no image but video exists
@@ -536,20 +536,6 @@ function DirectoryPageContent() {
                                   </div>
                                 </div>
                               ) : null}
-
-                              {/* Play button overlay when both image and video exist */}
-                              {business.mainImage && business.mainVideoUrl && (
-                                <button
-                                  onClick={() => handleVideoPlay(business.id)}
-                                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-lg hover:bg-opacity-50 transition-opacity"
-                                >
-                                  <div className="bg-white bg-opacity-90 rounded-full p-4 hover:bg-opacity-100 transition-opacity">
-                                    <svg className="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M8 5v14l11-7z"/>
-                                    </svg>
-                                  </div>
-                                </button>
-                              )}
                             </div>
                           )}
                         </div>
