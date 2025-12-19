@@ -140,18 +140,25 @@ export default function AdminDirectoryPage() {
     setLoading(true)
 
     try {
-      const url = editingBusiness 
+      const url = editingBusiness
         ? `/api/admin/directory/${editingBusiness.id}`
         : '/api/admin/directory'
-      
+
       const method = editingBusiness ? 'PUT' : 'POST'
+
+      // Ensure exclusive media selection before submission
+      const submissionData = { ...formData }
+      if (submissionData.mainImage && submissionData.mainVideoUrl) {
+        // If both exist, prioritize image and clear video
+        submissionData.mainVideoUrl = ''
+      }
 
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submissionData),
       })
 
       if (response.ok) {
@@ -193,6 +200,16 @@ export default function AdminDirectoryPage() {
 
   const handleEdit = (business: Business) => {
     setEditingBusiness(business)
+
+    // Handle exclusive media selection - prioritize image over video if both exist
+    let mainImage = business.mainImage || ''
+    let mainVideoUrl = business.mainVideoUrl || ''
+
+    // If both exist, prioritize image and clear video
+    if (mainImage && mainVideoUrl) {
+      mainVideoUrl = ''
+    }
+
     setFormData({
       name: business.name,
       name_ta: business.name_ta,
@@ -204,8 +221,8 @@ export default function AdminDirectoryPage() {
       phone: business.phone,
       email: business.email || '',
       website: business.website || '',
-      mainImage: business.mainImage || '',
-      mainVideoUrl: business.mainVideoUrl || '',
+      mainImage: mainImage,
+      mainVideoUrl: mainVideoUrl,
       youtubeUrl: business.youtubeUrl || '',
       instagramUrl: business.instagramUrl || '',
       facebookUrl: business.facebookUrl || '',
@@ -323,8 +340,12 @@ export default function AdminDirectoryPage() {
                           type="radio"
                           name="mediaType"
                           value="image"
-                          checked={formData.mainImage && !formData.mainVideoUrl}
-                          onChange={() => setFormData({ ...formData, mainVideoUrl: '' })}
+                          checked={!!formData.mainImage && !formData.mainVideoUrl}
+                          onChange={() => {
+                            if (formData.mainVideoUrl) {
+                              setFormData({ ...formData, mainVideoUrl: '' })
+                            }
+                          }}
                           className="mr-2"
                         />
                         <span className="text-sm font-medium text-gray-700">Image</span>
@@ -334,8 +355,12 @@ export default function AdminDirectoryPage() {
                           type="radio"
                           name="mediaType"
                           value="video"
-                          checked={formData.mainVideoUrl && !formData.mainImage}
-                          onChange={() => setFormData({ ...formData, mainImage: '' })}
+                          checked={!!formData.mainVideoUrl && !formData.mainImage}
+                          onChange={() => {
+                            if (formData.mainImage) {
+                              setFormData({ ...formData, mainImage: '' })
+                            }
+                          }}
                           className="mr-2"
                         />
                         <span className="text-sm font-medium text-gray-700">Video</span>
@@ -407,26 +432,27 @@ export default function AdminDirectoryPage() {
                       </div>
                     )}
 
-                    {/* Current Media Preview */}
-                    {(formData.mainImage || formData.mainVideoUrl) && (
+                    {/* Current Media Preview - Show only active media */}
+                    {(formData.mainImage && !formData.mainVideoUrl) && (
                       <div className="mt-4 p-3 bg-white rounded-lg border">
                         <p className="text-sm font-medium text-gray-700 mb-2">Current Media:</p>
-                        {formData.mainImage && (
-                          <div className="flex items-center space-x-2">
-                            <img src={formData.mainImage} alt="Preview" className="w-16 h-16 object-cover rounded" />
-                            <span className="text-sm text-gray-600">Image uploaded</span>
+                        <div className="flex items-center space-x-2">
+                          <img src={formData.mainImage} alt="Preview" className="w-16 h-16 object-cover rounded" />
+                          <span className="text-sm text-gray-600">Image uploaded</span>
+                        </div>
+                      </div>
+                    )}
+                    {(formData.mainVideoUrl && !formData.mainImage) && (
+                      <div className="mt-4 p-3 bg-white rounded-lg border">
+                        <p className="text-sm font-medium text-gray-700 mb-2">Current Media:</p>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center">
+                            <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z"/>
+                            </svg>
                           </div>
-                        )}
-                        {formData.mainVideoUrl && (
-                          <div className="flex items-center space-x-2">
-                            <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center">
-                              <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z"/>
-                              </svg>
-                            </div>
-                            <span className="text-sm text-gray-600">Video URL: {formData.mainVideoUrl.substring(0, 50)}...</span>
-                          </div>
-                        )}
+                          <span className="text-sm text-gray-600">Video URL: {formData.mainVideoUrl.substring(0, 50)}...</span>
+                        </div>
                       </div>
                     )}
                   </div>
