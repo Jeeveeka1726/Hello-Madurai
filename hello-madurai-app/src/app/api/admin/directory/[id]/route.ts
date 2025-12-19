@@ -14,8 +14,6 @@ export async function PUT(
       data: {
         name: data.name,
         name_ta: data.name_ta || undefined,
-        description: data.description || undefined,
-        description_ta: data.description_ta || undefined,
         category: data.category || '',
         categoryId: data.categoryId || null,
         subcategoryId: data.subcategoryId || null,

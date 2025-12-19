@@ -43,8 +43,6 @@ export async function POST(request: NextRequest) {
       data: {
         name: body.name,
         name_ta: body.name_ta,
-        description: body.description || '',
-        description_ta: body.description_ta,
         category: body.category || '',
         categoryId: body.categoryId || null,
         subcategoryId: body.subcategoryId || null,

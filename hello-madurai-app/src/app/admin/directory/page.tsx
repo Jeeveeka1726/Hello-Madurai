@@ -42,8 +42,6 @@ interface Business {
   id: string
   name: string
   name_ta: string
-  description: string
-  description_ta: string
   category: string
   categoryId?: string
   subcategoryId?: string
@@ -81,8 +79,6 @@ export default function AdminDirectoryPage() {
   const [formData, setFormData] = useState({
     name: '',
     name_ta: '',
-    description: '',
-    description_ta: '',
     category: '',
     categoryId: '',
     subcategoryId: '',
@@ -165,8 +161,6 @@ export default function AdminDirectoryPage() {
         setFormData({
           name: '',
           name_ta: '',
-          description: '',
-          description_ta: '',
           category: '',
           categoryId: '',
           subcategoryId: '',
@@ -202,8 +196,6 @@ export default function AdminDirectoryPage() {
     setFormData({
       name: business.name,
       name_ta: business.name_ta,
-      description: business.description,
-      description_ta: business.description_ta,
       category: business.category,
       categoryId: business.categoryId || '',
       subcategoryId: business.subcategoryId || '',
@@ -370,20 +362,7 @@ export default function AdminDirectoryPage() {
                     required
                   />
 
-                  {/* Description */}
-                  <BilingualField
-                    label="Description"
-                    value={formData.description}
-                    valueTa={formData.description_ta}
-                    onChange={(value) => setFormData({ ...formData, description: value })}
-                    onChangeTa={(value) => setFormData({ ...formData, description_ta: value })}
-                    placeholder={{
-                      english: "Enter business description in English...",
-                      tamil: "தமிழில் வணிக விவரணையை உள்ளிடவும்..."
-                    }}
-                    textarea
-                    required
-                  />
+
 
                   {/* Address */}
                   <BilingualField

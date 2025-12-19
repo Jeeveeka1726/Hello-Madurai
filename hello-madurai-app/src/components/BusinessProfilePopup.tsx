@@ -9,8 +9,6 @@ interface Business {
   id: string
   name: string
   name_ta: string
-  description: string
-  description_ta: string
   address: string
   address_ta: string
   phone?: string
@@ -114,13 +112,6 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
 
           {/* Main Video */}
           {renderVideoContent()}
-
-          {/* Description */}
-          <div className="mb-6">
-            <p className="text-gray-700 leading-relaxed">
-              {language === 'ta' && business.description_ta ? business.description_ta : business.description}
-            </p>
-          </div>
 
           {/* Contact Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">

@@ -47,8 +47,6 @@ interface Business {
   id: string
   name: string
   name_ta?: string
-  description: string
-  description_ta?: string
   category: string
   categoryId?: string
   subcategoryId?: string
@@ -154,8 +152,8 @@ function DirectoryPageContent() {
     const matchesSearch = searchTerm === '' ||
       business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (business.name_ta && business.name_ta.includes(searchTerm)) ||
-      business.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (business.description_ta && business.description_ta.includes(searchTerm))
+      business.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (business.address_ta && business.address_ta.includes(searchTerm))
 
     return matchesCategory && matchesSubcategory && matchesSearch
   }).sort((a, b) => {
@@ -231,7 +229,7 @@ function DirectoryPageContent() {
     if (navigator.share) {
       navigator.share({
         title: business.name,
-        text: business.description,
+        text: `${business.name} - ${language === 'ta' && business.address_ta ? business.address_ta : business.address}`,
         url: url,
       })
     } else {
@@ -409,14 +407,44 @@ function DirectoryPageContent() {
                       </div>
 
                       {/* Business Name */}
-                      <h3 className="font-bold text-xl text-gray-900 mb-2">
+                      <h3 className="font-bold text-xl text-gray-900 mb-3">
                         {language === 'ta' && business.name_ta ? business.name_ta : business.name}
                       </h3>
 
-                      {/* Description */}
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                        {language === 'ta' && business.description_ta ? business.description_ta : business.description}
-                      </p>
+                      {/* Main Business Image/Video */}
+                      {(business.mainImage || business.mainVideoUrl) && (
+                        <div className="mb-4">
+                          {business.mainImage && (
+                            <div className="relative">
+                              <img
+                                src={business.mainImage}
+                                alt={business.name}
+                                className="w-full h-48 object-cover rounded-lg"
+                                loading="lazy"
+                              />
+                              {business.mainVideoUrl && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-lg">
+                                  <div className="bg-white bg-opacity-90 rounded-full p-3">
+                                    <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {!business.mainImage && business.mainVideoUrl && (
+                            <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center">
+                              <div className="text-center">
+                                <svg className="w-12 h-12 text-red-600 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M8 5v14l11-7z"/>
+                                </svg>
+                                <p className="text-sm text-gray-600">Video Available</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {/* Clickable Contact Info */}
                       <div className="space-y-2 mb-4 text-sm">

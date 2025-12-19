@@ -128,8 +128,6 @@ model Business {
   id             String                @id @default(cuid())
   name           String
   name_ta        String?
-  description    String
-  description_ta String?
   category       String? // Legacy field - will be deprecated
   categoryId     String?
   mainCategory   DirectoryCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
