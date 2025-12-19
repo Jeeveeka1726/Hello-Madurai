@@ -360,11 +360,13 @@ export default function AdminDirectoryPage() {
                   <BilingualField
                     label="Business Name"
                     value={formData.name}
-                    value_ta={formData.name_ta}
+                    valueTa={formData.name_ta}
                     onChange={(value) => setFormData({ ...formData, name: value })}
-                    onChange_ta={(value) => setFormData({ ...formData, name_ta: value })}
-                    placeholder="Enter business name in English..."
-                    placeholder_ta="தமிழில் வணிக பெயரை உள்ளிடவும்..."
+                    onChangeTa={(value) => setFormData({ ...formData, name_ta: value })}
+                    placeholder={{
+                      english: "Enter business name in English...",
+                      tamil: "தமிழில் வணிக பெயரை உள்ளிடவும்..."
+                    }}
                     required
                   />
 
@@ -372,12 +374,14 @@ export default function AdminDirectoryPage() {
                   <BilingualField
                     label="Description"
                     value={formData.description}
-                    value_ta={formData.description_ta}
+                    valueTa={formData.description_ta}
                     onChange={(value) => setFormData({ ...formData, description: value })}
-                    onChange_ta={(value) => setFormData({ ...formData, description_ta: value })}
-                    placeholder="Enter business description in English..."
-                    placeholder_ta="தமிழில் வணிக விவரணையை உள்ளிடவும்..."
-                    multiline
+                    onChangeTa={(value) => setFormData({ ...formData, description_ta: value })}
+                    placeholder={{
+                      english: "Enter business description in English...",
+                      tamil: "தமிழில் வணிக விவரணையை உள்ளிடவும்..."
+                    }}
+                    textarea
                     required
                   />
 
@@ -385,12 +389,14 @@ export default function AdminDirectoryPage() {
                   <BilingualField
                     label="Address"
                     value={formData.address}
-                    value_ta={formData.address_ta}
+                    valueTa={formData.address_ta}
                     onChange={(value) => setFormData({ ...formData, address: value })}
-                    onChange_ta={(value) => setFormData({ ...formData, address_ta: value })}
-                    placeholder="Enter address in English..."
-                    placeholder_ta="தமிழில் முகவரியை உள்ளிடவும்..."
-                    multiline
+                    onChangeTa={(value) => setFormData({ ...formData, address_ta: value })}
+                    placeholder={{
+                      english: "Enter address in English...",
+                      tamil: "தமிழில் முகவரியை உள்ளிடவும்..."
+                    }}
+                    textarea
                     required
                   />
 
