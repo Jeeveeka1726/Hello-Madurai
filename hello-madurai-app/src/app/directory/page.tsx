@@ -482,10 +482,11 @@ function DirectoryPageContent() {
                                   return (
                                     <div className="relative">
                                       <iframe
-                                        src={embedUrl}
+                                        src={`${embedUrl}?autoplay=1&rel=0&modestbranding=1`}
                                         className="w-full h-full rounded-lg"
                                         allowFullScreen
                                         title={`${business.name} video`}
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                       />
                                       <button
                                         onClick={() => setPlayingVideo(null)}
