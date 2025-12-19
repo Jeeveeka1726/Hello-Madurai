@@ -568,11 +568,13 @@ export default function AdminDirectoryPage() {
                           <TranslatedText>Profile Image</TranslatedText>
                         </label>
                         <FileUpload
-                          onUpload={(url) => setFormData({ ...formData, profileImage: url })}
+                          label="Profile Image"
+                          fileType="image"
                           currentFile={formData.profileImage}
+                          onFileUpload={(url) => setFormData({ ...formData, profileImage: url })}
+                          onUrlChange={(url) => setFormData({ ...formData, profileImage: url })}
                           accept="image/*"
                           maxSize={5}
-                          folder="business-profiles"
                         />
                       </div>
 
