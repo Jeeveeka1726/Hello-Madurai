@@ -163,6 +163,15 @@ function DirectoryPageContent() {
     return videoId ? `https://www.youtube.com/embed/${videoId[1]}` : null
   }
 
+  const getYouTubeId = (url: string): string | null => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
+    return match ? match[1] : null
+  }
+
+  const getYouTubeThumbnail = (youtubeId: string): string => {
+    return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
+  }
+
   const handleVideoPlay = (businessId: string) => {
     setPlayingVideo(playingVideo === businessId ? null : businessId)
   }
@@ -523,18 +532,52 @@ function DirectoryPageContent() {
                                   loading="lazy"
                                 />
                               ) : business.mainVideoUrl ? (
-                                // Show video thumbnail if no image but video exists
-                                <div
-                                  className="w-full h-48 bg-gray-900 rounded-lg flex items-center justify-center cursor-pointer"
-                                  onClick={() => handleVideoPlay(business.id)}
-                                >
-                                  <div className="text-center text-white">
-                                    <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M8 5v14l11-7z"/>
-                                    </svg>
-                                    <p className="text-sm">Click to Play Video</p>
-                                  </div>
-                                </div>
+                                // Show YouTube video thumbnail if no image but video exists
+                                (() => {
+                                  const youtubeId = getYouTubeId(business.mainVideoUrl)
+                                  if (youtubeId) {
+                                    return (
+                                      <div
+                                        className="relative w-full h-48 bg-gray-900 rounded-lg overflow-hidden cursor-pointer group"
+                                        onClick={() => handleVideoPlay(business.id)}
+                                      >
+                                        <img
+                                          src={getYouTubeThumbnail(youtubeId)}
+                                          alt={`${business.name} video`}
+                                          className="absolute top-0 left-0 w-full h-full object-cover"
+                                          loading="lazy"
+                                          onError={(e) => {
+                                            e.currentTarget.src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+                                          }}
+                                        />
+                                        {/* Play Button Overlay */}
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                          <div className="absolute inset-0 bg-black opacity-30"></div>
+                                          <div className="relative w-16 h-16 bg-black bg-opacity-60 rounded-full flex items-center justify-center backdrop-blur-sm border-3 border-white border-opacity-80 shadow-2xl">
+                                            <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                              <path d="M8 5v14l11-7z" />
+                                            </svg>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )
+                                  } else {
+                                    // Non-YouTube video or invalid URL - show placeholder
+                                    return (
+                                      <div
+                                        className="w-full h-48 bg-gray-900 rounded-lg flex items-center justify-center cursor-pointer"
+                                        onClick={() => handleVideoPlay(business.id)}
+                                      >
+                                        <div className="text-center text-white">
+                                          <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M8 5v14l11-7z"/>
+                                          </svg>
+                                          <p className="text-sm">Play Video</p>
+                                        </div>
+                                      </div>
+                                    )
+                                  }
+                                })()
                               ) : null}
                             </div>
                           )}
