@@ -380,11 +380,14 @@ export default function AdminDirectoryPage() {
                         <option value="">Select Subcategory (Optional)</option>
                         {formData.categoryId && categories
                           .find(cat => cat.id === formData.categoryId)
-                          ?.subcategories?.map((subcategory) => (
-                            <option key={subcategory?.id || Math.random()} value={subcategory?.id || ''}>
-                              {subcategory?.name || 'Unknown Subcategory'}
-                            </option>
-                          ))}
+                          ?.subcategories?.filter(Boolean)?.map((subcategory) => {
+                            if (!subcategory || !subcategory.id) return null;
+                            return (
+                              <option key={subcategory.id} value={subcategory.id}>
+                                {subcategory.name || 'Unknown Subcategory'}
+                              </option>
+                            );
+                          }).filter(Boolean)}
                       </select>
                     </div>
                   </div>
@@ -525,7 +528,10 @@ export default function AdminDirectoryPage() {
                         type="checkbox"
                         id="hasProfile"
                         checked={formData.hasProfile}
-                        onChange={(e) => setFormData({ ...formData, hasProfile: e.target.checked })}
+                        onChange={(e) => {
+                          console.log('hasProfile checkbox clicked:', e.target.checked);
+                          setFormData({ ...formData, hasProfile: e.target.checked });
+                        }}
                         className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                       />
                       <label htmlFor="hasProfile" className="ml-2 block text-sm text-gray-700">
@@ -727,6 +733,9 @@ export default function AdminDirectoryPage() {
                             )}
                             {business.subcategory && business.subcategory.name && (
                               <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                {business.subcategory.icon && (
+                                  <span className="mr-1">{business.subcategory.icon}</span>
+                                )}
                                 {business.subcategory.name}
                               </span>
                             )}
