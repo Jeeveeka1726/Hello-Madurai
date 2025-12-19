@@ -101,6 +101,7 @@ export default function AdminDirectoryPage() {
     profileVideo: '',
     verified: false
   })
+  const [playingAdminVideo, setPlayingAdminVideo] = useState<boolean>(false)
 
   useEffect(() => {
     if (isAdmin) {
@@ -108,6 +109,21 @@ export default function AdminDirectoryPage() {
       fetchCategories()
     }
   }, [isAdmin])
+
+  // YouTube helper functions
+  const getYouTubeId = (url: string): string | null => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
+    return match ? match[1] : null
+  }
+
+  const getYouTubeEmbedUrl = (url: string): string | null => {
+    const videoId = getYouTubeId(url)
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null
+  }
+
+  const getYouTubeThumbnail = (youtubeId: string): string => {
+    return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
+  }
 
   const fetchCategories = async () => {
     try {
@@ -397,8 +413,10 @@ export default function AdminDirectoryPage() {
                         {formData.mainImage && (
                           <button
                             type="button"
-                            onClick={() => setFormData({ ...formData, mainImage: '' })}
-                            className="mt-2 text-sm text-red-600 hover:text-red-800"
+                            onClick={() => {
+                              setFormData({ ...formData, mainImage: '' })
+                            }}
+                            className="mt-2 px-3 py-1 text-sm text-red-600 hover:text-red-800 border border-red-300 rounded hover:bg-red-50"
                           >
                             Remove Image
                           </button>
@@ -420,39 +438,115 @@ export default function AdminDirectoryPage() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                           placeholder="https://www.youtube.com/watch?v=..."
                         />
+
+                        {/* Video Preview */}
                         {formData.mainVideoUrl && (
-                          <button
-                            type="button"
-                            onClick={() => setFormData({ ...formData, mainVideoUrl: '' })}
-                            className="mt-2 text-sm text-red-600 hover:text-red-800"
-                          >
-                            Remove Video URL
-                          </button>
+                          <div className="mt-4">
+                            {(() => {
+                              const youtubeId = getYouTubeId(formData.mainVideoUrl)
+                              if (youtubeId) {
+                                return (
+                                  <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
+                                    {playingAdminVideo ? (
+                                      // Show YouTube iframe when playing
+                                      <iframe
+                                        src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+                                        title="Video Preview"
+                                        className="absolute top-0 left-0 w-full h-full border-0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        allowFullScreen
+                                      />
+                                    ) : (
+                                      // Show thumbnail with play button
+                                      <div
+                                        className="absolute top-0 left-0 w-full h-full cursor-pointer group"
+                                        onClick={() => setPlayingAdminVideo(true)}
+                                      >
+                                        <img
+                                          src={getYouTubeThumbnail(youtubeId)}
+                                          alt="Video Preview"
+                                          className="absolute top-0 left-0 w-full h-full object-cover"
+                                          onError={(e) => {
+                                            e.currentTarget.src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+                                          }}
+                                        />
+                                        {/* Play Button Overlay */}
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                          <div className="absolute inset-0 bg-black opacity-30"></div>
+                                          <div className="relative w-16 h-16 bg-black bg-opacity-60 rounded-full flex items-center justify-center backdrop-blur-sm border-3 border-white border-opacity-80 shadow-2xl">
+                                            <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                              <path d="M8 5v14l11-7z" />
+                                            </svg>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                )
+                              } else {
+                                // Non-YouTube video or invalid URL
+                                return (
+                                  <div className="w-full aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                                    <div className="text-center text-gray-500">
+                                      <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                      </svg>
+                                      <p className="text-sm">Video Preview</p>
+                                      <p className="text-xs">Direct video URLs will play in directory</p>
+                                    </div>
+                                  </div>
+                                )
+                              }
+                            })()}
+                          </div>
+                        )}
+
+                        {formData.mainVideoUrl && (
+                          <div className="mt-2 flex space-x-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setFormData({ ...formData, mainVideoUrl: '' })
+                                setPlayingAdminVideo(false)
+                              }}
+                              className="px-3 py-1 text-sm text-red-600 hover:text-red-800 border border-red-300 rounded hover:bg-red-50"
+                            >
+                              Remove Video URL
+                            </button>
+                            {playingAdminVideo && (
+                              <button
+                                type="button"
+                                onClick={() => setPlayingAdminVideo(false)}
+                                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:bg-gray-50"
+                              >
+                                Stop Preview
+                              </button>
+                            )}
+                          </div>
                         )}
                       </div>
                     )}
 
-                    {/* Current Media Preview - Show only active media */}
-                    {(formData.mainImage && !formData.mainVideoUrl) && (
-                      <div className="mt-4 p-3 bg-white rounded-lg border">
-                        <p className="text-sm font-medium text-gray-700 mb-2">Current Media:</p>
-                        <div className="flex items-center space-x-2">
-                          <img src={formData.mainImage} alt="Preview" className="w-16 h-16 object-cover rounded" />
-                          <span className="text-sm text-gray-600">Image uploaded</span>
-                        </div>
-                      </div>
-                    )}
-                    {(formData.mainVideoUrl && !formData.mainImage) && (
-                      <div className="mt-4 p-3 bg-white rounded-lg border">
-                        <p className="text-sm font-medium text-gray-700 mb-2">Current Media:</p>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center">
-                            <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M8 5v14l11-7z"/>
-                            </svg>
+                    {/* Current Media Summary */}
+                    {(formData.mainImage || formData.mainVideoUrl) && (
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <p className="text-sm font-medium text-blue-900 mb-2">Selected Media:</p>
+                        {formData.mainImage && !formData.mainVideoUrl && (
+                          <div className="flex items-center space-x-2">
+                            <img src={formData.mainImage} alt="Preview" className="w-12 h-12 object-cover rounded" />
+                            <span className="text-sm text-blue-700">✓ Image selected</span>
                           </div>
-                          <span className="text-sm text-gray-600">Video URL: {formData.mainVideoUrl.substring(0, 50)}...</span>
-                        </div>
+                        )}
+                        {formData.mainVideoUrl && !formData.mainImage && (
+                          <div className="flex items-center space-x-2">
+                            <div className="w-12 h-12 bg-blue-100 rounded flex items-center justify-center">
+                              <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                              </svg>
+                            </div>
+                            <span className="text-sm text-blue-700">✓ Video URL selected</span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
