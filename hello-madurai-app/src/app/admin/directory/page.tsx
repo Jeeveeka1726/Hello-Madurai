@@ -102,6 +102,7 @@ export default function AdminDirectoryPage() {
     verified: false
   })
   const [playingAdminVideo, setPlayingAdminVideo] = useState<boolean>(false)
+  const [selectedMediaType, setSelectedMediaType] = useState<'image' | 'video' | ''>('')
 
   useEffect(() => {
     if (isAdmin) {
@@ -181,6 +182,8 @@ export default function AdminDirectoryPage() {
         await fetchBusinesses()
         setShowForm(false)
         setEditingBusiness(null)
+        setSelectedMediaType('')
+        setPlayingAdminVideo(false)
         setFormData({
           name: '',
           name_ta: '',
@@ -220,11 +223,19 @@ export default function AdminDirectoryPage() {
     // Handle exclusive media selection - prioritize image over video if both exist
     let mainImage = business.mainImage || ''
     let mainVideoUrl = business.mainVideoUrl || ''
+    let mediaType: 'image' | 'video' | '' = ''
 
     // If both exist, prioritize image and clear video
     if (mainImage && mainVideoUrl) {
       mainVideoUrl = ''
+      mediaType = 'image'
+    } else if (mainImage) {
+      mediaType = 'image'
+    } else if (mainVideoUrl) {
+      mediaType = 'video'
     }
+
+    setSelectedMediaType(mediaType)
 
     setFormData({
       name: business.name,
@@ -350,17 +361,17 @@ export default function AdminDirectoryPage() {
                     </h3>
 
                     {/* Media Type Selection */}
-                    <div className="flex space-x-6 mb-4">
+                    <div className="flex space-x-6 mb-6">
                       <label className="flex items-center">
                         <input
                           type="radio"
                           name="mediaType"
                           value="image"
-                          checked={!!formData.mainImage && !formData.mainVideoUrl}
+                          checked={selectedMediaType === 'image'}
                           onChange={() => {
-                            if (formData.mainVideoUrl) {
-                              setFormData({ ...formData, mainVideoUrl: '' })
-                            }
+                            setSelectedMediaType('image')
+                            setFormData({ ...formData, mainVideoUrl: '' })
+                            setPlayingAdminVideo(false)
                           }}
                           className="mr-2"
                         />
@@ -371,11 +382,10 @@ export default function AdminDirectoryPage() {
                           type="radio"
                           name="mediaType"
                           value="video"
-                          checked={!!formData.mainVideoUrl && !formData.mainImage}
+                          checked={selectedMediaType === 'video'}
                           onChange={() => {
-                            if (formData.mainImage) {
-                              setFormData({ ...formData, mainImage: '' })
-                            }
+                            setSelectedMediaType('video')
+                            setFormData({ ...formData, mainImage: '' })
                           }}
                           className="mr-2"
                         />
@@ -383,8 +393,8 @@ export default function AdminDirectoryPage() {
                       </label>
                     </div>
 
-                    {/* Main Image Upload - Only show if image is selected or no media type chosen */}
-                    {(!formData.mainVideoUrl) && (
+                    {/* Main Image Upload - Only show if image is selected */}
+                    {selectedMediaType === 'image' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           <TranslatedText>Main Business Image</TranslatedText>
@@ -413,8 +423,8 @@ export default function AdminDirectoryPage() {
                       </div>
                     )}
 
-                    {/* Main Video URL - Only show if video is selected or no media type chosen */}
-                    {(!formData.mainImage) && (
+                    {/* Main Video URL - Only show if video is selected */}
+                    {selectedMediaType === 'video' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           <TranslatedText>Main Business Video URL</TranslatedText>
@@ -854,6 +864,8 @@ export default function AdminDirectoryPage() {
                       onClick={() => {
                         setShowForm(false)
                         setEditingBusiness(null)
+                        setSelectedMediaType('')
+                        setPlayingAdminVideo(false)
                       }}
                       className="flex-1 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
