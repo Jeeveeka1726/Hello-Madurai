@@ -18,6 +18,7 @@ interface Subcategory {
   name: string
   name_ta: string
   icon?: string
+  orderNumber: number
   categoryId: string
   _count?: {
     businesses: number
@@ -28,6 +29,7 @@ interface Category {
   id: string
   name: string
   name_ta: string
+  orderNumber: number
   subcategories: Subcategory[]
   _count?: {
     businesses: number
@@ -46,7 +48,8 @@ export default function DirectoryCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [categoryForm, setCategoryForm] = useState({
     name: '',
-    name_ta: ''
+    name_ta: '',
+    orderNumber: 0
   })
 
   // Subcategory form state
@@ -57,6 +60,7 @@ export default function DirectoryCategoriesPage() {
     name: '',
     name_ta: '',
     icon: '',
+    orderNumber: 0,
     categoryId: ''
   })
 
@@ -107,7 +111,7 @@ export default function DirectoryCategoriesPage() {
         await fetchCategories()
         setShowCategoryForm(false)
         setEditingCategory(null)
-        setCategoryForm({ name: '', name_ta: '' })
+        setCategoryForm({ name: '', name_ta: '', orderNumber: 0 })
         toast.success(language === 'ta'
           ? (editingCategory ? 'வகை புதுப்பிக்கப்பட்டது!' : 'வகை சேர்க்கப்பட்டது!')
           : (editingCategory ? 'Category updated!' : 'Category added!')
@@ -142,7 +146,7 @@ export default function DirectoryCategoriesPage() {
         await fetchCategories()
         setShowSubcategoryForm(false)
         setEditingSubcategory(null)
-        setSubcategoryForm({ name: '', name_ta: '', icon: '', categoryId: '' })
+        setSubcategoryForm({ name: '', name_ta: '', icon: '', orderNumber: 0, categoryId: '' })
         toast.success(language === 'ta'
           ? (editingSubcategory ? 'துணை வகை புதுப்பிக்கப்பட்டது!' : 'துணை வகை சேர்க்கப்பட்டது!')
           : (editingSubcategory ? 'Subcategory updated!' : 'Subcategory added!')
@@ -208,11 +212,12 @@ export default function DirectoryCategoriesPage() {
       setEditingCategory(category)
       setCategoryForm({
         name: category.name,
-        name_ta: category.name_ta
+        name_ta: category.name_ta,
+        orderNumber: category.orderNumber || 0
       })
     } else {
       setEditingCategory(null)
-      setCategoryForm({ name: '', name_ta: '' })
+      setCategoryForm({ name: '', name_ta: '', orderNumber: 0 })
     }
     setShowCategoryForm(true)
   }
@@ -225,11 +230,12 @@ export default function DirectoryCategoriesPage() {
         name: subcategory.name || '',
         name_ta: subcategory.name_ta || '',
         icon: (subcategory && subcategory.icon) ? subcategory.icon : '',
+        orderNumber: subcategory.orderNumber || 0,
         categoryId: subcategory.categoryId || categoryId
       })
     } else {
       setEditingSubcategory(null)
-      setSubcategoryForm({ name: '', name_ta: '', icon: '', categoryId })
+      setSubcategoryForm({ name: '', name_ta: '', icon: '', orderNumber: 0, categoryId })
     }
     setShowSubcategoryForm(true)
   }
@@ -406,8 +412,20 @@ export default function DirectoryCategoriesPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {language === 'ta' ? 'வரிசை எண்' : 'Order Number'}
+                  </label>
+                  <input
+                    type="number"
+                    value={categoryForm.orderNumber}
+                    onChange={(e) => setCategoryForm({ ...categoryForm, orderNumber: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    min="0"
+                  />
                   <p className="text-xs text-gray-500 mt-1">
-                    {language === 'ta' ? 'வகைகள் அகரவரிசைப்படி காட்டப்படும்' : 'Categories are displayed alphabetically'}
+                    {language === 'ta' ? 'குறைந்த எண் முதலில் காட்டப்படும்' : 'Lower numbers appear first'}
                   </p>
                 </div>
                 <div className="flex gap-3 pt-4">
@@ -481,6 +499,21 @@ export default function DirectoryCategoriesPage() {
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     {language === 'ta' ? 'எமோஜி ஐகானை தேர்ந்தெடுக்கவும் அல்லது உள்ளிடவும்' : 'Choose or enter an emoji icon'}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {language === 'ta' ? 'வரிசை எண்' : 'Order Number'}
+                  </label>
+                  <input
+                    type="number"
+                    value={subcategoryForm.orderNumber}
+                    onChange={(e) => setSubcategoryForm({ ...subcategoryForm, orderNumber: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    min="0"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {language === 'ta' ? 'குறைந்த எண் முதலில் காட்டப்படும்' : 'Lower numbers appear first'}
                   </p>
                 </div>
                 <div>

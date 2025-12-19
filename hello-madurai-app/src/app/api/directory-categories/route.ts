@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
               select: { businesses: true }
             }
           },
-          orderBy: { name: 'asc' }
+          orderBy: { orderNumber: 'asc' }
         },
         _count: {
           select: {
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
           }
         }
       },
-      orderBy: { name: 'asc' }
+      orderBy: { orderNumber: 'asc' }
     })
 
     return NextResponse.json({ categories })

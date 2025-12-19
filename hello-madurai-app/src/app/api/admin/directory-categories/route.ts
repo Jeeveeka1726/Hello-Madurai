@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
               select: { businesses: true }
             }
           },
-          orderBy: { name: 'asc' }
+          orderBy: { orderNumber: 'asc' }
         },
         _count: {
           select: {
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
           }
         }
       },
-      orderBy: { name: 'asc' }
+      orderBy: { orderNumber: 'asc' }
     })
 
     return NextResponse.json({ categories })
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, name_ta } = body
+    const { name, name_ta, orderNumber } = body
 
     if (!name || !name_ta) {
       return NextResponse.json(
@@ -47,7 +47,8 @@ export async function POST(request: NextRequest) {
     const category = await prisma.directoryCategory.create({
       data: {
         name,
-        name_ta
+        name_ta,
+        orderNumber: orderNumber || 0
       },
       include: {
         subcategories: true,

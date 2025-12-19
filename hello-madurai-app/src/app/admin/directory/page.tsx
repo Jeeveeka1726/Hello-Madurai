@@ -23,6 +23,7 @@ interface Subcategory {
   name: string
   name_ta: string
   icon?: string
+  orderNumber: number
   categoryId: string
   _count?: {
     businesses: number
@@ -33,6 +34,7 @@ interface Category {
   id: string
   name: string
   name_ta: string
+  orderNumber: number
   subcategories: Subcategory[]
 }
 

@@ -99,6 +99,7 @@ model DirectoryCategory {
   id            String                 @id @default(cuid())
   name          String                 // English name
   name_ta       String                 // Tamil name
+  orderNumber   Int                    @default(0) // Manual ordering
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
   subcategories DirectorySubcategory[]
@@ -108,15 +109,16 @@ model DirectoryCategory {
 }
 
 model DirectorySubcategory {
-  id         String            @id @default(cuid())
-  name       String            // English name
-  name_ta    String            // Tamil name
-  icon       String?           // Emoji icon
-  categoryId String
-  category   DirectoryCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  businesses Business[]
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
+  id          String            @id @default(cuid())
+  name        String            // English name
+  name_ta     String            // Tamil name
+  icon        String?           // Emoji icon
+  orderNumber Int               @default(0) // Manual ordering
+  categoryId  String
+  category    DirectoryCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  businesses  Business[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 
   @@index([categoryId])
   @@map("directory_subcategories")
