@@ -526,22 +526,25 @@ function DirectoryPageContent() {
                             <div className="relative">
                               {business.mainImage ? (
                                 // Show image only (no video overlay since they're exclusive now)
-                                <img
-                                  src={business.mainImage}
-                                  alt={business.name}
-                                  className="w-full h-48 object-cover rounded-lg"
-                                  loading="lazy"
-                                />
+                                <div className="aspect-video w-full">
+                                  <img
+                                    src={business.mainImage}
+                                    alt={business.name}
+                                    className="w-full h-full object-cover rounded-lg"
+                                    loading="lazy"
+                                  />
+                                </div>
                               ) : business.mainVideoUrl ? (
                                 // Show YouTube video thumbnail if no image but video exists
                                 (() => {
                                   const youtubeId = getYouTubeId(business.mainVideoUrl)
                                   if (youtubeId) {
                                     return (
-                                      <div
-                                        className="relative w-full h-48 bg-gray-900 rounded-lg overflow-hidden cursor-pointer group"
-                                        onClick={() => handleVideoPlay(business.id)}
-                                      >
+                                      <div className="aspect-video w-full">
+                                        <div
+                                          className="relative w-full h-full bg-gray-900 rounded-lg overflow-hidden cursor-pointer group"
+                                          onClick={() => handleVideoPlay(business.id)}
+                                        >
                                         <img
                                           src={getYouTubeThumbnail(youtubeId)}
                                           alt={`${business.name} video`}
@@ -560,20 +563,23 @@ function DirectoryPageContent() {
                                             </svg>
                                           </div>
                                         </div>
+                                        </div>
                                       </div>
                                     )
                                   } else {
                                     // Non-YouTube video or invalid URL - show placeholder
                                     return (
-                                      <div
-                                        className="w-full h-48 bg-gray-900 rounded-lg flex items-center justify-center cursor-pointer"
-                                        onClick={() => handleVideoPlay(business.id)}
-                                      >
+                                      <div className="aspect-video w-full">
+                                        <div
+                                          className="w-full h-full bg-gray-900 rounded-lg flex items-center justify-center cursor-pointer"
+                                          onClick={() => handleVideoPlay(business.id)}
+                                        >
                                         <div className="text-center text-white">
                                           <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M8 5v14l11-7z"/>
                                           </svg>
                                           <p className="text-sm">Play Video</p>
+                                        </div>
                                         </div>
                                       </div>
                                     )
