@@ -22,7 +22,11 @@ interface Subcategory {
   id: string
   name: string
   name_ta: string
+  icon?: string
   categoryId: string
+  _count?: {
+    businesses: number
+  }
 }
 
 interface Category {
@@ -374,9 +378,9 @@ export default function AdminDirectoryPage() {
                         <option value="">Select Subcategory (Optional)</option>
                         {formData.categoryId && categories
                           .find(cat => cat.id === formData.categoryId)
-                          ?.subcategories.map((subcategory) => (
-                            <option key={subcategory.id} value={subcategory.id}>
-                              {subcategory.name}
+                          ?.subcategories?.map((subcategory) => (
+                            <option key={subcategory?.id || Math.random()} value={subcategory?.id || ''}>
+                              {subcategory?.name || 'Unknown Subcategory'}
                             </option>
                           ))}
                       </select>
@@ -719,7 +723,7 @@ export default function AdminDirectoryPage() {
                                 {business.mainCategory.name}
                               </span>
                             )}
-                            {business.subcategory && (
+                            {business.subcategory && business.subcategory.name && (
                               <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                 {business.subcategory.name}
                               </span>
