@@ -346,11 +346,11 @@ export default function AdminDirectoryPage() {
                   <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
                     <h3 className="text-lg font-medium text-green-900 mb-4">
                       <TranslatedText>Main Business Media</TranslatedText>
-                      <span className="text-sm font-normal text-green-700 block">Choose either image OR video (not both)</span>
+                      <span className="text-sm font-normal text-green-700 block">Choose either image OR video (use remove buttons to delete)</span>
                     </h3>
 
                     {/* Media Type Selection */}
-                    <div className="flex space-x-4 mb-4">
+                    <div className="flex space-x-6 mb-4">
                       <label className="flex items-center">
                         <input
                           type="radio"
@@ -380,17 +380,6 @@ export default function AdminDirectoryPage() {
                           className="mr-2"
                         />
                         <span className="text-sm font-medium text-gray-700">Video</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="mediaType"
-                          value="none"
-                          checked={!formData.mainImage && !formData.mainVideoUrl}
-                          onChange={() => setFormData({ ...formData, mainImage: '', mainVideoUrl: '' })}
-                          className="mr-2"
-                        />
-                        <span className="text-sm font-medium text-gray-700">None</span>
                       </label>
                     </div>
 
