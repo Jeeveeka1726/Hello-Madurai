@@ -24,6 +24,8 @@ export async function PUT(
         phone: data.phone,
         email: data.email || undefined,
         website: data.website || undefined,
+        mainImage: data.mainImage || undefined,
+        mainVideoUrl: data.mainVideoUrl || undefined,
         youtubeUrl: data.youtubeUrl || undefined,
         instagramUrl: data.instagramUrl || undefined,
         facebookUrl: data.facebookUrl || undefined,

@@ -54,6 +54,8 @@ interface Business {
   phone: string
   email?: string
   website?: string
+  mainImage?: string
+  mainVideoUrl?: string
   youtubeUrl?: string
   instagramUrl?: string
   facebookUrl?: string
@@ -89,6 +91,8 @@ export default function AdminDirectoryPage() {
     phone: '',
     email: '',
     website: '',
+    mainImage: '',
+    mainVideoUrl: '',
     youtubeUrl: '',
     instagramUrl: '',
     facebookUrl: '',
@@ -171,6 +175,8 @@ export default function AdminDirectoryPage() {
           phone: '',
           email: '',
           website: '',
+          mainImage: '',
+          mainVideoUrl: '',
           youtubeUrl: '',
           instagramUrl: '',
           facebookUrl: '',
@@ -206,6 +212,8 @@ export default function AdminDirectoryPage() {
       phone: business.phone,
       email: business.email || '',
       website: business.website || '',
+      mainImage: business.mainImage || '',
+      mainVideoUrl: business.mainVideoUrl || '',
       youtubeUrl: business.youtubeUrl || '',
       instagramUrl: business.instagramUrl || '',
       facebookUrl: business.facebookUrl || '',
@@ -279,6 +287,8 @@ export default function AdminDirectoryPage() {
                 phone: '',
                 email: '',
                 website: '',
+                mainImage: '',
+                mainVideoUrl: '',
                 videoUrl: '',
                 youtubeUrl: '',
                 instagramUrl: '',
@@ -307,6 +317,45 @@ export default function AdminDirectoryPage() {
                 </h2>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Main Image/Video Section */}
+                  <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                    <h3 className="text-lg font-medium text-green-900 mb-4">
+                      <TranslatedText>Main Business Image/Video</TranslatedText>
+                    </h3>
+
+                    {/* Main Image Upload */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <TranslatedText>Main Business Image</TranslatedText>
+                        <span className="text-xs text-gray-500 ml-2">(Recommended: 1280x720px)</span>
+                      </label>
+                      <FileUpload
+                        label="Main Business Image"
+                        fileType="image"
+                        currentFile={formData.mainImage}
+                        onFileUpload={(url) => setFormData({ ...formData, mainImage: url })}
+                        onUrlChange={(url) => setFormData({ ...formData, mainImage: url })}
+                        accept="image/*"
+                        maxSize={5}
+                      />
+                    </div>
+
+                    {/* Main Video URL */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <TranslatedText>Main Business Video URL</TranslatedText>
+                        <span className="text-xs text-gray-500 ml-2">(YouTube, Vimeo, etc.)</span>
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.mainVideoUrl}
+                        onChange={(e) => setFormData({ ...formData, mainVideoUrl: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="https://www.youtube.com/watch?v=..."
+                      />
+                    </div>
+                  </div>
+
                   {/* Business Name */}
                   <BilingualField
                     label="Business Name"

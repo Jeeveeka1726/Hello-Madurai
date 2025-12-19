@@ -51,6 +51,8 @@ export async function POST(request: NextRequest) {
         phone: body.phone,
         email: body.email,
         website: body.website,
+        mainImage: body.mainImage,
+        mainVideoUrl: body.mainVideoUrl,
         address: body.address,
         address_ta: body.address_ta,
         youtubeUrl: body.youtubeUrl,

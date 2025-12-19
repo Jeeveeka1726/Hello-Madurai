@@ -138,6 +138,8 @@ model Business {
   phone          String?
   email          String?
   website        String?
+  mainImage      String?               // Main business image
+  mainVideoUrl   String?               // Main business video URL
   address        String
   address_ta     String?
   instagramUrl   String?

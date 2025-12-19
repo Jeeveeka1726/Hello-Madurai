@@ -19,6 +19,7 @@ import NewspaperHeader from '@/components/NewspaperHeader'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Comments from '@/components/Comments'
+import BusinessProfilePopup from '@/components/BusinessProfilePopup'
 
 interface Subcategory {
   id: string
@@ -58,6 +59,8 @@ interface Business {
   phone: string
   email?: string
   website?: string
+  mainImage?: string
+  mainVideoUrl?: string
 
   // New business features
   videoUrl?: string
@@ -69,6 +72,10 @@ interface Business {
   longitude?: number
   orderNumber: number
   hasProfile: boolean
+  profileContent?: string
+  profileContent_ta?: string
+  profileImage?: string
+  profileVideo?: string
 
   verified: boolean
   createdAt: string
@@ -94,6 +101,8 @@ function DirectoryPageContent() {
   const [loading, setLoading] = useState(true)
   const [showComments, setShowComments] = useState(false)
   const [commentsBusinessId, setCommentsBusinessId] = useState<string>('')
+  const [showProfilePopup, setShowProfilePopup] = useState(false)
+  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
 
   // Fetch categories and businesses from database
   useEffect(() => {
@@ -511,12 +520,15 @@ function DirectoryPageContent() {
 
                       {/* View Profile Button - Only if hasProfile is true */}
                       {business.hasProfile && (
-                        <Link
-                          href={`/directory/${business.id}`}
+                        <button
+                          onClick={() => {
+                            setSelectedBusiness(business)
+                            setShowProfilePopup(true)
+                          }}
                           className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm font-medium"
                         >
                           View Profile
-                        </Link>
+                        </button>
                       )}
                     </CardContent>
                   </Card>
@@ -543,6 +555,18 @@ function DirectoryPageContent() {
           isOpen={showComments}
           onClose={() => setShowComments(false)}
         />
+
+        {/* Business Profile Popup */}
+        {selectedBusiness && (
+          <BusinessProfilePopup
+            business={selectedBusiness}
+            isOpen={showProfilePopup}
+            onClose={() => {
+              setShowProfilePopup(false)
+              setSelectedBusiness(null)
+            }}
+          />
+        )}
       </div>
     </div>
   )
