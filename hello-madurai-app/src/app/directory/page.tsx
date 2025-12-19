@@ -105,6 +105,7 @@ function DirectoryPageContent() {
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
   const [showShareModal, setShowShareModal] = useState(false)
   const [shareBusinessData, setShareBusinessData] = useState<Business | null>(null)
+  const [playingVideo, setPlayingVideo] = useState<string | null>(null)
 
   // Fetch categories and businesses from database
   useEffect(() => {
@@ -156,6 +157,15 @@ function DirectoryPageContent() {
       }
     }
   }, [searchParams, businesses])
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
+    return videoId ? `https://www.youtube.com/embed/${videoId[1]}` : null
+  }
+
+  const handleVideoPlay = (businessId: string) => {
+    setPlayingVideo(playingVideo === businessId ? null : businessId)
+  }
 
   const filteredBusinesses = businesses.filter(business => {
     // Filter by category
@@ -454,33 +464,92 @@ function DirectoryPageContent() {
                       {/* Main Business Image/Video */}
                       {(business.mainImage || business.mainVideoUrl) && (
                         <div className="mb-4">
-                          {business.mainImage && (
+                          {playingVideo === business.id && business.mainVideoUrl ? (
+                            // Show video player when playing
+                            <div className="aspect-video w-full">
+                              {(() => {
+                                const embedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
+                                if (embedUrl) {
+                                  return (
+                                    <div className="relative">
+                                      <iframe
+                                        src={embedUrl}
+                                        className="w-full h-full rounded-lg"
+                                        allowFullScreen
+                                        title={`${business.name} video`}
+                                      />
+                                      <button
+                                        onClick={() => setPlayingVideo(null)}
+                                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity"
+                                      >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                      </button>
+                                    </div>
+                                  )
+                                } else {
+                                  // Fallback for non-YouTube videos
+                                  return (
+                                    <div className="relative">
+                                      <video
+                                        src={business.mainVideoUrl}
+                                        className="w-full h-full rounded-lg"
+                                        controls
+                                        autoPlay
+                                      />
+                                      <button
+                                        onClick={() => setPlayingVideo(null)}
+                                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity"
+                                      >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                      </button>
+                                    </div>
+                                  )
+                                }
+                              })()}
+                            </div>
+                          ) : (
+                            // Show image with play button overlay or just image
                             <div className="relative">
-                              <img
-                                src={business.mainImage}
-                                alt={business.name}
-                                className="w-full h-48 object-cover rounded-lg"
-                                loading="lazy"
-                              />
-                              {business.mainVideoUrl && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-lg">
-                                  <div className="bg-white bg-opacity-90 rounded-full p-3">
-                                    <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                              {business.mainImage ? (
+                                <img
+                                  src={business.mainImage}
+                                  alt={business.name}
+                                  className="w-full h-48 object-cover rounded-lg cursor-pointer"
+                                  loading="lazy"
+                                  onClick={() => business.mainVideoUrl && handleVideoPlay(business.id)}
+                                />
+                              ) : business.mainVideoUrl ? (
+                                // Show video thumbnail if no image but video exists
+                                <div
+                                  className="w-full h-48 bg-gray-900 rounded-lg flex items-center justify-center cursor-pointer"
+                                  onClick={() => handleVideoPlay(business.id)}
+                                >
+                                  <div className="text-center text-white">
+                                    <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                    <p className="text-sm">Click to Play Video</p>
+                                  </div>
+                                </div>
+                              ) : null}
+
+                              {/* Play button overlay when both image and video exist */}
+                              {business.mainImage && business.mainVideoUrl && (
+                                <button
+                                  onClick={() => handleVideoPlay(business.id)}
+                                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-lg hover:bg-opacity-50 transition-opacity"
+                                >
+                                  <div className="bg-white bg-opacity-90 rounded-full p-4 hover:bg-opacity-100 transition-opacity">
+                                    <svg className="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
                                       <path d="M8 5v14l11-7z"/>
                                     </svg>
                                   </div>
-                                </div>
+                                </button>
                               )}
-                            </div>
-                          )}
-                          {!business.mainImage && business.mainVideoUrl && (
-                            <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                              <div className="text-center">
-                                <svg className="w-12 h-12 text-red-600 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M8 5v14l11-7z"/>
-                                </svg>
-                                <p className="text-sm text-gray-600">Video Available</p>
-                              </div>
                             </div>
                           )}
                         </div>
