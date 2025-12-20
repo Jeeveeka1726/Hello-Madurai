@@ -118,17 +118,13 @@ function DirectoryPageContent() {
 
         if (categoriesRes.ok) {
           const categoriesData = await categoriesRes.json()
-          // Sort categories alphabetically by name
-          const sortedCategories = (categoriesData.categories || []).sort((a: Category, b: Category) => {
-            const nameA = language === 'ta' ? a.name_ta : a.name
-            const nameB = language === 'ta' ? b.name_ta : b.name
-            return nameA.localeCompare(nameB)
-          })
-          setCategories(sortedCategories)
+          // Use categories in the order they come from API (ordered by orderNumber)
+          const categories = categoriesData.categories || []
+          setCategories(categories)
 
           // Auto-select first category if none selected
-          if (sortedCategories.length > 0 && !selectedCategory) {
-            setSelectedCategory(sortedCategories[0].id)
+          if (categories.length > 0 && !selectedCategory) {
+            setSelectedCategory(categories[0].id)
           }
         }
 
