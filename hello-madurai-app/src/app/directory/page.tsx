@@ -493,10 +493,10 @@ function DirectoryPageContent() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   {t('directory.searchResults', 'Search Results', 'தேடல் முடிவுகள்')} ({filteredBusinesses.length})
                 </h3>
-                <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-2">
+                <div className="grid gap-6 sm:gap-8 grid-cols-1 md:grid-cols-2">
                   {filteredBusinesses.map((business) => (
                     <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
-                      <CardContent className="p-3 sm:p-4 lg:p-6">
+                      <CardContent className="p-6">
                         {/* Category Badge */}
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
@@ -848,7 +848,10 @@ function DirectoryPageContent() {
                                           className="absolute top-0 left-0 w-full h-full object-cover"
                                           loading="lazy"
                                           onError={(e) => {
-                                            e.currentTarget.src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+                                            const videoId = getYouTubeId(business.mainVideoUrl)
+                                            if (videoId) {
+                                              e.currentTarget.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+                                            }
                                           }}
                                         />
                                         {/* Play Button Overlay */}
