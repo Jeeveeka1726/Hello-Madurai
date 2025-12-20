@@ -474,23 +474,24 @@ function DirectoryPageContent() {
                       {(business.mainImage || business.mainVideoUrl) && (
                         <div className="mb-4">
                           {playingVideo === business.id && business.mainVideoUrl ? (
-                            // Show video player when playing
-                            <div className="aspect-video w-full">
+                            // Show video player when playing - Enhanced size for better visibility
+                            <div className="aspect-video w-full min-h-[300px] md:min-h-[350px] lg:min-h-[400px]">
                               {(() => {
                                 const embedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
                                 if (embedUrl) {
                                   return (
-                                    <div className="relative">
+                                    <div className="relative w-full h-full">
                                       <iframe
                                         src={`${embedUrl}?autoplay=1&rel=0&modestbranding=1`}
-                                        className="w-full h-full rounded-lg"
+                                        className="absolute inset-0 w-full h-full rounded-lg border-0"
                                         allowFullScreen
                                         title={`${business.name} video`}
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        style={{ minHeight: '300px' }}
                                       />
                                       <button
                                         onClick={() => setPlayingVideo(null)}
-                                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity"
+                                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity z-10"
                                       >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -501,16 +502,17 @@ function DirectoryPageContent() {
                                 } else {
                                   // Fallback for non-YouTube videos
                                   return (
-                                    <div className="relative">
+                                    <div className="relative w-full h-full">
                                       <video
                                         src={business.mainVideoUrl}
-                                        className="w-full h-full rounded-lg"
+                                        className="absolute inset-0 w-full h-full rounded-lg object-cover"
                                         controls
                                         autoPlay
+                                        style={{ minHeight: '300px' }}
                                       />
                                       <button
                                         onClick={() => setPlayingVideo(null)}
-                                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity"
+                                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity z-10"
                                       >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
