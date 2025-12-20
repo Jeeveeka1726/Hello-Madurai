@@ -40,6 +40,17 @@ async function getBusiness(id: string): Promise<Business | null> {
   }
 }
 
+// Helper function to get YouTube ID from URL
+function getYouTubeId(url: string): string | null {
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
+  return match ? match[1] : null
+}
+
+// Helper function to get YouTube thumbnail
+function getYouTubeThumbnail(youtubeId: string): string {
+  return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const business = await getBusiness(params.id)
 
@@ -52,8 +63,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const businessName = business.name
   const businessAddress = business.address
-  const businessImage = business.mainImage || '/images/hello-madurai-logo.png'
-  const businessUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://hellomadurai.vercel.app'}/directory/${business.id}`
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://hellomadurai.vercel.app'
+
+  // Determine the best image for sharing
+  let businessImage = '/images/hello-madurai-logo.png' // Default fallback
+
+  // Priority 1: Main business image
+  if (business.mainImage) {
+    businessImage = business.mainImage
+  }
+  // Priority 2: YouTube thumbnail from main video
+  else if (business.mainVideoUrl) {
+    const youtubeId = getYouTubeId(business.mainVideoUrl)
+    if (youtubeId) {
+      businessImage = getYouTubeThumbnail(youtubeId)
+    }
+  }
+  // Priority 3: Profile image
+  else if (business.profileImage) {
+    businessImage = business.profileImage
+  }
+
+  // Ensure absolute URL for image
+  const absoluteImageUrl = businessImage.startsWith('http')
+    ? businessImage
+    : `${baseUrl}${businessImage}`
+
+  const businessUrl = `${baseUrl}/directory/${business.id}`
+
+  console.log('Business Metadata - Name:', businessName)
+  console.log('Business Metadata - Image URL:', absoluteImageUrl)
 
   return {
     title: `${businessName} - Hello Madurai Directory`,
@@ -65,7 +104,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: 'Hello Madurai',
       images: [
         {
-          url: businessImage,
+          url: absoluteImageUrl,
           width: 1200,
           height: 630,
           alt: businessName,
@@ -78,7 +117,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: businessName,
       description: `${businessName} - ${businessAddress}`,
-      images: [businessImage],
+      images: [absoluteImageUrl],
     },
     alternates: {
       canonical: businessUrl,
