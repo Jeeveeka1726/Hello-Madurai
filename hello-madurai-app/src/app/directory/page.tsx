@@ -161,18 +161,14 @@ function DirectoryPageContent() {
     return videoId ? `https://www.youtube.com/embed/${videoId[1]}` : null
   }
 
-  const getYouTubeThumbnail = (url: string) => {
-    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
-    return videoId ? `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg` : ''
-  }
-
   const getYouTubeId = (url: string): string | null => {
     const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
     return match ? match[1] : null
   }
 
-  const getYouTubeThumbnail = (youtubeId: string): string => {
-    return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
+  const getYouTubeThumbnail = (url: string) => {
+    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
+    return videoId ? `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg` : ''
   }
 
   const handleVideoPlay = (businessId: string) => {
@@ -497,10 +493,10 @@ function DirectoryPageContent() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   {t('directory.searchResults', 'Search Results', 'தேடல் முடிவுகள்')} ({filteredBusinesses.length})
                 </h3>
-                <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
+                <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-2">
                   {filteredBusinesses.map((business) => (
                     <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
-                      <CardContent className="p-6">
+                      <CardContent className="p-3 sm:p-4 lg:p-6">
                         {/* Category Badge */}
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
@@ -522,7 +518,7 @@ function DirectoryPageContent() {
                         </div>
 
                         {/* Business Name */}
-                        <h3 className="font-bold text-xl text-gray-900 mb-3">
+                        <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-3 break-words">
                           {language === 'ta' && business.name_ta ? business.name_ta : business.name}
                         </h3>
 
@@ -586,7 +582,7 @@ function DirectoryPageContent() {
                         </div>
 
                         {/* Action Buttons - Left/Right Layout */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           {/* Left Column - Social Media */}
                           <div className="space-y-2">
                             {business.instagramUrl && (
@@ -847,7 +843,7 @@ function DirectoryPageContent() {
                                           onClick={() => handleVideoPlay(business.id)}
                                         >
                                         <img
-                                          src={getYouTubeThumbnail(youtubeId)}
+                                          src={getYouTubeThumbnail(business.mainVideoUrl)}
                                           alt={`${business.name} video`}
                                           className="absolute top-0 left-0 w-full h-full object-cover"
                                           loading="lazy"

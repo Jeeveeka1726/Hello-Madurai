@@ -126,6 +126,11 @@ export default function AdminDirectoryPage() {
     return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
   }
 
+  const getYouTubeThumbnailFromUrl = (url: string): string => {
+    const videoId = getYouTubeId(url)
+    return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : ''
+  }
+
   const fetchCategories = async () => {
     try {
       const response = await fetch('/api/admin/directory-categories')
@@ -428,7 +433,7 @@ export default function AdminDirectoryPage() {
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           <TranslatedText>Main Business Video URL</TranslatedText>
-                          <span className="text-xs text-gray-500 ml-2">(YouTube, Vimeo, etc.)</span>
+                          <span className="text-xs text-gray-500 ml-2">(YouTube recommended for best sharing)</span>
                         </label>
                         <input
                           type="url"
@@ -437,6 +442,27 @@ export default function AdminDirectoryPage() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                           placeholder="https://www.youtube.com/watch?v=..."
                         />
+
+                        {/* YouTube Thumbnail Preview */}
+                        {formData.mainVideoUrl && getYouTubeId(formData.mainVideoUrl) && (
+                          <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <div className="flex items-start space-x-3">
+                              <img
+                                src={getYouTubeThumbnailFromUrl(formData.mainVideoUrl)}
+                                alt="YouTube Thumbnail"
+                                className="w-20 h-15 object-cover rounded"
+                                onError={(e) => {
+                                  e.currentTarget.src = `https://img.youtube.com/vi/${getYouTubeId(formData.mainVideoUrl)}/hqdefault.jpg`
+                                }}
+                              />
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-green-800">✓ YouTube Video Detected</p>
+                                <p className="text-xs text-green-600 mt-1">This thumbnail will be used for social sharing</p>
+                                <p className="text-xs text-gray-500 mt-1">Video ID: {getYouTubeId(formData.mainVideoUrl)}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
                         {/* Video Preview */}
                         {formData.mainVideoUrl && (
@@ -538,12 +564,28 @@ export default function AdminDirectoryPage() {
                         )}
                         {formData.mainVideoUrl && !formData.mainImage && (
                           <div className="flex items-center space-x-2">
-                            <div className="w-12 h-12 bg-blue-100 rounded flex items-center justify-center">
-                              <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z"/>
-                              </svg>
+                            {getYouTubeId(formData.mainVideoUrl) ? (
+                              <img
+                                src={getYouTubeThumbnailFromUrl(formData.mainVideoUrl)}
+                                alt="YouTube Thumbnail"
+                                className="w-12 h-9 object-cover rounded"
+                                onError={(e) => {
+                                  e.currentTarget.src = `https://img.youtube.com/vi/${getYouTubeId(formData.mainVideoUrl)}/hqdefault.jpg`
+                                }}
+                              />
+                            ) : (
+                              <div className="w-12 h-12 bg-blue-100 rounded flex items-center justify-center">
+                                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M8 5v14l11-7z"/>
+                                </svg>
+                              </div>
+                            )}
+                            <div>
+                              <span className="text-sm text-blue-700">✓ Video URL selected</span>
+                              {getYouTubeId(formData.mainVideoUrl) && (
+                                <p className="text-xs text-green-600">YouTube thumbnail available for sharing</p>
+                              )}
                             </div>
-                            <span className="text-sm text-blue-700">✓ Video URL selected</span>
                           </div>
                         )}
                       </div>

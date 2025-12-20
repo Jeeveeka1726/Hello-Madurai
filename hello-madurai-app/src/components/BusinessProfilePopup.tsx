@@ -75,12 +75,12 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-3 sm:p-4 flex justify-between items-start sm:items-center">
+          <div className="flex-1 min-w-0 pr-3">
+            <h2 className="text-lg sm:text-2xl font-bold text-gray-900 break-words">
               {language === 'ta' && business.name_ta ? business.name_ta : business.name}
             </h2>
             {business.verified && (
@@ -91,21 +91,21 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-3 sm:p-6">
           {/* Main Image */}
           {business.mainImage && (
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <img
                 src={business.mainImage}
                 alt={business.name}
-                className="w-full h-64 object-cover rounded-lg"
+                className="w-full h-48 sm:h-64 object-cover rounded-lg"
               />
             </div>
           )}
@@ -114,7 +114,7 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
           {renderVideoContent()}
 
           {/* Contact Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
             {business.address && (
               <div className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-gray-500 mt-1 flex-shrink-0" />
@@ -180,19 +180,19 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
 
           {/* Social Media Links */}
           {(business.instagramUrl || business.facebookUrl || business.youtubeUrl) && (
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-3">
+            <div className="mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-3">
                 <TranslatedText>Follow Us</TranslatedText>
               </h3>
-              <div className="flex space-x-4">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
                 {business.instagramUrl && (
                   <a
                     href={business.instagramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-2 px-4 py-2 bg-pink-50 text-pink-700 rounded-lg hover:bg-pink-100 transition-colors"
+                    className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-pink-50 text-pink-700 rounded-lg hover:bg-pink-100 transition-colors text-sm sm:text-base"
                   >
-                    <Instagram className="w-5 h-5" />
+                    <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>Instagram</span>
                   </a>
                 )}
@@ -201,9 +201,9 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
                     href={business.facebookUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                    className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm sm:text-base"
                   >
-                    <Facebook className="w-5 h-5" />
+                    <Facebook className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>Facebook</span>
                   </a>
                 )}
@@ -212,9 +212,9 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
                     href={business.youtubeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors"
+                    className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm sm:text-base"
                   >
-                    <Youtube className="w-5 h-5" />
+                    <Youtube className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>YouTube</span>
                   </a>
                 )}
