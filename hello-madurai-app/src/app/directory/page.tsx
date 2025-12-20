@@ -763,7 +763,7 @@ function DirectoryPageContent() {
             <div className="bg-white rounded-lg max-w-md w-full p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  <TranslatedText>Share Business</TranslatedText>
+                  {t('directory.shareBusiness', 'Share Business', 'வணிகத்தைப் பகிரவும்')}
                 </h3>
                 <button
                   onClick={() => setShowShareModal(false)}
@@ -777,7 +777,7 @@ function DirectoryPageContent() {
 
               <div className="mb-4">
                 <p className="text-sm text-gray-600 mb-2">
-                  <TranslatedText>Share</TranslatedText>: {language === 'ta' && shareBusinessData.name_ta ? shareBusinessData.name_ta : shareBusinessData.name}
+                  {t('directory.share', 'Share', 'பகிரவும்')}: {language === 'ta' && shareBusinessData.name_ta ? shareBusinessData.name_ta : shareBusinessData.name}
                 </p>
                 {shareBusinessData.mainImage && (
                   <img
@@ -819,7 +819,7 @@ function DirectoryPageContent() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
-                  <span><TranslatedText>Copy Link</TranslatedText></span>
+                  <span>{t('directory.copyLink', 'Copy Link', 'இணைப்பை நகலெடுக்கவும்')}</span>
                 </button>
               </div>
             </div>
