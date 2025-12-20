@@ -640,55 +640,71 @@ function DirectoryPageContent() {
                         )}
                       </div>
 
-                      {/* Action Buttons Grid */}
+                      {/* Action Buttons Grid - Left: Instagram, YouTube, Facebook | Right: Email, Booking, Share */}
                       <div className="grid grid-cols-2 gap-2 mb-3">
-                        {/* Instagram */}
-                        {business.instagramUrl && (
-                          <button
-                            onClick={() => handleInstagram(business.instagramUrl!)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                          >
-                            Instagram
-                          </button>
-                        )}
+                        {/* LEFT COLUMN */}
+                        <div className="space-y-2">
+                          {/* Instagram */}
+                          {business.instagramUrl && (
+                            <button
+                              onClick={() => handleInstagram(business.instagramUrl!)}
+                              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                            >
+                              Instagram
+                            </button>
+                          )}
 
-                        {/* Facebook */}
-                        {business.facebookUrl && (
-                          <button
-                            onClick={() => handleFacebook(business.facebookUrl!)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                          >
-                            Facebook
-                          </button>
-                        )}
+                          {/* YouTube */}
+                          {business.youtubeUrl && (
+                            <button
+                              onClick={() => window.open(business.youtubeUrl, '_blank')}
+                              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                            >
+                              YouTube
+                            </button>
+                          )}
 
-                        {/* YouTube */}
-                        {business.youtubeUrl && (
-                          <button
-                            onClick={() => window.open(business.youtubeUrl, '_blank')}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                          >
-                            Youtube
-                          </button>
-                        )}
+                          {/* Facebook */}
+                          {business.facebookUrl && (
+                            <button
+                              onClick={() => handleFacebook(business.facebookUrl!)}
+                              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                            >
+                              Facebook
+                            </button>
+                          )}
+                        </div>
 
-                        {/* Booking */}
-                        {business.bookingUrl && (
-                          <button
-                            onClick={() => handleBooking(business.bookingUrl!)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                          >
-                            Booking
-                          </button>
-                        )}
+                        {/* RIGHT COLUMN */}
+                        <div className="space-y-2">
+                          {/* Email */}
+                          {business.email && (
+                            <button
+                              onClick={() => window.open(`mailto:${business.email}`, '_self')}
+                              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                            >
+                              Email
+                            </button>
+                          )}
 
-                        {/* Share */}
-                        <button
-                          onClick={() => handleShare(business)}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                        >
-                          Share
-                        </button>
+                          {/* Booking */}
+                          {business.bookingUrl && (
+                            <button
+                              onClick={() => handleBooking(business.bookingUrl!)}
+                              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                            >
+                              Booking
+                            </button>
+                          )}
+
+                          {/* Share */}
+                          <button
+                            onClick={() => handleShare(business)}
+                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                          >
+                            Share
+                          </button>
+                        </div>
                       </div>
 
                       {/* View Profile Button - Only if hasProfile is true */}
