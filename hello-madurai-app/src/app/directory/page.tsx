@@ -3,16 +3,17 @@
 import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { 
-  PhoneIcon, 
-  EnvelopeIcon, 
-  MapPinIcon, 
-  GlobeAltIcon, 
+import {
+  PhoneIcon,
+  EnvelopeIcon,
+  MapPinIcon,
+  GlobeAltIcon,
   MagnifyingGlassIcon,
   CalendarIcon,
   ArrowDownTrayIcon,
   ShareIcon,
-  ChatBubbleLeftIcon
+  ChatBubbleLeftIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
@@ -160,6 +161,11 @@ function DirectoryPageContent() {
     return videoId ? `https://www.youtube.com/embed/${videoId[1]}` : null
   }
 
+  const getYouTubeThumbnail = (url: string) => {
+    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
+    return videoId ? `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg` : ''
+  }
+
   const getYouTubeId = (url: string): string | null => {
     const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
     return match ? match[1] : null
@@ -174,20 +180,23 @@ function DirectoryPageContent() {
   }
 
   const filteredBusinesses = businesses.filter(business => {
-    // Filter by category
-    const matchesCategory = !selectedCategory || business.categoryId === selectedCategory
-
-    // Filter by subcategory
-    const matchesSubcategory = !selectedSubcategory || business.subcategoryId === selectedSubcategory
-
-    // Filter by search term
+    // Filter by search term first - if searching, search across all categories
     const matchesSearch = searchTerm === '' ||
       business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (business.name_ta && business.name_ta.includes(searchTerm)) ||
       business.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (business.address_ta && business.address_ta.includes(searchTerm))
 
-    return matchesCategory && matchesSubcategory && matchesSearch
+    // If searching, ignore category/subcategory filters and search across all
+    if (searchTerm) {
+      return matchesSearch
+    }
+
+    // If not searching, apply category and subcategory filters
+    const matchesCategory = !selectedCategory || business.categoryId === selectedCategory
+    const matchesSubcategory = !selectedSubcategory || business.subcategoryId === selectedSubcategory
+
+    return matchesCategory && matchesSubcategory
   }).sort((a, b) => {
     // Sort by orderNumber (ascending), then by name
     if (a.orderNumber !== b.orderNumber) {
@@ -322,20 +331,37 @@ function DirectoryPageContent() {
           </div>
         )}
 
-        {/* Search and Filter */}
+        {/* Search Bar - Digital FM Style */}
         {!loading && (
           <>
-            <div className="mb-8">
-              <div className="relative max-w-md mx-auto">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <div className="mb-6">
+              <div className="relative max-w-2xl mx-auto">
                 <input
                   type="text"
-                  placeholder={t('directory.searchPlaceholder', 'Search businesses...', 'வணிகங்களைத் தேடுங்கள்...')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder={language === 'ta'
+                    ? 'வணிகங்களைத் தேடுங்கள் - அனைத்து வகைகளிலும்...'
+                    : 'Search businesses across all categories...'}
+                  className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+                <MagnifyingGlassIcon className="h-6 w-6 text-gray-400 absolute left-4 top-3.5" />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600"
+                  >
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                )}
               </div>
+              {searchTerm && (
+                <p className="text-center text-sm text-gray-500 mt-2">
+                  {language === 'ta'
+                    ? `"${searchTerm}" க்கான முடிவுகள் - அனைத்து வகைகளிலும் தேடப்பட்டது`
+                    : `Results for "${searchTerm}" - searched across all categories`}
+                </p>
+              )}
             </div>
 
             {/* Main Categories - Horizontal Scrollable */}
@@ -397,8 +423,8 @@ function DirectoryPageContent() {
               </div>
             )}
 
-            {/* Subcategories - Only show if not in subcategory view */}
-            {selectedCategoryObj && selectedCategoryObj.subcategories.length > 0 && !viewingSubcategory && (
+            {/* Subcategories - Only show if not in subcategory view and not searching */}
+            {selectedCategoryObj && selectedCategoryObj.subcategories.length > 0 && !viewingSubcategory && !searchTerm && (
               <div className="mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
                   {t('directory.selectSubcategory', 'Select Subcategory', 'துணை வகையைத் தேர்ந்தெடுக்கவும்')}
@@ -447,8 +473,242 @@ function DirectoryPageContent() {
               </div>
             )}
 
-            {/* Businesses - Only show when in subcategory view */}
-            {selectedCategoryObj && viewingSubcategory && selectedSubcategory && (
+            {/* Search Results - Show when searching */}
+            {searchTerm && filteredBusinesses.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  {t('directory.searchResults', 'Search Results', 'தேடல் முடிவுகள்')} ({filteredBusinesses.length})
+                </h3>
+                <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
+                  {filteredBusinesses.map((business) => (
+                    <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
+                      <CardContent className="p-6">
+                        {/* Category Badge */}
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            {business.subcategory && business.subcategory.icon && (
+                              <span className="text-2xl">{business.subcategory.icon}</span>
+                            )}
+                            <span className="text-sm text-gray-600 font-medium">
+                              {language === 'ta'
+                                ? (business.mainCategory?.name_ta || business.category)
+                                : (business.mainCategory?.name || business.category)
+                              }
+                            </span>
+                          </div>
+                          {business.verified && (
+                            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
+                              ✓ {t('directory.verified', 'Verified', 'சரிபார்க்கப்பட்டது')}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Business Name */}
+                        <h3 className="font-bold text-xl text-gray-900 mb-3">
+                          {language === 'ta' && business.name_ta ? business.name_ta : business.name}
+                        </h3>
+
+                        {/* Main Business Image/Video */}
+                        {(business.mainImage || business.mainVideoUrl) && (
+                          <div className="relative mb-4 aspect-video bg-gray-100 rounded-lg overflow-hidden min-h-[300px] md:min-h-[350px] lg:min-h-[400px]">
+                            {business.mainVideoUrl ? (
+                              <>
+                                {playingVideo === business.id ? (
+                                  <iframe
+                                    src={`${getYouTubeEmbedUrl(business.mainVideoUrl)}?autoplay=1&rel=0&modestbranding=1`}
+                                    className="absolute inset-0 w-full h-full border-0"
+                                    style={{ minHeight: '300px' }}
+                                    allowFullScreen
+                                    title="Business Video"
+                                  />
+                                ) : (
+                                  <div
+                                    className="relative w-full h-full cursor-pointer group"
+                                    onClick={() => handleVideoPlay(business.id)}
+                                  >
+                                    <img
+                                      src={getYouTubeThumbnail(business.mainVideoUrl)}
+                                      alt="Video thumbnail"
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center group-hover:bg-opacity-40 transition-all">
+                                      <div className="bg-white bg-opacity-90 rounded-full p-4 group-hover:scale-110 transition-transform">
+                                        <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                          <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                                <button
+                                  onClick={() => setPlayingVideo(null)}
+                                  className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-all z-10"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              </>
+                            ) : business.mainImage && (
+                              <img
+                                src={business.mainImage}
+                                alt={business.name}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                          </div>
+                        )}
+
+                        {/* Business Address */}
+                        <div className="flex items-start gap-2 text-gray-600 mb-4">
+                          <MapPinIcon className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm">
+                            {language === 'ta' && business.address_ta ? business.address_ta : business.address}
+                          </span>
+                        </div>
+
+                        {/* Action Buttons - Left/Right Layout */}
+                        <div className="grid grid-cols-2 gap-4">
+                          {/* Left Column - Social Media */}
+                          <div className="space-y-2">
+                            {business.instagramUrl && (
+                              <a
+                                href={business.instagramUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all text-sm"
+                              >
+                                <span>📷</span>
+                                <span>Instagram</span>
+                              </a>
+                            )}
+                            {business.youtubeUrl && (
+                              <a
+                                href={business.youtubeUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-sm"
+                              >
+                                <span>📺</span>
+                                <span>YouTube</span>
+                              </a>
+                            )}
+                            {business.facebookUrl && (
+                              <a
+                                href={business.facebookUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm"
+                              >
+                                <span>👥</span>
+                                <span>Facebook</span>
+                              </a>
+                            )}
+                          </div>
+
+                          {/* Right Column - Business Actions */}
+                          <div className="space-y-2">
+                            {business.email && (
+                              <button
+                                onClick={() => handleEmail(business.email!)}
+                                className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all text-sm w-full"
+                              >
+                                <EnvelopeIcon className="h-4 w-4" />
+                                <span>{t('directory.email', 'Email', 'மின்னஞ்சல்')}</span>
+                              </button>
+                            )}
+                            {business.bookingUrl && (
+                              <a
+                                href={business.bookingUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-sm"
+                              >
+                                <CalendarIcon className="h-4 w-4" />
+                                <span>{t('directory.booking', 'Booking', 'முன்பதிவு')}</span>
+                              </a>
+                            )}
+                            <button
+                              onClick={() => handleShare(business)}
+                              className="flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all text-sm w-full"
+                            >
+                              <ShareIcon className="h-4 w-4" />
+                              <span>{t('directory.share', 'Share', 'பகிரவும்')}</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Additional Action Buttons */}
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          <button
+                            onClick={() => handleCall(business.phone)}
+                            className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-sm"
+                          >
+                            <PhoneIcon className="h-4 w-4" />
+                            <span>{t('directory.call', 'Call', 'அழைக்கவும்')}</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleDirections(business)}
+                            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm"
+                          >
+                            <MapPinIcon className="h-4 w-4" />
+                            <span>{t('directory.directions', 'Directions', 'திசைகள்')}</span>
+                          </button>
+
+                          {business.website && (
+                            <a
+                              href={business.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all text-sm"
+                            >
+                              <GlobeAltIcon className="h-4 w-4" />
+                              <span>{t('directory.website', 'Website', 'இணையதளம்')}</span>
+                            </a>
+                          )}
+
+                          <button
+                            onClick={() => {
+                              setCommentsBusinessId(business.id)
+                              setShowComments(true)
+                            }}
+                            className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all text-sm"
+                          >
+                            <ChatBubbleLeftIcon className="h-4 w-4" />
+                            <span>{t('directory.comments', 'Comments', 'கருத்துகள்')}</span>
+                          </button>
+
+                          {business.hasProfile && (
+                            <button
+                              onClick={() => {
+                                setSelectedBusiness(business)
+                                setShowProfilePopup(true)
+                              }}
+                              className="flex items-center gap-2 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all text-sm"
+                            >
+                              <span>{t('directory.viewProfile', 'View Profile', 'சுயவிவரத்தைப் பார்க்கவும்')}</span>
+                            </button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* No Search Results */}
+            {searchTerm && filteredBusinesses.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500">
+                  {language === 'ta' ? 'முடிவுகள் இல்லை' : 'No results found'}
+                </p>
+              </div>
+            )}
+
+            {/* Businesses - Only show when in subcategory view and not searching */}
+            {selectedCategoryObj && viewingSubcategory && selectedSubcategory && !searchTerm && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
                   {viewingSubcategory && selectedSubcategory ? (
