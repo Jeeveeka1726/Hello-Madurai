@@ -180,14 +180,32 @@ function DirectoryPageContent() {
   }
 
   const filteredBusinesses = businesses.filter(business => {
-    // Filter by search term first - if searching, search across all categories
+    // Enhanced search across ALL fields and categories/subcategories
+    const searchLower = searchTerm.toLowerCase()
     const matchesSearch = searchTerm === '' ||
-      business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      // Business name (English & Tamil)
+      business.name.toLowerCase().includes(searchLower) ||
       (business.name_ta && business.name_ta.includes(searchTerm)) ||
-      business.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (business.address_ta && business.address_ta.includes(searchTerm))
+      // Business address (English & Tamil)
+      business.address.toLowerCase().includes(searchLower) ||
+      (business.address_ta && business.address_ta.includes(searchTerm)) ||
+      // Business description (if exists)
+      (business.description && business.description.toLowerCase().includes(searchLower)) ||
+      (business.description_ta && business.description_ta.includes(searchTerm)) ||
+      // Category name (English & Tamil)
+      (business.mainCategory?.name && business.mainCategory.name.toLowerCase().includes(searchLower)) ||
+      (business.mainCategory?.name_ta && business.mainCategory.name_ta.includes(searchTerm)) ||
+      // Subcategory name (English & Tamil)
+      (business.subcategory?.name && business.subcategory.name.toLowerCase().includes(searchLower)) ||
+      (business.subcategory?.name_ta && business.subcategory.name_ta.includes(searchTerm)) ||
+      // Phone number
+      business.phone.includes(searchTerm) ||
+      // Email
+      (business.email && business.email.toLowerCase().includes(searchLower)) ||
+      // Website
+      (business.website && business.website.toLowerCase().includes(searchLower))
 
-    // If searching, ignore category/subcategory filters and search across all
+    // If searching, ignore category/subcategory filters and search across ALL businesses
     if (searchTerm) {
       return matchesSearch
     }
@@ -341,8 +359,8 @@ function DirectoryPageContent() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={language === 'ta'
-                    ? 'வணிகங்களைத் தேடுங்கள் - அனைத்து வகைகளிலும்...'
-                    : 'Search businesses across all categories...'}
+                    ? 'வணிகங்கள், வகைகள், முகவரிகள், தொலைபேசி எண்கள்...'
+                    : 'Search businesses, categories, addresses, phone numbers...'}
                   className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <MagnifyingGlassIcon className="h-6 w-6 text-gray-400 absolute left-4 top-3.5" />
@@ -358,8 +376,8 @@ function DirectoryPageContent() {
               {searchTerm && (
                 <p className="text-center text-sm text-gray-500 mt-2">
                   {language === 'ta'
-                    ? `"${searchTerm}" க்கான முடிவுகள் - அனைத்து வகைகளிலும் தேடப்பட்டது`
-                    : `Results for "${searchTerm}" - searched across all categories`}
+                    ? `"${searchTerm}" க்கான முடிவுகள் - அனைத்து வகைகள், துணைவகைகள் மற்றும் வணிகங்களில் தேடப்பட்டது`
+                    : `Results for "${searchTerm}" - searched across all categories, subcategories, and business details`}
                 </p>
               )}
             </div>
