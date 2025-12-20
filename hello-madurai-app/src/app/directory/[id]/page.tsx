@@ -65,21 +65,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const businessAddress = business.address
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://hellomadurai.vercel.app'
 
-  // Determine the best image for sharing
+  // Determine the best image for sharing - Prioritize YouTube thumbnails
   let businessImage = '/images/hello-madurai-logo.png' // Default fallback
 
-  // Priority 1: Main business image
-  if (business.mainImage) {
-    businessImage = business.mainImage
-  }
-  // Priority 2: YouTube thumbnail from main video
-  else if (business.mainVideoUrl) {
+  // Priority 1: YouTube thumbnail from main video (always preferred for sharing)
+  if (business.mainVideoUrl) {
     const youtubeId = getYouTubeId(business.mainVideoUrl)
     if (youtubeId) {
       businessImage = getYouTubeThumbnail(youtubeId)
     }
   }
-  // Priority 3: Profile image
+  // Priority 2: Main business image (if no YouTube video)
+  else if (business.mainImage) {
+    businessImage = business.mainImage
+  }
+  // Priority 3: Profile image (if no YouTube video or main image)
   else if (business.profileImage) {
     businessImage = business.profileImage
   }
