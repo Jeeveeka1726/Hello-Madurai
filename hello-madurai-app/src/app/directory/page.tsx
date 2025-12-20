@@ -95,6 +95,7 @@ function DirectoryPageContent() {
   const searchParams = useSearchParams()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null)
+  const [viewingSubcategory, setViewingSubcategory] = useState(false) // Track if we're in subcategory view
   const [searchTerm, setSearchTerm] = useState('')
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -337,38 +338,41 @@ function DirectoryPageContent() {
               </div>
             </div>
 
-            {/* Main Categories */}
+            {/* Main Categories - Horizontal Scrollable */}
             {!loading && categories.length > 0 && (
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4 text-center">
                   {t('directory.selectCategory', 'Select Category', 'வகையைத் தேர்ந்தெடுக்கவும்')}
                 </h2>
-                <div className="flex flex-wrap gap-3 justify-center">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => {
-                        setSelectedCategory(category.id)
-                        setSelectedSubcategory(null)
-                      }}
-                      className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                        selectedCategory === category.id
-                          ? 'bg-blue-600 text-white shadow-lg scale-105'
-                          : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400 hover:shadow-md'
-                      }`}
-                    >
-                      <span>{language === 'ta' ? category.name_ta : category.name}</span>
-                      {category._count && category._count.businesses > 0 && (
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                <div className="overflow-x-auto pb-2">
+                  <div className="flex gap-3 min-w-max px-4">
+                    {categories.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => {
+                          setSelectedCategory(category.id)
+                          setSelectedSubcategory(null)
+                          setViewingSubcategory(false)
+                        }}
+                        className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
                           selectedCategory === category.id
-                            ? 'bg-white/20'
-                            : 'bg-gray-200'
-                        }`}>
-                          {category._count.businesses}
-                        </span>
-                      )}
-                    </button>
-                  ))}
+                            ? 'bg-blue-600 text-white shadow-lg scale-105'
+                            : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400 hover:shadow-md'
+                        }`}
+                      >
+                        <span>{language === 'ta' ? category.name_ta : category.name}</span>
+                        {category._count && category._count.businesses > 0 && (
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            selectedCategory === category.id
+                              ? 'bg-white/20'
+                              : 'bg-gray-200'
+                          }`}>
+                            {category._count.businesses}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -384,8 +388,8 @@ function DirectoryPageContent() {
               </div>
             )}
 
-            {/* Subcategories */}
-            {selectedCategoryObj && selectedCategoryObj.subcategories.length > 0 && (
+            {/* Subcategories - Only show if not in subcategory view */}
+            {selectedCategoryObj && selectedCategoryObj.subcategories.length > 0 && !viewingSubcategory && (
               <div className="mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
                   {t('directory.selectSubcategory', 'Select Subcategory', 'துணை வகையைத் தேர்ந்தெடுக்கவும்')}
@@ -394,7 +398,10 @@ function DirectoryPageContent() {
                   {selectedCategoryObj.subcategories.map((subcategory) => (
                     <button
                       key={subcategory.id}
-                      onClick={() => setSelectedSubcategory(subcategory.id)}
+                      onClick={() => {
+                        setSelectedSubcategory(subcategory.id)
+                        setViewingSubcategory(true)
+                      }}
                       className={`p-4 rounded-xl border-2 transition-all hover:shadow-lg ${
                         selectedSubcategory === subcategory.id
                           ? 'border-blue-600 bg-blue-50 shadow-md'
@@ -431,11 +438,38 @@ function DirectoryPageContent() {
               </div>
             )}
 
+            {/* Back Button - Show when in subcategory view */}
+            {viewingSubcategory && selectedSubcategory && (
+              <div className="mb-6">
+                <button
+                  onClick={() => {
+                    setViewingSubcategory(false)
+                    setSelectedSubcategory(null)
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>{t('directory.backToCategory', 'Back to Category', 'வகைக்கு திரும்பு')}</span>
+                </button>
+              </div>
+            )}
+
             {/* Businesses */}
             {selectedCategoryObj && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  {language === 'ta' ? selectedCategoryObj.name_ta : selectedCategoryObj.name}
+                  {viewingSubcategory && selectedSubcategory ? (
+                    // Show subcategory name when in subcategory view
+                    (() => {
+                      const subcategoryObj = selectedCategoryObj.subcategories.find(sub => sub.id === selectedSubcategory)
+                      return subcategoryObj ? (language === 'ta' ? subcategoryObj.name_ta : subcategoryObj.name) : ''
+                    })()
+                  ) : (
+                    // Show category name when in category view
+                    language === 'ta' ? selectedCategoryObj.name_ta : selectedCategoryObj.name
+                  )}
                 </h2>
               <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
                 {filteredBusinesses.map((business) => (
