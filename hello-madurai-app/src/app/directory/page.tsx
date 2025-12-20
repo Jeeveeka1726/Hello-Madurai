@@ -361,15 +361,6 @@ function DirectoryPageContent() {
                         }`}
                       >
                         <span>{language === 'ta' ? category.name_ta : category.name}</span>
-                        {category._count && category._count.businesses > 0 && (
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${
-                            selectedCategory === category.id
-                              ? 'bg-white/20'
-                              : 'bg-gray-200'
-                          }`}>
-                            {category._count.businesses}
-                          </span>
-                        )}
                       </button>
                     ))}
                   </div>
@@ -385,6 +376,24 @@ function DirectoryPageContent() {
                     ? 'வகைகள் இன்னும் சேர்க்கப்படவில்லை'
                     : 'No categories added yet'}
                 </p>
+              </div>
+            )}
+
+            {/* Back Button - Always at top when in subcategory view */}
+            {viewingSubcategory && selectedSubcategory && (
+              <div className="mb-6">
+                <button
+                  onClick={() => {
+                    setViewingSubcategory(false)
+                    setSelectedSubcategory(null)
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>{t('directory.backToCategory', 'Back to Category', 'வகைக்கு திரும்பு')}</span>
+                </button>
               </div>
             )}
 
@@ -438,26 +447,8 @@ function DirectoryPageContent() {
               </div>
             )}
 
-            {/* Back Button - Show when in subcategory view */}
-            {viewingSubcategory && selectedSubcategory && (
-              <div className="mb-6">
-                <button
-                  onClick={() => {
-                    setViewingSubcategory(false)
-                    setSelectedSubcategory(null)
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  <span>{t('directory.backToCategory', 'Back to Category', 'வகைக்கு திரும்பு')}</span>
-                </button>
-              </div>
-            )}
-
-            {/* Businesses */}
-            {selectedCategoryObj && (
+            {/* Businesses - Only show when in subcategory view */}
+            {selectedCategoryObj && viewingSubcategory && selectedSubcategory && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
                   {viewingSubcategory && selectedSubcategory ? (
