@@ -73,6 +73,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const youtubeId = getYouTubeId(business.mainVideoUrl)
     if (youtubeId) {
       businessImage = getYouTubeThumbnail(youtubeId)
+      console.log('Business has YouTube video - Using thumbnail:', businessImage)
+    } else {
+      console.log('Business has video URL but not YouTube:', business.mainVideoUrl)
     }
   }
   // Priority 2: Main business image (if no YouTube video)
