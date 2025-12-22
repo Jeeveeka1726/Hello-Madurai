@@ -226,9 +226,7 @@ function DirectoryPageContent() {
     window.location.href = `tel:${phone}`
   }
 
-  const handleEmail = (email: string) => {
-    window.location.href = `mailto:${email}`
-  }
+
 
   const handleWebsite = (website: string) => {
     window.open(website, '_blank')
@@ -639,15 +637,13 @@ function DirectoryPageContent() {
 
                           {/* Right Column - Business Actions */}
                           <div className="space-y-2">
-                            {business.email && (
-                              <button
-                                onClick={() => handleEmail(business.email!)}
-                                className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all text-sm w-full"
-                              >
-                                <EnvelopeIcon className="h-4 w-4" />
-                                <span>{t('directory.email', 'Email', 'மின்னஞ்சல்')}</span>
-                              </button>
-                            )}
+                            <button
+                              onClick={() => handleDirections(business)}
+                              className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm w-full"
+                            >
+                              <MapPinIcon className="h-4 w-4" />
+                              <span>{t('directory.directions', 'Directions', 'திசைகள்')}</span>
+                            </button>
                             {business.bookingUrl && (
                               <a
                                 href={business.bookingUrl}
@@ -997,15 +993,13 @@ function DirectoryPageContent() {
 
                         {/* RIGHT COLUMN */}
                         <div className="space-y-2">
-                          {/* Email */}
-                          {business.email && (
-                            <button
-                              onClick={() => window.open(`mailto:${business.email}`, '_self')}
-                              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                            >
-                              Email
-                            </button>
-                          )}
+                          {/* Directions */}
+                          <button
+                            onClick={() => handleDirections(business)}
+                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                          >
+                            {t('directory.directions', 'Directions', 'திசைகள்')}
+                          </button>
 
                           {/* Booking */}
                           {business.bookingUrl && (

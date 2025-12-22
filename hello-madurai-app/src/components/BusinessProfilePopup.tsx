@@ -143,19 +143,24 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
               </div>
             )}
 
-            {business.email && (
-              <div className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-gray-500 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    <TranslatedText>Email</TranslatedText>
-                  </p>
-                  <a href={`mailto:${business.email}`} className="text-sm text-primary-600 hover:text-primary-700">
-                    {business.email}
-                  </a>
-                </div>
+            <div className="flex items-center space-x-3">
+              <MapPin className="w-5 h-5 text-gray-500 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">
+                  <TranslatedText>Address</TranslatedText>
+                </p>
+                <button
+                  onClick={() => {
+                    const address = business.address_ta || business.address
+                    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+                    window.open(url, '_blank')
+                  }}
+                  className="text-sm text-primary-600 hover:text-primary-700 text-left"
+                >
+                  {business.address_ta || business.address}
+                </button>
               </div>
-            )}
+            </div>
 
             {business.website && (
               <div className="flex items-center space-x-3">
