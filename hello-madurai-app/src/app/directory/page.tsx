@@ -105,8 +105,7 @@ function DirectoryPageContent() {
   const [commentsBusinessId, setCommentsBusinessId] = useState<string>('')
   const [showProfilePopup, setShowProfilePopup] = useState(false)
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
-  const [showShareModal, setShowShareModal] = useState(false)
-  const [shareBusinessData, setShareBusinessData] = useState<Business | null>(null)
+
   const [playingVideo, setPlayingVideo] = useState<string | null>(null)
 
   // Fetch categories and businesses from database
@@ -285,10 +284,7 @@ function DirectoryPageContent() {
     }
   }
 
-  const handleShare = (business: Business) => {
-    setShareBusinessData(business)
-    setShowShareModal(true)
-  }
+
 
   const shareToWhatsApp = async (business: Business) => {
     const url = `${window.location.origin}/directory/${business.id}`
@@ -309,7 +305,6 @@ function DirectoryPageContent() {
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`
     window.open(whatsappUrl, '_blank')
-    setShowShareModal(false)
   }
 
   const shareToFacebook = async (business: Business) => {
@@ -328,7 +323,6 @@ function DirectoryPageContent() {
 
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
     window.open(facebookUrl, '_blank')
-    setShowShareModal(false)
   }
 
   const copyLink = async (business: Business) => {
@@ -356,79 +350,11 @@ function DirectoryPageContent() {
       textArea.select()
       document.execCommand('copy')
       document.body.removeChild(textArea)
-      alert(t('directory.linkCopied', 'Link copied to clipboard!', 'இணைப்பு கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது!'))
-    }
-    setShowShareModal(false)
-  }
-
-  // Native share with image support (like other sections)
-  const nativeShare = async (business: Business) => {
-    const url = `${window.location.origin}/directory/${business.id}`
-    const businessName = language === 'ta' && business.name_ta ? business.name_ta : business.name
-    const businessAddress = language === 'ta' && business.address_ta ? business.address_ta : business.address
-
-    const shareData: ShareData = {
-      title: businessName,
-      text: `${businessName}\n📍 ${businessAddress}`,
-      url: url
-    }
-
-    // Get the best image for sharing (same priority as metadata)
-    let imageUrl = ''
-    if (business.mainVideoUrl) {
-      const youtubeId = getYouTubeId(business.mainVideoUrl)
-      if (youtubeId) {
-        imageUrl = `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
-      }
-    } else if (business.mainImage) {
-      imageUrl = business.mainImage
-    } else if (business.profileImage) {
-      imageUrl = business.profileImage
-    }
-
-    // Try to fetch and share image if available (works for WhatsApp, Telegram, etc.)
-    if (imageUrl) {
-      try {
-        // Convert image URL to absolute URL if needed
-        const absoluteImageUrl = imageUrl.startsWith('http')
-          ? imageUrl
-          : `${window.location.origin}${imageUrl}`
-
-        // Fetch the image
-        const response = await fetch(absoluteImageUrl)
-        const blob = await response.blob()
-        const file = new File([blob], 'business-image.jpg', { type: blob.type })
-
-        // Check if files can be shared
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          shareData.files = [file]
-        }
-      } catch (imgError) {
-        console.log('Could not fetch image for sharing:', imgError)
-        // Continue without image (Facebook/Twitter will use Open Graph meta tags)
-      }
-    }
-
-    try {
-      // Share
-      await navigator.share(shareData)
-
-      // Track the share
-      await fetch(`/api/business/${business.id}/share`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ platform: 'native' })
-      })
-
-      setShowShareModal(false)
-    } catch (error) {
-      if ((error as Error).name !== 'AbortError') {
-        console.error('Error sharing:', error)
-        // Fallback to showing share menu
-        // Keep modal open for manual sharing
-      }
+      alert('Link copied to clipboard!')
     }
   }
+
+
 
   const openComments = (businessId: string) => {
     setCommentsBusinessId(businessId)
@@ -945,12 +871,28 @@ function DirectoryPageContent() {
                             </button>
                           )}
 
-                          {/* Share */}
+                          {/* WhatsApp Share */}
                           <button
-                            onClick={() => handleShare(business)}
+                            onClick={() => shareToWhatsApp(business)}
+                            className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
+                          >
+                            WhatsApp
+                          </button>
+
+                          {/* Facebook Share */}
+                          <button
+                            onClick={() => shareToFacebook(business)}
                             className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                           >
-                            Share
+                            Facebook
+                          </button>
+
+                          {/* Copy Link */}
+                          <button
+                            onClick={() => copyLink(business)}
+                            className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
+                          >
+                            Copy Link
                           </button>
                         </div>
                       </div>
@@ -1005,111 +947,7 @@ function DirectoryPageContent() {
           />
         )}
 
-        {/* Share Modal */}
-        {showShareModal && shareBusinessData && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg max-w-md w-full p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {t('directory.shareBusiness', 'Share Business', 'வணிகத்தைப் பகிரவும்')}
-                </h3>
-                <button
-                  onClick={() => setShowShareModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
 
-              <div className="mb-4">
-                <p className="text-sm text-gray-600 mb-2">
-                  {t('directory.share', 'Share', 'பகிரவும்')}: {language === 'ta' && shareBusinessData.name_ta ? shareBusinessData.name_ta : shareBusinessData.name}
-                </p>
-                {(() => {
-                  // Show the best image for sharing (same priority as metadata)
-                  let imageUrl = ''
-                  let imageAlt = shareBusinessData.name
-
-                  if (shareBusinessData.mainVideoUrl) {
-                    const youtubeId = getYouTubeId(shareBusinessData.mainVideoUrl)
-                    if (youtubeId) {
-                      imageUrl = `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
-                      imageAlt = `${shareBusinessData.name} video thumbnail`
-                    }
-                  } else if (shareBusinessData.mainImage) {
-                    imageUrl = shareBusinessData.mainImage
-                    imageAlt = shareBusinessData.name
-                  } else if (shareBusinessData.profileImage) {
-                    imageUrl = shareBusinessData.profileImage
-                    imageAlt = `${shareBusinessData.name} profile`
-                  }
-
-                  return imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt={imageAlt}
-                      className="w-full h-32 object-cover rounded-lg mb-3"
-                      onError={(e) => {
-                        // Hide image if it fails to load
-                        e.currentTarget.style.display = 'none'
-                      }}
-                    />
-                  ) : null
-                })()}
-              </div>
-
-              <div className="space-y-3">
-                {/* Native Share (if supported) */}
-                {typeof navigator !== 'undefined' && navigator.share && (
-                  <button
-                    onClick={() => nativeShare(shareBusinessData)}
-                    className="w-full flex items-center justify-center space-x-3 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                    </svg>
-                    <span>{t('directory.share', 'Share', 'பகிரவும்')}</span>
-                  </button>
-                )}
-
-                {/* WhatsApp */}
-                <button
-                  onClick={() => shareToWhatsApp(shareBusinessData)}
-                  className="w-full flex items-center justify-center space-x-3 px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.382"/>
-                  </svg>
-                  <span>WhatsApp</span>
-                </button>
-
-                {/* Facebook */}
-                <button
-                  onClick={() => shareToFacebook(shareBusinessData)}
-                  className="w-full flex items-center justify-center space-x-3 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                  </svg>
-                  <span>Facebook</span>
-                </button>
-
-                {/* Copy Link */}
-                <button
-                  onClick={() => copyLink(shareBusinessData)}
-                  className="w-full flex items-center justify-center space-x-3 px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  <span>{t('directory.copyLink', 'Copy Link', 'இணைப்பை நகலெடுக்கவும்')}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
