@@ -254,8 +254,16 @@ function DirectoryPageContent() {
     }
   }
 
-  const handleBooking = (bookingUrl: string) => {
-    window.open(bookingUrl, '_blank')
+  const handleBooking = (bookingInfo: string) => {
+    // Check if it's a phone number (starts with + or contains only digits, spaces, hyphens, parentheses)
+    const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
+    if (phoneRegex.test(bookingInfo.replace(/\s/g, ''))) {
+      // It's a phone number - open phone dialer
+      window.open(`tel:${bookingInfo}`, '_self')
+    } else {
+      // It's a URL - open in new tab
+      window.open(bookingInfo, '_blank')
+    }
   }
 
   const handleDownload = async (business: Business) => {
@@ -615,218 +623,38 @@ function DirectoryPageContent() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   {t('directory.searchResults', 'Search Results', 'தேடல் முடிவுகள்')} ({filteredBusinesses.length})
                 </h3>
-                <div className="grid gap-6 sm:gap-8 grid-cols-1 md:grid-cols-2">
+                {/* Compact Blue Boxes for Search Results */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {filteredBusinesses.map((business) => (
-                    <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
-                      <CardContent className="p-6">
-                        {/* Category Badge */}
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            {business.subcategory && business.subcategory.icon && (
-                              <span className="text-2xl">{business.subcategory.icon}</span>
-                            )}
-                            <span className="text-sm text-gray-600 font-medium">
-                              {language === 'ta'
-                                ? (business.mainCategory?.name_ta || business.category)
-                                : (business.mainCategory?.name || business.category)
-                              }
-                            </span>
-                          </div>
-                          {business.verified && (
-                            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
-                              ✓ {t('directory.verified', 'Verified', 'சரிபார்க்கப்பட்டது')}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Business Name */}
-                        <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-3 break-words">
-                          {language === 'ta' && business.name_ta ? business.name_ta : business.name}
-                        </h3>
-
-                        {/* Main Business Image/Video */}
-                        {(business.mainImage || business.mainVideoUrl) && (
-                          <div className="relative mb-4 aspect-video bg-gray-100 rounded-lg overflow-hidden min-h-[300px] md:min-h-[350px] lg:min-h-[400px]">
-                            {business.mainVideoUrl ? (
-                              <>
-                                {playingVideo === business.id ? (
-                                  <iframe
-                                    src={`${getYouTubeEmbedUrl(business.mainVideoUrl)}?autoplay=1&rel=0&modestbranding=1`}
-                                    className="absolute inset-0 w-full h-full border-0"
-                                    style={{ minHeight: '300px' }}
-                                    allowFullScreen
-                                    title="Business Video"
-                                  />
-                                ) : (
-                                  <div
-                                    className="relative w-full h-full cursor-pointer group"
-                                    onClick={() => handleVideoPlay(business.id)}
-                                  >
-                                    <img
-                                      src={getYouTubeThumbnail(business.mainVideoUrl)}
-                                      alt="Video thumbnail"
-                                      className="w-full h-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center group-hover:bg-opacity-40 transition-all">
-                                      <div className="bg-white bg-opacity-90 rounded-full p-4 group-hover:scale-110 transition-transform">
-                                        <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                                          <path d="M8 5v14l11-7z"/>
-                                        </svg>
-                                      </div>
-                                    </div>
-                                  </div>
-                                )}
-                                <button
-                                  onClick={() => setPlayingVideo(null)}
-                                  className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-all z-10"
-                                >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                  </svg>
-                                </button>
-                              </>
-                            ) : business.mainImage && (
-                              <img
-                                src={business.mainImage}
-                                alt={business.name}
-                                className="w-full h-full object-cover"
-                              />
-                            )}
-                          </div>
+                    <div
+                      key={business.id}
+                      className="bg-blue-600 text-white rounded-lg p-4 cursor-pointer hover:bg-blue-700 transition-colors"
+                      onClick={() => {
+                        // Navigate to the category where this business is located
+                        if (business.categoryId) {
+                          setSelectedCategory(business.categoryId)
+                          setViewingSubcategory(false)
+                          setSelectedSubcategory(null)
+                          setSearchQuery('')
+                          setSearchTerm('')
+                        }
+                      }}
+                    >
+                      <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+                        {language === 'ta' && business.name_ta ? business.name_ta : business.name}
+                      </h3>
+                      <p className="text-blue-100 text-sm mb-2 line-clamp-1">
+                        📍 {language === 'ta' && business.address_ta ? business.address_ta : business.address}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-blue-200 text-xs">
+                          {business.category}
+                        </span>
+                        {business.verified && (
+                          <span className="text-green-300 text-xs">✓</span>
                         )}
-
-                        {/* Business Address */}
-                        <div className="flex items-start gap-2 text-gray-600 mb-4">
-                          <MapPinIcon className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                          <span className="text-sm">
-                            {language === 'ta' && business.address_ta ? business.address_ta : business.address}
-                          </span>
-                        </div>
-
-                        {/* Action Buttons - Left/Right Layout */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                          {/* Left Column - Social Media */}
-                          <div className="space-y-2">
-                            {business.instagramUrl && (
-                              <a
-                                href={business.instagramUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all text-sm"
-                              >
-                                <span>📷</span>
-                                <span>Instagram</span>
-                              </a>
-                            )}
-                            {business.youtubeUrl && (
-                              <a
-                                href={business.youtubeUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-sm"
-                              >
-                                <span>📺</span>
-                                <span>YouTube</span>
-                              </a>
-                            )}
-                            {business.facebookUrl && (
-                              <a
-                                href={business.facebookUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm"
-                              >
-                                <span>👥</span>
-                                <span>Facebook</span>
-                              </a>
-                            )}
-                          </div>
-
-                          {/* Right Column - Business Actions */}
-                          <div className="space-y-2">
-                            <button
-                              onClick={() => handleDirections(business)}
-                              className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm w-full"
-                            >
-                              <MapPinIcon className="h-4 w-4" />
-                              <span>{t('directory.directions', 'Directions', 'திசைகள்')}</span>
-                            </button>
-                            {business.bookingUrl && (
-                              <a
-                                href={business.bookingUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-sm"
-                              >
-                                <CalendarIcon className="h-4 w-4" />
-                                <span>{t('directory.booking', 'Booking', 'முன்பதிவு')}</span>
-                              </a>
-                            )}
-                            <button
-                              onClick={() => handleShare(business)}
-                              className="flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all text-sm w-full"
-                            >
-                              <ShareIcon className="h-4 w-4" />
-                              <span>{t('directory.share', 'Share', 'பகிரவும்')}</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Additional Action Buttons */}
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          <button
-                            onClick={() => handleCall(business.phone)}
-                            className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-sm"
-                          >
-                            <PhoneIcon className="h-4 w-4" />
-                            <span>{t('directory.call', 'Call', 'அழைக்கவும்')}</span>
-                          </button>
-
-                          <button
-                            onClick={() => handleDirections(business)}
-                            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm"
-                          >
-                            <MapPinIcon className="h-4 w-4" />
-                            <span>{t('directory.directions', 'Directions', 'திசைகள்')}</span>
-                          </button>
-
-                          {business.website && (
-                            <a
-                              href={business.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all text-sm"
-                            >
-                              <GlobeAltIcon className="h-4 w-4" />
-                              <span>{t('directory.website', 'Website', 'இணையதளம்')}</span>
-                            </a>
-                          )}
-
-                          <button
-                            onClick={() => {
-                              setCommentsBusinessId(business.id)
-                              setShowComments(true)
-                            }}
-                            className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all text-sm"
-                          >
-                            <ChatBubbleLeftIcon className="h-4 w-4" />
-                            <span>{t('directory.comments', 'Comments', 'கருத்துகள்')}</span>
-                          </button>
-
-                          {business.hasProfile && (
-                            <button
-                              onClick={() => {
-                                setSelectedBusiness(business)
-                                setShowProfilePopup(true)
-                              }}
-                              className="flex items-center gap-2 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all text-sm"
-                            >
-                              <span>{t('directory.viewProfile', 'View Profile', 'சுயவிவரத்தைப் பார்க்கவும்')}</span>
-                            </button>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -1105,16 +933,16 @@ function DirectoryPageContent() {
                             onClick={() => handleDirections(business)}
                             className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                           >
-                            {t('directory.directions', 'Directions', 'திசைகள்')}
+                            Directions
                           </button>
 
                           {/* Booking */}
                           {business.bookingUrl && (
                             <button
                               onClick={() => handleBooking(business.bookingUrl!)}
-                              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                              className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                             >
-                              Booking
+                              Book Now
                             </button>
                           )}
 
