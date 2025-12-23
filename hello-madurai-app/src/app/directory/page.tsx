@@ -282,16 +282,42 @@ function DirectoryPageContent() {
     setShowShareModal(true)
   }
 
-  const shareToWhatsApp = (business: Business) => {
+  const shareToWhatsApp = async (business: Business) => {
     const url = `${window.location.origin}/directory/${business.id}`
-    const text = `${business.name}\n${language === 'ta' && business.address_ta ? business.address_ta : business.address}\n${url}`
+    const businessName = language === 'ta' && business.name_ta ? business.name_ta : business.name
+    const businessAddress = language === 'ta' && business.address_ta ? business.address_ta : business.address
+    const text = `${businessName}\n📍 ${businessAddress}\n\n${url}`
+
+    // Track share
+    try {
+      await fetch(`/api/business/${business.id}/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform: 'whatsapp' })
+      })
+    } catch (error) {
+      console.log('Could not track share:', error)
+    }
+
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`
     window.open(whatsappUrl, '_blank')
     setShowShareModal(false)
   }
 
-  const shareToFacebook = (business: Business) => {
+  const shareToFacebook = async (business: Business) => {
     const url = `${window.location.origin}/directory/${business.id}`
+
+    // Track share
+    try {
+      await fetch(`/api/business/${business.id}/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform: 'facebook' })
+      })
+    } catch (error) {
+      console.log('Could not track share:', error)
+    }
+
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
     window.open(facebookUrl, '_blank')
     setShowShareModal(false)
@@ -299,6 +325,18 @@ function DirectoryPageContent() {
 
   const copyLink = async (business: Business) => {
     const url = `${window.location.origin}/directory/${business.id}`
+
+    // Track share
+    try {
+      await fetch(`/api/business/${business.id}/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform: 'copy' })
+      })
+    } catch (error) {
+      console.log('Could not track share:', error)
+    }
+
     try {
       await navigator.clipboard.writeText(url)
       alert(t('directory.linkCopied', 'Link copied to clipboard!', 'இணைப்பு கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது!'))
@@ -313,6 +351,75 @@ function DirectoryPageContent() {
       alert(t('directory.linkCopied', 'Link copied to clipboard!', 'இணைப்பு கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது!'))
     }
     setShowShareModal(false)
+  }
+
+  // Native share with image support (like other sections)
+  const nativeShare = async (business: Business) => {
+    const url = `${window.location.origin}/directory/${business.id}`
+    const businessName = language === 'ta' && business.name_ta ? business.name_ta : business.name
+    const businessAddress = language === 'ta' && business.address_ta ? business.address_ta : business.address
+
+    const shareData: ShareData = {
+      title: businessName,
+      text: `${businessName}\n📍 ${businessAddress}`,
+      url: url
+    }
+
+    // Get the best image for sharing (same priority as metadata)
+    let imageUrl = ''
+    if (business.mainVideoUrl) {
+      const youtubeId = getYouTubeId(business.mainVideoUrl)
+      if (youtubeId) {
+        imageUrl = `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
+      }
+    } else if (business.mainImage) {
+      imageUrl = business.mainImage
+    } else if (business.profileImage) {
+      imageUrl = business.profileImage
+    }
+
+    // Try to fetch and share image if available (works for WhatsApp, Telegram, etc.)
+    if (imageUrl) {
+      try {
+        // Convert image URL to absolute URL if needed
+        const absoluteImageUrl = imageUrl.startsWith('http')
+          ? imageUrl
+          : `${window.location.origin}${imageUrl}`
+
+        // Fetch the image
+        const response = await fetch(absoluteImageUrl)
+        const blob = await response.blob()
+        const file = new File([blob], 'business-image.jpg', { type: blob.type })
+
+        // Check if files can be shared
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          shareData.files = [file]
+        }
+      } catch (imgError) {
+        console.log('Could not fetch image for sharing:', imgError)
+        // Continue without image (Facebook/Twitter will use Open Graph meta tags)
+      }
+    }
+
+    try {
+      // Share
+      await navigator.share(shareData)
+
+      // Track the share
+      await fetch(`/api/business/${business.id}/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform: 'native' })
+      })
+
+      setShowShareModal(false)
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') {
+        console.error('Error sharing:', error)
+        // Fallback to showing share menu
+        // Keep modal open for manual sharing
+      }
+    }
   }
 
   const openComments = (businessId: string) => {
@@ -1093,16 +1200,53 @@ function DirectoryPageContent() {
                 <p className="text-sm text-gray-600 mb-2">
                   {t('directory.share', 'Share', 'பகிரவும்')}: {language === 'ta' && shareBusinessData.name_ta ? shareBusinessData.name_ta : shareBusinessData.name}
                 </p>
-                {shareBusinessData.mainImage && (
-                  <img
-                    src={shareBusinessData.mainImage}
-                    alt={shareBusinessData.name}
-                    className="w-full h-32 object-cover rounded-lg mb-3"
-                  />
-                )}
+                {(() => {
+                  // Show the best image for sharing (same priority as metadata)
+                  let imageUrl = ''
+                  let imageAlt = shareBusinessData.name
+
+                  if (shareBusinessData.mainVideoUrl) {
+                    const youtubeId = getYouTubeId(shareBusinessData.mainVideoUrl)
+                    if (youtubeId) {
+                      imageUrl = `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
+                      imageAlt = `${shareBusinessData.name} video thumbnail`
+                    }
+                  } else if (shareBusinessData.mainImage) {
+                    imageUrl = shareBusinessData.mainImage
+                    imageAlt = shareBusinessData.name
+                  } else if (shareBusinessData.profileImage) {
+                    imageUrl = shareBusinessData.profileImage
+                    imageAlt = `${shareBusinessData.name} profile`
+                  }
+
+                  return imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt={imageAlt}
+                      className="w-full h-32 object-cover rounded-lg mb-3"
+                      onError={(e) => {
+                        // Hide image if it fails to load
+                        e.currentTarget.style.display = 'none'
+                      }}
+                    />
+                  ) : null
+                })()}
               </div>
 
               <div className="space-y-3">
+                {/* Native Share (if supported) */}
+                {typeof navigator !== 'undefined' && navigator.share && (
+                  <button
+                    onClick={() => nativeShare(shareBusinessData)}
+                    className="w-full flex items-center justify-center space-x-3 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    </svg>
+                    <span>{t('directory.share', 'Share', 'பகிரவும்')}</span>
+                  </button>
+                )}
+
                 {/* WhatsApp */}
                 <button
                   onClick={() => shareToWhatsApp(shareBusinessData)}

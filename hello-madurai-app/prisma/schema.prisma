@@ -154,6 +154,7 @@ model Business {
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
   comments       BusinessComment[]
+  shares         BusinessShare[]
 
   @@index([categoryId])
   @@index([subcategoryId])
@@ -264,6 +265,17 @@ model BusinessComment {
   business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@map("business_comments")
+}
+
+model BusinessShare {
+  id         String   @id @default(cuid())
+  businessId String
+  platform   String
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@map("business_shares")
 }
 
 model Helpline {
