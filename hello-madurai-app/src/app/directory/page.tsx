@@ -635,7 +635,6 @@ function DirectoryPageContent() {
                           setSelectedCategory(business.categoryId)
                           setViewingSubcategory(false)
                           setSelectedSubcategory(null)
-                          setSearchQuery('')
                           setSearchTerm('')
                         }
                       }}
