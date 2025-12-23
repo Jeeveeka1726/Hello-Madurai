@@ -63,43 +63,59 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const businessName = business.name
   const businessAddress = business.address
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://hellomadurai.vercel.app'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://hellomadurai.vercel.app'
 
   // Determine the best image for sharing - Prioritize YouTube thumbnails
-  let businessImage = '/images/hello-madurai-logo.png' // Default fallback
+  let businessImage = '' // Start empty
 
   // Priority 1: YouTube thumbnail from main video (always preferred for sharing)
   if (business.mainVideoUrl) {
     const youtubeId = getYouTubeId(business.mainVideoUrl)
     if (youtubeId) {
       businessImage = getYouTubeThumbnail(youtubeId)
-      console.log('Business has YouTube video - Using thumbnail:', businessImage)
+      console.log('✅ Business has YouTube video - Using thumbnail:', businessImage)
     } else {
-      console.log('Business has video URL but not YouTube:', business.mainVideoUrl)
+      console.log('⚠️ Business has video URL but not YouTube:', business.mainVideoUrl)
     }
   }
   // Priority 2: Main business image (if no YouTube video)
   else if (business.mainImage) {
-    businessImage = business.mainImage
+    businessImage = business.mainImage.startsWith('http')
+      ? business.mainImage
+      : `${baseUrl}${business.mainImage}`
+    console.log('✅ Using main business image:', businessImage)
   }
   // Priority 3: Profile image (if no YouTube video or main image)
   else if (business.profileImage) {
-    businessImage = business.profileImage
+    businessImage = business.profileImage.startsWith('http')
+      ? business.profileImage
+      : `${baseUrl}${business.profileImage}`
+    console.log('✅ Using profile image:', businessImage)
   }
 
-  // Ensure absolute URL for image
+  // Fallback to logo if no image found
+  if (!businessImage) {
+    businessImage = `${baseUrl}/logo.jpg`
+    console.log('⚠️ No business image found, using logo fallback:', businessImage)
+  }
+
+  // Ensure absolute URL for image (YouTube thumbnails are already absolute)
   const absoluteImageUrl = businessImage.startsWith('http')
     ? businessImage
     : `${baseUrl}${businessImage}`
 
   const businessUrl = `${baseUrl}/directory/${business.id}`
+  const description = `${businessName} located at ${businessAddress}. Find contact details, services, and more on Hello Madurai business directory.`
 
-  console.log('Business Metadata - Name:', businessName)
-  console.log('Business Metadata - Image URL:', absoluteImageUrl)
+  console.log('🔍 Business Metadata Generation:')
+  console.log('📍 Business Name:', businessName)
+  console.log('🌐 Base URL:', baseUrl)
+  console.log('🖼️ Final Image URL:', absoluteImageUrl)
+  console.log('🔗 Business URL:', businessUrl)
 
   return {
-    title: `${businessName} - Hello Madurai Directory`,
-    description: `${businessName} located at ${businessAddress}. Find contact details, services, and more on Hello Madurai business directory.`,
+    title: `${businessName} - Hello Madurai`,
+    description,
     openGraph: {
       title: businessName,
       description: `${businessName} - ${businessAddress}`,
@@ -108,12 +124,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: [
         {
           url: absoluteImageUrl,
-          width: 1200,
-          height: 630,
+          width: 1280,
+          height: 720,
           alt: businessName,
         }
       ],
-      locale: 'en_US',
       type: 'website',
     },
     twitter: {
