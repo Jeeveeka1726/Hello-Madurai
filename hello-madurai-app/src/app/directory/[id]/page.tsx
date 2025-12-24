@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 
 interface Business {
@@ -52,7 +53,8 @@ function getYouTubeThumbnail(youtubeId: string): string {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const business = await getBusiness(params.id)
+  const { id } = await params
+  const business = await getBusiness(id)
 
   if (!business) {
     return {
@@ -144,14 +146,140 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function BusinessPage({ params }: PageProps) {
-  const business = await getBusiness(params.id)
+  const { id } = await params
+  const business = await getBusiness(id)
 
   if (!business) {
     notFound()
   }
 
-  // Redirect to directory with business parameter for popup display
-  redirect(`/directory?business=${params.id}`)
+  // For social media crawlers and direct access, show business page
+  // For user navigation, redirect to directory with popup
+  const headersList = await headers()
+  const userAgent = headersList.get('user-agent') || ''
+  const isCrawler = /bot|crawler|spider|crawling/i.test(userAgent) ||
+                   /facebookexternalhit|twitterbot|linkedinbot|whatsapp/i.test(userAgent)
+
+  if (!isCrawler) {
+    // Redirect to directory with business parameter for popup display
+    redirect(`/directory?business=${id}`)
+  }
+
+  // Show business page for crawlers and direct metadata access
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          {/* Business Header */}
+          <div className="relative h-64 bg-gradient-to-r from-blue-500 to-purple-600">
+            {business.mainImage && (
+              <img
+                src={`/api/image/${business.mainImage}`}
+                alt={business.name}
+                className="w-full h-full object-cover"
+              />
+            )}
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end">
+              <div className="p-6 text-white">
+                <h1 className="text-3xl font-bold mb-2">{business.name}</h1>
+                <p className="text-lg opacity-90">{business.address}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Business Details */}
+          <div className="p-6">
+            {business.description && (
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold mb-3">About</h2>
+                <p className="text-gray-700 leading-relaxed">{business.description}</p>
+              </div>
+            )}
+
+            {/* Contact Information */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Contact Information</h3>
+                <div className="space-y-2">
+                  {business.phone && (
+                    <p className="flex items-center">
+                      <span className="font-medium mr-2">Phone:</span>
+                      <a href={`tel:${business.phone}`} className="text-blue-600 hover:underline">
+                        {business.phone}
+                      </a>
+                    </p>
+                  )}
+                  {business.email && (
+                    <p className="flex items-center">
+                      <span className="font-medium mr-2">Email:</span>
+                      <a href={`mailto:${business.email}`} className="text-blue-600 hover:underline">
+                        {business.email}
+                      </a>
+                    </p>
+                  )}
+                  {business.website && (
+                    <p className="flex items-center">
+                      <span className="font-medium mr-2">Website:</span>
+                      <a href={business.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        Visit Website
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Social Media</h3>
+                <div className="space-y-2">
+                  {business.facebookUrl && (
+                    <p>
+                      <a href={business.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        Facebook
+                      </a>
+                    </p>
+                  )}
+                  {business.instagramUrl && (
+                    <p>
+                      <a href={business.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        Instagram
+                      </a>
+                    </p>
+                  )}
+                  {business.youtubeUrl && (
+                    <p>
+                      <a href={business.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        YouTube
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-8 flex flex-wrap gap-4">
+              <a
+                href={`/directory`}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Back to Directory
+              </a>
+              {business.bookingUrl && (
+                <a
+                  href={business.bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Book Now
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 
 }
 
