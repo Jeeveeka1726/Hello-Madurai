@@ -332,6 +332,22 @@ function DirectoryPageContent() {
       console.log('Could not track share:', error)
     }
 
+    // Enhanced iPhone compatibility - try native sharing first
+    if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      try {
+        await navigator.share({
+          title: businessName,
+          text: `${businessName}\n📍 ${businessAddress}`,
+          url: url
+        })
+        setShowShareModal(false)
+        return
+      } catch (error) {
+        // Fall back to WhatsApp URL if native sharing fails
+        console.log('Native sharing failed, falling back to WhatsApp URL')
+      }
+    }
+
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`
     window.open(whatsappUrl, '_blank')
     setShowShareModal(false)
@@ -371,17 +387,38 @@ function DirectoryPageContent() {
     }
 
     try {
-      await navigator.clipboard.writeText(url)
-      alert(t('directory.linkCopied', 'Link copied to clipboard!', 'இணைப்பு கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது!'))
-    } catch (err) {
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea')
-      textArea.value = url
-      document.body.appendChild(textArea)
-      textArea.select()
-      document.execCommand('copy')
-      document.body.removeChild(textArea)
-      alert('Link copied to clipboard!')
+      // Enhanced iPhone compatibility
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url)
+        alert(t('directory.linkCopied', 'Link copied to clipboard!', 'இணைப்பு கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது!'))
+      } else {
+        // Fallback for older browsers and non-secure contexts
+        const textArea = document.createElement('textarea')
+        textArea.value = url
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-999999px'
+        textArea.style.top = '-999999px'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+
+        // For iPhone Safari compatibility
+        textArea.setSelectionRange(0, 99999)
+
+        const successful = document.execCommand('copy')
+        document.body.removeChild(textArea)
+
+        if (successful) {
+          alert(t('directory.linkCopied', 'Link copied to clipboard!', 'இணைப்பு கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது!'))
+        } else {
+          // Final fallback - show the URL for manual copying
+          prompt('Copy this link:', url)
+        }
+      }
+    } catch (error) {
+      console.error('Copy failed:', error)
+      // Final fallback - show the URL for manual copying
+      prompt('Copy this link:', url)
     }
     setShowShareModal(false)
   }
@@ -685,8 +722,8 @@ function DirectoryPageContent() {
                       {(business.mainImage || business.mainVideoUrl) && (
                         <div className="mb-4">
                           {playingVideo === business.id && business.mainVideoUrl ? (
-                            // Show video player when playing - Enhanced size for better visibility
-                            <div className="aspect-video w-full min-h-[300px] md:min-h-[350px] lg:min-h-[400px]">
+                            // Show video player when playing - Proper 16:9 aspect ratio
+                            <div className="relative w-full" style={{ paddingBottom: '56.25%' /* 16:9 aspect ratio */ }}>
                               {(() => {
                                 const embedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
                                 if (embedUrl) {
@@ -698,7 +735,6 @@ function DirectoryPageContent() {
                                         allowFullScreen
                                         title={`${business.name} video`}
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                        style={{ minHeight: '300px' }}
                                       />
                                       <button
                                         onClick={() => setPlayingVideo(null)}
@@ -719,7 +755,8 @@ function DirectoryPageContent() {
                                         className="absolute inset-0 w-full h-full rounded-lg object-cover"
                                         controls
                                         autoPlay
-                                        style={{ minHeight: '300px' }}
+                                        playsInline
+                                        muted
                                       />
                                       <button
                                         onClick={() => setPlayingVideo(null)}
@@ -1027,6 +1064,32 @@ function DirectoryPageContent() {
               </div>
 
               <div className="space-y-3">
+                {/* Native Share (iPhone/Android) */}
+                {navigator.share && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const businessName = language === 'ta' && shareBusinessData.name_ta ? shareBusinessData.name_ta : shareBusinessData.name
+                        const businessAddress = language === 'ta' && shareBusinessData.address_ta ? shareBusinessData.address_ta : shareBusinessData.address
+                        await navigator.share({
+                          title: businessName,
+                          text: `${businessName}\n📍 ${businessAddress}`,
+                          url: `${window.location.origin}/directory/${shareBusinessData.id}`
+                        })
+                        setShowShareModal(false)
+                      } catch (error) {
+                        console.log('Native sharing cancelled or failed')
+                      }
+                    }}
+                    className="w-full flex items-center justify-center space-x-3 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    </svg>
+                    <span>Share</span>
+                  </button>
+                )}
+
                 {/* WhatsApp */}
                 <button
                   onClick={() => shareToWhatsApp(shareBusinessData)}
