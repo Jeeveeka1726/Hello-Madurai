@@ -161,8 +161,21 @@ export default async function BusinessPage({ params }: PageProps) {
                    /facebookexternalhit|twitterbot|linkedinbot|whatsapp/i.test(userAgent)
 
   if (!isCrawler) {
-    // Redirect to directory with business parameter for popup display
-    redirect(`/directory?business=${id}`)
+    // Redirect to directory and navigate to the specific subcategory where this business is located
+    const params = new URLSearchParams()
+
+    if (business.categoryId) {
+      params.set('category', business.categoryId)
+
+      // If business has a subcategory, navigate to that subcategory
+      if (business.subcategoryId) {
+        params.set('subcategory', business.subcategoryId)
+        params.set('viewSubcategory', 'true')
+      }
+    }
+
+    const redirectUrl = params.toString() ? `/directory?${params.toString()}` : '/directory'
+    redirect(redirectUrl)
   }
 
   // Show business page for crawlers and direct metadata access

@@ -157,6 +157,28 @@ function DirectoryPageContent() {
     }
   }, [searchParams, businesses])
 
+  // Handle category and subcategory parameters from URL (for direct navigation)
+  useEffect(() => {
+    const categoryParam = searchParams.get('category')
+    const subcategoryParam = searchParams.get('subcategory')
+    const viewSubcategoryParam = searchParams.get('viewSubcategory')
+
+    if (categoryParam && categories.length > 0) {
+      // Set the category
+      setSelectedCategory(categoryParam)
+
+      if (subcategoryParam && viewSubcategoryParam === 'true') {
+        // Navigate to the specific subcategory
+        setSelectedSubcategory(subcategoryParam)
+        setViewingSubcategory(true)
+      } else {
+        // Just show the category view
+        setSelectedSubcategory(null)
+        setViewingSubcategory(false)
+      }
+    }
+  }, [searchParams, categories])
+
   const getYouTubeEmbedUrl = (url: string) => {
     const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
     return videoId ? `https://www.youtube.com/embed/${videoId[1]}` : null
