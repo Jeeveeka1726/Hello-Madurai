@@ -289,7 +289,9 @@ function DirectoryPageContent() {
 
     // Action buttons (right column)
     buttons.push('directions') // Always available
-    if (business.bookingUrl || business.bookingPhone) buttons.push('booking')
+    // Safely check for booking options with backward compatibility
+    const bookingPhone = (business as any).bookingPhone || null
+    if (business.bookingUrl || bookingPhone) buttons.push('booking')
     buttons.push('share') // Always available
 
     return buttons
@@ -324,8 +326,12 @@ function DirectoryPageContent() {
   }
 
   const handleBooking = (business: Business) => {
+    // Safely access bookingPhone with fallback for backward compatibility
+    const bookingPhone = (business as any).bookingPhone || null
+    const bookingUrl = business.bookingUrl || null
+
     // If has both URL and phone, show options
-    if (business.bookingUrl && business.bookingPhone) {
+    if (bookingUrl && bookingPhone) {
       const choice = confirm(
         `${t('directory.bookingOptions', 'Choose booking method:', 'முன்பதிவு முறையைத் தேர்ந்தெடுக்கவும்:')}\n\n` +
         `1. ${t('directory.website', 'Website', 'வலைத்தளம்')}\n` +
@@ -333,27 +339,21 @@ function DirectoryPageContent() {
         `${t('directory.clickOk', 'Click OK for Website, Cancel for Phone', 'வலைத்தளத்திற்கு OK, தொலைபேசிக்கு Cancel')}`
       )
       if (choice) {
-        window.open(business.bookingUrl, '_blank')
+        window.open(bookingUrl, '_blank')
       } else {
-        window.open(`tel:${business.bookingPhone}`, '_self')
+        window.open(`tel:${bookingPhone}`, '_self')
       }
-    } else if (business.bookingUrl) {
-      // Only URL available
-      window.open(business.bookingUrl, '_blank')
-    } else if (business.bookingPhone) {
+    } else if (bookingUrl) {
+      // Check if bookingUrl is actually a phone number (legacy support)
+      const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
+      if (phoneRegex.test(bookingUrl.replace(/\s/g, ''))) {
+        window.open(`tel:${bookingUrl}`, '_self')
+      } else {
+        window.open(bookingUrl, '_blank')
+      }
+    } else if (bookingPhone) {
       // Only phone available
-      window.open(`tel:${business.bookingPhone}`, '_self')
-    } else {
-      // Fallback to old bookingUrl logic for backward compatibility
-      const bookingInfo = business.bookingUrl
-      if (bookingInfo) {
-        const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
-        if (phoneRegex.test(bookingInfo.replace(/\s/g, ''))) {
-          window.open(`tel:${bookingInfo}`, '_self')
-        } else {
-          window.open(bookingInfo, '_blank')
-        }
-      }
+      window.open(`tel:${bookingPhone}`, '_self')
     }
   }
 
@@ -1002,7 +1002,7 @@ function DirectoryPageContent() {
                         </button>
 
                         {/* Booking */}
-                        {(business.bookingUrl || business.bookingPhone) && (
+                        {(business.bookingUrl || (business as any).bookingPhone) && (
                           <button
                             onClick={() => handleBooking(business)}
                             className={getButtonLayoutClasses(business).buttonClass}
