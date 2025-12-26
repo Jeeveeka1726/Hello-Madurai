@@ -728,7 +728,7 @@ function DirectoryPageContent() {
                                 const embedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
                                 if (embedUrl) {
                                   return (
-                                    <div className="relative w-full h-full">
+                                    <>
                                       <iframe
                                         src={`${embedUrl}?autoplay=1&rel=0&modestbranding=1`}
                                         className="absolute inset-0 w-full h-full rounded-lg border-0"
@@ -744,12 +744,12 @@ function DirectoryPageContent() {
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                       </button>
-                                    </div>
+                                    </>
                                   )
                                 } else {
                                   // Fallback for non-YouTube videos
                                   return (
-                                    <div className="relative w-full h-full">
+                                    <>
                                       <video
                                         src={business.mainVideoUrl}
                                         className="absolute inset-0 w-full h-full rounded-lg object-cover"
@@ -766,7 +766,7 @@ function DirectoryPageContent() {
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                       </button>
-                                    </div>
+                                    </>
                                   )
                                 }
                               })()}
