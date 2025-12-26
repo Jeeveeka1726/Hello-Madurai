@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
         instagramUrl: body.instagramUrl,
         facebookUrl: body.facebookUrl,
         bookingUrl: body.bookingUrl,
+        bookingPhone: body.bookingPhone,
         orderNumber: body.orderNumber || 0,
         hasProfile: body.hasProfile || false,
         profileContent: body.profileContent,

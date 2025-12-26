@@ -68,6 +68,7 @@ interface Business {
   instagramUrl?: string
   facebookUrl?: string
   bookingUrl?: string
+  bookingPhone?: string
   latitude?: number
   longitude?: number
   orderNumber: number
@@ -277,15 +278,82 @@ function DirectoryPageContent() {
     }
   }
 
-  const handleBooking = (bookingInfo: string) => {
-    // Check if it's a phone number (starts with + or contains only digits, spaces, hyphens, parentheses)
-    const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
-    if (phoneRegex.test(bookingInfo.replace(/\s/g, ''))) {
-      // It's a phone number - open phone dialer
-      window.open(`tel:${bookingInfo}`, '_self')
+  // Function to get available action buttons for a business
+  const getAvailableButtons = (business: Business) => {
+    const buttons = []
+
+    // Social media buttons (left column)
+    if (business.instagramUrl) buttons.push('instagram')
+    if (business.youtubeUrl) buttons.push('youtube')
+    if (business.facebookUrl) buttons.push('facebook')
+
+    // Action buttons (right column)
+    buttons.push('directions') // Always available
+    if (business.bookingUrl || business.bookingPhone) buttons.push('booking')
+    buttons.push('share') // Always available
+
+    return buttons
+  }
+
+  // Function to get button layout classes based on number of buttons
+  const getButtonLayoutClasses = (business: Business) => {
+    const buttons = getAvailableButtons(business)
+    const totalButtons = buttons.length
+
+    // For 1-3 buttons: single column, centered
+    if (totalButtons <= 3) {
+      return {
+        containerClass: "flex flex-col space-y-2 max-w-xs mx-auto",
+        buttonClass: "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+      }
+    }
+
+    // For 4-6 buttons: 2 columns
+    if (totalButtons <= 6) {
+      return {
+        containerClass: "grid grid-cols-2 gap-2",
+        buttonClass: "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+      }
+    }
+
+    // For more buttons: 3 columns on larger screens, 2 on mobile
+    return {
+      containerClass: "grid grid-cols-2 md:grid-cols-3 gap-2",
+      buttonClass: "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+    }
+  }
+
+  const handleBooking = (business: Business) => {
+    // If has both URL and phone, show options
+    if (business.bookingUrl && business.bookingPhone) {
+      const choice = confirm(
+        `${t('directory.bookingOptions', 'Choose booking method:', 'முன்பதிவு முறையைத் தேர்ந்தெடுக்கவும்:')}\n\n` +
+        `1. ${t('directory.website', 'Website', 'வலைத்தளம்')}\n` +
+        `2. ${t('directory.phone', 'Phone', 'தொலைபேசி')}\n\n` +
+        `${t('directory.clickOk', 'Click OK for Website, Cancel for Phone', 'வலைத்தளத்திற்கு OK, தொலைபேசிக்கு Cancel')}`
+      )
+      if (choice) {
+        window.open(business.bookingUrl, '_blank')
+      } else {
+        window.open(`tel:${business.bookingPhone}`, '_self')
+      }
+    } else if (business.bookingUrl) {
+      // Only URL available
+      window.open(business.bookingUrl, '_blank')
+    } else if (business.bookingPhone) {
+      // Only phone available
+      window.open(`tel:${business.bookingPhone}`, '_self')
     } else {
-      // It's a URL - open in new tab
-      window.open(bookingInfo, '_blank')
+      // Fallback to old bookingUrl logic for backward compatibility
+      const bookingInfo = business.bookingUrl
+      if (bookingInfo) {
+        const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
+        if (phoneRegex.test(bookingInfo.replace(/\s/g, ''))) {
+          window.open(`tel:${bookingInfo}`, '_self')
+        } else {
+          window.open(bookingInfo, '_blank')
+        }
+      }
     }
   }
 
@@ -893,69 +961,63 @@ function DirectoryPageContent() {
                         )}
                       </div>
 
-                      {/* Action Buttons Grid - Left: Instagram, YouTube, Facebook | Right: Email, Booking, Share */}
-                      <div className="grid grid-cols-2 gap-2 mb-3">
-                        {/* LEFT COLUMN */}
-                        <div className="space-y-2">
-                          {/* Instagram */}
-                          {business.instagramUrl && (
-                            <button
-                              onClick={() => handleInstagram(business.instagramUrl!)}
-                              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                            >
-                              Instagram
-                            </button>
-                          )}
-
-                          {/* YouTube */}
-                          {business.youtubeUrl && (
-                            <button
-                              onClick={() => window.open(business.youtubeUrl, '_blank')}
-                              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                            >
-                              YouTube
-                            </button>
-                          )}
-
-                          {/* Facebook */}
-                          {business.facebookUrl && (
-                            <button
-                              onClick={() => handleFacebook(business.facebookUrl!)}
-                              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                            >
-                              Facebook
-                            </button>
-                          )}
-                        </div>
-
-                        {/* RIGHT COLUMN */}
-                        <div className="space-y-2">
-                          {/* Directions */}
+                      {/* Action Buttons - Auto-aligned based on available buttons */}
+                      <div className={`${getButtonLayoutClasses(business).containerClass} mb-3`}>
+                        {/* Instagram */}
+                        {business.instagramUrl && (
                           <button
-                            onClick={() => handleDirections(business)}
-                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                            onClick={() => handleInstagram(business.instagramUrl!)}
+                            className={getButtonLayoutClasses(business).buttonClass}
                           >
-                            Directions
+                            Instagram
                           </button>
+                        )}
 
-                          {/* Booking */}
-                          {business.bookingUrl && (
-                            <button
-                              onClick={() => handleBooking(business.bookingUrl!)}
-                              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                            >
-                              Book Now
-                            </button>
-                          )}
-
-                          {/* Share */}
+                        {/* YouTube */}
+                        {business.youtubeUrl && (
                           <button
-                            onClick={() => handleShare(business)}
-                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                            onClick={() => window.open(business.youtubeUrl, '_blank')}
+                            className={getButtonLayoutClasses(business).buttonClass}
                           >
-                            Share
+                            YouTube
                           </button>
-                        </div>
+                        )}
+
+                        {/* Facebook */}
+                        {business.facebookUrl && (
+                          <button
+                            onClick={() => handleFacebook(business.facebookUrl!)}
+                            className={getButtonLayoutClasses(business).buttonClass}
+                          >
+                            Facebook
+                          </button>
+                        )}
+
+                        {/* Directions - Always available */}
+                        <button
+                          onClick={() => handleDirections(business)}
+                          className={getButtonLayoutClasses(business).buttonClass}
+                        >
+                          Directions
+                        </button>
+
+                        {/* Booking */}
+                        {(business.bookingUrl || business.bookingPhone) && (
+                          <button
+                            onClick={() => handleBooking(business)}
+                            className={getButtonLayoutClasses(business).buttonClass}
+                          >
+                            Book Now
+                          </button>
+                        )}
+
+                        {/* Share - Always available */}
+                        <button
+                          onClick={() => handleShare(business)}
+                          className={getButtonLayoutClasses(business).buttonClass}
+                        >
+                          Share
+                        </button>
                       </div>
 
                       {/* View Profile Button - Only if hasProfile is true */}

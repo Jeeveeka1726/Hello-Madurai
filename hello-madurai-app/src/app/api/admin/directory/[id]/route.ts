@@ -28,6 +28,7 @@ export async function PUT(
         instagramUrl: data.instagramUrl || undefined,
         facebookUrl: data.facebookUrl || undefined,
         bookingUrl: data.bookingUrl || undefined,
+        bookingPhone: data.bookingPhone || undefined,
         orderNumber: data.orderNumber !== undefined ? data.orderNumber : 0,
         hasProfile: data.hasProfile !== undefined ? data.hasProfile : false,
         profileContent: data.profileContent || undefined,

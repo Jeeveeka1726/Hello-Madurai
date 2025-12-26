@@ -58,6 +58,7 @@ interface Business {
   instagramUrl?: string
   facebookUrl?: string
   bookingUrl?: string
+  bookingPhone?: string
   orderNumber: number
   hasProfile: boolean
   profileContent?: string
@@ -93,6 +94,7 @@ export default function AdminDirectoryPage() {
     instagramUrl: '',
     facebookUrl: '',
     bookingUrl: '',
+    bookingPhone: '',
     orderNumber: 0,
     hasProfile: false,
     profileContent: '',
@@ -206,6 +208,7 @@ export default function AdminDirectoryPage() {
           instagramUrl: '',
           facebookUrl: '',
           bookingUrl: '',
+        bookingPhone: '',
           orderNumber: 0,
           hasProfile: false,
           profileContent: '',
@@ -259,6 +262,7 @@ export default function AdminDirectoryPage() {
       instagramUrl: business.instagramUrl || '',
       facebookUrl: business.facebookUrl || '',
       bookingUrl: business.bookingUrl || '',
+      bookingPhone: business.bookingPhone || '',
       orderNumber: business.orderNumber || 0,
       hasProfile: business.hasProfile || false,
       profileContent: business.profileContent || '',
@@ -335,6 +339,7 @@ export default function AdminDirectoryPage() {
                 instagramUrl: '',
                 facebookUrl: '',
                 bookingUrl: '',
+                bookingPhone: '',
                 latitude: '',
                 longitude: '',
                 orderNumber: 0,
@@ -775,6 +780,23 @@ export default function AdminDirectoryPage() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="https://booking.com/..."
                       />
+                    </div>
+
+                    {/* Booking Phone */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Booking Phone (Optional)
+                      </label>
+                      <input
+                        type="tel"
+                        value={formData.bookingPhone}
+                        onChange={(e) => setFormData({ ...formData, bookingPhone: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="+91 98765 43210"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Separate booking phone number (if different from main phone)
+                      </p>
                     </div>
                   </div>
 
