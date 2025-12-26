@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import FileUpload from '@/components/admin/FileUpload'
 import { toast } from 'react-hot-toast'
 import {
   PlusIcon,
@@ -77,8 +78,6 @@ export default function RadioMusicAdminPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [uploadingImage, setUploadingImage] = useState(false)
   const [imagePreview, setImagePreview] = useState<string>('')
-  const [uploadingAudio, setUploadingAudio] = useState(false)
-  const [audioPreview, setAudioPreview] = useState<string>('')
   const [comments, setComments] = useState<Comment[]>([])
   const [loadingComments, setLoadingComments] = useState(false)
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
@@ -236,104 +235,7 @@ export default function RadioMusicAdminPage() {
     }
   }
 
-  const handleAudioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
 
-    // Validate file type
-    if (!file.type.startsWith('audio/')) {
-      toast.error('Please select an audio file')
-      return
-    }
-
-    // Validate file size (max 100MB)
-    if (file.size > 100 * 1024 * 1024) {
-      toast.error('Audio file size must be less than 100MB')
-      return
-    }
-
-    // Create local preview immediately
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setAudioPreview(reader.result as string)
-    }
-    reader.readAsDataURL(file)
-
-    setUploadingAudio(true)
-
-    try {
-      console.log('📤 Uploading audio file to Cloudinary (direct upload)...')
-      console.log('📊 File size:', (file.size / 1024 / 1024).toFixed(2), 'MB')
-
-      // Step 1: Get upload signature from our API
-      const signatureResponse = await fetch('/api/upload/radio-audio')
-      if (!signatureResponse.ok) {
-        throw new Error('Failed to get upload signature')
-      }
-      const { signature, timestamp, cloudName, apiKey, folder } = await signatureResponse.json()
-
-      console.log('🔑 Got upload signature, uploading directly to Cloudinary...')
-      console.log('📋 Signature params:', { timestamp, folder })
-
-      // Step 2: Upload directly to Cloudinary (bypasses Vercel's 4.5MB limit)
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('signature', signature)
-      formData.append('timestamp', timestamp.toString())
-      formData.append('api_key', apiKey)
-      formData.append('folder', folder)
-      // NOTE: Don't add resource_type here - it's already in the URL (/video/upload)
-
-      const cloudinaryResponse = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
-      )
-
-      if (!cloudinaryResponse.ok) {
-        const errorData = await cloudinaryResponse.json()
-        console.error('❌ Cloudinary upload failed:', errorData)
-        throw new Error(errorData.error?.message || 'Cloudinary upload failed')
-      }
-
-      const cloudinaryData = await cloudinaryResponse.json()
-      console.log('✅ Cloudinary upload successful:', cloudinaryData.public_id)
-
-      // Step 3: Save metadata to our database
-      const metadataResponse = await fetch('/api/upload/save-audio-metadata', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: cloudinaryData.secure_url,
-          publicId: cloudinaryData.public_id,
-          filename: file.name,
-          mimeType: file.type,
-          size: file.size,
-          duration: cloudinaryData.duration
-            ? `${Math.floor(cloudinaryData.duration / 60)}:${String(Math.floor(cloudinaryData.duration % 60)).padStart(2, '0')}`
-            : null,
-        }),
-      })
-
-      if (!metadataResponse.ok) {
-        throw new Error('Failed to save audio metadata')
-      }
-
-      const metadataData = await metadataResponse.json()
-      console.log('✅ Metadata saved:', metadataData.id)
-
-      setSongFormData({ ...songFormData, audioUrl: cloudinaryData.secure_url })
-      toast.success('✅ Audio file uploaded successfully!')
-    } catch (error) {
-      console.error('❌ Error uploading audio:', error)
-      toast.error(error instanceof Error ? error.message : 'Error uploading audio file')
-      setAudioPreview('') // Clear preview on error
-    } finally {
-      setUploadingAudio(false)
-    }
-  }
 
   const handleSaveSinger = async () => {
     try {
@@ -408,7 +310,6 @@ export default function RadioMusicAdminPage() {
         setShowSongForm(false)
         setEditingSong(null)
         setSongFormData({ title: '', title_ta: '', audioUrl: '', duration: '', singerId: '' })
-        setAudioPreview('') // Clear audio preview
       }
     } catch (error) {
       console.error('Error saving song:', error)
@@ -985,51 +886,17 @@ export default function RadioMusicAdminPage() {
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Audio File * (MP3, WAV, OGG, AAC, M4A, FLAC)</label>
-                  <div className="space-y-3">
-                    {/* Upload Button */}
-                    <div>
-                      <input
-                        type="file"
-                        accept="audio/*"
-                        onChange={handleAudioUpload}
-                        className="hidden"
-                        id="audio-upload"
-                      />
-                      <label
-                        htmlFor="audio-upload"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer transition-colors"
-                      >
-                        <MusicalNoteIcon className="h-5 w-5" />
-                        {uploadingAudio ? 'Uploading...' : songFormData.audioUrl ? 'Change Audio File' : 'Upload Audio File'}
-                      </label>
-                      {uploadingAudio && (
-                        <span className="ml-3 text-sm text-gray-600">Uploading audio...</span>
-                      )}
-                    </div>
-
-                    {/* Audio Preview */}
-                    {(audioPreview || songFormData.audioUrl) && (
-                      <div className="border border-gray-300 rounded-md p-3 bg-gray-50">
-                        <audio
-                          controls
-                          src={audioPreview || songFormData.audioUrl}
-                          className="w-full"
-                          style={{ maxHeight: '54px' }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAudioPreview('')
-                            setSongFormData({ ...songFormData, audioUrl: '' })
-                          }}
-                          className="mt-2 text-sm text-red-600 hover:text-red-700"
-                        >
-                          Remove Audio
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <FileUpload
+                    label="Audio File * (MP3, WAV, OGG, AAC, M4A, FLAC)"
+                    fileType="audio"
+                    currentFile={songFormData.audioUrl}
+                    currentUrl={songFormData.audioUrl}
+                    onFileUpload={(url) => setSongFormData({ ...songFormData, audioUrl: url })}
+                    onUrlChange={(url) => setSongFormData({ ...songFormData, audioUrl: url })}
+                    accept="audio/*"
+                    maxSize={100}
+                    showUrlOption={true}
+                  />
                 </div>
               </div>
               <div className="flex gap-2 mt-4">
@@ -1041,7 +908,6 @@ export default function RadioMusicAdminPage() {
                     setShowSongForm(false)
                     setEditingSong(null)
                     setSongFormData({ title: '', title_ta: '', audioUrl: '', duration: '', singerId: '' })
-                    setAudioPreview('') // Clear audio preview
                   }}
                   className="bg-gray-200 text-gray-700 hover:bg-gray-300"
                 >
