@@ -80,7 +80,7 @@ export default function FileUpload({
     if (!files || files.length === 0) return
 
     const file = files[0]
-    
+
     // Validate file type
     if (acceptTypes && !file.type.match(acceptTypes.replace(/\*/g, '.*'))) {
       toast.error(`Only ${config.label.toLowerCase()} files are allowed.`)
@@ -94,35 +94,14 @@ export default function FileUpload({
     }
 
     setUploading(true)
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('type', fileType)
 
     try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
-      
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-        signal: controller.signal
-      })
-
-      clearTimeout(timeoutId)
-
-      if (response.ok) {
-        const data = await response.json()
-        onFileUpload(data.url)
-        
-        if (data.resized) {
-          toast.success(`✅ ${config.label} uploaded and resized to 1280x720!`)
-        } else {
-          toast.success(`✅ ${config.label} uploaded successfully!`)
-        }
+      // Use Cloudinary for audio files (better for large files and streaming)
+      if (fileType === 'audio') {
+        await handleAudioUploadToCloudinary(file)
       } else {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        console.error('Upload failed:', errorData)
-        toast.error(`❌ Upload failed: ${errorData.error || 'Unknown error'}. Please try again.`)
+        // Use regular upload for other file types
+        await handleRegularUpload(file)
       }
     } catch (error) {
       console.error('Upload error:', error)
@@ -133,6 +112,103 @@ export default function FileUpload({
       }
     } finally {
       setUploading(false)
+    }
+  }
+
+  const handleAudioUploadToCloudinary = async (file: File) => {
+    console.log('📤 Uploading audio file to Cloudinary (direct upload)...')
+    console.log('📊 File size:', (file.size / 1024 / 1024).toFixed(2), 'MB')
+
+    // Step 1: Get upload signature from our API
+    const signatureResponse = await fetch('/api/upload/radio-audio')
+    if (!signatureResponse.ok) {
+      throw new Error('Failed to get upload signature')
+    }
+    const { signature, timestamp, cloudName, apiKey, folder } = await signatureResponse.json()
+
+    console.log('🔑 Got upload signature, uploading directly to Cloudinary...')
+
+    // Step 2: Upload directly to Cloudinary (bypasses Vercel's 4.5MB limit)
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('signature', signature)
+    formData.append('timestamp', timestamp.toString())
+    formData.append('api_key', apiKey)
+    formData.append('folder', folder)
+
+    const cloudinaryResponse = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    )
+
+    if (!cloudinaryResponse.ok) {
+      const errorData = await cloudinaryResponse.json()
+      console.error('❌ Cloudinary upload failed:', errorData)
+      throw new Error(errorData.error?.message || 'Cloudinary upload failed')
+    }
+
+    const cloudinaryData = await cloudinaryResponse.json()
+    console.log('✅ Cloudinary upload successful:', cloudinaryData.public_id)
+
+    // Step 3: Save metadata to our database
+    const metadataResponse = await fetch('/api/upload/save-audio-metadata', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: cloudinaryData.secure_url,
+        publicId: cloudinaryData.public_id,
+        filename: file.name,
+        mimeType: file.type,
+        size: file.size,
+        duration: cloudinaryData.duration
+          ? `${Math.floor(cloudinaryData.duration / 60)}:${String(Math.floor(cloudinaryData.duration % 60)).padStart(2, '0')}`
+          : null,
+      }),
+    })
+
+    if (!metadataResponse.ok) {
+      throw new Error('Failed to save audio metadata')
+    }
+
+    const metadataData = await metadataResponse.json()
+    console.log('✅ Metadata saved:', metadataData.id)
+
+    onFileUpload(cloudinaryData.secure_url)
+    toast.success('✅ Audio file uploaded to Cloudinary successfully!')
+  }
+
+  const handleRegularUpload = async (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('type', fileType)
+
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+      signal: controller.signal
+    })
+
+    clearTimeout(timeoutId)
+
+    if (response.ok) {
+      const data = await response.json()
+      onFileUpload(data.url)
+
+      if (data.resized) {
+        toast.success(`✅ ${config.label} uploaded and resized to 1280x720!`)
+      } else {
+        toast.success(`✅ ${config.label} uploaded successfully!`)
+      }
+    } else {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+      console.error('Upload failed:', errorData)
+      toast.error(`❌ Upload failed: ${errorData.error || 'Unknown error'}. Please try again.`)
     }
   }
 
