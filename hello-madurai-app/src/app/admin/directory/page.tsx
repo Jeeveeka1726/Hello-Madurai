@@ -147,7 +147,13 @@ export default function AdminDirectoryPage() {
 
   const fetchBusinesses = async () => {
     try {
-      const response = await fetch('/api/admin/directory')
+      // Add cache-busting to ensure fresh data
+      const response = await fetch('/api/admin/directory', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        }
+      })
       if (response.ok) {
         const data = await response.json()
         setBusinesses(data)
@@ -262,7 +268,7 @@ export default function AdminDirectoryPage() {
       instagramUrl: business.instagramUrl || '',
       facebookUrl: business.facebookUrl || '',
       bookingUrl: business.bookingUrl || '',
-      bookingPhone: business.bookingPhone || '',
+      bookingPhone: '', // Will be enabled after database migration
       orderNumber: business.orderNumber || 0,
       hasProfile: business.hasProfile || false,
       profileContent: business.profileContent || '',
@@ -768,36 +774,24 @@ export default function AdminDirectoryPage() {
                       />
                     </div>
 
-                    {/* Booking URL */}
+                    {/* Booking URL/Phone */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Booking URL (Optional)
+                        Booking URL or Phone (Optional)
                       </label>
                       <input
-                        type="url"
+                        type="text"
                         value={formData.bookingUrl}
                         onChange={(e) => setFormData({ ...formData, bookingUrl: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="https://booking.com/..."
-                      />
-                    </div>
-
-                    {/* Booking Phone */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Booking Phone (Optional)
-                      </label>
-                      <input
-                        type="tel"
-                        value={formData.bookingPhone}
-                        onChange={(e) => setFormData({ ...formData, bookingPhone: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="+91 98765 43210"
+                        placeholder="https://booking.com/... or +91 98765 43210 or both separated by comma"
                       />
                       <p className="text-xs text-gray-500 mt-1">
-                        Separate booking phone number (if different from main phone)
+                        Enter a website URL, phone number, or both separated by comma (e.g., "https://booking.com, +91 98765 43210")
                       </p>
                     </div>
+
+
                   </div>
 
 

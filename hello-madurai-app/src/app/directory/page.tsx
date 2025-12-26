@@ -289,9 +289,7 @@ function DirectoryPageContent() {
 
     // Action buttons (right column)
     buttons.push('directions') // Always available
-    // Safely check for booking options with backward compatibility
-    const bookingPhone = (business as any).bookingPhone || null
-    if (business.bookingUrl || bookingPhone) buttons.push('booking')
+    if (business.bookingUrl) buttons.push('booking')
     buttons.push('share') // Always available
 
     return buttons
@@ -326,34 +324,50 @@ function DirectoryPageContent() {
   }
 
   const handleBooking = (business: Business) => {
-    // Safely access bookingPhone with fallback for backward compatibility
-    const bookingPhone = (business as any).bookingPhone || null
     const bookingUrl = business.bookingUrl || null
 
-    // If has both URL and phone, show options
-    if (bookingUrl && bookingPhone) {
-      const choice = confirm(
-        `${t('directory.bookingOptions', 'Choose booking method:', 'முன்பதிவு முறையைத் தேர்ந்தெடுக்கவும்:')}\n\n` +
-        `1. ${t('directory.website', 'Website', 'வலைத்தளம்')}\n` +
-        `2. ${t('directory.phone', 'Phone', 'தொலைபேசி')}\n\n` +
-        `${t('directory.clickOk', 'Click OK for Website, Cancel for Phone', 'வலைத்தளத்திற்கு OK, தொலைபேசிக்கு Cancel')}`
-      )
-      if (choice) {
-        window.open(bookingUrl, '_blank')
+    if (bookingUrl) {
+      // Smart detection: Check if bookingUrl contains multiple options separated by comma or pipe
+      const bookingOptions = bookingUrl.split(/[,|]/).map(option => option.trim()).filter(option => option.length > 0)
+
+      if (bookingOptions.length > 1) {
+        // Multiple booking options available - show choice dialog
+        let optionsText = `${t('directory.bookingOptions', 'Choose booking method:', 'முன்பதிவு முறையைத் தேர்ந்தெடுக்கவும்:')}\n\n`
+
+        bookingOptions.forEach((option, index) => {
+          const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
+          const isPhone = phoneRegex.test(option.replace(/\s/g, ''))
+          const label = isPhone ?
+            `${t('directory.phone', 'Phone', 'தொலைபேசி')}: ${option}` :
+            `${t('directory.website', 'Website', 'வலைத்தளம்')}: ${option}`
+          optionsText += `${index + 1}. ${label}\n`
+        })
+
+        optionsText += `\n${t('directory.clickOk', 'Click OK for first option, Cancel for second', 'முதல் விருப்பத்திற்கு OK, இரண்டாவதற்கு Cancel')}`
+
+        const choice = confirm(optionsText)
+        const selectedOption = choice ? bookingOptions[0] : bookingOptions[1]
+
+        // Handle the selected option
+        const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
+        if (phoneRegex.test(selectedOption.replace(/\s/g, ''))) {
+          window.open(`tel:${selectedOption}`, '_self')
+        } else {
+          window.open(selectedOption.startsWith('http') ? selectedOption : `https://${selectedOption}`, '_blank')
+        }
       } else {
-        window.open(`tel:${bookingPhone}`, '_self')
+        // Single booking option - auto-detect type
+        const singleOption = bookingOptions[0]
+        const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
+
+        if (phoneRegex.test(singleOption.replace(/\s/g, ''))) {
+          // It's a phone number
+          window.open(`tel:${singleOption}`, '_self')
+        } else {
+          // It's a URL
+          window.open(singleOption.startsWith('http') ? singleOption : `https://${singleOption}`, '_blank')
+        }
       }
-    } else if (bookingUrl) {
-      // Check if bookingUrl is actually a phone number (legacy support)
-      const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
-      if (phoneRegex.test(bookingUrl.replace(/\s/g, ''))) {
-        window.open(`tel:${bookingUrl}`, '_self')
-      } else {
-        window.open(bookingUrl, '_blank')
-      }
-    } else if (bookingPhone) {
-      // Only phone available
-      window.open(`tel:${bookingPhone}`, '_self')
     }
   }
 
@@ -1002,7 +1016,7 @@ function DirectoryPageContent() {
                         </button>
 
                         {/* Booking */}
-                        {(business.bookingUrl || (business as any).bookingPhone) && (
+                        {business.bookingUrl && (
                           <button
                             onClick={() => handleBooking(business)}
                             className={getButtonLayoutClasses(business).buttonClass}
