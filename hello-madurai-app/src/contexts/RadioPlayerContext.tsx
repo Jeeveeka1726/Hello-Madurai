@@ -79,6 +79,18 @@ const validateAndFixAudioUrl = (url: string): string => {
     return url
   }
 
+  // Handle radio station webpage URLs (not direct streams)
+  if (url.includes('tamilradios.com') || url.includes('radio.com') || url.includes('tunein.com')) {
+    console.warn('⚠️ Radio station webpage URLs cannot be played directly. Please find the direct stream URL (usually ends with .m3u8, .pls, or .mp3).')
+    return url
+  }
+
+  // Handle common radio streaming formats
+  if (url.includes('.m3u8') || url.includes('.pls') || url.includes('.m3u')) {
+    console.log('🎵 Detected streaming format:', url)
+    return url
+  }
+
   console.log('✅ URL appears to be a direct link:', url)
   return url
 }

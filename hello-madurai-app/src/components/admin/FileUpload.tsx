@@ -253,7 +253,21 @@ export default function FileUpload({
 
       const onError = (e: Event) => {
         console.error('❌ Audio URL test failed:', url, e)
-        toast.error('❌ Audio URL is not accessible or not a valid audio file')
+
+        // Provide specific guidance based on URL type
+        let errorMessage = '❌ Audio URL is not accessible or not a valid audio file'
+
+        if (url.includes('tamilradios.com') || url.includes('radio.com') || url.includes('tunein.com')) {
+          errorMessage = '❌ This appears to be a radio station webpage. Please find the direct stream URL instead.\n\nTip: Look for URLs ending with .m3u8, .pls, .mp3, or similar audio formats.'
+        } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+          errorMessage = '❌ YouTube URLs cannot be played directly. Please download the audio file and upload it, or use a direct audio file URL.'
+        } else if (url.includes('soundcloud.com')) {
+          errorMessage = '❌ SoundCloud URLs cannot be played directly. Please use a direct audio file URL.'
+        } else if (!url.match(/\.(mp3|wav|ogg|aac|m4a|flac|m3u8|pls)(\?.*)?$/i)) {
+          errorMessage = '❌ URL does not appear to be a direct audio file. Please use URLs ending with .mp3, .wav, .ogg, .aac, .m4a, .flac, .m3u8, or .pls'
+        }
+
+        toast.error(errorMessage)
         cleanup()
         resolve(false)
       }
@@ -433,6 +447,25 @@ export default function FileUpload({
               placeholder={`Enter ${config.label.toLowerCase()} URL...`}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
+          </div>
+
+          {fileType === 'audio' && (
+            <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+              <p className="font-medium text-green-700">✅ Supported URL types:</p>
+              <ul className="list-disc list-inside mt-1 space-y-1">
+                <li>Direct audio files: .mp3, .wav, .ogg, .aac, .m4a, .flac</li>
+                <li>Streaming formats: .m3u8, .pls, .m3u</li>
+                <li>Google Drive, Dropbox, OneDrive (auto-fixed)</li>
+              </ul>
+              <p className="font-medium text-red-700 mt-2">❌ Not supported:</p>
+              <ul className="list-disc list-inside mt-1 space-y-1">
+                <li>YouTube, SoundCloud, Spotify links</li>
+                <li>Radio station webpages (use direct stream URLs instead)</li>
+              </ul>
+            </div>
+          )}
+
+          <div className="flex space-x-2">
             {fileType === 'audio' && (
               <Button
                 type="button"
