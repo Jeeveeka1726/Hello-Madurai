@@ -42,7 +42,7 @@ const nextConfig: NextConfig = {
           // Content Security Policy - Prevents XSS attacks
           {
             key: 'Content-Security-Policy',
-            value: "frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://www.instagram.com https://instagram.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.google.com https://ep2.adtrafficquality.google https://tpc.googlesyndication.com;",
+            value: "frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://www.instagram.com https://instagram.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.google.com https://ep2.adtrafficquality.google https://tpc.googlesyndication.com https://www.tamilradios.com https://tamilradios.com https://*.tamilradios.com;",
           },
           // Strict Transport Security - Forces HTTPS (prevents SSL downgrade attacks)
           {

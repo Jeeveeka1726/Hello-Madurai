@@ -90,41 +90,54 @@ export default function GlobalRadioPlayer() {
             </p>
           </div>
 
-          {/* Progress Bar (Desktop) */}
-          <div className="hidden md:flex items-center gap-3 flex-1 max-w-md">
-            <span className="text-xs text-white/80 w-12 text-right">
-              {formatTime(currentTime)}
-            </span>
-            <input
-              type="range"
-              min="0"
-              max={duration || 0}
-              value={currentTime}
-              onChange={handleSeek}
-              className="flex-1 h-1 bg-white/30 rounded-full appearance-none cursor-pointer
-                [&::-webkit-slider-thumb]:appearance-none
-                [&::-webkit-slider-thumb]:w-3
-                [&::-webkit-slider-thumb]:h-3
-                [&::-webkit-slider-thumb]:rounded-full
-                [&::-webkit-slider-thumb]:bg-white
-                [&::-webkit-slider-thumb]:cursor-pointer
-                [&::-webkit-slider-thumb]:shadow-lg
-                [&::-moz-range-thumb]:w-3
-                [&::-moz-range-thumb]:h-3
-                [&::-moz-range-thumb]:rounded-full
-                [&::-moz-range-thumb]:bg-white
-                [&::-moz-range-thumb]:cursor-pointer
-                [&::-moz-range-thumb]:border-0
-                [&::-moz-range-thumb]:shadow-lg"
-            />
-            <span className="text-xs text-white/80 w-12">
-              {formatTime(duration)}
-            </span>
-          </div>
+          {/* Progress Bar (Desktop) - Only show for direct audio */}
+          {currentSong.audioType !== 'embed' && (
+            <div className="hidden md:flex items-center gap-3 flex-1 max-w-md">
+              <span className="text-xs text-white/80 w-12 text-right">
+                {formatTime(currentTime)}
+              </span>
+              <input
+                type="range"
+                min="0"
+                max={duration || 0}
+                value={currentTime}
+                onChange={handleSeek}
+                className="flex-1 h-1 bg-white/30 rounded-full appearance-none cursor-pointer
+                  [&::-webkit-slider-thumb]:appearance-none
+                  [&::-webkit-slider-thumb]:w-3
+                  [&::-webkit-slider-thumb]:h-3
+                  [&::-webkit-slider-thumb]:rounded-full
+                  [&::-webkit-slider-thumb]:bg-white
+                  [&::-webkit-slider-thumb]:cursor-pointer
+                  [&::-webkit-slider-thumb]:shadow-lg
+                  [&::-moz-range-thumb]:w-3
+                  [&::-moz-range-thumb]:h-3
+                  [&::-moz-range-thumb]:rounded-full
+                  [&::-moz-range-thumb]:bg-white
+                  [&::-moz-range-thumb]:cursor-pointer
+                  [&::-moz-range-thumb]:border-0
+                  [&::-moz-range-thumb]:shadow-lg"
+              />
+              <span className="text-xs text-white/80 w-12">
+                {formatTime(duration)}
+              </span>
+            </div>
+          )}
+
+          {/* Embedded Radio Info (Desktop) */}
+          {currentSong.audioType === 'embed' && (
+            <div className="hidden md:flex items-center gap-3 flex-1 max-w-md">
+              <div className="flex-1 text-center">
+                <span className="text-xs text-white/80">
+                  🎵 Live Radio Station • Playing
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Controls */}
           <div className="flex items-center gap-2">
-            {/* Play/Pause Button */}
+            {/* Play/Pause Button - Same behavior for all audio types */}
             <button
               onClick={togglePlayPause}
               className="w-10 h-10 rounded-full bg-yellow-400 text-purple-900 flex items-center justify-center hover:bg-yellow-300 hover:scale-110 transition-all shadow-lg"
@@ -148,35 +161,60 @@ export default function GlobalRadioPlayer() {
           </div>
         </div>
 
-        {/* Progress Bar (Mobile) */}
-        <div className="md:hidden mt-2 flex items-center gap-2">
-          <span className="text-xs text-white/80">
-            {formatTime(currentTime)}
-          </span>
-          <input
-            type="range"
-            min="0"
-            max={duration || 0}
-            value={currentTime}
-            onChange={handleSeek}
-            className="flex-1 h-1 bg-white/30 rounded-full appearance-none cursor-pointer
-              [&::-webkit-slider-thumb]:appearance-none
-              [&::-webkit-slider-thumb]:w-3
-              [&::-webkit-slider-thumb]:h-3
-              [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-white
-              [&::-webkit-slider-thumb]:cursor-pointer
-              [&::-moz-range-thumb]:w-3
-              [&::-moz-range-thumb]:h-3
-              [&::-moz-range-thumb]:rounded-full
-              [&::-moz-range-thumb]:bg-white
-              [&::-moz-range-thumb]:cursor-pointer
-              [&::-moz-range-thumb]:border-0"
-          />
-          <span className="text-xs text-white/80">
-            {formatTime(duration)}
-          </span>
-        </div>
+        {/* Progress Bar (Mobile) - Only show for direct audio */}
+        {currentSong.audioType !== 'embed' && (
+          <div className="md:hidden mt-2 flex items-center gap-2">
+            <span className="text-xs text-white/80">
+              {formatTime(currentTime)}
+            </span>
+            <input
+              type="range"
+              min="0"
+              max={duration || 0}
+              value={currentTime}
+              onChange={handleSeek}
+              className="flex-1 h-1 bg-white/30 rounded-full appearance-none cursor-pointer
+                [&::-webkit-slider-thumb]:appearance-none
+                [&::-webkit-slider-thumb]:w-3
+                [&::-webkit-slider-thumb]:h-3
+                [&::-webkit-slider-thumb]:rounded-full
+                [&::-webkit-slider-thumb]:bg-white
+                [&::-webkit-slider-thumb]:cursor-pointer
+                [&::-moz-range-thumb]:w-3
+                [&::-moz-range-thumb]:h-3
+                [&::-moz-range-thumb]:rounded-full
+                [&::-moz-range-thumb]:bg-white
+                [&::-moz-range-thumb]:cursor-pointer
+                [&::-moz-range-thumb]:border-0"
+            />
+            <span className="text-xs text-white/80">
+              {formatTime(duration)}
+            </span>
+          </div>
+        )}
+
+        {/* Embedded Radio Info (Mobile) */}
+        {currentSong.audioType === 'embed' && (
+          <div className="md:hidden mt-2 text-center">
+            <span className="text-xs text-white/80">
+              🎵 Live Radio Station • Click play button on the radio player below
+            </span>
+          </div>
+        )}
+
+        {/* Live Radio Stream Player */}
+        {currentSong.audioType === 'embed' && (
+          <div className="mt-3 bg-gradient-to-r from-red-600/20 to-orange-600/20 rounded-lg p-3 border border-white/10">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-sm text-white font-medium">🎵 Live Radio Stream</span>
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            </div>
+            <div className="text-xs text-white/70 text-center">
+              {isPlaying ? 'Streaming live radio...' : 'Radio stream paused'}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
