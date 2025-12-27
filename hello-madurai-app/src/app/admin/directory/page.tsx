@@ -59,6 +59,7 @@ interface Business {
   facebookUrl?: string
   bookingUrl?: string
   bookingPhone?: string
+  directionsUrl?: string
   orderNumber: number
   hasProfile: boolean
   profileContent?: string
@@ -95,6 +96,7 @@ export default function AdminDirectoryPage() {
     facebookUrl: '',
     bookingUrl: '',
     bookingPhone: '',
+    directionsUrl: '',
     orderNumber: 0,
     hasProfile: false,
     profileContent: '',
@@ -215,6 +217,7 @@ export default function AdminDirectoryPage() {
           facebookUrl: '',
           bookingUrl: '',
         bookingPhone: '',
+          directionsUrl: '',
           orderNumber: 0,
           hasProfile: false,
           profileContent: '',
@@ -269,6 +272,7 @@ export default function AdminDirectoryPage() {
       facebookUrl: business.facebookUrl || '',
       bookingUrl: business.bookingUrl || '',
       bookingPhone: '', // Will be enabled after database migration
+      directionsUrl: business.directionsUrl || '',
       orderNumber: business.orderNumber || 0,
       hasProfile: business.hasProfile || false,
       profileContent: business.profileContent || '',
@@ -346,6 +350,7 @@ export default function AdminDirectoryPage() {
                 facebookUrl: '',
                 bookingUrl: '',
                 bookingPhone: '',
+                directionsUrl: '',
                 latitude: '',
                 longitude: '',
                 orderNumber: 0,
@@ -788,6 +793,23 @@ export default function AdminDirectoryPage() {
                       />
                       <p className="text-xs text-gray-500 mt-1">
                         Enter a website URL, phone number, or both separated by comma (e.g., "https://booking.com, +91 98765 43210")
+                      </p>
+                    </div>
+
+                    {/* Directions URL */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Directions URL (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.directionsUrl}
+                        onChange={(e) => setFormData({ ...formData, directionsUrl: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="https://maps.google.com/... or https://goo.gl/maps/..."
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Enter a Google Maps URL or any other directions link. If empty, will use latitude/longitude for directions.
                       </p>
                     </div>
 

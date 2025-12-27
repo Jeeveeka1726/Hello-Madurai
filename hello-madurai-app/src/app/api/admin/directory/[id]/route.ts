@@ -29,6 +29,7 @@ export async function PUT(
         facebookUrl: data.facebookUrl || undefined,
         bookingUrl: data.bookingUrl || undefined,
         // bookingPhone: data.bookingPhone || undefined, // Will be enabled after database migration
+        directionsUrl: data.directionsUrl || undefined,
         orderNumber: data.orderNumber !== undefined ? data.orderNumber : 0,
         hasProfile: data.hasProfile !== undefined ? data.hasProfile : false,
         profileContent: data.profileContent || undefined,

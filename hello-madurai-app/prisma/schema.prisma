@@ -144,6 +144,7 @@ model Business {
   facebookUrl    String?
   bookingUrl     String?
   // bookingPhone   String?               // Separate booking phone number - Will be added after database migration
+  directionsUrl  String?               // Custom directions URL (Google Maps, etc.)
   youtubeUrl     String?
   orderNumber    Int                   @default(0)
   hasProfile     Boolean               @default(false) // Whether to show View Profile button

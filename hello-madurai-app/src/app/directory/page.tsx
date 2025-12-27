@@ -69,6 +69,7 @@ interface Business {
   facebookUrl?: string
   bookingUrl?: string
   bookingPhone?: string
+  directionsUrl?: string
   latitude?: number
   longitude?: number
   orderNumber: number
@@ -269,6 +270,13 @@ function DirectoryPageContent() {
   }
 
   const handleDirections = (business: Business) => {
+    // Use custom directions URL if provided
+    if (business.directionsUrl) {
+      window.open(business.directionsUrl, '_blank')
+      return
+    }
+
+    // Fallback to coordinates or address
     if (business.latitude && business.longitude) {
       const url = `https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`
       window.open(url, '_blank')
@@ -295,30 +303,10 @@ function DirectoryPageContent() {
     return buttons
   }
 
-  // Function to get button layout classes based on number of buttons
-  const getButtonLayoutClasses = (business: Business) => {
-    const buttons = getAvailableButtons(business)
-    const totalButtons = buttons.length
-
-    // For 1-3 buttons: single column, centered
-    if (totalButtons <= 3) {
-      return {
-        containerClass: "flex flex-col space-y-2 max-w-xs mx-auto",
-        buttonClass: "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-      }
-    }
-
-    // For 4-6 buttons: 2 columns
-    if (totalButtons <= 6) {
-      return {
-        containerClass: "grid grid-cols-2 gap-2",
-        buttonClass: "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-      }
-    }
-
-    // For more buttons: 3 columns on larger screens, 2 on mobile
+  // Function to get button layout classes - Always 2x2 grid
+  const getButtonLayoutClasses = () => {
     return {
-      containerClass: "grid grid-cols-2 md:grid-cols-3 gap-2",
+      containerClass: "grid grid-cols-2 gap-2",
       buttonClass: "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
     }
   }
@@ -975,13 +963,13 @@ function DirectoryPageContent() {
                         )}
                       </div>
 
-                      {/* Action Buttons - Auto-aligned based on available buttons */}
-                      <div className={`${getButtonLayoutClasses(business).containerClass} mb-3`}>
+                      {/* Action Buttons - Always 2x2 grid layout */}
+                      <div className={`${getButtonLayoutClasses().containerClass} mb-3`}>
                         {/* Instagram */}
                         {business.instagramUrl && (
                           <button
                             onClick={() => handleInstagram(business.instagramUrl!)}
-                            className={getButtonLayoutClasses(business).buttonClass}
+                            className={getButtonLayoutClasses().buttonClass}
                           >
                             Instagram
                           </button>
@@ -991,7 +979,7 @@ function DirectoryPageContent() {
                         {business.youtubeUrl && (
                           <button
                             onClick={() => window.open(business.youtubeUrl, '_blank')}
-                            className={getButtonLayoutClasses(business).buttonClass}
+                            className={getButtonLayoutClasses().buttonClass}
                           >
                             YouTube
                           </button>
@@ -1001,7 +989,7 @@ function DirectoryPageContent() {
                         {business.facebookUrl && (
                           <button
                             onClick={() => handleFacebook(business.facebookUrl!)}
-                            className={getButtonLayoutClasses(business).buttonClass}
+                            className={getButtonLayoutClasses().buttonClass}
                           >
                             Facebook
                           </button>
@@ -1010,7 +998,7 @@ function DirectoryPageContent() {
                         {/* Directions - Always available */}
                         <button
                           onClick={() => handleDirections(business)}
-                          className={getButtonLayoutClasses(business).buttonClass}
+                          className={getButtonLayoutClasses().buttonClass}
                         >
                           Directions
                         </button>
@@ -1019,7 +1007,7 @@ function DirectoryPageContent() {
                         {business.bookingUrl && (
                           <button
                             onClick={() => handleBooking(business)}
-                            className={getButtonLayoutClasses(business).buttonClass}
+                            className={getButtonLayoutClasses().buttonClass}
                           >
                             Book Now
                           </button>
@@ -1028,7 +1016,7 @@ function DirectoryPageContent() {
                         {/* Share - Always available */}
                         <button
                           onClick={() => handleShare(business)}
-                          className={getButtonLayoutClasses(business).buttonClass}
+                          className={getButtonLayoutClasses().buttonClass}
                         >
                           Share
                         </button>

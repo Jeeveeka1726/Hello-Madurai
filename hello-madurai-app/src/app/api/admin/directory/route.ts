@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
         facebookUrl: body.facebookUrl,
         bookingUrl: body.bookingUrl,
         // bookingPhone: body.bookingPhone, // Will be enabled after database migration
+        directionsUrl: body.directionsUrl,
         orderNumber: body.orderNumber || 0,
         hasProfile: body.hasProfile || false,
         profileContent: body.profileContent,
