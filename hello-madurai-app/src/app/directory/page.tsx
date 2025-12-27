@@ -654,11 +654,6 @@ function DirectoryPageContent() {
                               }`}>
                                 {language === 'ta' ? subcategory.name_ta : subcategory.name}
                               </p>
-                              {subcategory._count && subcategory._count.businesses > 0 && (
-                                <p className="text-xs text-gray-500 mt-1">
-                                  {subcategory._count.businesses} {language === 'ta' ? 'வணிகங்கள்' : 'businesses'}
-                                </p>
-                              )}
                             </div>
                           </div>
                         </button>
@@ -792,8 +787,8 @@ function DirectoryPageContent() {
                       {(business.mainImage || business.mainVideoUrl) && (
                         <div className="mb-4">
                           {playingVideo === business.id && business.mainVideoUrl ? (
-                            // Show video player when playing - Proper 16:9 aspect ratio
-                            <div className="relative w-full" style={{ paddingBottom: '56.25%' /* 16:9 aspect ratio */ }}>
+                            // Show video player when playing - Responsive 16:9 aspect ratio
+                            <div className="relative w-full aspect-video overflow-hidden rounded-lg bg-black">
                               {(() => {
                                 const embedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
                                 if (embedUrl) {
@@ -801,7 +796,7 @@ function DirectoryPageContent() {
                                     <>
                                       <iframe
                                         src={`${embedUrl}?autoplay=1&rel=0&modestbranding=1`}
-                                        className="absolute inset-0 w-full h-full rounded-lg border-0"
+                                        className="absolute inset-0 w-full h-full border-0"
                                         allowFullScreen
                                         title={`${business.name} video`}
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -822,7 +817,7 @@ function DirectoryPageContent() {
                                     <>
                                       <video
                                         src={business.mainVideoUrl}
-                                        className="absolute inset-0 w-full h-full rounded-lg object-cover"
+                                        className="absolute inset-0 w-full h-full object-cover"
                                         controls
                                         autoPlay
                                         playsInline
