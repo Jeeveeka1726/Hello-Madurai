@@ -47,6 +47,7 @@ interface RadioSong {
   title: string
   title_ta: string | null
   audioUrl: string
+  audioType: string
   duration: string | null
   plays: number
   shares: number
@@ -97,6 +98,9 @@ function DigitalFMPageContent() {
   const [allSongs, setAllSongs] = useState<RadioSong[]>([]) // All songs for search
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [showEmbeddedRadio, setShowEmbeddedRadio] = useState(false)
+  const [embeddedRadioUrl, setEmbeddedRadioUrl] = useState('')
+  const [embeddedRadioTitle, setEmbeddedRadioTitle] = useState('')
   const [loadingSongs, setLoadingSongs] = useState(false)
   const [ads, setAds] = useState<Ad[]>([])
   const [sessionToken, setSessionToken] = useState<string | null>(null)
@@ -549,12 +553,24 @@ function DigitalFMPageContent() {
   }
 
   const handlePlaySong = async (song: RadioSong) => {
-    if (currentSong?.id === song.id) {
-      // Toggle play/pause for current song
-      togglePlayPause()
+    if (song.audioType === 'embed') {
+      // Handle embedded radio stations
+      setEmbeddedRadioUrl(song.audioUrl)
+      setEmbeddedRadioTitle(song.title)
+      setShowEmbeddedRadio(true)
+
+      // Track play count for embedded radio
+      fetch(`/api/radio-songs/${song.id}/play`, { method: 'POST' })
+        .catch(err => console.error('Error tracking play:', err))
     } else {
-      // Play new song using global player
-      playSong(song)
+      // Handle direct audio files
+      if (currentSong?.id === song.id) {
+        // Toggle play/pause for current song
+        togglePlayPause()
+      } else {
+        // Play new song using global player
+        playSong(song)
+      }
     }
   }
 
@@ -1251,6 +1267,44 @@ function DigitalFMPageContent() {
         )}
 
         {/* Music Player is now global - shown at bottom of all pages via GlobalRadioPlayer component */}
+
+        {/* Embedded Radio Modal */}
+        {showEmbeddedRadio && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg w-full max-w-4xl h-[80vh] flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {embeddedRadioTitle}
+                </h3>
+                <button
+                  onClick={() => setShowEmbeddedRadio(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Iframe Content */}
+              <div className="flex-1 p-4">
+                <iframe
+                  src={embeddedRadioUrl}
+                  className="w-full h-full border-0 rounded-lg"
+                  title={embeddedRadioTitle}
+                  allow="autoplay; encrypted-media"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+                />
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 border-t bg-gray-50 rounded-b-lg">
+                <p className="text-sm text-gray-600">
+                  🎵 Enjoying this radio station? This content is embedded from: {new URL(embeddedRadioUrl).hostname}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

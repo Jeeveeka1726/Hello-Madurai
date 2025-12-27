@@ -15,7 +15,7 @@ import Button from '@/components/ui/Button'
 
 interface FileUploadProps {
   label: string
-  fileType: 'image' | 'pdf' | 'audio' | 'document'
+  fileType: 'image' | 'pdf' | 'audio' | 'document' | 'url'
   currentFile?: string
   currentUrl?: string
   onFileUpload: (url: string) => void
@@ -24,6 +24,7 @@ interface FileUploadProps {
   accept?: string
   maxSize?: number // in MB
   showUrlOption?: boolean
+  showFileUpload?: boolean
 }
 
 const fileTypeConfig = {
@@ -50,6 +51,12 @@ const fileTypeConfig = {
     accept: '.pdf,.doc,.docx,.txt',
     maxSize: 10,
     label: 'Document'
+  },
+  url: {
+    icon: LinkIcon,
+    accept: '',
+    maxSize: 0,
+    label: 'URL'
   }
 }
 
@@ -63,11 +70,12 @@ export default function FileUpload({
   className = '',
   accept,
   maxSize,
-  showUrlOption = true
+  showUrlOption = true,
+  showFileUpload = true
 }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file')
+  const [uploadMode, setUploadMode] = useState<'file' | 'url'>(showFileUpload ? 'file' : 'url')
   const [urlInput, setUrlInput] = useState(currentUrl || '')
   const [testingUrl, setTestingUrl] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -297,7 +305,7 @@ export default function FileUpload({
 
   const handleUrlSubmit = async () => {
     if (urlInput.trim()) {
-      // Test audio URLs before saving
+      // Test audio URLs before saving (but skip for 'url' type which is for embedding)
       if (fileType === 'audio') {
         const isValid = await testAudioUrl(urlInput.trim())
         if (!isValid) {
@@ -325,7 +333,7 @@ export default function FileUpload({
       </label>
 
       {/* Mode Toggle */}
-      {showUrlOption && (
+      {showUrlOption && showFileUpload && (
         <div className="flex space-x-2 mb-4">
           <Button
             type="button"
@@ -348,7 +356,7 @@ export default function FileUpload({
         </div>
       )}
 
-      {uploadMode === 'file' ? (
+      {uploadMode === 'file' && showFileUpload ? (
         /* File Upload Mode */
         <div>
           {!currentFileUrl ? (
@@ -461,6 +469,18 @@ export default function FileUpload({
               <ul className="list-disc list-inside mt-1 space-y-1">
                 <li>YouTube, SoundCloud, Spotify links</li>
                 <li>Radio station webpages (use direct stream URLs instead)</li>
+              </ul>
+            </div>
+          )}
+
+          {fileType === 'url' && (
+            <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-md">
+              <p className="font-medium text-blue-700">🎵 Radio Station Embedding:</p>
+              <ul className="list-disc list-inside mt-1 space-y-1">
+                <li>Enter any radio station webpage URL</li>
+                <li>Examples: tamilradios.com, radio.com, tunein.com</li>
+                <li>The webpage will be embedded in an iframe for users</li>
+                <li>No audio validation needed - any webpage URL works</li>
               </ul>
             </div>
           )}

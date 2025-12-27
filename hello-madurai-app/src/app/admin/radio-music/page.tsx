@@ -46,6 +46,7 @@ interface RadioSong {
   title: string
   title_ta: string | null
   audioUrl: string
+  audioType: string
   duration: string | null
   plays: number
   singerId: string
@@ -97,6 +98,7 @@ export default function RadioMusicAdminPage() {
     title: '',
     title_ta: '',
     audioUrl: '',
+    audioType: 'direct' as 'direct' | 'embed',
     duration: '',
     singerId: ''
   })
@@ -309,7 +311,7 @@ export default function RadioMusicAdminPage() {
         await fetchSongs()
         setShowSongForm(false)
         setEditingSong(null)
-        setSongFormData({ title: '', title_ta: '', audioUrl: '', duration: '', singerId: '' })
+        setSongFormData({ title: '', title_ta: '', audioUrl: '', audioType: 'direct', duration: '', singerId: '' })
       }
     } catch (error) {
       console.error('Error saving song:', error)
@@ -335,6 +337,7 @@ export default function RadioMusicAdminPage() {
       title: song.title,
       title_ta: song.title_ta || '',
       audioUrl: song.audioUrl,
+      audioType: song.audioType || 'direct',
       duration: song.duration || '',
       singerId: song.singerId
     })
@@ -840,7 +843,7 @@ export default function RadioMusicAdminPage() {
                 onClick={() => {
                   setShowSongForm(!showSongForm)
                   setEditingSong(null)
-                  setSongFormData({ title: '', title_ta: '', audioUrl: '', duration: '', singerId: selectedSinger.id })
+                  setSongFormData({ title: '', title_ta: '', audioUrl: '', audioType: 'direct', duration: '', singerId: selectedSinger.id })
                 }}
                 className="bg-blue-600 text-white hover:bg-blue-700"
               >
@@ -886,16 +889,48 @@ export default function RadioMusicAdminPage() {
                   />
                 </div>
                 <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Audio Type *
+                  </label>
+                  <div className="flex gap-4 mb-4">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="audioType"
+                        value="direct"
+                        checked={songFormData.audioType === 'direct'}
+                        onChange={(e) => setSongFormData({ ...songFormData, audioType: e.target.value as 'direct' | 'embed' })}
+                        className="mr-2"
+                      />
+                      <span className="text-sm">Direct Audio File/URL</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="audioType"
+                        value="embed"
+                        checked={songFormData.audioType === 'embed'}
+                        onChange={(e) => setSongFormData({ ...songFormData, audioType: e.target.value as 'direct' | 'embed' })}
+                        className="mr-2"
+                      />
+                      <span className="text-sm">Radio Station Webpage (Embed)</span>
+                    </label>
+                  </div>
+
                   <FileUpload
-                    label="Audio File * (MP3, WAV, OGG, AAC, M4A, FLAC)"
-                    fileType="audio"
+                    label={songFormData.audioType === 'direct'
+                      ? "Audio File * (MP3, WAV, OGG, AAC, M4A, FLAC)"
+                      : "Radio Station URL * (e.g., https://www.tamilradios.com/ilayaraja-fm)"
+                    }
+                    fileType={songFormData.audioType === 'direct' ? "audio" : "url"}
                     currentFile={songFormData.audioUrl}
                     currentUrl={songFormData.audioUrl}
                     onFileUpload={(url) => setSongFormData({ ...songFormData, audioUrl: url })}
                     onUrlChange={(url) => setSongFormData({ ...songFormData, audioUrl: url })}
-                    accept="audio/*"
+                    accept={songFormData.audioType === 'direct' ? "audio/*" : undefined}
                     maxSize={100}
                     showUrlOption={true}
+                    showFileUpload={songFormData.audioType === 'direct'}
                   />
                 </div>
               </div>
@@ -907,7 +942,7 @@ export default function RadioMusicAdminPage() {
                   onClick={() => {
                     setShowSongForm(false)
                     setEditingSong(null)
-                    setSongFormData({ title: '', title_ta: '', audioUrl: '', duration: '', singerId: '' })
+                    setSongFormData({ title: '', title_ta: '', audioUrl: '', audioType: 'direct', duration: '', singerId: '' })
                   }}
                   className="bg-gray-200 text-gray-700 hover:bg-gray-300"
                 >

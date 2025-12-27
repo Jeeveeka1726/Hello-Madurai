@@ -16,6 +16,7 @@ export async function PUT(
         title: body.title,
         title_ta: body.title_ta || null,
         audioUrl: body.audioUrl,
+        audioType: body.audioType || 'direct',
         duration: body.duration || null,
         singerId: body.singerId
       },

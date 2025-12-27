@@ -7,6 +7,7 @@ interface RadioSong {
   title: string
   title_ta: string | null
   audioUrl: string
+  audioType: string
   duration: string | null
   plays: number
   shares: number

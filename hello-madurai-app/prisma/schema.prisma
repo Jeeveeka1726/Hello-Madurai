@@ -500,7 +500,8 @@ model RadioSong {
   id        String     @id @default(cuid())
   title     String     // Song title
   title_ta  String?    // Tamil title (optional)
-  audioUrl  String     // Audio file URL
+  audioUrl  String     // Audio file URL or embeddable webpage URL
+  audioType String     @default("direct") // "direct" for audio files, "embed" for radio station webpages
   duration  String?    // Duration (e.g., "3:45")
   plays     Int        @default(0)
   shares    Int        @default(0)
