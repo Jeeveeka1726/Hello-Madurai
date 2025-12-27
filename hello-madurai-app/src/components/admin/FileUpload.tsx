@@ -69,6 +69,7 @@ export default function FileUpload({
   const [uploading, setUploading] = useState(false)
   const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file')
   const [urlInput, setUrlInput] = useState(currentUrl || '')
+  const [testingUrl, setTestingUrl] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const config = fileTypeConfig[fileType]
@@ -228,8 +229,68 @@ export default function FileUpload({
     handleFileChange(e.dataTransfer.files)
   }
 
-  const handleUrlSubmit = () => {
+  const testAudioUrl = async (url: string) => {
+    if (!url.trim()) return false
+
+    setTestingUrl(true)
+
+    return new Promise<boolean>((resolve) => {
+      const audio = new Audio()
+
+      const cleanup = () => {
+        audio.removeEventListener('canplay', onCanPlay)
+        audio.removeEventListener('error', onError)
+        audio.removeEventListener('loadstart', onLoadStart)
+        setTestingUrl(false)
+      }
+
+      const onCanPlay = () => {
+        console.log('✅ Audio URL test successful:', url)
+        toast.success('✅ Audio URL is valid and playable!')
+        cleanup()
+        resolve(true)
+      }
+
+      const onError = (e: Event) => {
+        console.error('❌ Audio URL test failed:', url, e)
+        toast.error('❌ Audio URL is not accessible or not a valid audio file')
+        cleanup()
+        resolve(false)
+      }
+
+      const onLoadStart = () => {
+        console.log('🔄 Testing audio URL:', url)
+      }
+
+      audio.addEventListener('canplay', onCanPlay)
+      audio.addEventListener('error', onError)
+      audio.addEventListener('loadstart', onLoadStart)
+
+      // Set a timeout to avoid hanging
+      setTimeout(() => {
+        if (testingUrl) {
+          console.warn('⏰ Audio URL test timeout:', url)
+          toast.warning('⏰ Audio URL test timed out - URL might be slow to load')
+          cleanup()
+          resolve(false)
+        }
+      }, 10000) // 10 second timeout
+
+      audio.src = url
+      audio.load()
+    })
+  }
+
+  const handleUrlSubmit = async () => {
     if (urlInput.trim()) {
+      // Test audio URLs before saving
+      if (fileType === 'audio') {
+        const isValid = await testAudioUrl(urlInput.trim())
+        if (!isValid) {
+          return // Don't save invalid URLs
+        }
+      }
+
       onUrlChange(urlInput.trim())
       toast.success('URL updated successfully!')
     }
@@ -372,10 +433,20 @@ export default function FileUpload({
               placeholder={`Enter ${config.label.toLowerCase()} URL...`}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
+            {fileType === 'audio' && (
+              <Button
+                type="button"
+                onClick={() => testAudioUrl(urlInput.trim())}
+                disabled={!urlInput.trim() || testingUrl}
+                variant="outline"
+              >
+                {testingUrl ? 'Testing...' : 'Test URL'}
+              </Button>
+            )}
             <Button
               type="button"
               onClick={handleUrlSubmit}
-              disabled={!urlInput.trim()}
+              disabled={!urlInput.trim() || testingUrl}
             >
               Set URL
             </Button>

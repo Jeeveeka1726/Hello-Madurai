@@ -34,6 +34,55 @@ interface RadioPlayerContextType {
 
 const RadioPlayerContext = createContext<RadioPlayerContextType | undefined>(undefined)
 
+// Utility function to validate and potentially fix audio URLs
+const validateAndFixAudioUrl = (url: string): string => {
+  if (!url) return url
+
+  console.log('🔗 Original URL:', url)
+
+  // Handle Google Drive links
+  if (url.includes('drive.google.com')) {
+    const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/)
+    if (fileIdMatch) {
+      const fileId = fileIdMatch[1]
+      const fixedUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
+      console.log('🔧 Fixed Google Drive URL:', fixedUrl)
+      return fixedUrl
+    }
+  }
+
+  // Handle Dropbox links
+  if (url.includes('dropbox.com') && !url.includes('dl=1')) {
+    const fixedUrl = url.replace('dl=0', 'dl=1').replace(/\?.*/, '') + '?dl=1'
+    console.log('🔧 Fixed Dropbox URL:', fixedUrl)
+    return fixedUrl
+  }
+
+  // Handle OneDrive links
+  if (url.includes('1drv.ms') || url.includes('onedrive.live.com')) {
+    if (!url.includes('download=1')) {
+      const fixedUrl = url + (url.includes('?') ? '&' : '?') + 'download=1'
+      console.log('🔧 Fixed OneDrive URL:', fixedUrl)
+      return fixedUrl
+    }
+  }
+
+  // Handle YouTube links (not directly playable, but we can detect them)
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    console.warn('⚠️ YouTube URLs cannot be played directly. Please use a direct audio file URL.')
+    return url
+  }
+
+  // Handle SoundCloud links (not directly playable)
+  if (url.includes('soundcloud.com')) {
+    console.warn('⚠️ SoundCloud URLs cannot be played directly. Please use a direct audio file URL.')
+    return url
+  }
+
+  console.log('✅ URL appears to be a direct link:', url)
+  return url
+}
+
 export function RadioPlayerProvider({ children }: { children: ReactNode }) {
   const [currentSong, setCurrentSong] = useState<RadioSong | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -111,10 +160,73 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
 
   const playSong = (song: RadioSong) => {
     if (audioRef.current) {
+      console.log('🎵 Playing song:', song.title, 'URL:', song.audioUrl)
       setCurrentSong(song)
-      audioRef.current.src = song.audioUrl
-      audioRef.current.play()
-      setIsPlaying(true)
+
+      // Clear any previous source and reset audio element
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+
+      // Validate and fix the audio URL
+      const fixedUrl = validateAndFixAudioUrl(song.audioUrl)
+
+      // Set new source
+      audioRef.current.src = fixedUrl
+
+      // Add error handling
+      const handleError = (e: Event) => {
+        console.error('❌ Audio playback error:', e)
+        console.error('❌ Audio URL that failed:', song.audioUrl)
+        console.error('❌ Audio element error:', audioRef.current?.error)
+        setIsPlaying(false)
+
+        // Try to provide more specific error information
+        if (audioRef.current?.error) {
+          const error = audioRef.current.error
+          let errorMessage = 'Unknown audio error'
+
+          switch (error.code) {
+            case MediaError.MEDIA_ERR_ABORTED:
+              errorMessage = 'Audio playback was aborted'
+              break
+            case MediaError.MEDIA_ERR_NETWORK:
+              errorMessage = 'Network error while loading audio'
+              break
+            case MediaError.MEDIA_ERR_DECODE:
+              errorMessage = 'Audio file is corrupted or unsupported format'
+              break
+            case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+              errorMessage = 'Audio format not supported or URL not accessible'
+              break
+          }
+
+          console.error('❌ Detailed error:', errorMessage)
+        }
+      }
+
+      const handleCanPlay = () => {
+        console.log('✅ Audio can play, starting playback')
+        audioRef.current?.play()
+          .then(() => {
+            console.log('✅ Audio playback started successfully')
+            setIsPlaying(true)
+          })
+          .catch(err => {
+            console.error('❌ Play promise rejected:', err)
+            setIsPlaying(false)
+          })
+      }
+
+      // Remove any existing event listeners
+      audioRef.current.removeEventListener('error', handleError)
+      audioRef.current.removeEventListener('canplay', handleCanPlay)
+
+      // Add new event listeners
+      audioRef.current.addEventListener('error', handleError)
+      audioRef.current.addEventListener('canplay', handleCanPlay)
+
+      // Load the audio
+      audioRef.current.load()
 
       // Track play count
       fetch(`/api/radio-songs/${song.id}/play`, { method: 'POST' })
