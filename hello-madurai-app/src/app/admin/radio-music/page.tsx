@@ -174,10 +174,17 @@ export default function RadioMusicAdminPage() {
   const fetchSongs = async () => {
     try {
       const res = await fetch('/api/admin/radio-songs')
+      if (!res.ok) {
+        console.error('Failed to fetch songs:', res.status, res.statusText)
+        setSongs([]) // Set empty array on error
+        return
+      }
       const data = await res.json()
-      setSongs(data)
+      // Ensure data is an array
+      setSongs(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error fetching songs:', error)
+      setSongs([]) // Set empty array on error
     }
   }
 
