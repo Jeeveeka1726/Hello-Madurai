@@ -920,14 +920,14 @@ export default function RadioMusicAdminPage() {
                         onChange={(e) => setSongFormData({ ...songFormData, audioType: e.target.value as 'direct' | 'embed' })}
                         className="mr-2"
                       />
-                      <span className="text-sm">Radio Station Webpage (Embed)</span>
+                      <span className="text-sm">Audio Stream (Radio/SoundCloud/etc.)</span>
                     </label>
                   </div>
 
                   <FileUpload
                     label={songFormData.audioType === 'direct'
                       ? "Audio File * (MP3, WAV, OGG, AAC, M4A, FLAC)"
-                      : "Radio Station URL * (e.g., https://www.tamilradios.com/ilayaraja-fm)"
+                      : "Audio Stream URL * (Radio stations, SoundCloud, etc.)"
                     }
                     fileType={songFormData.audioType === 'direct' ? "audio" : "url"}
                     currentFile={songFormData.audioUrl}

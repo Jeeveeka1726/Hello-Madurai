@@ -270,7 +270,7 @@ export default function FileUpload({
         } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
           errorMessage = '❌ YouTube URLs cannot be played directly. Please download the audio file and upload it, or use a direct audio file URL.'
         } else if (url.includes('soundcloud.com')) {
-          errorMessage = '❌ SoundCloud URLs cannot be played directly. Please use a direct audio file URL.'
+          errorMessage = '❌ SoundCloud URLs cannot be played directly as direct audio. Please use "Radio Station Webpage (Embed)" option instead.'
         } else if (!url.match(/\.(mp3|wav|ogg|aac|m4a|flac|m3u8|pls)(\?.*)?$/i)) {
           errorMessage = '❌ URL does not appear to be a direct audio file. Please use URLs ending with .mp3, .wav, .ogg, .aac, .m4a, .flac, .m3u8, or .pls'
         }
@@ -467,20 +467,20 @@ export default function FileUpload({
               </ul>
               <p className="font-medium text-red-700 mt-2">❌ Not supported:</p>
               <ul className="list-disc list-inside mt-1 space-y-1">
-                <li>YouTube, SoundCloud, Spotify links</li>
-                <li>Radio station webpages (use direct stream URLs instead)</li>
+                <li>YouTube, Spotify links</li>
+                <li>SoundCloud, Radio station webpages (use "Embed" option instead)</li>
               </ul>
             </div>
           )}
 
           {fileType === 'url' && (
             <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-md">
-              <p className="font-medium text-blue-700">🎵 Radio Station Embedding:</p>
+              <p className="font-medium text-blue-700">🎵 Audio Stream Embedding:</p>
               <ul className="list-disc list-inside mt-1 space-y-1">
-                <li>Enter any radio station webpage URL</li>
-                <li>Examples: tamilradios.com, radio.com, tunein.com</li>
-                <li>The webpage will be embedded in an iframe for users</li>
-                <li>No audio validation needed - any webpage URL works</li>
+                <li>Enter radio station or audio platform URLs</li>
+                <li>Examples: tamilradios.com, soundcloud.com, radio.com, tunein.com</li>
+                <li>Audio streams will be extracted and played directly</li>
+                <li>Works with SoundCloud tracks, radio stations, and streaming platforms</li>
               </ul>
             </div>
           )}
