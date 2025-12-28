@@ -234,14 +234,7 @@ export default function GlobalRadioPlayer() {
               </div>
             ) : (
               <div>
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-white font-medium">🎵 Live Radio Stream</span>
-                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                </div>
-                <div className="text-xs text-white/70 text-center mb-2">
-                  {isPlaying ? 'Streaming live radio...' : 'Radio stream paused'}
-                </div>
+                {/* Radio stream status removed as it's already visible in the right corner */}
               </div>
             )}
             <div className="text-xs text-white/60 text-center border-t border-white/10 pt-2">
