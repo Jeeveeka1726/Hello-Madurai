@@ -801,11 +801,7 @@ function DigitalFMPageContent() {
               ? 'ரேடியோ, செய்தி, இசை, லோக்கல் தகவல்கள் அனைத்தும்'
               : 'Radio, News, Music, Local Information Everything'}
           </p>
-          <p className="mt-1 text-sm text-gray-500" suppressHydrationWarning>
-            {language === 'ta'
-              ? 'மதுரையின் வரலாறு, விவசாயம், தொழில் மற்றும் கதைகள்'
-              : 'Madurai – History, Agriculture, Industry & Stories'}
-          </p>
+
         </div>
 
         {!selectedSinger ? (
