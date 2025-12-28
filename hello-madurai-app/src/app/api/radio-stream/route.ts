@@ -148,98 +148,22 @@ async function handleSoundCloudUrl(soundcloudUrl: string) {
   try {
     console.log('🎵 Processing SoundCloud URL:', soundcloudUrl)
 
-    // Fetch the SoundCloud page
-    const response = await fetch(soundcloudUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'DNT': '1',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-      }
+    // For SoundCloud, we'll use the embed widget approach since direct API streams require auth
+    // Convert the regular SoundCloud URL to an embed widget URL
+    const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(soundcloudUrl)}&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false`
+
+    console.log('🎵 Generated SoundCloud embed URL:', embedUrl)
+
+    // Return the embed URL as a special type that the frontend can handle
+    return NextResponse.json({
+      success: true,
+      embedUrl,
+      platform: 'soundcloud',
+      requiresEmbed: true,
+      message: 'SoundCloud requires embed widget for playback'
     })
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch SoundCloud page: ${response.status}`)
-    }
 
-    const html = await response.text()
-    console.log('📄 Fetched SoundCloud HTML content, length:', html.length)
-
-    // Extract SoundCloud stream URLs
-    const streamUrls: string[] = []
-
-    // Look for SoundCloud-specific patterns
-    const patterns = [
-      // SoundCloud progressive stream URLs
-      /https?:\/\/[^"'\s]*soundcloud[^"'\s]*\.mp3[^"'\s]*/gi,
-      // SoundCloud media URLs
-      /https?:\/\/[^"'\s]*sndcdn[^"'\s]*\.mp3[^"'\s]*/gi,
-      // SoundCloud API stream URLs
-      /https?:\/\/api[^"'\s]*soundcloud[^"'\s]*\/stream[^"'\s]*/gi,
-      // General audio stream patterns
-      /https?:\/\/[^"'\s]+\.(?:mp3|aac|m4a)/gi,
-    ]
-
-    patterns.forEach(pattern => {
-      const matches = html.match(pattern)
-      if (matches) {
-        streamUrls.push(...matches)
-      }
-    })
-
-    // Look for SoundCloud widget/embed URLs
-    const widgetMatches = html.match(/https?:\/\/w\.soundcloud\.com\/player\/[^"'\s]+/gi)
-    if (widgetMatches) {
-      streamUrls.push(...widgetMatches)
-    }
-
-    // Look for JSON data containing stream URLs
-    const jsonMatches = html.match(/"progressive":\s*\[([^\]]+)\]/gi)
-    if (jsonMatches) {
-      jsonMatches.forEach(match => {
-        const urlMatches = match.match(/"url":"([^"]+)"/gi)
-        if (urlMatches) {
-          urlMatches.forEach(urlMatch => {
-            const url = urlMatch.match(/"url":"([^"]+)"/)?.[1]
-            if (url) {
-              // Decode the URL
-              const decodedUrl = url.replace(/\\u0026/g, '&').replace(/\\/g, '')
-              streamUrls.push(decodedUrl)
-            }
-          })
-        }
-      })
-    }
-
-    // Remove duplicates and filter valid URLs
-    const uniqueUrls = [...new Set(streamUrls)]
-      .filter(url => url && url.startsWith('http'))
-      .filter(url => !url.includes('.js') && !url.includes('.css') && !url.includes('.png') && !url.includes('.jpg'))
-
-    console.log('🎵 Found SoundCloud stream URLs:', uniqueUrls)
-
-    if (uniqueUrls.length > 0) {
-      const streamUrl = uniqueUrls[0]
-      console.log('✅ Using SoundCloud stream URL:', streamUrl)
-
-      return NextResponse.json({
-        success: true,
-        streamUrl,
-        allUrls: uniqueUrls,
-        proxyUrl: `/api/radio-proxy?url=${encodeURIComponent(streamUrl)}`,
-        platform: 'soundcloud'
-      })
-    } else {
-      console.log('❌ No SoundCloud stream URLs found')
-      return NextResponse.json({
-        error: 'No SoundCloud audio stream found',
-        platform: 'soundcloud',
-        html: html.substring(0, 1000) + '...'
-      }, { status: 404 })
-    }
 
   } catch (error) {
     console.error('❌ Error processing SoundCloud URL:', error)

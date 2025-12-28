@@ -124,12 +124,14 @@ export default function GlobalRadioPlayer() {
             </div>
           )}
 
-          {/* Embedded Radio Info (Desktop) */}
+          {/* Embedded Audio Info (Desktop) */}
           {currentSong.audioType === 'embed' && (
             <div className="hidden md:flex items-center gap-3 flex-1 max-w-md">
               <div className="flex-1 text-center">
                 <span className="text-xs text-white/80">
-                  🎵 Live Radio Station • Playing
+                  {(currentSong as any).embedUrl
+                    ? '🎵 SoundCloud Player • Ready'
+                    : '🎵 Live Radio Station • Playing'}
                 </span>
               </div>
             </div>
@@ -193,11 +195,13 @@ export default function GlobalRadioPlayer() {
           </div>
         )}
 
-        {/* Embedded Radio Info (Mobile) */}
+        {/* Embedded Audio Info (Mobile) */}
         {currentSong.audioType === 'embed' && (
           <div className="md:hidden mt-2 text-center">
             <span className="text-xs text-white/80">
-              🎵 Live Radio Station • Click play button on the radio player below
+              {(currentSong as any).embedUrl
+                ? '🎵 SoundCloud Player • Use player below'
+                : '🎵 Live Radio Station • Click play button on the radio player below'}
             </span>
           </div>
         )}
@@ -205,16 +209,43 @@ export default function GlobalRadioPlayer() {
         {/* Live Radio Stream Player */}
         {currentSong.audioType === 'embed' && (
           <div className="mt-3 bg-gradient-to-r from-red-600/20 to-orange-600/20 rounded-lg p-3 border border-white/10">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-white font-medium">🎵 Live Radio Stream</span>
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-            </div>
-            <div className="text-xs text-white/70 text-center mb-2">
-              {isPlaying ? 'Streaming live radio...' : 'Radio stream paused'}
-            </div>
+            {/* Check if this is a SoundCloud embed */}
+            {(currentSong as any).embedUrl ? (
+              <div>
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-white font-medium">🎵 SoundCloud Player</span>
+                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                </div>
+                <div className="bg-white/10 rounded-lg p-2">
+                  <iframe
+                    width="100%"
+                    height="166"
+                    scrolling="no"
+                    frameBorder="no"
+                    allow="autoplay"
+                    src={(currentSong as any).embedUrl}
+                    className="rounded-lg"
+                  ></iframe>
+                </div>
+                <div className="text-xs text-white/70 text-center mt-2">
+                  Use the play button in the SoundCloud player above
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-white font-medium">🎵 Live Radio Stream</span>
+                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                </div>
+                <div className="text-xs text-white/70 text-center mb-2">
+                  {isPlaying ? 'Streaming live radio...' : 'Radio stream paused'}
+                </div>
+              </div>
+            )}
             <div className="text-xs text-white/60 text-center border-t border-white/10 pt-2">
-              External Radio links Only | Rights Belong to Respective Owners,<br />
+              External Audio links Only | Rights Belong to Respective Owners,<br />
               Original Content © Hello Madurai
             </div>
           </div>
