@@ -117,8 +117,8 @@ function DirectoryPageContent() {
     const fetchData = async () => {
       try {
         const [categoriesRes, businessesRes] = await Promise.all([
-          fetch('/api/directory-categories'),
-          fetch('/api/directory')
+          fetch('/api/directory-categories', { cache: 'no-store' }),
+          fetch('/api/directory', { cache: 'no-store' })
         ])
 
         if (categoriesRes.ok) {

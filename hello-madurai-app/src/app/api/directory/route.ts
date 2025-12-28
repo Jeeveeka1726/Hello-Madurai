@@ -15,7 +15,13 @@ export async function GET() {
       }
     })
 
-    return NextResponse.json(businesses || [])
+    return NextResponse.json(businesses || [], {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    })
   } catch (error) {
     console.error('Error fetching businesses:', error)
     return NextResponse.json(
