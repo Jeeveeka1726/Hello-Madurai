@@ -60,10 +60,10 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
       const embedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
       if (embedUrl) {
         return (
-          <div className="aspect-video w-full mb-6">
+          <div className="aspect-video w-full mb-4 sm:mb-6 -mx-3 sm:mx-0">
             <iframe
               src={embedUrl}
-              className="w-full h-full rounded-lg"
+              className="w-full h-full sm:rounded-lg"
               allowFullScreen
               title="Business Video"
             />
@@ -101,12 +101,14 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
         <div className="p-3 sm:p-6">
           {/* Main Image */}
           {business.mainImage && (
-            <div className="mb-4 sm:mb-6">
-              <img
-                src={business.mainImage}
-                alt={business.name}
-                className="w-full h-48 sm:h-64 object-cover rounded-lg"
-              />
+            <div className="mb-4 sm:mb-6 -mx-3 sm:mx-0">
+              <div className="aspect-video w-full">
+                <img
+                  src={business.mainImage}
+                  alt={business.name}
+                  className="w-full h-full object-cover sm:rounded-lg"
+                />
+              </div>
             </div>
           )}
 

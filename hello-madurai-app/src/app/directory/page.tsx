@@ -757,7 +757,7 @@ function DirectoryPageContent() {
               <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
                 {filteredBusinesses.map((business) => (
                   <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
-                    <CardContent className="p-6">
+                    <CardContent className="p-6 directory-card-content">
                       {/* Category Badge */}
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
@@ -785,10 +785,10 @@ function DirectoryPageContent() {
 
                       {/* Main Business Image/Video */}
                       {(business.mainImage || business.mainVideoUrl) && (
-                        <div className="mb-4">
+                        <div className="mb-4 -mx-6 sm:mx-0 sm:rounded-lg overflow-hidden directory-video-container">
                           {playingVideo === business.id && business.mainVideoUrl ? (
                             // Show video player when playing - Responsive 16:9 aspect ratio
-                            <div className="relative w-full aspect-video overflow-hidden rounded-lg bg-black">
+                            <div className="relative w-full aspect-video bg-black sm:rounded-lg overflow-hidden">
                               {(() => {
                                 const embedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
                                 if (embedUrl) {
@@ -845,7 +845,7 @@ function DirectoryPageContent() {
                                   <img
                                     src={business.mainImage}
                                     alt={business.name}
-                                    className="w-full h-full object-cover rounded-lg"
+                                    className="w-full h-full object-cover sm:rounded-lg"
                                     loading="lazy"
                                   />
                                 </div>
@@ -857,7 +857,7 @@ function DirectoryPageContent() {
                                     return (
                                       <div className="aspect-video w-full">
                                         <div
-                                          className="relative w-full h-full bg-gray-900 rounded-lg overflow-hidden cursor-pointer group"
+                                          className="relative w-full h-full bg-gray-900 sm:rounded-lg overflow-hidden cursor-pointer group"
                                           onClick={() => handleVideoPlay(business.id)}
                                         >
                                         <img

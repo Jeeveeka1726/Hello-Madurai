@@ -552,6 +552,82 @@ p {
   border-radius: 8px !important;
 }
 
+/* Mobile video fixes - ensure no blank spaces */
+@media (max-width: 640px) {
+  /* Directory videos - full width on mobile */
+  .aspect-video {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16/9 !important;
+  }
+
+  /* Remove any potential padding/margin issues on mobile videos */
+  .aspect-video iframe,
+  .aspect-video video,
+  .aspect-video img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+    border-radius: 0 !important;
+  }
+
+  /* Ensure video containers have no extra spacing */
+  .aspect-video > * {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+/* Tablet and larger - restore rounded corners */
+@media (min-width: 641px) {
+  .aspect-video iframe,
+  .aspect-video video,
+  .aspect-video img {
+    border-radius: 0.5rem !important;
+  }
+}
+
+/* Directory card mobile optimizations */
+@media (max-width: 640px) {
+  /* Remove card padding on mobile for full-width videos */
+  .directory-card-content {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Restore padding for text content */
+  .directory-card-content > *:not(.aspect-video):not([class*="aspect-video"]) {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+
+  /* Ensure video containers extend to card edges */
+  .directory-video-container {
+    margin-left: -1.5rem !important;
+    margin-right: -1.5rem !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* iPhone specific fixes */
+@media (max-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
+  .aspect-video {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
+/* Android specific fixes */
+@media (max-width: 640px) and (orientation: portrait) {
+  .aspect-video iframe {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 /* Mobile-first responsive typography */
 /* REMOVED: Global .prose white color rules - these were breaking admin editor */
 /* Typography rules are now only in .news-content and .event-description sections below */
