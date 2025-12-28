@@ -163,6 +163,12 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
     audio.addEventListener('pause', handlePause)
 
     return () => {
+      // Always stop any streams on unmount (don't check song type to avoid dependency issues)
+      console.log('🛑 Component unmounting - stopping all audio streams')
+      audio.pause()
+      audio.src = ''
+      audio.load()
+
       audio.removeEventListener('timeupdate', handleTimeUpdate)
       audio.removeEventListener('durationchange', handleDurationChange)
       audio.removeEventListener('ended', handleEnded)
@@ -174,6 +180,15 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
   const playSong = async (song: RadioSong) => {
     console.log('🎵 Playing song:', song.title, 'URL:', song.audioUrl, 'Type:', song.audioType)
     console.log('🔍 Full song object:', JSON.stringify(song, null, 2))
+
+    // Stop any currently playing embedded radio before starting new song
+    if (currentSong?.audioType === 'embed' && audioRef.current) {
+      console.log('🛑 Stopping previous embedded radio stream')
+      audioRef.current.pause()
+      audioRef.current.src = ''
+      audioRef.current.load()
+    }
+
     setCurrentSong(song)
 
     // Handle embedded radio stations
@@ -197,76 +212,34 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
 
           // Play the extracted stream URL through the audio player
           if (audioRef.current) {
+            console.log('🎵 Setting up radio stream playback')
+
             // Clear any previous source and reset audio element
             audioRef.current.pause()
             audioRef.current.currentTime = 0
 
-            let currentAttempt = 0
-            const streamUrls = [
-              data.streamUrl,      // Try direct URL first
-              data.proxyUrl        // Try proxy URL as fallback
-            ].filter(Boolean) // Remove any undefined URLs
+            // Try direct stream URL first
+            const streamUrl = data.streamUrl
+            console.log('🎵 Loading radio stream:', streamUrl)
 
-            const tryNextStream = () => {
-              if (currentAttempt >= streamUrls.length) {
-                console.error('❌ All stream URLs failed')
-                setIsPlaying(false)
-                return
-              }
+            // Simple approach - just set the source and play
+            audioRef.current.src = streamUrl
+            audioRef.current.load()
 
-              const currentUrl = streamUrls[currentAttempt]
-              console.log(`🎵 Attempting stream ${currentAttempt + 1}/${streamUrls.length}:`, currentUrl)
-
-              if (!audioRef.current) return
-
-              // Add error handling for the audio element
-              const handleStreamError = (e: Event) => {
-                console.error(`❌ Stream ${currentAttempt + 1} failed:`, e)
-                console.error('❌ Failed URL:', currentUrl)
-
-                // Remove listeners before trying next
-                audioRef.current?.removeEventListener('error', handleStreamError)
-                audioRef.current?.removeEventListener('canplay', handleStreamCanPlay)
-                audioRef.current?.removeEventListener('loadstart', handleLoadStart)
-
-                currentAttempt++
-                setTimeout(tryNextStream, 1000) // Wait 1 second before trying next
-              }
-
-              const handleStreamCanPlay = () => {
-                console.log(`✅ Stream ${currentAttempt + 1} can play, attempting to start...`)
-                audioRef.current?.play()
+            // Wait a moment for the stream to load, then play
+            setTimeout(() => {
+              if (audioRef.current) {
+                audioRef.current.play()
                   .then(() => {
-                    console.log('✅ Radio stream playback started successfully')
+                    console.log('✅ Radio stream started successfully')
                     setIsPlaying(true)
                   })
                   .catch(err => {
-                    console.error('❌ Radio stream play promise rejected:', err)
-                    handleStreamError(err)
+                    console.error('❌ Radio stream failed to start:', err)
+                    setIsPlaying(false)
                   })
               }
-
-              const handleLoadStart = () => {
-                console.log(`🔄 Loading stream ${currentAttempt + 1}...`)
-              }
-
-              // Remove any existing event listeners
-              audioRef.current.removeEventListener('error', handleStreamError)
-              audioRef.current.removeEventListener('canplay', handleStreamCanPlay)
-              audioRef.current.removeEventListener('loadstart', handleLoadStart)
-
-              // Add new event listeners
-              audioRef.current.addEventListener('error', handleStreamError)
-              audioRef.current.addEventListener('canplay', handleStreamCanPlay)
-              audioRef.current.addEventListener('loadstart', handleLoadStart)
-
-              // Set the source and load
-              audioRef.current.src = currentUrl
-              audioRef.current.load()
-            }
-
-            // Start trying streams
-            tryNextStream()
+            }, 1000)
           }
         } else {
           console.error('❌ Failed to extract stream URL:', data.error)
@@ -357,8 +330,18 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
   }
 
   const pauseSong = () => {
+    console.log('⏸️ pauseSong called for:', currentSong?.audioType)
+
     if (audioRef.current) {
       audioRef.current.pause()
+
+      // For embedded radio, also clear the source to fully stop the stream
+      if (currentSong?.audioType === 'embed') {
+        console.log('⏸️ Stopping embedded radio stream')
+        audioRef.current.src = ''
+        audioRef.current.load()
+      }
+
       setIsPlaying(false)
     }
   }
@@ -374,8 +357,13 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
     // Handle embedded radio stations
     if (currentSong?.audioType === 'embed') {
       if (isPlaying) {
-        console.log('⏸️ Pausing embedded radio')
-        // "Pause" embedded radio by setting isPlaying to false
+        console.log('⏸️ Pausing embedded radio - stopping audio')
+        // Actually stop the audio element
+        if (audioRef.current) {
+          audioRef.current.pause()
+          audioRef.current.src = '' // Clear the source to stop the stream
+          audioRef.current.load() // Reset the audio element
+        }
         setIsPlaying(false)
       } else {
         console.log('▶️ Resuming embedded radio - calling playSong to restart stream')
@@ -402,6 +390,19 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const handleSetCurrentSong = (song: RadioSong | null) => {
+    // If clearing the current song and it's embedded radio, stop the stream
+    if (!song && currentSong?.audioType === 'embed' && audioRef.current) {
+      console.log('🛑 Clearing embedded radio stream')
+      audioRef.current.pause()
+      audioRef.current.src = ''
+      audioRef.current.load()
+      setIsPlaying(false)
+    }
+
+    setCurrentSong(song)
+  }
+
   return (
     <RadioPlayerContext.Provider
       value={{
@@ -415,7 +416,7 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
         resumeSong,
         togglePlayPause,
         seekTo,
-        setCurrentSong,
+        setCurrentSong: handleSetCurrentSong,
       }}
     >
       {children}
