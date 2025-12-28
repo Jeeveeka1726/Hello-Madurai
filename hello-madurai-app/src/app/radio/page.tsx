@@ -794,9 +794,14 @@ function DigitalFMPageContent() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl" suppressHydrationWarning>
-            {language === 'ta' ? 'டிஜிட்டல் எஃப்.எம்' : 'Digital FM'}
+            {language === 'ta' ? 'டிஜிட்டல் எஃப்.எம் & ரேடியோ' : 'Digital Fm & Radio'}
           </h1>
           <p className="mt-2 text-lg text-gray-600" suppressHydrationWarning>
+            {language === 'ta'
+              ? 'ரேடியோ, செய்தி, இசை, லோக்கல் தகவல்கள் அனைத்தும்'
+              : 'Radio, News, Music, Local Information Everything'}
+          </p>
+          <p className="mt-1 text-sm text-gray-500" suppressHydrationWarning>
             {language === 'ta'
               ? 'மதுரையின் வரலாறு, விவசாயம், தொழில் மற்றும் கதைகள்'
               : 'Madurai – History, Agriculture, Industry & Stories'}
@@ -1272,7 +1277,7 @@ function DigitalFMPageWrapper() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Digital FM...</p>
+          <p className="mt-4 text-gray-600">Loading Digital FM & Radio...</p>
         </div>
       </div>
     }>
