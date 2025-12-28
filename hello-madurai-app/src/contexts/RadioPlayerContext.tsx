@@ -206,52 +206,40 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
 
         const data = await response.json()
 
-        if (data.success) {
-          // Handle SoundCloud embed widgets
-          if (data.requiresEmbed && data.embedUrl) {
-            console.log('🎵 SoundCloud requires embed widget:', data.embedUrl)
-            // For SoundCloud, we'll show an embedded iframe player
-            setCurrentSong({ ...song, embedUrl: data.embedUrl })
-            setIsPlaying(true)
-            return
-          }
+        if (data.success && data.streamUrl) {
+          console.log('✅ Found stream URL:', data.streamUrl)
+          console.log('🔄 Proxy URL available:', data.proxyUrl)
 
-          // Handle regular stream URLs
-          if (data.streamUrl) {
-            console.log('✅ Found stream URL:', data.streamUrl)
-            console.log('🔄 Proxy URL available:', data.proxyUrl)
+          // Play the extracted stream URL through the audio player
+          if (audioRef.current) {
+            console.log('🎵 Setting up radio stream playback')
 
-            // Play the extracted stream URL through the audio player
-            if (audioRef.current) {
-              console.log('🎵 Setting up radio stream playback')
+            // Clear any previous source and reset audio element
+            audioRef.current.pause()
+            audioRef.current.currentTime = 0
 
-              // Clear any previous source and reset audio element
-              audioRef.current.pause()
-              audioRef.current.currentTime = 0
+            // Try direct stream URL first
+            const streamUrl = data.streamUrl
+            console.log('🎵 Loading radio stream:', streamUrl)
 
-              // Try direct stream URL first
-              const streamUrl = data.streamUrl
-              console.log('🎵 Loading radio stream:', streamUrl)
+            // Simple approach - just set the source and play
+            audioRef.current.src = streamUrl
+            audioRef.current.load()
 
-              // Simple approach - just set the source and play
-              audioRef.current.src = streamUrl
-              audioRef.current.load()
-
-              // Wait a moment for the stream to load, then play
-              setTimeout(() => {
-                if (audioRef.current) {
-                  audioRef.current.play()
-                    .then(() => {
-                      console.log('✅ Radio stream started successfully')
-                      setIsPlaying(true)
-                    })
-                    .catch(err => {
-                      console.error('❌ Radio stream failed to start:', err)
-                      setIsPlaying(false)
-                    })
-                }
-              }, 1000)
-            }
+            // Wait a moment for the stream to load, then play
+            setTimeout(() => {
+              if (audioRef.current) {
+                audioRef.current.play()
+                  .then(() => {
+                    console.log('✅ Radio stream started successfully')
+                    setIsPlaying(true)
+                  })
+                  .catch(err => {
+                    console.error('❌ Radio stream failed to start:', err)
+                    setIsPlaying(false)
+                  })
+              }
+            }, 1000)
           }
         } else {
           console.error('❌ Failed to extract stream URL:', data.error)

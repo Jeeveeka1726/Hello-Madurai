@@ -148,20 +148,87 @@ async function handleSoundCloudUrl(soundcloudUrl: string) {
   try {
     console.log('🎵 Processing SoundCloud URL:', soundcloudUrl)
 
-    // For SoundCloud, we'll use the embed widget approach since direct API streams require auth
-    // Convert the regular SoundCloud URL to an embed widget URL
-    const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(soundcloudUrl)}&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false`
+    // Try to extract track ID from the URL
+    const trackMatch = soundcloudUrl.match(/soundcloud\.com\/([^\/]+)\/([^\/\?]+)/)
+    if (!trackMatch) {
+      throw new Error('Invalid SoundCloud URL format')
+    }
 
-    console.log('🎵 Generated SoundCloud embed URL:', embedUrl)
+    const [, username, trackSlug] = trackMatch
+    console.log('🎵 Extracted SoundCloud info:', { username, trackSlug })
 
-    // Return the embed URL as a special type that the frontend can handle
-    return NextResponse.json({
-      success: true,
-      embedUrl,
-      platform: 'soundcloud',
-      requiresEmbed: true,
-      message: 'SoundCloud requires embed widget for playback'
+    // Fetch the SoundCloud page to get the track data
+    const response = await fetch(soundcloudUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+      }
     })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch SoundCloud page: ${response.status}`)
+    }
+
+    const html = await response.text()
+    console.log('📄 Fetched SoundCloud HTML content, length:', html.length)
+
+    // Look for the client_id in the page (needed for SoundCloud API)
+    const clientIdMatch = html.match(/client_id["\s]*[:=]["\s]*([a-zA-Z0-9]+)/)
+    if (!clientIdMatch) {
+      console.log('❌ Could not find SoundCloud client_id')
+      return NextResponse.json({
+        error: 'Could not extract SoundCloud client_id',
+        platform: 'soundcloud'
+      }, { status: 404 })
+    }
+
+    const clientId = clientIdMatch[1]
+    console.log('🔑 Found SoundCloud client_id:', clientId.substring(0, 8) + '...')
+
+    // Look for track data in the page
+    const trackDataMatch = html.match(/"permalink_url":"[^"]*soundcloud\.com\/[^\/]+\/[^"]*","id":(\d+)/)
+    if (!trackDataMatch) {
+      console.log('❌ Could not find track ID in page')
+      return NextResponse.json({
+        error: 'Could not extract track ID from SoundCloud page',
+        platform: 'soundcloud'
+      }, { status: 404 })
+    }
+
+    const trackId = trackDataMatch[1]
+    console.log('🎵 Found track ID:', trackId)
+
+    // Try to get stream URL using SoundCloud's public API
+    const apiUrl = `https://api.soundcloud.com/tracks/${trackId}/stream?client_id=${clientId}`
+    console.log('🔗 Trying SoundCloud API URL:', apiUrl)
+
+    // Test if the stream URL works
+    try {
+      const streamResponse = await fetch(apiUrl, { method: 'HEAD' })
+      if (streamResponse.ok || streamResponse.status === 302) {
+        console.log('✅ SoundCloud stream URL is accessible')
+        return NextResponse.json({
+          success: true,
+          streamUrl: apiUrl,
+          platform: 'soundcloud',
+          trackId: trackId
+        })
+      }
+    } catch (streamError) {
+      console.log('⚠️ Direct stream URL failed, trying alternative approach')
+    }
+
+    // If direct stream doesn't work, return error
+    return NextResponse.json({
+      error: 'SoundCloud stream not accessible - may require authentication',
+      platform: 'soundcloud',
+      trackId: trackId
+    }, { status: 404 })
 
 
 

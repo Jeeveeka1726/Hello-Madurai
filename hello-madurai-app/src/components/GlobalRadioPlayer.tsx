@@ -129,9 +129,7 @@ export default function GlobalRadioPlayer() {
             <div className="hidden md:flex items-center gap-3 flex-1 max-w-md">
               <div className="flex-1 text-center">
                 <span className="text-xs text-white/80">
-                  {(currentSong as any).embedUrl
-                    ? '🎵 SoundCloud Player • Ready'
-                    : '🎵 Live Radio Station • Playing'}
+                  🎵 Live Audio Stream • Playing
                 </span>
               </div>
             </div>
@@ -199,45 +197,15 @@ export default function GlobalRadioPlayer() {
         {currentSong.audioType === 'embed' && (
           <div className="md:hidden mt-2 text-center">
             <span className="text-xs text-white/80">
-              {(currentSong as any).embedUrl
-                ? '🎵 SoundCloud Player • Use player below'
-                : '🎵 Live Radio Station • Click play button on the radio player below'}
+              🎵 Live Audio Stream • Streaming
             </span>
           </div>
         )}
 
-        {/* Live Radio Stream Player */}
+        {/* Live Audio Stream Player */}
         {currentSong.audioType === 'embed' && (
           <div className="mt-3 bg-gradient-to-r from-red-600/20 to-orange-600/20 rounded-lg p-3 border border-white/10">
-            {/* Check if this is a SoundCloud embed */}
-            {(currentSong as any).embedUrl ? (
-              <div>
-                <div className="flex items-center justify-center gap-2 mb-3">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-white font-medium">🎵 SoundCloud Player</span>
-                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                </div>
-                <div className="bg-white/10 rounded-lg p-2">
-                  <iframe
-                    width="100%"
-                    height="166"
-                    scrolling="no"
-                    frameBorder="no"
-                    allow="autoplay"
-                    src={(currentSong as any).embedUrl}
-                    className="rounded-lg"
-                  ></iframe>
-                </div>
-                <div className="text-xs text-white/70 text-center mt-2">
-                  Use the play button in the SoundCloud player above
-                </div>
-              </div>
-            ) : (
-              <div>
-                {/* Radio stream status removed as it's already visible in the right corner */}
-              </div>
-            )}
-            <div className="text-xs text-white/60 text-center border-t border-white/10 pt-2">
+            <div className="text-xs text-white/60 text-center">
               External Audio links Only | Rights Belong to Respective Owners,<br />
               Original Content © Hello Madurai
             </div>
