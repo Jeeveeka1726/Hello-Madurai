@@ -70,6 +70,17 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Look for source elements inside audio tags (more common pattern)
+    const sourceSrcMatches = html.match(/<source[^>]+src=["']([^"']+)["']/gi)
+    if (sourceSrcMatches) {
+      sourceSrcMatches.forEach(match => {
+        const srcMatch = match.match(/src=["']([^"']+)["']/)
+        if (srcMatch && srcMatch[1]) {
+          streamUrls.push(srcMatch[1])
+        }
+      })
+    }
+
     // Look for JavaScript variables that might contain stream URLs
     const jsStreamMatches = html.match(/(?:stream|audio|radio)(?:Url|URL|_url)\s*[:=]\s*["']([^"']+)["']/gi)
     if (jsStreamMatches) {

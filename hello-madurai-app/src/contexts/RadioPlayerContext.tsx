@@ -206,10 +206,10 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
 
         if (!response.ok) {
           console.error('❌ API Error:', response.status, response.statusText)
-          // Fallback: For SoundCloud and other embeds that can't be extracted, show a message
+          // Fallback: For SoundCloud and other embeds that can't be extracted
           if (song.audioUrl.includes('soundcloud.com')) {
-            console.log('🎵 SoundCloud link detected - showing user message')
-            alert('Please visit the SoundCloud link directly to play this audio:\n\n' + song.audioUrl)
+            console.log('🎵 SoundCloud link detected - opening in new tab')
+            window.open(song.audioUrl, '_blank')
           }
           setIsPlaying(false)
           return
@@ -256,8 +256,8 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
           console.error('❌ Failed to extract stream URL:', data.error)
           // Fallback for SoundCloud
           if (song.audioUrl.includes('soundcloud.com')) {
-            console.log('🎵 SoundCloud extraction failed - showing user message')
-            alert('Please visit the SoundCloud link directly to play this audio:\n\n' + song.audioUrl)
+            console.log('🎵 SoundCloud extraction failed - opening in new tab')
+            window.open(song.audioUrl, '_blank')
           }
           setIsPlaying(false)
         }
@@ -265,8 +265,8 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
         console.error('❌ Error extracting radio stream:', error)
         // Fallback for SoundCloud
         if (song.audioUrl.includes('soundcloud.com')) {
-          console.log('🎵 SoundCloud API error - showing user message')
-          alert('Please visit the SoundCloud link directly to play this audio:\n\n' + song.audioUrl)
+          console.log('🎵 SoundCloud API error - opening in new tab')
+          window.open(song.audioUrl, '_blank')
         }
         setIsPlaying(false)
       }
