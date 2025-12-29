@@ -44,6 +44,7 @@ export async function PUT(
         slug: slug || undefined,
         imageUrl: body.imageUrl || null,
         featured: body.featured !== undefined ? body.featured : false,
+        orderNumber: body.orderNumber !== undefined ? body.orderNumber : undefined,
         categoryId: body.categoryId
       },
       include: {

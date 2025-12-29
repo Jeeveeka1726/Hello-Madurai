@@ -202,12 +202,7 @@ export default function GlobalRadioPlayer() {
           </div>
         )}
 
-        {/* Live Audio Stream Player */}
-        {currentSong.audioType === 'embed' && (
-          <div className="mt-3 bg-gradient-to-r from-red-600/20 to-orange-600/20 rounded-lg p-3 border border-white/10">
-            {/* Copyright text removed as requested */}
-          </div>
-        )}
+
       </div>
     </div>
   )

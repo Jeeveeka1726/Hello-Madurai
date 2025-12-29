@@ -10,8 +10,9 @@ export async function GET(request: NextRequest) {
     const singers = await prisma.singer.findMany({
       where: categoryId ? { categoryId } : undefined,
       orderBy: [
-        { featured: 'desc' },  // Featured singers first
-        { updatedAt: 'desc' }  // Then latest updated first
+        { featured: 'desc' },    // Featured singers first
+        { orderNumber: 'asc' },  // Then by manual order
+        { updatedAt: 'desc' }    // Finally by latest updated
       ],
       include: {
         category: true,
@@ -59,6 +60,7 @@ export async function POST(request: NextRequest) {
         slug: uniqueSlug,
         imageUrl: body.imageUrl || null,
         featured: body.featured || false,
+        orderNumber: body.orderNumber || 0,
         categoryId: body.categoryId
       },
       include: {

@@ -11,8 +11,9 @@ export async function GET() {
       include: {
         singers: {
           orderBy: [
-            { featured: 'desc' },  // Featured singers first
-            { updatedAt: 'desc' }  // Then latest updated first
+            { featured: 'desc' },    // Featured singers first
+            { orderNumber: 'asc' },  // Then by manual order
+            { updatedAt: 'desc' }    // Finally by latest updated
           ],
           include: {
             _count: {
