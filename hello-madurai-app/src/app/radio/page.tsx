@@ -1260,6 +1260,13 @@ function DigitalFMPageContent() {
 
         {/* Music Player is now global - shown at bottom of all pages via GlobalRadioPlayer component */}
 
+        {/* Footer */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <div className="text-center text-sm text-gray-500">
+            External Radio links Only | Rights Belong to Respective Owners,<br />
+            Original Content © Hello Madurai
+          </div>
+        </div>
 
       </div>
     </div>
