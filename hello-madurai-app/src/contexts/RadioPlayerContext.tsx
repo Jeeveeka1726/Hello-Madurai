@@ -412,13 +412,25 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
   }
 
   const handleSetCurrentSong = (song: RadioSong | null) => {
-    // If clearing the current song and it's embedded radio, stop the stream
-    if (!song && currentSong?.audioType === 'embed' && audioRef.current) {
-      console.log('🛑 Clearing embedded radio stream')
+    // If clearing the current song, properly stop and reset audio
+    if (!song && currentSong && audioRef.current) {
+      console.log('🛑 Clearing current song:', currentSong.audioType)
+
+      // Stop the audio
       audioRef.current.pause()
-      audioRef.current.src = ''
-      audioRef.current.load()
+      audioRef.current.currentTime = 0
+
+      // For embedded radio, also clear the source to fully stop the stream
+      if (currentSong.audioType === 'embed') {
+        console.log('🛑 Clearing embedded radio stream')
+        audioRef.current.src = ''
+        audioRef.current.load()
+      }
+
+      // Reset all states
       setIsPlaying(false)
+      setCurrentTime(0)
+      setDuration(0)
     }
 
     setCurrentSong(song)

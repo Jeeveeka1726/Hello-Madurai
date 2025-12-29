@@ -91,6 +91,7 @@ export default function RadioMusicAdminPage() {
     name_ta: '',
     imageUrl: '',
     featured: false,
+    orderNumber: 0,
     categoryId: ''
   })
 
@@ -262,7 +263,7 @@ export default function RadioMusicAdminPage() {
         await fetchSingers()
         setShowSingerForm(false)
         setEditingSinger(null)
-        setSingerFormData({ name: '', name_ta: '', imageUrl: '', featured: false, categoryId: categories[0]?.id || '' })
+        setSingerFormData({ name: '', name_ta: '', imageUrl: '', featured: false, orderNumber: 0, categoryId: categories[0]?.id || '' })
         setImagePreview('') // Clear preview
         toast.success(editingSinger ? '✅ Singer updated!' : '✅ Singer created!')
       } else {
@@ -296,6 +297,7 @@ export default function RadioMusicAdminPage() {
       name_ta: singer.name_ta || '',
       imageUrl: singer.imageUrl || '',
       featured: singer.featured || false,
+      orderNumber: singer.orderNumber || 0,
       categoryId: singer.categoryId
     })
     setImagePreview('') // Clear local preview when editing (will show saved image)
@@ -568,7 +570,7 @@ export default function RadioMusicAdminPage() {
               onClick={() => {
                 setShowSingerForm(!showSingerForm)
                 setEditingSinger(null)
-                setSingerFormData({ name: '', name_ta: '', imageUrl: '', featured: false, categoryId: categories[0]?.id || '' })
+                setSingerFormData({ name: '', name_ta: '', imageUrl: '', featured: false, orderNumber: 0, categoryId: categories[0]?.id || '' })
                 setImagePreview('') // Clear preview
               }}
               className="bg-blue-600 text-white hover:bg-blue-700"
@@ -658,6 +660,18 @@ export default function RadioMusicAdminPage() {
                   <p className="text-xs text-gray-500 mt-1 ml-6">Featured speakers appear first in the list</p>
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Order Number</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={singerFormData.orderNumber}
+                    onChange={(e) => setSingerFormData({ ...singerFormData, orderNumber: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Lower numbers appear first (0 = default order)</p>
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Speaker Image (400x400px)</label>
 
                   {/* Image Preview */}
@@ -737,7 +751,7 @@ export default function RadioMusicAdminPage() {
                   onClick={() => {
                     setShowSingerForm(false)
                     setEditingSinger(null)
-                    setSingerFormData({ name: '', name_ta: '', imageUrl: '', featured: false, categoryId: categories[0]?.id || '' })
+                    setSingerFormData({ name: '', name_ta: '', imageUrl: '', featured: false, orderNumber: 0, categoryId: categories[0]?.id || '' })
                     setImagePreview('') // Clear preview
                   }}
                   className="bg-gray-200 text-gray-700 hover:bg-gray-300"

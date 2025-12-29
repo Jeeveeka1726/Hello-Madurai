@@ -35,15 +35,12 @@ export default function GlobalRadioPlayer() {
   }
 
   const handleClose = () => {
-    // Stop the audio first
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.currentTime = 0
-    }
-    pauseSong()
+    console.log('❌ Closing player for:', currentSong?.audioType)
 
-    // Clear the song and localStorage
+    // Clear the song first (this will handle stopping the audio properly)
     setCurrentSong(null)
+
+    // Clear localStorage
     localStorage.removeItem('radio_current_song')
     localStorage.removeItem('radio_current_time')
     localStorage.removeItem('radio_is_playing')
