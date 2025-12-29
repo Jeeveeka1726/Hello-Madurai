@@ -205,10 +205,7 @@ export default function GlobalRadioPlayer() {
         {/* Live Audio Stream Player */}
         {currentSong.audioType === 'embed' && (
           <div className="mt-3 bg-gradient-to-r from-red-600/20 to-orange-600/20 rounded-lg p-3 border border-white/10">
-            <div className="text-xs text-white/60 text-center">
-              External Audio links Only | Rights Belong to Respective Owners,<br />
-              Original Content © Hello Madurai
-            </div>
+            {/* Copyright text removed as requested */}
           </div>
         )}
       </div>

@@ -178,9 +178,16 @@ async function handleSoundCloudUrl(soundcloudUrl: string) {
     console.log('📄 Fetched SoundCloud HTML content, length:', html.length)
 
     // Look for the client_id in the page (needed for SoundCloud API)
-    const clientIdMatch = html.match(/client_id["\s]*[:=]["\s]*([a-zA-Z0-9]+)/)
+    // Try multiple patterns to find client_id
+    let clientIdMatch = html.match(/client_id["\s]*[:=]["\s]*["']([a-zA-Z0-9]+)["']/) ||
+                       html.match(/client_id["\s]*[:=]["\s]*([a-zA-Z0-9]+)/) ||
+                       html.match(/"client_id":"([a-zA-Z0-9]+)"/) ||
+                       html.match(/clientId["\s]*[:=]["\s]*["']([a-zA-Z0-9]+)["']/) ||
+                       html.match(/window\.__sc_hydration.*?"client_id":"([a-zA-Z0-9]+)"/)
+
     if (!clientIdMatch) {
-      console.log('❌ Could not find SoundCloud client_id')
+      console.log('❌ Could not find SoundCloud client_id in page')
+      console.log('📄 HTML snippet:', html.substring(0, 500))
       return NextResponse.json({
         error: 'Could not extract SoundCloud client_id',
         platform: 'soundcloud'
@@ -190,10 +197,16 @@ async function handleSoundCloudUrl(soundcloudUrl: string) {
     const clientId = clientIdMatch[1]
     console.log('🔑 Found SoundCloud client_id:', clientId.substring(0, 8) + '...')
 
-    // Look for track data in the page
-    const trackDataMatch = html.match(/"permalink_url":"[^"]*soundcloud\.com\/[^\/]+\/[^"]*","id":(\d+)/)
+    // Look for track data in the page - try multiple patterns
+    let trackDataMatch = html.match(/"permalink_url":"[^"]*soundcloud\.com\/[^\/]+\/[^"]*","id":(\d+)/) ||
+                         html.match(/"id":(\d+),"kind":"track"/) ||
+                         html.match(/soundcloud:\/\/sounds:(\d+)/) ||
+                         html.match(/"tracks":\[{"id":(\d+)/) ||
+                         html.match(/window\.__sc_hydration.*?"id":(\d+).*?"kind":"track"/)
+
     if (!trackDataMatch) {
       console.log('❌ Could not find track ID in page')
+      console.log('📄 HTML snippet for track search:', html.substring(html.indexOf('soundcloud'), html.indexOf('soundcloud') + 200))
       return NextResponse.json({
         error: 'Could not extract track ID from SoundCloud page',
         platform: 'soundcloud'
