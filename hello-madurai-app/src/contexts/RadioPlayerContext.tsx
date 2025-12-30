@@ -102,6 +102,7 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const audioRef = useRef<HTMLAudioElement>(null)
+  const isClosingRef = useRef(false)
 
   // Restore state from localStorage on mount
   useEffect(() => {
@@ -152,9 +153,21 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
 
     const handleTimeUpdate = () => setCurrentTime(audio.currentTime)
     const handleDurationChange = () => setDuration(audio.duration)
-    const handleEnded = () => setIsPlaying(false)
-    const handlePlay = () => setIsPlaying(true)
-    const handlePause = () => setIsPlaying(false)
+    const handleEnded = () => {
+      console.log('🔚 Audio ended')
+      setIsPlaying(false)
+    }
+    const handlePlay = () => {
+      console.log('▶️ Audio play event - currentSong exists:', !!currentSong, 'isClosing:', isClosingRef.current)
+      // Only set playing to true if we actually have a current song and we're not closing
+      if (currentSong && !isClosingRef.current) {
+        setIsPlaying(true)
+      }
+    }
+    const handlePause = () => {
+      console.log('⏸️ Audio pause event')
+      setIsPlaying(false)
+    }
 
     audio.addEventListener('timeupdate', handleTimeUpdate)
     audio.addEventListener('durationchange', handleDurationChange)
@@ -416,6 +429,9 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
     if (!song && currentSong && audioRef.current) {
       console.log('🛑 Clearing current song:', currentSong.audioType)
 
+      // Set closing flag to prevent audio events from restarting playback
+      isClosingRef.current = true
+
       // Stop the audio
       audioRef.current.pause()
       audioRef.current.currentTime = 0
@@ -425,12 +441,22 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
         console.log('🛑 Clearing embedded radio stream')
         audioRef.current.src = ''
         audioRef.current.load()
+      } else {
+        // For direct audio files, also clear the source to prevent restart
+        console.log('🛑 Clearing direct audio source')
+        audioRef.current.src = ''
+        audioRef.current.load()
       }
 
       // Reset all states
       setIsPlaying(false)
       setCurrentTime(0)
       setDuration(0)
+
+      // Reset closing flag after a short delay
+      setTimeout(() => {
+        isClosingRef.current = false
+      }, 100)
     }
 
     setCurrentSong(song)
