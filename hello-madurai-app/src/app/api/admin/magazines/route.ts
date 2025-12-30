@@ -10,7 +10,7 @@ export async function GET() {
         collection: true
       },
       orderBy: {
-        createdAt: 'desc'
+        publishedAt: 'desc'
       }
     })
 
@@ -49,7 +49,11 @@ export async function POST(request: NextRequest) {
         featuredImage: body.featuredImage,
         issueNumber: body.issueNumber || '',
         collectionId: body.collectionId,
-        featured: body.featured || false
+        featured: body.featured || false,
+        publishedAt: body.publishedAt ? new Date(body.publishedAt) : new Date()
+      },
+      include: {
+        collection: true
       }
     })
 

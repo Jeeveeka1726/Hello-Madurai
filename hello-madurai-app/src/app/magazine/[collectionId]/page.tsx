@@ -77,14 +77,24 @@ function MagazineCollectionPageContent() {
     })
   }
 
-  const handleDownload = (pdfUrl: string, title: string) => {
-    const link = document.createElement('a')
-    link.href = pdfUrl
-    link.download = `${title}.pdf`
-    link.target = '_blank'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const handleDownload = async (magazine: any) => {
+    try {
+      // Track download
+      await fetch(`/api/magazines/${magazine.id}/download`, {
+        method: 'POST'
+      })
+
+      // Download the file
+      const link = document.createElement('a')
+      link.href = magazine.pdfUrl
+      link.download = `${magazine.title}.pdf`
+      link.target = '_blank'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (error) {
+      console.error('Error tracking download:', error)
+    }
   }
 
   if (loading) {
@@ -225,7 +235,7 @@ function MagazineCollectionPageContent() {
                     
                     <div className="flex space-x-3">
                       <Button
-                        onClick={() => handleDownload(magazine.pdfUrl, magazine.title)}
+                        onClick={() => handleDownload(magazine)}
                         className="flex-1 bg-blue-600 text-white hover:bg-blue-700"
                       >
                         <DocumentArrowDownIcon className="h-4 w-4 mr-2" />

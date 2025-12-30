@@ -10,15 +10,25 @@ import { toast } from 'react-hot-toast'
 interface Magazine {
   id: string
   title: string
+  title_ta?: string
   description: string
+  description_ta?: string
   pdfUrl: string
   coverImage?: string
+  featuredImage?: string
   issueNumber: string
   publishedAt: string
   downloads: number
+  likes: number
   featured: boolean
   createdAt: string
   updatedAt: string
+  collectionId: string
+  collection?: {
+    id: string
+    name: string
+    name_ta?: string
+  }
 }
 
 export default function AdminMagazinesPage() {
@@ -28,15 +38,21 @@ export default function AdminMagazinesPage() {
   const [editingMagazine, setEditingMagazine] = useState<Magazine | null>(null)
   const [formData, setFormData] = useState({
     title: '',
+    title_ta: '',
     description: '',
+    description_ta: '',
     pdfUrl: '',
     coverImage: '',
+    featuredImage: '',
     issueNumber: '',
+    collectionId: '',
     featured: false
   })
+  const [collections, setCollections] = useState<{id: string, name: string, name_ta?: string}[]>([])
 
   useEffect(() => {
     fetchMagazines()
+    fetchCollections()
   }, [])
 
   const fetchMagazines = async () => {
@@ -44,7 +60,11 @@ export default function AdminMagazinesPage() {
       const response = await fetch('/api/admin/magazines')
       if (response.ok) {
         const data = await response.json()
-        setMagazines(data)
+        // Sort by publishedAt date (newest first)
+        const sortedData = data.sort((a: Magazine, b: Magazine) =>
+          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+        )
+        setMagazines(sortedData)
       } else {
         toast.error('பத்திரிகைகளை பெறுவதில் பிழை')
       }
@@ -53,6 +73,18 @@ export default function AdminMagazinesPage() {
       toast.error('பத்திரிகைகளை பெறுவதில் பிழை')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchCollections = async () => {
+    try {
+      const response = await fetch('/api/magazines')
+      if (response.ok) {
+        const data = await response.json()
+        setCollections(data)
+      }
+    } catch (error) {
+      console.error('Error fetching collections:', error)
     }
   }
 
@@ -99,10 +131,14 @@ export default function AdminMagazinesPage() {
     setEditingMagazine(magazine)
     setFormData({
       title: magazine.title,
+      title_ta: magazine.title_ta || '',
       description: magazine.description,
+      description_ta: magazine.description_ta || '',
       pdfUrl: magazine.pdfUrl,
       coverImage: magazine.coverImage || '',
+      featuredImage: magazine.featuredImage || '',
       issueNumber: magazine.issueNumber,
+      collectionId: magazine.collectionId,
       featured: magazine.featured
     })
     setShowForm(true)
@@ -159,10 +195,14 @@ export default function AdminMagazinesPage() {
               setEditingMagazine(null)
               setFormData({
                 title: '',
+                title_ta: '',
                 description: '',
+                description_ta: '',
                 pdfUrl: '',
                 coverImage: '',
+                featuredImage: '',
                 issueNumber: '',
+                collectionId: '',
                 featured: false
               })
             }}
@@ -183,31 +223,79 @@ export default function AdminMagazinesPage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Title - Tamil only */}
+                  {/* Collection Selection */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      தலைப்பு *
+                      தொகுப்பு *
+                    </label>
+                    <select
+                      required
+                      value={formData.collectionId}
+                      onChange={(e) => setFormData({ ...formData, collectionId: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="">தொகுப்பைத் தேர்ந்தெடுக்கவும்</option>
+                      {collections.map((collection) => (
+                        <option key={collection.id} value={collection.id}>
+                          {collection.name} {collection.name_ta && `(${collection.name_ta})`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Title - English */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Title (English) *
                     </label>
                     <input
                       type="text"
                       required
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="பத்திரிகை தலைப்பை உள்ளிடவும்"
+                      placeholder="Enter magazine title in English"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
 
-                  {/* Description - Tamil only */}
+                  {/* Title - Tamil */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      விளக்கம் *
+                      தலைப்பு (தமிழ்)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.title_ta}
+                      onChange={(e) => setFormData({ ...formData, title_ta: e.target.value })}
+                      placeholder="பத்திரிகை தலைப்பை தமிழில் உள்ளிடவும்"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+
+                  {/* Description - English */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Description (English) *
                     </label>
                     <textarea
                       required
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="பத்திரிகை விளக்கத்தை உள்ளிடவும்"
+                      placeholder="Enter magazine description in English"
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+
+                  {/* Description - Tamil */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      விளக்கம் (தமிழ்)
+                    </label>
+                    <textarea
+                      value={formData.description_ta}
+                      onChange={(e) => setFormData({ ...formData, description_ta: e.target.value })}
+                      placeholder="பத்திரிகை விளக்கத்தை தமிழில் உள்ளிடவும்"
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
@@ -225,11 +313,21 @@ export default function AdminMagazinesPage() {
 
                   {/* Cover Image Upload */}
                   <FileUpload
-                    label="அட்டைப் படம்"
+                    label="அட்டைப் படம் (Cover Image)"
                     fileType="image"
                     currentFile={formData.coverImage}
                     onFileUpload={(url) => setFormData({ ...formData, coverImage: url })}
                     onUrlChange={(url) => setFormData({ ...formData, coverImage: url })}
+                    className="mb-6"
+                  />
+
+                  {/* Featured Image Upload */}
+                  <FileUpload
+                    label="சிறப்பு படம் (Featured Image)"
+                    fileType="image"
+                    currentFile={formData.featuredImage}
+                    onFileUpload={(url) => setFormData({ ...formData, featuredImage: url })}
+                    onUrlChange={(url) => setFormData({ ...formData, featuredImage: url })}
                     className="mb-6"
                   />
 
@@ -297,24 +395,43 @@ export default function AdminMagazinesPage() {
                   />
                 )}
                 <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {magazine.title}
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {magazine.title}
+                    </h3>
+                    {magazine.featured && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        சிறப்பு
+                      </span>
+                    )}
+                  </div>
+                  {magazine.title_ta && (
+                    <h4 className="text-md text-gray-600">
+                      {magazine.title_ta}
+                    </h4>
+                  )}
                   <p className="text-sm text-gray-600 line-clamp-2">
                     {magazine.description}
                   </p>
+                  <div className="text-xs text-gray-500">
+                    <p>தொகுப்பு: {magazine.collection?.name}</p>
+                    <p>வெளியீட்டு தேதி: {new Date(magazine.publishedAt).toLocaleDateString('ta-IN')}</p>
+                  </div>
                   <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>{magazine.issueNumber}</span>
-                    <div className="flex items-center">
-                      <EyeIcon className="h-4 w-4 mr-1" />
-                      {magazine.downloads || 0} பதிவிறக்கங்கள்
+                    <span>இதழ்: {magazine.issueNumber}</span>
+                    <div className="flex items-center space-x-3">
+                      <div className="flex items-center">
+                        <EyeIcon className="h-4 w-4 mr-1" />
+                        {magazine.downloads || 0}
+                      </div>
+                      <div className="flex items-center">
+                        <svg className="h-4 w-4 mr-1 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        {magazine.likes || 0}
+                      </div>
                     </div>
                   </div>
-                  {magazine.featured && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      சிறப்பு
-                    </span>
-                  )}
                 </div>
                 <div className="mt-4 flex justify-between">
                   <div className="flex space-x-2">
