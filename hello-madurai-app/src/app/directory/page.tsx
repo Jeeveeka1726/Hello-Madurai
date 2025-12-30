@@ -193,19 +193,25 @@ function DirectoryPageContent() {
   const getNearbyBusinesses = () => {
     if (!userLocation) return []
 
-    return businesses
-      .filter(business => business.latitude && business.longitude)
-      .map(business => ({
+    const businessesWithCoords = businesses.filter(business =>
+      business.latitude && business.longitude
+    )
+
+    const businessesWithDistances = businessesWithCoords.map(business => {
+      const distance = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        business.latitude!,
+        business.longitude!
+      )
+      return {
         ...business,
-        distance: calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          business.latitude!,
-          business.longitude!
-        )
-      }))
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, 20) // Show top 20 nearest businesses
+        distance: Math.round(distance * 100) / 100 // Round to 2 decimal places
+      }
+    })
+
+    // Sort by distance (ascending - nearest first) and return ALL businesses
+    return businessesWithDistances.sort((a, b) => a.distance - b.distance)
   }
 
   // Fetch categories and businesses from database

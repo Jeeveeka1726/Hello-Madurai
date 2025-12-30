@@ -21,13 +21,12 @@ async function main() {
       phone: '+91 98765 43210',
       email: 'info@silambambaster.com',
       website: 'https://www.silambambaster.com',
-      videoUrl: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
+      mainVideoUrl: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
       instagramUrl: 'https://instagram.com/silambambaster',
       facebookUrl: 'https://facebook.com/silambambaster',
       bookingUrl: 'https://calendly.com/silambambaster',
       latitude: 9.9252,
       longitude: 78.1198,
-      featured: true,
       verified: true
     }
   })
@@ -48,13 +47,12 @@ async function main() {
       phone: '+91 98765 12345',
       email: 'contact@meenakshimess.com',
       website: 'https://www.meenakshimess.com',
-      videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      mainVideoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       instagramUrl: 'https://instagram.com/meenakshimess',
       facebookUrl: 'https://facebook.com/meenakshimess',
       bookingUrl: 'https://zomato.com/meenakshimess',
       latitude: 9.9195,
       longitude: 78.1193,
-      featured: true,
       verified: true
     }
   })
@@ -75,13 +73,12 @@ async function main() {
       phone: '+91 98765 67890',
       email: 'sales@kumarsilks.com',
       website: 'https://www.kumarsilks.com',
-      videoUrl: 'https://www.youtube.com/watch?v=9bZkp7q19f0',
+      mainVideoUrl: 'https://www.youtube.com/watch?v=9bZkp7q19f0',
       instagramUrl: 'https://instagram.com/kumarsilks',
       facebookUrl: 'https://facebook.com/kumarsilks',
       bookingUrl: 'https://www.kumarsilks.com/book-appointment',
       latitude: 9.9173,
       longitude: 78.1216,
-      featured: true,
       verified: true
     }
   })
@@ -107,7 +104,6 @@ async function main() {
       bookingUrl: 'https://practo.com/modern-dental-clinic',
       latitude: 9.9312,
       longitude: 78.1214,
-      featured: false,
       verified: true
     }
   })
@@ -128,13 +124,12 @@ async function main() {
       phone: '+91 98765 22222',
       email: 'booking@maduraiphotography.com',
       website: 'https://www.maduraiphotography.com',
-      videoUrl: 'https://www.youtube.com/watch?v=ScMzIvxBSi4',
+      mainVideoUrl: 'https://www.youtube.com/watch?v=ScMzIvxBSi4',
       instagramUrl: 'https://instagram.com/maduraiphotography',
       facebookUrl: 'https://facebook.com/maduraiphotography',
       bookingUrl: 'https://calendly.com/maduraiphotography',
       latitude: 9.9248,
       longitude: 78.1141,
-      featured: false,
       verified: true
     }
   })
@@ -155,13 +150,12 @@ async function main() {
       phone: '+91 98765 33333',
       email: 'reservations@heritagegrand.com',
       website: 'https://www.heritagegrand.com',
-      videoUrl: 'https://www.youtube.com/watch?v=QH2-TGUlwu4',
+      mainVideoUrl: 'https://www.youtube.com/watch?v=QH2-TGUlwu4',
       instagramUrl: 'https://instagram.com/heritagegrand',
       facebookUrl: 'https://facebook.com/heritagegrand',
       bookingUrl: 'https://booking.com/heritagegrand',
       latitude: 9.9185,
       longitude: 78.1189,
-      featured: true,
       verified: true
     }
   })
@@ -187,7 +181,6 @@ async function main() {
       bookingUrl: 'https://www.rajautoservice.com/book',
       latitude: 9.9330,
       longitude: 78.1122,
-      featured: false,
       verified: true
     }
   })
@@ -208,13 +201,12 @@ async function main() {
       phone: '+91 98765 55555',
       email: 'admissions@brightminds.com',
       website: 'https://www.brightminds.com',
-      videoUrl: 'https://www.youtube.com/watch?v=kJQP7kiw5Fk',
+      mainVideoUrl: 'https://www.youtube.com/watch?v=kJQP7kiw5Fk',
       instagramUrl: 'https://instagram.com/brightminds',
       facebookUrl: 'https://facebook.com/brightminds',
       bookingUrl: 'https://www.brightminds.com/enroll',
       latitude: 9.9397,
       longitude: 78.1212,
-      featured: false,
       verified: true
     }
   })
@@ -235,13 +227,12 @@ async function main() {
       phone: '+91 98765 66666',
       email: 'info@powergym.com',
       website: 'https://www.powergym.com',
-      videoUrl: 'https://www.youtube.com/watch?v=EngW7tLk6R8',
+      mainVideoUrl: 'https://www.youtube.com/watch?v=EngW7tLk6R8',
       instagramUrl: 'https://instagram.com/powergym',
       facebookUrl: 'https://facebook.com/powergym',
       bookingUrl: 'https://www.powergym.com/membership',
       latitude: 9.9143,
       longitude: 78.1377,
-      featured: false,
       verified: true
     }
   })
@@ -267,7 +258,6 @@ async function main() {
       bookingUrl: 'https://swiggy.com/royalbakery',
       latitude: 9.9207,
       longitude: 78.1199,
-      featured: false,
       verified: true
     }
   })
