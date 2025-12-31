@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import {
   PhoneIcon,
   EnvelopeIcon,
@@ -96,6 +96,8 @@ interface BusinessComment {
 function DirectoryPageContent() {
   const { t, language } = useLanguage()
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null)
   const [viewingSubcategory, setViewingSubcategory] = useState(false) // Track if we're in subcategory view
@@ -107,6 +109,28 @@ function DirectoryPageContent() {
   const [commentsBusinessId, setCommentsBusinessId] = useState<string>('')
   const [showProfilePopup, setShowProfilePopup] = useState(false)
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
+
+  // Function to update URL parameters
+  const updateURL = (category: string | null, subcategory: string | null, viewSubcategory: boolean) => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (category) {
+      params.set('category', category)
+    } else {
+      params.delete('category')
+    }
+
+    if (subcategory && viewSubcategory) {
+      params.set('subcategory', subcategory)
+      params.set('viewSubcategory', 'true')
+    } else {
+      params.delete('subcategory')
+      params.delete('viewSubcategory')
+    }
+
+    const newURL = `${pathname}?${params.toString()}`
+    router.replace(newURL)
+  }
   const [showShareModal, setShowShareModal] = useState(false)
   const [shareBusinessData, setShareBusinessData] = useState<Business | null>(null)
 
@@ -743,6 +767,10 @@ function DirectoryPageContent() {
                     onClick={() => {
                       setShowNearbyBusinesses(false)
                       setUserLocation(null)
+                      setSelectedCategory(null)
+                      setSelectedSubcategory(null)
+                      setViewingSubcategory(false)
+                      updateURL(null, null, false)
                     }}
                     className="text-gray-600 hover:text-gray-800 text-sm underline"
                   >
@@ -886,6 +914,7 @@ function DirectoryPageContent() {
                           setSelectedCategory(category.id)
                           setSelectedSubcategory(null)
                           setViewingSubcategory(false)
+                          updateURL(category.id, null, false)
                         }}
                         className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
                           selectedCategory === category.id
@@ -919,6 +948,7 @@ function DirectoryPageContent() {
                   onClick={() => {
                     setViewingSubcategory(false)
                     setSelectedSubcategory(null)
+                    updateURL(selectedCategory, null, false)
                   }}
                   className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all"
                 >
@@ -945,6 +975,7 @@ function DirectoryPageContent() {
                           onClick={() => {
                             setSelectedSubcategory(subcategory.id)
                             setViewingSubcategory(true)
+                            updateURL(selectedCategory, subcategory.id, true)
                           }}
                           className={`p-4 rounded-xl border-2 transition-all hover:shadow-lg ${
                             selectedSubcategory === subcategory.id
@@ -1020,9 +1051,11 @@ function DirectoryPageContent() {
                           if (business.subcategoryId) {
                             setViewingSubcategory(true)
                             setSelectedSubcategory(business.subcategoryId)
+                            updateURL(business.categoryId, business.subcategoryId, true)
                           } else {
                             setViewingSubcategory(false)
                             setSelectedSubcategory(null)
+                            updateURL(business.categoryId, null, false)
                           }
 
                           setSearchTerm('')
