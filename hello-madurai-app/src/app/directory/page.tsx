@@ -469,6 +469,7 @@ function DirectoryPageContent() {
       business.facebookUrl,
       true, // Directions - always available
       business.bookingUrl,
+      business.hasProfile,
       true  // Share - always available
     ].filter(Boolean).length
 
@@ -1084,6 +1085,19 @@ function DirectoryPageContent() {
                             </button>
                           )}
 
+                          {/* Profile */}
+                          {business.hasProfile && (
+                            <button
+                              onClick={() => {
+                                setSelectedBusiness(business)
+                                setShowProfilePopup(true)
+                              }}
+                              className={getButtonLayoutClasses(business).buttonClass}
+                            >
+                              Profile
+                            </button>
+                          )}
+
                           {/* Share - Always available */}
                           <button
                             onClick={() => handleShare(business)}
@@ -1331,91 +1345,75 @@ function DirectoryPageContent() {
                           </div>
                         )}
 
-                        {/* Action Buttons - Dynamic Flexbox Layout */}
-                        <div className="flex flex-wrap gap-2">
-                          {/* Phone Button - Always present */}
-                          <a
-                            href={`tel:${business.phone}`}
-                            className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                        {/* Action Buttons - Smart grid layout */}
+                        <div className={`${getButtonLayoutClasses(business).containerClass} mb-3`}>
+                          {/* Instagram */}
+                          {business.instagramUrl && (
+                            <button
+                              onClick={() => handleInstagram(business.instagramUrl!)}
+                              className={getButtonLayoutClasses(business).buttonClass}
+                            >
+                              Instagram
+                            </button>
+                          )}
+
+                          {/* YouTube */}
+                          {business.youtubeUrl && (
+                            <button
+                              onClick={() => window.open(business.youtubeUrl, '_blank')}
+                              className={getButtonLayoutClasses(business).buttonClass}
+                            >
+                              YouTube
+                            </button>
+                          )}
+
+                          {/* Facebook */}
+                          {business.facebookUrl && (
+                            <button
+                              onClick={() => handleFacebook(business.facebookUrl!)}
+                              className={getButtonLayoutClasses(business).buttonClass}
+                            >
+                              Facebook
+                            </button>
+                          )}
+
+                          {/* Directions - Always available */}
+                          <button
+                            onClick={() => handleDirections(business)}
+                            className={getButtonLayoutClasses(business).buttonClass}
                           >
-                            <PhoneIcon className="h-4 w-4" />
-                            {language === 'ta' ? 'அழை' : 'Call'}
-                          </a>
+                            Directions
+                          </button>
 
-                          {/* Email Button - Only if email exists */}
-                          {business.email && (
-                            <a
-                              href={`mailto:${business.email}`}
-                              className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                            >
-                              <EnvelopeIcon className="h-4 w-4" />
-                              {language === 'ta' ? 'மின்னஞ்சல்' : 'Email'}
-                            </a>
-                          )}
-
-                          {/* Website Button - Only if website exists */}
-                          {business.website && (
-                            <a
-                              href={business.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
-                            >
-                              <GlobeAltIcon className="h-4 w-4" />
-                              {language === 'ta' ? 'வலைத்தளம்' : 'Website'}
-                            </a>
-                          )}
-
-                          {/* Directions Button - Only if directions or coordinates exist */}
-                          {(business.directionsUrl || (business.latitude && business.longitude)) && (
-                            <a
-                              href={business.directionsUrl || `https://www.google.com/maps?q=${business.latitude},${business.longitude}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                            >
-                              <MapPinIcon className="h-4 w-4" />
-                              {language === 'ta' ? 'திசைகள்' : 'Directions'}
-                            </a>
-                          )}
-
-                          {/* Booking Button - Only if booking URL exists */}
+                          {/* Booking */}
                           {business.bookingUrl && (
-                            <a
-                              href={business.bookingUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1 px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                            <button
+                              onClick={() => handleBooking(business)}
+                              className={getButtonLayoutClasses(business).buttonClass}
                             >
-                              <CalendarIcon className="h-4 w-4" />
-                              {language === 'ta' ? 'முன்பதிவு' : 'Book'}
-                            </a>
+                              Book Now
+                            </button>
                           )}
 
-                          {/* Profile Button - Only if has profile */}
+                          {/* Profile */}
                           {business.hasProfile && (
                             <button
                               onClick={() => {
                                 setSelectedBusiness(business)
                                 setShowProfilePopup(true)
                               }}
-                              className="flex items-center gap-1 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                              className={getButtonLayoutClasses(business).buttonClass}
                             >
-                              <UserIcon className="h-4 w-4" />
-                              {language === 'ta' ? 'விவரம்' : 'Profile'}
+                              Profile
                             </button>
                           )}
 
-                          {/* Share Button - Always present */}
+                          {/* Share - Always available */}
                           <button
-                            onClick={() => {
-                              setSelectedBusiness(business)
-                              setShowShareModal(true)
-                            }}
-                            className="flex items-center gap-1 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                            onClick={() => handleShare(business)}
+                            className={getButtonLayoutClasses(business).buttonClass}
                           >
-                            <ShareIcon className="h-4 w-4" />
-                            {language === 'ta' ? 'பகிர்' : 'Share'}
+                            Share
                           </button>
                         </div>
                       </CardContent>
@@ -1714,6 +1712,19 @@ function DirectoryPageContent() {
                             className={getButtonLayoutClasses(business).buttonClass}
                           >
                             Book Now
+                          </button>
+                        )}
+
+                        {/* Profile */}
+                        {business.hasProfile && (
+                          <button
+                            onClick={() => {
+                              setSelectedBusiness(business)
+                              setShowProfilePopup(true)
+                            }}
+                            className={getButtonLayoutClasses(business).buttonClass}
+                          >
+                            Profile
                           </button>
                         )}
 
