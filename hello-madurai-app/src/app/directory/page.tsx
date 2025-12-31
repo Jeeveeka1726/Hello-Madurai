@@ -831,8 +831,131 @@ function DirectoryPageContent() {
                           {language === 'ta' && business.name_ta ? business.name_ta : business.name}
                         </h3>
 
-                        {/* Address with Distance */}
+                        {/* Main Business Image/Video */}
+                        {(business.mainImage || business.mainVideoUrl) && (
+                          <div className="mb-4 -mx-6 sm:mx-0 sm:rounded-lg overflow-hidden directory-video-container">
+                            {playingVideo === business.id && business.mainVideoUrl ? (
+                              // Show video player when playing - Responsive 16:9 aspect ratio
+                              <div className="relative w-full aspect-video bg-black sm:rounded-lg overflow-hidden">
+                                {(() => {
+                                  const embedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
+                                  if (embedUrl) {
+                                    return (
+                                      <>
+                                        <iframe
+                                          src={`${embedUrl}?autoplay=1&rel=0&modestbranding=1`}
+                                          className="absolute inset-0 w-full h-full border-0"
+                                          allowFullScreen
+                                          title={`${business.name} video`}
+                                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        />
+                                        <button
+                                          onClick={() => setPlayingVideo(null)}
+                                          className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity z-10"
+                                        >
+                                          <XMarkIcon className="w-4 h-4" />
+                                        </button>
+                                      </>
+                                    )
+                                  } else {
+                                    // Fallback for non-YouTube videos
+                                    return (
+                                      <>
+                                        <video
+                                          src={business.mainVideoUrl}
+                                          className="absolute inset-0 w-full h-full object-cover"
+                                          controls
+                                          autoPlay
+                                          playsInline
+                                          muted
+                                        />
+                                        <button
+                                          onClick={() => setPlayingVideo(null)}
+                                          className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity z-10"
+                                        >
+                                          <XMarkIcon className="w-4 h-4" />
+                                        </button>
+                                      </>
+                                    )
+                                  }
+                                })()}
+                              </div>
+                            ) : (
+                              // Show image or video thumbnail (exclusive)
+                              <div className="relative">
+                                {business.mainImage ? (
+                                  // Show image only (no video overlay since they're exclusive now)
+                                  <div className="aspect-video w-full">
+                                    <img
+                                      src={business.mainImage}
+                                      alt={business.name}
+                                      className="w-full h-full object-cover sm:rounded-lg"
+                                      loading="lazy"
+                                    />
+                                  </div>
+                                ) : business.mainVideoUrl ? (
+                                  // Show YouTube video thumbnail if no image but video exists
+                                  (() => {
+                                    const youtubeId = getYouTubeId(business.mainVideoUrl)
+                                    if (youtubeId) {
+                                      return (
+                                        <div className="aspect-video w-full">
+                                          <div
+                                            className="relative w-full h-full bg-gray-900 sm:rounded-lg overflow-hidden cursor-pointer group"
+                                            onClick={() => handleVideoPlay(business.id)}
+                                          >
+                                          <img
+                                            src={getYouTubeThumbnail(business.mainVideoUrl)}
+                                            alt={`${business.name} video`}
+                                            className="absolute top-0 left-0 w-full h-full object-cover"
+                                            loading="lazy"
+                                            onError={(e) => {
+                                              const videoId = getYouTubeId(business.mainVideoUrl)
+                                              if (videoId) {
+                                                e.currentTarget.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+                                              }
+                                            }}
+                                          />
+                                          {/* Play Button Overlay */}
+                                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                            <div className="absolute inset-0 bg-black opacity-30"></div>
+                                            <div className="relative w-16 h-16 bg-black bg-opacity-60 rounded-full flex items-center justify-center backdrop-blur-sm border-3 border-white border-opacity-80 shadow-2xl">
+                                              <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z" />
+                                              </svg>
+                                            </div>
+                                          </div>
+                                          </div>
+                                        </div>
+                                      )
+                                    } else {
+                                      // Non-YouTube video or invalid URL - show placeholder
+                                      return (
+                                        <div className="aspect-video w-full">
+                                          <div
+                                            className="w-full h-full bg-gray-900 rounded-lg flex items-center justify-center cursor-pointer"
+                                            onClick={() => handleVideoPlay(business.id)}
+                                          >
+                                          <div className="text-center text-white">
+                                            <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                                              <path d="M8 5v14l11-7z"/>
+                                            </svg>
+                                            <p className="text-sm">Play Video</p>
+                                          </div>
+                                          </div>
+                                        </div>
+                                      )
+                                    }
+                                  })()
+                                ) : null}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Clickable Contact Info */}
                         <div className="space-y-2 mb-4 text-sm">
+                          {/* Address - Clickable for directions */}
                           <button
                             onClick={() => handleDirections(business)}
                             className="flex items-start gap-2 text-gray-700 hover:text-blue-600 transition-colors w-full text-left group"
@@ -842,6 +965,7 @@ function DirectoryPageContent() {
                               <span className="line-clamp-2 block">
                                 {language === 'ta' && business.address_ta ? business.address_ta : business.address}
                               </span>
+                              {/* Distance display for nearby businesses */}
                               <span className="text-xs text-blue-600 font-medium mt-1 block">
                                 🚶 {(business as any).distance < 1
                                   ? `${Math.round((business as any).distance * 1000)}m ${language === 'ta' ? 'தூரம்' : 'away'}`
@@ -851,7 +975,7 @@ function DirectoryPageContent() {
                             </div>
                           </button>
 
-                          {/* Phone */}
+                          {/* Phone - Clickable to call */}
                           {business.phone && (
                             <a
                               href={`tel:${business.phone}`}
@@ -861,36 +985,88 @@ function DirectoryPageContent() {
                               <span>{business.phone}</span>
                             </a>
                           )}
+
+                          {/* Email - Clickable to email */}
+                          {business.email && (
+                            <a
+                              href={`mailto:${business.email}`}
+                              className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors"
+                            >
+                              <EnvelopeIcon className="h-4 w-4 flex-shrink-0" />
+                              <span className="truncate">{business.email}</span>
+                            </a>
+                          )}
+
+                          {/* Website - Clickable to open */}
+                          {business.website && (
+                            <a
+                              href={business.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors"
+                            >
+                              <GlobeAltIcon className="h-4 w-4 flex-shrink-0" />
+                              <span className="truncate">{business.website}</span>
+                            </a>
+                          )}
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex flex-wrap gap-2">
-                          {business.hasProfile && (
+                        {/* Action Buttons - Dynamic flexbox layout */}
+                        <div className={`${getButtonLayoutClasses().containerClass} mb-3`}>
+                          {/* Instagram */}
+                          {business.instagramUrl && (
                             <button
-                              onClick={() => {
-                                setSelectedBusiness(business)
-                                setShowProfilePopup(true)
-                              }}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
+                              onClick={() => handleInstagram(business.instagramUrl!)}
+                              className={getButtonLayoutClasses().buttonClass}
                             >
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              {t('directory.viewProfile', 'View Profile', 'சுயவிவரம்')}
+                              Instagram
                             </button>
                           )}
 
+                          {/* YouTube */}
+                          {business.youtubeUrl && (
+                            <button
+                              onClick={() => window.open(business.youtubeUrl, '_blank')}
+                              className={getButtonLayoutClasses().buttonClass}
+                            >
+                              YouTube
+                            </button>
+                          )}
+
+                          {/* Facebook */}
+                          {business.facebookUrl && (
+                            <button
+                              onClick={() => handleFacebook(business.facebookUrl!)}
+                              className={getButtonLayoutClasses().buttonClass}
+                            >
+                              Facebook
+                            </button>
+                          )}
+
+                          {/* Directions - Always available */}
                           <button
-                            onClick={() => {
-                              setShareBusinessData(business)
-                              setShowShareModal(true)
-                            }}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition-colors"
+                            onClick={() => handleDirections(business)}
+                            className={getButtonLayoutClasses().buttonClass}
                           >
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                            </svg>
-                            {t('directory.share', 'Share', 'பகிர்')}
+                            Directions
+                          </button>
+
+                          {/* Booking */}
+                          {business.bookingUrl && (
+                            <button
+                              onClick={() => handleBooking(business)}
+                              className={getButtonLayoutClasses().buttonClass}
+                            >
+                              Book Now
+                            </button>
+                          )}
+
+                          {/* Share - Always available */}
+                          <button
+                            onClick={() => handleShare(business)}
+                            className={getButtonLayoutClasses().buttonClass}
+                          >
+                            Share
                           </button>
                         </div>
                       </CardContent>
@@ -1038,7 +1214,7 @@ function DirectoryPageContent() {
                   }
                 </h3>
                 {/* Full Business Cards for Search Results */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
                   {filteredBusinesses.map((business) => (
                     <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
                       <CardContent className="p-6 directory-card-content">
