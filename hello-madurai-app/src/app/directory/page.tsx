@@ -13,7 +13,8 @@ import {
   ArrowDownTrayIcon,
   ShareIcon,
   ChatBubbleLeftIcon,
-  XMarkIcon
+  XMarkIcon,
+  UserIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
@@ -459,11 +460,11 @@ function DirectoryPageContent() {
     return buttons
   }
 
-  // Function to get button layout classes - Always 2x2 grid
+  // Function to get button layout classes - Dynamic flexbox layout
   const getButtonLayoutClasses = () => {
     return {
-      containerClass: "grid grid-cols-2 gap-2",
-      buttonClass: "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+      containerClass: "flex flex-wrap gap-2 justify-center",
+      buttonClass: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
     }
   }
 
@@ -1036,56 +1037,190 @@ function DirectoryPageContent() {
                         : `Search Results (${filteredBusinesses.length})`)
                   }
                 </h3>
-                {/* Compact Blue Boxes for Search Results */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {/* Full Business Cards for Search Results */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredBusinesses.map((business) => (
-                    <div
-                      key={business.id}
-                      className="bg-blue-600 text-white rounded-lg p-4 cursor-pointer hover:bg-blue-700 transition-colors"
-                      onClick={() => {
-                        // Navigate to the specific subcategory where this business is located
-                        if (business.categoryId) {
-                          setSelectedCategory(business.categoryId)
+                    <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
+                      <CardContent className="p-6 directory-card-content">
+                        {/* Category Badge with Distance */}
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            {business.subcategory && business.subcategory.icon && (
+                              <span className="text-2xl">{business.subcategory.icon}</span>
+                            )}
+                            <span className="text-sm text-gray-600 font-medium">
+                              {language === 'ta'
+                                ? (business.mainCategory?.name_ta || business.category)
+                                : (business.mainCategory?.name || business.category)
+                              }
+                            </span>
+                          </div>
+                          {/* Distance display for nearby businesses */}
+                          {showNearbyBusinesses && userLocation && (business as any).distance !== undefined && (
+                            <span className="text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-full">
+                              🚶 {(business as any).distance < 1
+                                ? `${Math.round((business as any).distance * 1000)}m`
+                                : `${(business as any).distance}km`
+                              }
+                            </span>
+                          )}
+                          <button
+                            onClick={() => {
+                              // Navigate to the specific subcategory where this business is located
+                              if (business.categoryId) {
+                                setSelectedCategory(business.categoryId)
 
-                          // If business has a subcategory, navigate to that subcategory
-                          if (business.subcategoryId) {
-                            setViewingSubcategory(true)
-                            setSelectedSubcategory(business.subcategoryId)
-                            updateURL(business.categoryId, business.subcategoryId, true)
-                          } else {
-                            setViewingSubcategory(false)
-                            setSelectedSubcategory(null)
-                            updateURL(business.categoryId, null, false)
-                          }
+                                // If business has a subcategory, navigate to that subcategory
+                                if (business.subcategoryId) {
+                                  setViewingSubcategory(true)
+                                  setSelectedSubcategory(business.subcategoryId)
+                                  updateURL(business.categoryId, business.subcategoryId, true)
+                                } else {
+                                  setViewingSubcategory(false)
+                                  setSelectedSubcategory(null)
+                                  updateURL(business.categoryId, null, false)
+                                }
 
-                          setSearchTerm('')
-                        }
-                      }}
-                    >
-                      <h3 className="font-semibold text-lg mb-2 line-clamp-2">
-                        {language === 'ta' && business.name_ta ? business.name_ta : business.name}
-                      </h3>
-                      <p className="text-blue-100 text-sm mb-2 line-clamp-1">
-                        📍 {language === 'ta' && business.address_ta ? business.address_ta : business.address}
-                      </p>
-                      {/* Distance display for nearby businesses in search results */}
-                      {showNearbyBusinesses && userLocation && (business as any).distance !== undefined && (
-                        <p className="text-green-300 text-xs mb-2 font-medium">
-                          🚶 {(business as any).distance < 1
-                            ? `${Math.round((business as any).distance * 1000)}m ${language === 'ta' ? 'தூரம்' : 'away'}`
-                            : `${(business as any).distance}km ${language === 'ta' ? 'தூரம்' : 'away'}`
-                          }
-                        </p>
-                      )}
-                      <div className="flex items-center justify-between">
-                        <span className="text-blue-200 text-xs">
-                          {business.category}
-                        </span>
-                        {business.verified && (
-                          <span className="text-green-300 text-xs">✓</span>
+                                setSearchTerm('')
+                              }
+                            }}
+                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                          >
+                            {language === 'ta' ? 'வகைக்கு செல்' : 'Go to Category'}
+                          </button>
+                        </div>
+
+                        {/* Business Name */}
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                          {language === 'ta' ? (business.name_ta || business.name) : business.name}
+                        </h3>
+
+                        {/* Address */}
+                        <div className="flex items-start gap-2 mb-3">
+                          <MapPinIcon className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
+                          <p className="text-gray-600 text-sm">
+                            {language === 'ta' ? (business.address_ta || business.address) : business.address}
+                          </p>
+                        </div>
+
+                        {/* Main Image or Video */}
+                        {business.mainImage && (
+                          <div className="mb-4">
+                            <img
+                              src={business.mainImage}
+                              alt={business.name}
+                              className="w-full h-48 object-cover rounded-lg"
+                            />
+                          </div>
                         )}
-                      </div>
-                    </div>
+
+                        {business.mainVideoUrl && !business.mainImage && (
+                          <div className="mb-4">
+                            {getYouTubeEmbedUrl(business.mainVideoUrl) ? (
+                              <iframe
+                                src={getYouTubeEmbedUrl(business.mainVideoUrl)}
+                                className="w-full h-48 rounded-lg"
+                                allowFullScreen
+                              />
+                            ) : (
+                              <video
+                                src={business.mainVideoUrl}
+                                className="w-full h-48 object-cover rounded-lg"
+                                controls
+                              />
+                            )}
+                          </div>
+                        )}
+
+                        {/* Action Buttons - Dynamic Flexbox Layout */}
+                        <div className="flex flex-wrap gap-2">
+                          {/* Phone Button - Always present */}
+                          <a
+                            href={`tel:${business.phone}`}
+                            className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                          >
+                            <PhoneIcon className="h-4 w-4" />
+                            {language === 'ta' ? 'அழை' : 'Call'}
+                          </a>
+
+                          {/* Email Button - Only if email exists */}
+                          {business.email && (
+                            <a
+                              href={`mailto:${business.email}`}
+                              className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                            >
+                              <EnvelopeIcon className="h-4 w-4" />
+                              {language === 'ta' ? 'மின்னஞ்சல்' : 'Email'}
+                            </a>
+                          )}
+
+                          {/* Website Button - Only if website exists */}
+                          {business.website && (
+                            <a
+                              href={business.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                            >
+                              <GlobeAltIcon className="h-4 w-4" />
+                              {language === 'ta' ? 'வலைத்தளம்' : 'Website'}
+                            </a>
+                          )}
+
+                          {/* Directions Button - Only if directions or coordinates exist */}
+                          {(business.directionsUrl || (business.latitude && business.longitude)) && (
+                            <a
+                              href={business.directionsUrl || `https://www.google.com/maps?q=${business.latitude},${business.longitude}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                            >
+                              <MapPinIcon className="h-4 w-4" />
+                              {language === 'ta' ? 'திசைகள்' : 'Directions'}
+                            </a>
+                          )}
+
+                          {/* Booking Button - Only if booking URL exists */}
+                          {business.bookingUrl && (
+                            <a
+                              href={business.bookingUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                            >
+                              <CalendarIcon className="h-4 w-4" />
+                              {language === 'ta' ? 'முன்பதிவு' : 'Book'}
+                            </a>
+                          )}
+
+                          {/* Profile Button - Only if has profile */}
+                          {business.hasProfile && (
+                            <button
+                              onClick={() => {
+                                setSelectedBusiness(business)
+                                setShowProfilePopup(true)
+                              }}
+                              className="flex items-center gap-1 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                            >
+                              <UserIcon className="h-4 w-4" />
+                              {language === 'ta' ? 'விவரம்' : 'Profile'}
+                            </button>
+                          )}
+
+                          {/* Share Button - Always present */}
+                          <button
+                            onClick={() => {
+                              setSelectedBusiness(business)
+                              setShowShareModal(true)
+                            }}
+                            className="flex items-center gap-1 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                          >
+                            <ShareIcon className="h-4 w-4" />
+                            {language === 'ta' ? 'பகிர்' : 'Share'}
+                          </button>
+                        </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               </div>
@@ -1333,7 +1468,7 @@ function DirectoryPageContent() {
                         )}
                       </div>
 
-                      {/* Action Buttons - Always 2x2 grid layout */}
+                      {/* Action Buttons - Dynamic flexbox layout */}
                       <div className={`${getButtonLayoutClasses().containerClass} mb-3`}>
                         {/* Instagram */}
                         {business.instagramUrl && (
