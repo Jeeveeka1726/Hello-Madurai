@@ -460,11 +460,34 @@ function DirectoryPageContent() {
     return buttons
   }
 
-  // Function to get button layout classes - Dynamic flexbox layout
-  const getButtonLayoutClasses = () => {
-    return {
-      containerClass: "flex flex-wrap gap-2 justify-center",
-      buttonClass: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+  // Function to get button layout classes - Smart grid layout
+  const getButtonLayoutClasses = (business: any) => {
+    // Count available buttons for this business
+    const availableButtons = [
+      business.instagramUrl,
+      business.youtubeUrl,
+      business.facebookUrl,
+      true, // Directions - always available
+      business.bookingUrl,
+      true  // Share - always available
+    ].filter(Boolean).length
+
+    // Use different layouts based on button count
+    if (availableButtons <= 2) {
+      return {
+        containerClass: "flex gap-2 justify-center",
+        buttonClass: "flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+      }
+    } else if (availableButtons <= 4) {
+      return {
+        containerClass: "grid grid-cols-2 gap-2",
+        buttonClass: "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+      }
+    } else {
+      return {
+        containerClass: "grid grid-cols-2 gap-2",
+        buttonClass: "w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-medium"
+      }
     }
   }
 
@@ -1011,13 +1034,13 @@ function DirectoryPageContent() {
                           )}
                         </div>
 
-                        {/* Action Buttons - Dynamic flexbox layout */}
-                        <div className={`${getButtonLayoutClasses().containerClass} mb-3`}>
+                        {/* Action Buttons - Smart grid layout */}
+                        <div className={`${getButtonLayoutClasses(business).containerClass} mb-3`}>
                           {/* Instagram */}
                           {business.instagramUrl && (
                             <button
                               onClick={() => handleInstagram(business.instagramUrl!)}
-                              className={getButtonLayoutClasses().buttonClass}
+                              className={getButtonLayoutClasses(business).buttonClass}
                             >
                               Instagram
                             </button>
@@ -1027,7 +1050,7 @@ function DirectoryPageContent() {
                           {business.youtubeUrl && (
                             <button
                               onClick={() => window.open(business.youtubeUrl, '_blank')}
-                              className={getButtonLayoutClasses().buttonClass}
+                              className={getButtonLayoutClasses(business).buttonClass}
                             >
                               YouTube
                             </button>
@@ -1037,7 +1060,7 @@ function DirectoryPageContent() {
                           {business.facebookUrl && (
                             <button
                               onClick={() => handleFacebook(business.facebookUrl!)}
-                              className={getButtonLayoutClasses().buttonClass}
+                              className={getButtonLayoutClasses(business).buttonClass}
                             >
                               Facebook
                             </button>
@@ -1046,7 +1069,7 @@ function DirectoryPageContent() {
                           {/* Directions - Always available */}
                           <button
                             onClick={() => handleDirections(business)}
-                            className={getButtonLayoutClasses().buttonClass}
+                            className={getButtonLayoutClasses(business).buttonClass}
                           >
                             Directions
                           </button>
@@ -1055,7 +1078,7 @@ function DirectoryPageContent() {
                           {business.bookingUrl && (
                             <button
                               onClick={() => handleBooking(business)}
-                              className={getButtonLayoutClasses().buttonClass}
+                              className={getButtonLayoutClasses(business).buttonClass}
                             >
                               Book Now
                             </button>
@@ -1064,7 +1087,7 @@ function DirectoryPageContent() {
                           {/* Share - Always available */}
                           <button
                             onClick={() => handleShare(business)}
-                            className={getButtonLayoutClasses().buttonClass}
+                            className={getButtonLayoutClasses(business).buttonClass}
                           >
                             Share
                           </button>
@@ -1644,13 +1667,13 @@ function DirectoryPageContent() {
                         )}
                       </div>
 
-                      {/* Action Buttons - Dynamic flexbox layout */}
-                      <div className={`${getButtonLayoutClasses().containerClass} mb-3`}>
+                      {/* Action Buttons - Smart grid layout */}
+                      <div className={`${getButtonLayoutClasses(business).containerClass} mb-3`}>
                         {/* Instagram */}
                         {business.instagramUrl && (
                           <button
                             onClick={() => handleInstagram(business.instagramUrl!)}
-                            className={getButtonLayoutClasses().buttonClass}
+                            className={getButtonLayoutClasses(business).buttonClass}
                           >
                             Instagram
                           </button>
@@ -1660,7 +1683,7 @@ function DirectoryPageContent() {
                         {business.youtubeUrl && (
                           <button
                             onClick={() => window.open(business.youtubeUrl, '_blank')}
-                            className={getButtonLayoutClasses().buttonClass}
+                            className={getButtonLayoutClasses(business).buttonClass}
                           >
                             YouTube
                           </button>
@@ -1670,7 +1693,7 @@ function DirectoryPageContent() {
                         {business.facebookUrl && (
                           <button
                             onClick={() => handleFacebook(business.facebookUrl!)}
-                            className={getButtonLayoutClasses().buttonClass}
+                            className={getButtonLayoutClasses(business).buttonClass}
                           >
                             Facebook
                           </button>
@@ -1679,7 +1702,7 @@ function DirectoryPageContent() {
                         {/* Directions - Always available */}
                         <button
                           onClick={() => handleDirections(business)}
-                          className={getButtonLayoutClasses().buttonClass}
+                          className={getButtonLayoutClasses(business).buttonClass}
                         >
                           Directions
                         </button>
@@ -1688,7 +1711,7 @@ function DirectoryPageContent() {
                         {business.bookingUrl && (
                           <button
                             onClick={() => handleBooking(business)}
-                            className={getButtonLayoutClasses().buttonClass}
+                            className={getButtonLayoutClasses(business).buttonClass}
                           >
                             Book Now
                           </button>
@@ -1697,7 +1720,7 @@ function DirectoryPageContent() {
                         {/* Share - Always available */}
                         <button
                           onClick={() => handleShare(business)}
-                          className={getButtonLayoutClasses().buttonClass}
+                          className={getButtonLayoutClasses(business).buttonClass}
                         >
                           Share
                         </button>
