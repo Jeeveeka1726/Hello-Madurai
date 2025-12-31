@@ -273,6 +273,8 @@ export default function AdminDirectoryPage() {
       bookingUrl: business.bookingUrl || '',
       bookingPhone: '', // Will be enabled after database migration
       directionsUrl: business.directionsUrl || '',
+      latitude: business.latitude?.toString() || '',
+      longitude: business.longitude?.toString() || '',
       orderNumber: business.orderNumber || 0,
       hasProfile: business.hasProfile || false,
       profileContent: business.profileContent || '',
@@ -813,6 +815,41 @@ export default function AdminDirectoryPage() {
                       </p>
                     </div>
 
+                    {/* Location Coordinates */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <TranslatedText>Latitude</TranslatedText>
+                        </label>
+                        <input
+                          type="number"
+                          step="any"
+                          value={formData.latitude}
+                          onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          placeholder="9.9252"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Required for nearby businesses feature
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <TranslatedText>Longitude</TranslatedText>
+                        </label>
+                        <input
+                          type="number"
+                          step="any"
+                          value={formData.longitude}
+                          onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                          placeholder="78.1198"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Required for nearby businesses feature
+                        </p>
+                      </div>
+                    </div>
 
                   </div>
 

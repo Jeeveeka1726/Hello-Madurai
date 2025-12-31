@@ -30,6 +30,8 @@ export async function PUT(
         bookingUrl: data.bookingUrl || undefined,
         // bookingPhone: data.bookingPhone || undefined, // Will be enabled after database migration
         directionsUrl: data.directionsUrl || undefined,
+        latitude: data.latitude ? parseFloat(data.latitude) : null,
+        longitude: data.longitude ? parseFloat(data.longitude) : null,
         orderNumber: data.orderNumber !== undefined ? data.orderNumber : 0,
         hasProfile: data.hasProfile !== undefined ? data.hasProfile : false,
         profileContent: data.profileContent || undefined,

@@ -59,6 +59,8 @@ export async function POST(request: NextRequest) {
         bookingUrl: body.bookingUrl,
         // bookingPhone: body.bookingPhone, // Will be enabled after database migration
         directionsUrl: body.directionsUrl,
+        latitude: body.latitude ? parseFloat(body.latitude) : null,
+        longitude: body.longitude ? parseFloat(body.longitude) : null,
         orderNumber: body.orderNumber || 0,
         hasProfile: body.hasProfile || false,
         profileContent: body.profileContent,
