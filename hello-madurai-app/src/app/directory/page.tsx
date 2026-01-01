@@ -136,6 +136,7 @@ function DirectoryPageContent() {
   const [shareBusinessData, setShareBusinessData] = useState<Business | null>(null)
 
   const [playingVideo, setPlayingVideo] = useState<string | null>(null)
+  const [videoKey, setVideoKey] = useState<number>(0)
 
   // Nearby businesses state
   const [showNearbyBusinesses, setShowNearbyBusinesses] = useState(false)
@@ -325,6 +326,12 @@ function DirectoryPageContent() {
 
   const handleVideoPlay = (businessId: string) => {
     setPlayingVideo(playingVideo === businessId ? null : businessId)
+  }
+
+  const handleVideoClose = () => {
+    setPlayingVideo(null)
+    // Force iframe recreation by changing key - this stops the YouTube video completely
+    setVideoKey(prev => prev + 1)
   }
 
   const filteredBusinesses = (() => {
@@ -881,6 +888,7 @@ function DirectoryPageContent() {
                                     return (
                                       <>
                                         <iframe
+                                          key={`${business.id}-${videoKey}`}
                                           src={`${embedUrl}?autoplay=1&rel=0&modestbranding=1`}
                                           className="absolute inset-0 w-full h-full border-0"
                                           allowFullScreen
@@ -888,7 +896,7 @@ function DirectoryPageContent() {
                                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                         />
                                         <button
-                                          onClick={() => setPlayingVideo(null)}
+                                          onClick={handleVideoClose}
                                           className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity z-10"
                                         >
                                           <XMarkIcon className="w-4 h-4" />
@@ -908,7 +916,7 @@ function DirectoryPageContent() {
                                           muted
                                         />
                                         <button
-                                          onClick={() => setPlayingVideo(null)}
+                                          onClick={handleVideoClose}
                                           className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity z-10"
                                         >
                                           <XMarkIcon className="w-4 h-4" />
@@ -1509,6 +1517,7 @@ function DirectoryPageContent() {
                                   return (
                                     <>
                                       <iframe
+                                        key={`${business.id}-${videoKey}`}
                                         src={`${embedUrl}?autoplay=1&rel=0&modestbranding=1`}
                                         className="absolute inset-0 w-full h-full border-0"
                                         allowFullScreen
@@ -1516,7 +1525,7 @@ function DirectoryPageContent() {
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                       />
                                       <button
-                                        onClick={() => setPlayingVideo(null)}
+                                        onClick={handleVideoClose}
                                         className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity z-10"
                                       >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1538,7 +1547,7 @@ function DirectoryPageContent() {
                                         muted
                                       />
                                       <button
-                                        onClick={() => setPlayingVideo(null)}
+                                        onClick={handleVideoClose}
                                         className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity z-10"
                                       >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
