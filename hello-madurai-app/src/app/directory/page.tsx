@@ -954,9 +954,11 @@ function DirectoryPageContent() {
                                               }
                                             }}
                                           />
-                                          {/* YouTube Button - Always Visible */}
-                                          <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold shadow-lg">
-                                            YouTube
+                                          {/* Play Button - Always Visible */}
+                                          <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white p-2 rounded-full shadow-lg">
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                              <path d="M8 5v14l11-7z" />
+                                            </svg>
                                           </div>
 
                                           {/* Play Button Overlay */}
@@ -1591,9 +1593,11 @@ function DirectoryPageContent() {
                                             }
                                           }}
                                         />
-                                        {/* YouTube Button - Always Visible */}
-                                        <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold shadow-lg">
-                                          YouTube
+                                        {/* Play Button - Always Visible */}
+                                        <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white p-2 rounded-full shadow-lg">
+                                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M8 5v14l11-7z" />
+                                          </svg>
                                         </div>
 
                                         {/* Play Button Overlay */}
