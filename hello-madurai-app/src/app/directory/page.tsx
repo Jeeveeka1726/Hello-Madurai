@@ -954,22 +954,15 @@ function DirectoryPageContent() {
                                               }
                                             }}
                                           />
-                                          {/* Play Button - Always Visible */}
-                                          <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white p-2 rounded-full shadow-lg">
-                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                              <path d="M8 5v14l11-7z" />
-                                            </svg>
-                                          </div>
-
-                                          {/* Play Button Overlay */}
-                                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                            <div className="absolute inset-0 bg-black opacity-30"></div>
-                                            <div className="relative w-16 h-16 bg-black bg-opacity-60 rounded-full flex items-center justify-center backdrop-blur-sm border-3 border-white border-opacity-80 shadow-2xl">
-                                              <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                          {/* Play Button - Always Visible Center */}
+                                          <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="bg-black bg-opacity-60 text-white p-3 rounded-full shadow-lg">
+                                              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M8 5v14l11-7z" />
                                               </svg>
                                             </div>
                                           </div>
+
                                           </div>
                                         </div>
                                       )
@@ -1126,7 +1119,7 @@ function DirectoryPageContent() {
                             }}
                             className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm font-medium mt-3"
                           >
-                            {language === 'ta' ? 'விவரம் பார்க்க' : 'View Profile'}
+                            View Profile
                           </button>
                         )}
                       </CardContent>
@@ -1438,7 +1431,7 @@ function DirectoryPageContent() {
                             }}
                             className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm font-medium mt-3"
                           >
-                            {language === 'ta' ? 'விவரம் பார்க்க' : 'View Profile'}
+                            View Profile
                           </button>
                         )}
                       </CardContent>
@@ -1593,22 +1586,15 @@ function DirectoryPageContent() {
                                             }
                                           }}
                                         />
-                                        {/* Play Button - Always Visible */}
-                                        <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white p-2 rounded-full shadow-lg">
-                                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M8 5v14l11-7z" />
-                                          </svg>
-                                        </div>
-
-                                        {/* Play Button Overlay */}
-                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                          <div className="absolute inset-0 bg-black opacity-30"></div>
-                                          <div className="relative w-16 h-16 bg-black bg-opacity-60 rounded-full flex items-center justify-center backdrop-blur-sm border-3 border-white border-opacity-80 shadow-2xl">
-                                            <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                        {/* Play Button - Always Visible Center */}
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                          <div className="bg-black bg-opacity-60 text-white p-3 rounded-full shadow-lg">
+                                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                               <path d="M8 5v14l11-7z" />
                                             </svg>
                                           </div>
                                         </div>
+
                                         </div>
                                       </div>
                                     )
@@ -1767,7 +1753,7 @@ function DirectoryPageContent() {
                           }}
                           className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm font-medium"
                         >
-                          {language === 'ta' ? 'விவரம் பார்க்க' : 'View Profile'}
+                          View Profile
                         </button>
                       )}
                     </CardContent>
