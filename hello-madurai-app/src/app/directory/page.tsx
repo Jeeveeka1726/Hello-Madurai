@@ -462,14 +462,13 @@ function DirectoryPageContent() {
 
   // Function to get button layout classes - Smart responsive grid layout
   const getButtonLayoutClasses = (business: any) => {
-    // Count available buttons for this business
+    // Count available buttons for this business (excluding Profile - it has separate View Profile button)
     const availableButtons = [
       business.instagramUrl,
       business.youtubeUrl,
       business.facebookUrl,
       true, // Directions - always available
       business.bookingUrl,
-      business.hasProfile,
       true  // Share - always available
     ].filter(Boolean).length
 
@@ -792,10 +791,25 @@ function DirectoryPageContent() {
                     onClick={() => {
                       setShowNearbyBusinesses(false)
                       setUserLocation(null)
-                      setSelectedCategory(null)
-                      setSelectedSubcategory(null)
-                      setViewingSubcategory(false)
-                      updateURL(null, null, false)
+                      // Auto-select Shopping category (assuming it's the first category or has a specific ID)
+                      const shoppingCategory = categories.find(cat =>
+                        cat.name.toLowerCase().includes('shopping') ||
+                        cat.name.toLowerCase().includes('shop') ||
+                        cat.name_ta?.includes('கடை') ||
+                        cat.id === '1' // Fallback to first category if shopping not found
+                      ) || categories[0] // Fallback to first category
+
+                      if (shoppingCategory) {
+                        setSelectedCategory(shoppingCategory.id)
+                        setSelectedSubcategory(null)
+                        setViewingSubcategory(false)
+                        updateURL(shoppingCategory.id, null, false)
+                      } else {
+                        setSelectedCategory(null)
+                        setSelectedSubcategory(null)
+                        setViewingSubcategory(false)
+                        updateURL(null, null, false)
+                      }
                     }}
                     className="text-gray-600 hover:text-gray-800 text-sm underline"
                   >
@@ -1085,18 +1099,7 @@ function DirectoryPageContent() {
                             </button>
                           )}
 
-                          {/* Profile */}
-                          {business.hasProfile && (
-                            <button
-                              onClick={() => {
-                                setSelectedBusiness(business)
-                                setShowProfilePopup(true)
-                              }}
-                              className={getButtonLayoutClasses(business).buttonClass}
-                            >
-                              Profile
-                            </button>
-                          )}
+
 
                           {/* Share - Always available */}
                           <button
@@ -1106,6 +1109,19 @@ function DirectoryPageContent() {
                             Share
                           </button>
                         </div>
+
+                        {/* View Profile Button - Only if hasProfile is true */}
+                        {business.hasProfile && (
+                          <button
+                            onClick={() => {
+                              setSelectedBusiness(business)
+                              setShowProfilePopup(true)
+                            }}
+                            className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm font-medium mt-3"
+                          >
+                            {language === 'ta' ? 'விவரம் பார்க்க' : 'View Profile'}
+                          </button>
+                        )}
                       </CardContent>
                     </Card>
                   ))}
@@ -1395,18 +1411,7 @@ function DirectoryPageContent() {
                             </button>
                           )}
 
-                          {/* Profile */}
-                          {business.hasProfile && (
-                            <button
-                              onClick={() => {
-                                setSelectedBusiness(business)
-                                setShowProfilePopup(true)
-                              }}
-                              className={getButtonLayoutClasses(business).buttonClass}
-                            >
-                              Profile
-                            </button>
-                          )}
+
 
                           {/* Share - Always available */}
                           <button
@@ -1416,6 +1421,19 @@ function DirectoryPageContent() {
                             Share
                           </button>
                         </div>
+
+                        {/* View Profile Button - Only if hasProfile is true */}
+                        {business.hasProfile && (
+                          <button
+                            onClick={() => {
+                              setSelectedBusiness(business)
+                              setShowProfilePopup(true)
+                            }}
+                            className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm font-medium mt-3"
+                          >
+                            {language === 'ta' ? 'விவரம் பார்க்க' : 'View Profile'}
+                          </button>
+                        )}
                       </CardContent>
                     </Card>
                   ))}
@@ -1715,18 +1733,7 @@ function DirectoryPageContent() {
                           </button>
                         )}
 
-                        {/* Profile */}
-                        {business.hasProfile && (
-                          <button
-                            onClick={() => {
-                              setSelectedBusiness(business)
-                              setShowProfilePopup(true)
-                            }}
-                            className={getButtonLayoutClasses(business).buttonClass}
-                          >
-                            Profile
-                          </button>
-                        )}
+
 
                         {/* Share - Always available */}
                         <button
@@ -1746,7 +1753,7 @@ function DirectoryPageContent() {
                           }}
                           className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm font-medium"
                         >
-                          View Profile
+                          {language === 'ta' ? 'விவரம் பார்க்க' : 'View Profile'}
                         </button>
                       )}
                     </CardContent>
