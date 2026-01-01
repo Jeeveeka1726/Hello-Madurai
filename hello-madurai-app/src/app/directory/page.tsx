@@ -954,6 +954,11 @@ function DirectoryPageContent() {
                                               }
                                             }}
                                           />
+                                          {/* YouTube Button - Always Visible */}
+                                          <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold shadow-lg">
+                                            YouTube
+                                          </div>
+
                                           {/* Play Button Overlay */}
                                           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                                             <div className="absolute inset-0 bg-black opacity-30"></div>
@@ -1586,6 +1591,11 @@ function DirectoryPageContent() {
                                             }
                                           }}
                                         />
+                                        {/* YouTube Button - Always Visible */}
+                                        <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold shadow-lg">
+                                          YouTube
+                                        </div>
+
                                         {/* Play Button Overlay */}
                                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                                           <div className="absolute inset-0 bg-black opacity-30"></div>
