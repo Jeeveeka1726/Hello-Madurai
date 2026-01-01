@@ -460,7 +460,7 @@ function DirectoryPageContent() {
     return buttons
   }
 
-  // Function to get button layout classes - Smart grid layout
+  // Function to get button layout classes - Smart responsive grid layout
   const getButtonLayoutClasses = (business: any) => {
     // Count available buttons for this business
     const availableButtons = [
@@ -473,21 +473,21 @@ function DirectoryPageContent() {
       true  // Share - always available
     ].filter(Boolean).length
 
-    // Use different layouts based on button count
+    // Use different layouts based on button count with responsive design
     if (availableButtons <= 2) {
       return {
-        containerClass: "flex gap-2 justify-center",
-        buttonClass: "flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+        containerClass: "flex flex-col sm:flex-row gap-2 justify-center",
+        buttonClass: "flex-1 px-3 py-2 sm:px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium text-center"
       }
     } else if (availableButtons <= 4) {
       return {
-        containerClass: "grid grid-cols-2 gap-2",
-        buttonClass: "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+        containerClass: "grid grid-cols-1 sm:grid-cols-2 gap-2",
+        buttonClass: "w-full px-3 py-2 sm:px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium text-center"
       }
     } else {
       return {
-        containerClass: "grid grid-cols-2 gap-2",
-        buttonClass: "w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-medium"
+        containerClass: "grid grid-cols-2 sm:grid-cols-3 gap-2",
+        buttonClass: "w-full px-2 py-2 sm:px-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm font-medium text-center"
       }
     }
   }
@@ -689,7 +689,7 @@ function DirectoryPageContent() {
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
             {t('directory.title', 'Business Directory', 'வணிக முகவரி')}
           </h1>
-          <p className="mt-2 text-lg text-gray-600">
+          <p className="mt-2 text-base sm:text-lg text-gray-600 leading-relaxed">
             {t('directory.subtitle', 'Find local businesses and services in Madurai', 'மதுரையில் உள்ளூர் வணிகங்கள் மற்றும் சேவைகளைக் கண்டறியுங்கள்')}
           </p>
         </div>
@@ -814,13 +814,13 @@ function DirectoryPageContent() {
             {/* Nearby Businesses - Show when nearby mode is active and not searching */}
             {showNearbyBusinesses && userLocation && !searchTerm && (
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 text-center">
                   {language === 'ta' ? 'அருகிலுள்ள வணிகங்கள்' : 'Nearby Businesses'}
                 </h2>
-                <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
+                <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 md:grid-cols-2">
                   {filteredBusinesses.map((business) => (
                     <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
-                      <CardContent className="p-6 directory-card-content">
+                      <CardContent className="p-4 sm:p-6 directory-card-content">
                         {/* Category Badge with Distance */}
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
@@ -851,7 +851,7 @@ function DirectoryPageContent() {
                         </div>
 
                         {/* Business Name */}
-                        <h3 className="font-bold text-xl text-gray-900 mb-3">
+                        <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-3 leading-tight">
                           {language === 'ta' && business.name_ta ? business.name_ta : business.name}
                         </h3>
 
@@ -1130,7 +1130,7 @@ function DirectoryPageContent() {
                           setViewingSubcategory(false)
                           updateURL(category.id, null, false)
                         }}
-                        className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
+                        className={`px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-medium transition-all flex items-center gap-2 whitespace-nowrap text-sm sm:text-base ${
                           selectedCategory === category.id
                             ? 'bg-blue-600 text-white shadow-lg scale-105'
                             : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400 hover:shadow-md'
@@ -1191,15 +1191,15 @@ function DirectoryPageContent() {
                             setViewingSubcategory(true)
                             updateURL(selectedCategory, subcategory.id, true)
                           }}
-                          className={`p-4 rounded-xl border-2 transition-all hover:shadow-lg ${
+                          className={`p-3 sm:p-4 rounded-xl border-2 transition-all hover:shadow-lg ${
                             selectedSubcategory === subcategory.id
                               ? 'border-blue-600 bg-blue-50 shadow-md'
                               : 'border-gray-200 bg-white hover:border-blue-300'
                           }`}
                         >
-                          <div className="flex flex-col items-center text-center gap-2">
+                          <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
                             {/* Icon from database */}
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
+                            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-xl sm:text-2xl ${
                               selectedSubcategory === subcategory.id
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600'
@@ -1207,7 +1207,7 @@ function DirectoryPageContent() {
                               {subcategory.icon || '🏢'}
                             </div>
                             <div>
-                              <p className={`font-medium text-sm ${
+                              <p className={`font-medium text-xs sm:text-sm leading-tight ${
                                 selectedSubcategory === subcategory.id
                                   ? 'text-blue-900'
                                   : 'text-gray-900'
@@ -1240,7 +1240,7 @@ function DirectoryPageContent() {
             {/* Search Results - Show when searching */}
             {searchTerm && filteredBusinesses.length > 0 && (
               <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
                   {showNearbyBusinesses && userLocation
                     ? (language === 'ta'
                         ? `அருகிலுள்ள தேடல் முடிவுகள் (${filteredBusinesses.length})`
@@ -1251,10 +1251,10 @@ function DirectoryPageContent() {
                   }
                 </h3>
                 {/* Full Business Cards for Search Results */}
-                <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
+                <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 md:grid-cols-2">
                   {filteredBusinesses.map((business) => (
                     <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
-                      <CardContent className="p-6 directory-card-content">
+                      <CardContent className="p-4 sm:p-6 directory-card-content">
                         {/* Category Badge with Distance */}
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
@@ -1304,14 +1304,14 @@ function DirectoryPageContent() {
                         </div>
 
                         {/* Business Name */}
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-tight">
                           {language === 'ta' ? (business.name_ta || business.name) : business.name}
                         </h3>
 
                         {/* Address */}
                         <div className="flex items-start gap-2 mb-3">
                           <MapPinIcon className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
-                          <p className="text-gray-600 text-sm">
+                          <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
                             {language === 'ta' ? (business.address_ta || business.address) : business.address}
                           </p>
                         </div>
@@ -1438,7 +1438,7 @@ function DirectoryPageContent() {
               (selectedCategoryObj.subcategories.length === 0)
             ) && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
                   {viewingSubcategory && selectedSubcategory ? (
                     // Show subcategory name when in subcategory view
                     (() => {
@@ -1450,10 +1450,10 @@ function DirectoryPageContent() {
                     language === 'ta' ? selectedCategoryObj.name_ta : selectedCategoryObj.name
                   )}
                 </h2>
-              <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
+              <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 md:grid-cols-2">
                 {filteredBusinesses.map((business) => (
                   <Card key={business.id} className="hover:shadow-xl transition-all bg-white border-gray-200 overflow-hidden">
-                    <CardContent className="p-6 directory-card-content">
+                    <CardContent className="p-4 sm:p-6 directory-card-content">
                       {/* Category Badge */}
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
@@ -1475,7 +1475,7 @@ function DirectoryPageContent() {
                       </div>
 
                       {/* Business Name */}
-                      <h3 className="font-bold text-xl text-gray-900 mb-3">
+                      <h3 className="font-bold text-lg sm:text-xl text-gray-900 mb-3 leading-tight">
                         {language === 'ta' && business.name_ta ? business.name_ta : business.name}
                       </h3>
 
