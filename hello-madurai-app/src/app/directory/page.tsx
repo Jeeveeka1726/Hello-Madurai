@@ -130,7 +130,8 @@ function DirectoryPageContent() {
     }
 
     const newURL = `${pathname}?${params.toString()}`
-    router.replace(newURL)
+    // Use window.history.replaceState to update URL without page refresh
+    window.history.replaceState(null, '', newURL)
   }
   const [showShareModal, setShowShareModal] = useState(false)
   const [shareBusinessData, setShareBusinessData] = useState<Business | null>(null)
