@@ -34,12 +34,25 @@ interface Magazine {
   }
 }
 
+interface MagazineCollection {
+  id: string
+  name: string
+  name_ta?: string
+  description?: string
+  description_ta?: string
+  coverImage?: string
+  featured: boolean
+  magazines?: Magazine[]
+}
+
 export default function AdminMagazinesPage() {
   const { t } = useLanguage()
   const [magazines, setMagazines] = useState<Magazine[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [showCollectionForm, setShowCollectionForm] = useState(false)
   const [editingMagazine, setEditingMagazine] = useState<Magazine | null>(null)
+  const [editingCollection, setEditingCollection] = useState<MagazineCollection | null>(null)
   const [formData, setFormData] = useState({
     title: '',
     title_ta: '',
@@ -52,7 +65,15 @@ export default function AdminMagazinesPage() {
     collectionId: '',
     featured: false
   })
-  const [collections, setCollections] = useState<{id: string, name: string, name_ta?: string}[]>([])
+  const [collectionFormData, setCollectionFormData] = useState({
+    name: '',
+    name_ta: '',
+    description: '',
+    description_ta: '',
+    coverImage: '',
+    featured: false
+  })
+  const [collections, setCollections] = useState<MagazineCollection[]>([])
 
   useEffect(() => {
     fetchMagazines()
@@ -138,6 +159,48 @@ export default function AdminMagazinesPage() {
     }
   }
 
+  const handleCollectionSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/magazines/collections', {
+        method: editingCollection ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...collectionFormData,
+          ...(editingCollection && { id: editingCollection.id })
+        }),
+      })
+
+      if (response.ok) {
+        await fetchCollections()
+        setShowCollectionForm(false)
+        setEditingCollection(null)
+        setCollectionFormData({
+          name: '',
+          name_ta: '',
+          description: '',
+          description_ta: '',
+          coverImage: '',
+          featured: false
+        })
+        toast.success(editingCollection
+          ? t('admin.collectionUpdated', 'Collection updated successfully!', 'தொகுப்பு வெற்றிகரமாக புதுப்பிக்கப்பட்டது!')
+          : t('admin.collectionCreated', 'Collection created successfully!', 'தொகுப்பு வெற்றிகரமாக உருவாக்கப்பட்டது!')
+        )
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || t('admin.errorSavingCollection', 'Error saving collection', 'தொகுப்பை சேமிப்பதில் பிழை'))
+      }
+    } catch (error) {
+      console.error('Error saving collection:', error)
+      toast.error(t('admin.errorSavingCollection', 'Error saving collection', 'தொகுப்பை சேமிப்பதில் பிழை'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleEdit = (magazine: Magazine) => {
     setEditingMagazine(magazine)
     setFormData({
@@ -175,6 +238,39 @@ export default function AdminMagazinesPage() {
     }
   }
 
+  const handleEditCollection = (collection: MagazineCollection) => {
+    setEditingCollection(collection)
+    setCollectionFormData({
+      name: collection.name,
+      name_ta: collection.name_ta || '',
+      description: collection.description || '',
+      description_ta: collection.description_ta || '',
+      coverImage: collection.coverImage || '',
+      featured: collection.featured
+    })
+    setShowCollectionForm(true)
+  }
+
+  const handleDeleteCollection = async (id: string) => {
+    if (!confirm(t('admin.confirmDeleteCollection', 'Are you sure you want to delete this collection?', 'இந்த தொகுப்பை நிச்சயமாக நீக்க விரும்புகிறீர்களா?'))) return
+
+    try {
+      const response = await fetch(`/api/magazines/collections/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        await fetchCollections()
+        toast.success(t('admin.collectionDeleted', 'Collection deleted successfully!', 'தொகுப்பு வெற்றிகரமாக நீக்கப்பட்டது!'))
+      } else {
+        toast.error(t('admin.errorDeletingCollection', 'Error deleting collection', 'தொகுப்பை நீக்குவதில் பிழை'))
+      }
+    } catch (error) {
+      console.error('Error deleting collection:', error)
+      toast.error(t('admin.errorDeletingCollection', 'Error deleting collection', 'தொகுப்பை நீக்குவதில் பிழை'))
+    }
+  }
+
   if (loading && magazines.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -204,27 +300,48 @@ export default function AdminMagazinesPage() {
               </TranslatedText>
             </p>
           </div>
-          <Button
-            onClick={() => {
-              setShowForm(true)
-              setEditingMagazine(null)
-              setFormData({
-                title: '',
-                title_ta: '',
-                description: '',
-                description_ta: '',
-                pdfUrl: '',
-                coverImage: '',
-                featuredImage: '',
-                issueNumber: '',
-                collectionId: '',
-                featured: false
-              })
-            }}
-          >
-            <PlusIcon className="h-4 w-4 mr-2" />
-            <TranslatedText tamil="பத்திரிகை சேர்க்க">Add Magazine</TranslatedText>
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => {
+                setShowCollectionForm(true)
+                setEditingCollection(null)
+                setCollectionFormData({
+                  name: '',
+                  name_ta: '',
+                  description: '',
+                  description_ta: '',
+                  coverImage: '',
+                  featured: false
+                })
+              }}
+              className="bg-blue-600 text-white hover:bg-blue-700"
+            >
+              <PlusIcon className="h-4 w-4 mr-2" />
+              <TranslatedText tamil="தொகுப்பு சேர்க்க">Add Collection</TranslatedText>
+            </Button>
+            <Button
+              onClick={() => {
+                setShowForm(true)
+                setEditingMagazine(null)
+                setFormData({
+                  title: '',
+                  title_ta: '',
+                  description: '',
+                  description_ta: '',
+                  pdfUrl: '',
+                  coverImage: '',
+                  featuredImage: '',
+                  issueNumber: '',
+                  collectionId: '',
+                  featured: false
+                })
+              }}
+              className="bg-green-600 text-white hover:bg-green-700"
+            >
+              <PlusIcon className="h-4 w-4 mr-2" />
+              <TranslatedText tamil="பத்திரிகை சேர்க்க">Add Magazine</TranslatedText>
+            </Button>
+          </div>
         </div>
 
         {/* Form Modal */}
@@ -379,6 +496,141 @@ export default function AdminMagazinesPage() {
             </Card>
           </div>
         )}
+
+        {/* Collection Form Modal */}
+        {showCollectionForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white text-gray-900">
+              <CardHeader>
+                <CardTitle className="text-gray-900">
+                  {editingCollection
+                    ? <TranslatedText tamil="தொகுப்பை திருத்து">Edit Collection</TranslatedText>
+                    : <TranslatedText tamil="புதிய தொகுப்பு சேர்க்க">Add New Collection</TranslatedText>
+                  }
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleCollectionSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <BilingualField
+                      label="Name"
+                      labelTamil="பெயர்"
+                      englishValue={collectionFormData.name}
+                      tamilValue={collectionFormData.name_ta}
+                      onEnglishChange={(value) => setCollectionFormData({ ...collectionFormData, name: value })}
+                      onTamilChange={(value) => setCollectionFormData({ ...collectionFormData, name_ta: value })}
+                      required={true}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <BilingualField
+                      label="Description"
+                      labelTamil="விளக்கம்"
+                      englishValue={collectionFormData.description}
+                      tamilValue={collectionFormData.description_ta}
+                      onEnglishChange={(value) => setCollectionFormData({ ...collectionFormData, description: value })}
+                      onTamilChange={(value) => setCollectionFormData({ ...collectionFormData, description_ta: value })}
+                      type="textarea"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <TranslatedText tamil="அட்டைப்படம் URL">Cover Image URL</TranslatedText>
+                    </label>
+                    <input
+                      type="url"
+                      value={collectionFormData.coverImage}
+                      onChange={(e) => setCollectionFormData({ ...collectionFormData, coverImage: e.target.value })}
+                      placeholder="https://example.com/image.jpg"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={collectionFormData.featured}
+                        onChange={(e) => setCollectionFormData({ ...collectionFormData, featured: e.target.checked })}
+                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700">
+                        <TranslatedText tamil="சிறப்பு தொகுப்பு">Featured Collection</TranslatedText>
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className="flex justify-end space-x-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowCollectionForm(false)}
+                    >
+                      <TranslatedText tamil="ரத்து செய்">Cancel</TranslatedText>
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={loading || !collectionFormData.name}
+                    >
+                      {loading
+                        ? t('admin.saving', 'Saving...', 'சேமிக்கிறது...')
+                        : editingCollection
+                          ? t('admin.update', 'Update', 'புதுப்பி')
+                          : t('admin.create', 'Create', 'உருவாக்கு')
+                      }
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Collections List */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <TranslatedText tamil="தொகுப்புகள்">Collections</TranslatedText>
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {collections.map((collection) => (
+              <Card key={collection.id} className="bg-white border-gray-200">
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-semibold text-gray-900">
+                      {collection.name}
+                    </h3>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditCollection(collection)}
+                      >
+                        <TranslatedText tamil="திருத்து">Edit</TranslatedText>
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteCollection(collection.id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <TranslatedText tamil="நீக்கு">Delete</TranslatedText>
+                      </Button>
+                    </div>
+                  </div>
+                  {collection.name_ta && (
+                    <p className="text-sm text-gray-600 mb-2">{collection.name_ta}</p>
+                  )}
+                  {collection.description && (
+                    <p className="text-sm text-gray-700">{collection.description}</p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
 
         {/* Magazines List */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
