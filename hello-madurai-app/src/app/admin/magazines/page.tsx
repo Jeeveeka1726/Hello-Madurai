@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import FileUpload from '@/components/admin/FileUpload'
+import TranslatedText from '@/components/TranslatedText'
+import BilingualField from '@/components/admin/BilingualField'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, DocumentIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
 
@@ -32,6 +35,7 @@ interface Magazine {
 }
 
 export default function AdminMagazinesPage() {
+  const { t } = useLanguage()
   const [magazines, setMagazines] = useState<Magazine[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -108,20 +112,27 @@ export default function AdminMagazinesPage() {
         setEditingMagazine(null)
         setFormData({
           title: '',
+          title_ta: '',
           description: '',
+          description_ta: '',
           pdfUrl: '',
           coverImage: '',
+          featuredImage: '',
           issueNumber: '',
+          collectionId: '',
           featured: false
         })
-        toast.success(editingMagazine ? 'பத்திரிகை வெற்றிகரமாக புதுப்பிக்கப்பட்டது!' : 'பத்திரிகை வெற்றிகரமாக உருவாக்கப்பட்டது!')
+        toast.success(editingMagazine
+          ? t('admin.magazineUpdated', 'Magazine updated successfully!', 'பத்திரிகை வெற்றிகரமாக புதுப்பிக்கப்பட்டது!')
+          : t('admin.magazineCreated', 'Magazine created successfully!', 'பத்திரிகை வெற்றிகரமாக உருவாக்கப்பட்டது!')
+        )
       } else {
         const errorData = await response.json()
-        toast.error(errorData.error || 'பத்திரிகையை சேமிப்பதில் பிழை')
+        toast.error(errorData.error || t('admin.errorSavingMagazine', 'Error saving magazine', 'பத்திரிகையை சேமிப்பதில் பிழை'))
       }
     } catch (error) {
       console.error('Error saving magazine:', error)
-      toast.error('பத்திரிகையை சேமிப்பதில் பிழை')
+      toast.error(t('admin.errorSavingMagazine', 'Error saving magazine', 'பத்திரிகையை சேமிப்பதில் பிழை'))
     } finally {
       setLoading(false)
     }
@@ -145,7 +156,7 @@ export default function AdminMagazinesPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('இந்த பத்திரிகையை நிச்சயமாக நீக்க விரும்புகிறீர்களா?')) return
+    if (!confirm(t('admin.confirmDeleteMagazine', 'Are you sure you want to delete this magazine?', 'இந்த பத்திரிகையை நிச்சயமாக நீக்க விரும்புகிறீர்களா?'))) return
 
     try {
       const response = await fetch(`/api/admin/magazines/${id}`, {
@@ -154,13 +165,13 @@ export default function AdminMagazinesPage() {
 
       if (response.ok) {
         await fetchMagazines()
-        toast.success('பத்திரிகை வெற்றிகரமாக நீக்கப்பட்டது!')
+        toast.success(t('admin.magazineDeleted', 'Magazine deleted successfully!', 'பத்திரிகை வெற்றிகரமாக நீக்கப்பட்டது!'))
       } else {
-        toast.error('பத்திரிகையை நீக்குவதில் பிழை')
+        toast.error(t('admin.errorDeletingMagazine', 'Error deleting magazine', 'பத்திரிகையை நீக்குவதில் பிழை'))
       }
     } catch (error) {
       console.error('Error deleting magazine:', error)
-      toast.error('பத்திரிகையை நீக்குவதில் பிழை')
+      toast.error(t('admin.errorDeletingMagazine', 'Error deleting magazine', 'பத்திரிகையை நீக்குவதில் பிழை'))
     }
   }
 
@@ -169,7 +180,9 @@ export default function AdminMagazinesPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-gray-500">ஏற்றுகிறது...</p>
+            <p className="text-gray-500">
+              <TranslatedText tamil="ஏற்றுகிறது...">Loading...</TranslatedText>
+            </p>
           </div>
         </div>
       </div>
@@ -183,10 +196,12 @@ export default function AdminMagazinesPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              பத்திரிகை மேலாண்மை
+              <TranslatedText tamil="பத்திரிகை மேலாண்மை">Magazine Management</TranslatedText>
             </h1>
             <p className="mt-2 text-gray-600">
-              டிஜிட்டல் பத்திரிகைகளை உருவாக்கவும், திருத்தவும், நிர்வகிக்கவும்
+              <TranslatedText tamil="டிஜிட்டல் பத்திரிகைகளை உருவாக்கவும், திருத்தவும், நிர்வகிக்கவும்">
+                Create, edit, and manage digital magazines
+              </TranslatedText>
             </p>
           </div>
           <Button
@@ -208,7 +223,7 @@ export default function AdminMagazinesPage() {
             }}
           >
             <PlusIcon className="h-4 w-4 mr-2" />
-            பத்திரிகை சேர்க்க
+            <TranslatedText tamil="பத்திரிகை சேர்க்க">Add Magazine</TranslatedText>
           </Button>
         </div>
 
@@ -218,7 +233,9 @@ export default function AdminMagazinesPage() {
             <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white text-gray-900">
               <CardHeader>
                 <CardTitle className="text-gray-900">
-                  {editingMagazine ? 'பத்திரிகை திருத்து' : 'பத்திரிகை சேர்க்க'}
+                  <TranslatedText tamil={editingMagazine ? 'பத்திரிகை திருத்து' : 'பத்திரிகை சேர்க்க'}>
+                    {editingMagazine ? 'Edit Magazine' : 'Add Magazine'}
+                  </TranslatedText>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -226,7 +243,7 @@ export default function AdminMagazinesPage() {
                   {/* Collection Selection */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      தொகுப்பு *
+                      <TranslatedText tamil="தொகுப்பு *">Collection *</TranslatedText>
                     </label>
                     <select
                       required
@@ -234,7 +251,9 @@ export default function AdminMagazinesPage() {
                       onChange={(e) => setFormData({ ...formData, collectionId: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                     >
-                      <option value="">தொகுப்பைத் தேர்ந்தெடுக்கவும்</option>
+                      <option value="">
+                        {t('admin.selectCollection', 'Select a collection', 'தொகுப்பைத் தேர்ந்தெடுக்கவும்')}
+                      </option>
                       {collections.map((collection) => (
                         <option key={collection.id} value={collection.id}>
                           {collection.name} {collection.name_ta && `(${collection.name_ta})`}
@@ -243,67 +262,41 @@ export default function AdminMagazinesPage() {
                     </select>
                   </div>
 
-                  {/* Title - English */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Title (English) *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="Enter magazine title in English"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
+                  {/* Title - Bilingual */}
+                  <BilingualField
+                    label="Title"
+                    labelTamil="தலைப்பு"
+                    englishValue={formData.title}
+                    tamilValue={formData.title_ta}
+                    onEnglishChange={(value) => setFormData({ ...formData, title: value })}
+                    onTamilChange={(value) => setFormData({ ...formData, title_ta: value })}
+                    required={true}
+                    placeholder={{
+                      english: "Enter magazine title in English",
+                      tamil: "பத்திரிகை தலைப்பை தமிழில் உள்ளிடவும்"
+                    }}
+                  />
 
-                  {/* Title - Tamil */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      தலைப்பு (தமிழ்)
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.title_ta}
-                      onChange={(e) => setFormData({ ...formData, title_ta: e.target.value })}
-                      placeholder="பத்திரிகை தலைப்பை தமிழில் உள்ளிடவும்"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
-
-                  {/* Description - English */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Description (English) *
-                    </label>
-                    <textarea
-                      required
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Enter magazine description in English"
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
-
-                  {/* Description - Tamil */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      விளக்கம் (தமிழ்)
-                    </label>
-                    <textarea
-                      value={formData.description_ta}
-                      onChange={(e) => setFormData({ ...formData, description_ta: e.target.value })}
-                      placeholder="பத்திரிகை விளக்கத்தை தமிழில் உள்ளிடவும்"
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
+                  {/* Description - Bilingual */}
+                  <BilingualField
+                    label="Description"
+                    labelTamil="விளக்கம்"
+                    englishValue={formData.description}
+                    tamilValue={formData.description_ta}
+                    onEnglishChange={(value) => setFormData({ ...formData, description: value })}
+                    onTamilChange={(value) => setFormData({ ...formData, description_ta: value })}
+                    type="textarea"
+                    rows={3}
+                    required={true}
+                    placeholder={{
+                      english: "Enter magazine description in English",
+                      tamil: "பத்திரிகை விளக்கத்தை தமிழில் உள்ளிடவும்"
+                    }}
+                  />
 
                   {/* PDF Upload */}
                   <FileUpload
-                    label="பத்திரிகை PDF"
+                    label={t('admin.magazinePdf', 'Magazine PDF', 'பத்திரிகை PDF')}
                     fileType="pdf"
                     currentFile={formData.pdfUrl}
                     onFileUpload={(url) => setFormData({ ...formData, pdfUrl: url })}
@@ -313,7 +306,7 @@ export default function AdminMagazinesPage() {
 
                   {/* Cover Image Upload */}
                   <FileUpload
-                    label="அட்டைப் படம் (Cover Image)"
+                    label={t('admin.coverImage', 'Cover Image', 'அட்டைப் படம்')}
                     fileType="image"
                     currentFile={formData.coverImage}
                     onFileUpload={(url) => setFormData({ ...formData, coverImage: url })}
@@ -323,7 +316,7 @@ export default function AdminMagazinesPage() {
 
                   {/* Featured Image Upload */}
                   <FileUpload
-                    label="சிறப்பு படம் (Featured Image)"
+                    label={t('admin.featuredImage', 'Featured Image', 'சிறப்பு படம்')}
                     fileType="image"
                     currentFile={formData.featuredImage}
                     onFileUpload={(url) => setFormData({ ...formData, featuredImage: url })}
@@ -334,7 +327,7 @@ export default function AdminMagazinesPage() {
                   <div className="grid gap-6 md:grid-cols-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        இதழ் எண் *
+                        <TranslatedText tamil="இதழ் எண் *">Issue Number *</TranslatedText>
                       </label>
                       <input
                         type="text"
@@ -342,7 +335,7 @@ export default function AdminMagazinesPage() {
                         value={formData.issueNumber}
                         onChange={(e) => setFormData({ ...formData, issueNumber: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="எ.கா., இதழ் 1, தொகுதி 2"
+                        placeholder={t('admin.issueNumberPlaceholder', 'e.g., Issue 1, Volume 2', 'எ.கா., இதழ் 1, தொகுதி 2')}
                       />
                     </div>
 
@@ -355,7 +348,7 @@ export default function AdminMagazinesPage() {
                           className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                         />
                         <span className="text-sm font-medium text-gray-700">
-                          சிறப்பு பத்திரிகை
+                          <TranslatedText tamil="சிறப்பு பத்திரிகை">Featured Magazine</TranslatedText>
                         </span>
                       </label>
                     </div>
@@ -367,13 +360,18 @@ export default function AdminMagazinesPage() {
                       variant="outline"
                       onClick={() => setShowForm(false)}
                     >
-                      ரத்து செய்
+                      <TranslatedText tamil="ரத்து செய்">Cancel</TranslatedText>
                     </Button>
                     <Button
                       type="submit"
                       disabled={loading || !formData.title || !formData.description || !formData.pdfUrl || !formData.issueNumber}
                     >
-                      {loading ? 'சேமிக்கிறது...' : (editingMagazine ? 'புதுப்பி' : 'உருவாக்கு')}
+                      {loading
+                        ? t('admin.saving', 'Saving...', 'சேமிக்கிறது...')
+                        : editingMagazine
+                          ? t('admin.update', 'Update', 'புதுப்பி')
+                          : t('admin.create', 'Create', 'உருவாக்கு')
+                      }
                     </Button>
                   </div>
                 </form>
@@ -401,7 +399,7 @@ export default function AdminMagazinesPage() {
                     </h3>
                     {magazine.featured && (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        சிறப்பு
+                        <TranslatedText tamil="சிறப்பு">Featured</TranslatedText>
                       </span>
                     )}
                   </div>
@@ -414,11 +412,17 @@ export default function AdminMagazinesPage() {
                     {magazine.description}
                   </p>
                   <div className="text-xs text-gray-500">
-                    <p>தொகுப்பு: {magazine.collection?.name}</p>
-                    <p>வெளியீட்டு தேதி: {new Date(magazine.publishedAt).toLocaleDateString('ta-IN')}</p>
+                    <p>
+                      <TranslatedText tamil="தொகுப்பு:">Collection:</TranslatedText> {magazine.collection?.name}
+                    </p>
+                    <p>
+                      <TranslatedText tamil="வெளியீட்டு தேதி:">Published Date:</TranslatedText> {new Date(magazine.publishedAt).toLocaleDateString()}
+                    </p>
                   </div>
                   <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>இதழ்: {magazine.issueNumber}</span>
+                    <span>
+                      <TranslatedText tamil="இதழ்:">Issue:</TranslatedText> {magazine.issueNumber}
+                    </span>
                     <div className="flex items-center space-x-3">
                       <div className="flex items-center">
                         <EyeIcon className="h-4 w-4 mr-1" />
@@ -457,7 +461,7 @@ export default function AdminMagazinesPage() {
                       onClick={() => window.open(magazine.pdfUrl, '_blank')}
                     >
                       <DocumentIcon className="h-4 w-4 mr-1" />
-                      PDF பார்க்க
+                      <TranslatedText tamil="PDF பார்க்க">View PDF</TranslatedText>
                     </Button>
                   )}
                 </div>
@@ -470,10 +474,12 @@ export default function AdminMagazinesPage() {
           <div className="text-center py-12">
             <DocumentIcon className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-gray-900">
-              பத்திரிகைகள் இல்லை
+              <TranslatedText tamil="பத்திரிகைகள் இல்லை">No magazines found</TranslatedText>
             </h3>
             <p className="mt-1 text-sm text-gray-500">
-              புதிய பத்திரிகையை உருவாக்குவதன் மூலம் தொடங்குங்கள்.
+              <TranslatedText tamil="புதிய பத்திரிகையை உருவாக்குவதன் மூலம் தொடங்குங்கள்.">
+                Get started by creating your first magazine.
+              </TranslatedText>
             </p>
           </div>
         )}
