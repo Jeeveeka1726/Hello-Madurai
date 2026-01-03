@@ -59,11 +59,7 @@ export async function PUT(
       where: { id },
       data: {
         name: body.name,
-        name_ta: body.name_ta || undefined,
-        description: body.description || undefined,
-        description_ta: body.description_ta || undefined,
-        coverImage: body.coverImage || undefined,
-        featured: body.featured || false
+        name_ta: body.name_ta || undefined
       },
       include: {
         magazines: true

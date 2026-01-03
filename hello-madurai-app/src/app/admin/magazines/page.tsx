@@ -35,8 +35,6 @@ interface MagazineCollection {
   id: string
   name: string
   name_ta?: string
-  coverImage?: string
-  featured: boolean
   magazines?: Magazine[]
 }
 
@@ -59,9 +57,7 @@ export default function AdminMagazinesPage() {
   })
   const [collectionFormData, setCollectionFormData] = useState({
     name: '',
-    name_ta: '',
-    coverImage: '',
-    featured: false
+    name_ta: ''
   })
   const [collections, setCollections] = useState<MagazineCollection[]>([])
 
@@ -151,13 +147,14 @@ export default function AdminMagazinesPage() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/magazines/collections', {
+      const url = editingCollection
+        ? `/api/magazines/collections/${editingCollection.id}`
+        : '/api/magazines/collections'
+
+      const response = await fetch(url, {
         method: editingCollection ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...collectionFormData,
-          ...(editingCollection && { id: editingCollection.id })
-        }),
+        body: JSON.stringify(collectionFormData),
       })
 
       if (response.ok) {
@@ -166,9 +163,7 @@ export default function AdminMagazinesPage() {
         setEditingCollection(null)
         setCollectionFormData({
           name: '',
-          name_ta: '',
-          coverImage: '',
-          featured: false
+          name_ta: ''
         })
         toast.success(editingCollection
           ? t('admin.collectionUpdated', 'Collection updated successfully!', 'தொகுப்பு வெற்றிகரமாக புதுப்பிக்கப்பட்டது!')
@@ -224,9 +219,7 @@ export default function AdminMagazinesPage() {
     setEditingCollection(collection)
     setCollectionFormData({
       name: collection.name,
-      name_ta: collection.name_ta || '',
-      coverImage: collection.coverImage || '',
-      featured: collection.featured
+      name_ta: collection.name_ta || ''
     })
     setShowCollectionForm(true)
   }
@@ -287,9 +280,7 @@ export default function AdminMagazinesPage() {
                 setEditingCollection(null)
                 setCollectionFormData({
                   name: '',
-                  name_ta: '',
-                  coverImage: '',
-                  featured: false
+                  name_ta: ''
                 })
               }}
               className="bg-blue-600 text-white hover:bg-blue-700"
@@ -469,33 +460,6 @@ export default function AdminMagazinesPage() {
                       onTamilChange={(value) => setCollectionFormData({ ...collectionFormData, name_ta: value })}
                       required={true}
                     />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <TranslatedText tamil="அட்டைப்படம் URL">Cover Image URL</TranslatedText>
-                    </label>
-                    <input
-                      type="url"
-                      value={collectionFormData.coverImage}
-                      onChange={(e) => setCollectionFormData({ ...collectionFormData, coverImage: e.target.value })}
-                      placeholder="https://example.com/image.jpg"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-900"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={collectionFormData.featured}
-                        onChange={(e) => setCollectionFormData({ ...collectionFormData, featured: e.target.checked })}
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                      />
-                      <span className="ml-2 text-sm font-medium text-gray-700">
-                        <TranslatedText tamil="சிறப்பு தொகுப்பு">Featured Collection</TranslatedText>
-                      </span>
-                    </label>
                   </div>
 
                   <div className="flex justify-end space-x-4">

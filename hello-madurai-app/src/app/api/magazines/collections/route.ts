@@ -25,16 +25,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, name_ta, description, description_ta, coverImage, featured } = body
+    const { name, name_ta } = body
 
     const collection = await prisma.magazineCollection.create({
       data: {
         name,
-        name_ta: name_ta || undefined,
-        description: description || undefined,
-        description_ta: description_ta || undefined,
-        coverImage: coverImage || undefined,
-        featured: featured || false
+        name_ta: name_ta || undefined
       }
     })
 
