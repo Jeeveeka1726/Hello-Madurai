@@ -37,7 +37,7 @@ const fileTypeConfig = {
   pdf: {
     icon: DocumentIcon,
     accept: 'application/pdf',
-    maxSize: 50,
+    maxSize: 100, // Cloudinary free tier supports up to 100MB
     label: 'PDF'
   },
   audio: {
@@ -194,6 +194,13 @@ export default function FileUpload({
   const handlePdfUploadToCloudinary = async (file: File) => {
     console.log('📄 Uploading PDF file to Cloudinary (direct upload)...')
     console.log('📊 File size:', (file.size / 1024 / 1024).toFixed(2), 'MB')
+
+    // Check file size limit (100MB for Cloudinary free tier)
+    const maxSizeBytes = 100 * 1024 * 1024 // 100MB - Cloudinary free tier limit
+    if (file.size > maxSizeBytes) {
+      const sizeMB = (file.size / 1024 / 1024).toFixed(2)
+      throw new Error(`PDF file is too large (${sizeMB}MB). Cloudinary free tier supports up to 100MB per file. Please compress your PDF or upgrade to a paid plan.`)
+    }
 
     // Step 1: Get upload signature from our API
     const signatureResponse = await fetch('/api/upload/magazine-pdf')
