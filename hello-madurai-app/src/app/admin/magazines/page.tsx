@@ -14,11 +14,8 @@ interface Magazine {
   id: string
   title: string
   title_ta?: string
-  description: string
-  description_ta?: string
   pdfUrl: string
   coverImage?: string
-  featuredImage?: string
   issueNumber: string
   publishedAt: string
   downloads: number
@@ -38,8 +35,6 @@ interface MagazineCollection {
   id: string
   name: string
   name_ta?: string
-  description?: string
-  description_ta?: string
   coverImage?: string
   featured: boolean
   magazines?: Magazine[]
@@ -56,11 +51,8 @@ export default function AdminMagazinesPage() {
   const [formData, setFormData] = useState({
     title: '',
     title_ta: '',
-    description: '',
-    description_ta: '',
     pdfUrl: '',
     coverImage: '',
-    featuredImage: '',
     issueNumber: '',
     collectionId: '',
     featured: false
@@ -68,8 +60,6 @@ export default function AdminMagazinesPage() {
   const [collectionFormData, setCollectionFormData] = useState({
     name: '',
     name_ta: '',
-    description: '',
-    description_ta: '',
     coverImage: '',
     featured: false
   })
@@ -134,11 +124,8 @@ export default function AdminMagazinesPage() {
         setFormData({
           title: '',
           title_ta: '',
-          description: '',
-          description_ta: '',
           pdfUrl: '',
           coverImage: '',
-          featuredImage: '',
           issueNumber: '',
           collectionId: '',
           featured: false
@@ -180,8 +167,6 @@ export default function AdminMagazinesPage() {
         setCollectionFormData({
           name: '',
           name_ta: '',
-          description: '',
-          description_ta: '',
           coverImage: '',
           featured: false
         })
@@ -206,11 +191,8 @@ export default function AdminMagazinesPage() {
     setFormData({
       title: magazine.title,
       title_ta: magazine.title_ta || '',
-      description: magazine.description,
-      description_ta: magazine.description_ta || '',
       pdfUrl: magazine.pdfUrl,
       coverImage: magazine.coverImage || '',
-      featuredImage: magazine.featuredImage || '',
       issueNumber: magazine.issueNumber,
       collectionId: magazine.collectionId,
       featured: magazine.featured
@@ -243,8 +225,6 @@ export default function AdminMagazinesPage() {
     setCollectionFormData({
       name: collection.name,
       name_ta: collection.name_ta || '',
-      description: collection.description || '',
-      description_ta: collection.description_ta || '',
       coverImage: collection.coverImage || '',
       featured: collection.featured
     })
@@ -308,8 +288,6 @@ export default function AdminMagazinesPage() {
                 setCollectionFormData({
                   name: '',
                   name_ta: '',
-                  description: '',
-                  description_ta: '',
                   coverImage: '',
                   featured: false
                 })
@@ -326,11 +304,8 @@ export default function AdminMagazinesPage() {
                 setFormData({
                   title: '',
                   title_ta: '',
-                  description: '',
-                  description_ta: '',
                   pdfUrl: '',
                   coverImage: '',
-                  featuredImage: '',
                   issueNumber: '',
                   collectionId: '',
                   featured: false
@@ -394,23 +369,6 @@ export default function AdminMagazinesPage() {
                     }}
                   />
 
-                  {/* Description - Bilingual */}
-                  <BilingualField
-                    label="Description"
-                    labelTamil="விளக்கம்"
-                    englishValue={formData.description}
-                    tamilValue={formData.description_ta}
-                    onEnglishChange={(value) => setFormData({ ...formData, description: value })}
-                    onTamilChange={(value) => setFormData({ ...formData, description_ta: value })}
-                    type="textarea"
-                    rows={3}
-                    required={true}
-                    placeholder={{
-                      english: "Enter magazine description in English",
-                      tamil: "பத்திரிகை விளக்கத்தை தமிழில் உள்ளிடவும்"
-                    }}
-                  />
-
                   {/* PDF Upload */}
                   <FileUpload
                     label={t('admin.magazinePdf', 'Magazine PDF', 'பத்திரிகை PDF')}
@@ -428,16 +386,6 @@ export default function AdminMagazinesPage() {
                     currentFile={formData.coverImage}
                     onFileUpload={(url) => setFormData({ ...formData, coverImage: url })}
                     onUrlChange={(url) => setFormData({ ...formData, coverImage: url })}
-                    className="mb-6"
-                  />
-
-                  {/* Featured Image Upload */}
-                  <FileUpload
-                    label={t('admin.featuredImage', 'Featured Image', 'சிறப்பு படம்')}
-                    fileType="image"
-                    currentFile={formData.featuredImage}
-                    onFileUpload={(url) => setFormData({ ...formData, featuredImage: url })}
-                    onUrlChange={(url) => setFormData({ ...formData, featuredImage: url })}
                     className="mb-6"
                   />
 
@@ -481,7 +429,7 @@ export default function AdminMagazinesPage() {
                     </Button>
                     <Button
                       type="submit"
-                      disabled={loading || !formData.title || !formData.description || !formData.pdfUrl || !formData.issueNumber}
+                      disabled={loading || !formData.title || !formData.pdfUrl || !formData.issueNumber}
                     >
                       {loading
                         ? t('admin.saving', 'Saving...', 'சேமிக்கிறது...')
@@ -520,19 +468,6 @@ export default function AdminMagazinesPage() {
                       onEnglishChange={(value) => setCollectionFormData({ ...collectionFormData, name: value })}
                       onTamilChange={(value) => setCollectionFormData({ ...collectionFormData, name_ta: value })}
                       required={true}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <BilingualField
-                      label="Description"
-                      labelTamil="விளக்கம்"
-                      englishValue={collectionFormData.description}
-                      tamilValue={collectionFormData.description_ta}
-                      onEnglishChange={(value) => setCollectionFormData({ ...collectionFormData, description: value })}
-                      onTamilChange={(value) => setCollectionFormData({ ...collectionFormData, description_ta: value })}
-                      type="textarea"
-                      rows={3}
                     />
                   </div>
 
@@ -623,9 +558,6 @@ export default function AdminMagazinesPage() {
                   {collection.name_ta && (
                     <p className="text-sm text-gray-600 mb-2">{collection.name_ta}</p>
                   )}
-                  {collection.description && (
-                    <p className="text-sm text-gray-700">{collection.description}</p>
-                  )}
                 </CardContent>
               </Card>
             ))}
@@ -660,9 +592,6 @@ export default function AdminMagazinesPage() {
                       {magazine.title_ta}
                     </h4>
                   )}
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {magazine.description}
-                  </p>
                   <div className="text-xs text-gray-500">
                     <p>
                       <TranslatedText tamil="தொகுப்பு:">Collection:</TranslatedText> {magazine.collection?.name}
