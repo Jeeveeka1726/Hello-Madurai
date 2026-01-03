@@ -16,11 +16,10 @@ export async function GET() {
     const folder = 'hello-madurai/magazines'
 
     // Parameters to sign (must match exactly what's sent to Cloudinary)
-    // IMPORTANT: Include resource_type in signature for raw uploads
+    // IMPORTANT: For /raw/upload endpoint, resource_type is NOT included in form data
     const paramsToSign = {
       timestamp: timestamp,
       folder: folder,
-      resource_type: 'raw', // Must be included for raw uploads
     }
 
     // Generate signature for secure uploads
