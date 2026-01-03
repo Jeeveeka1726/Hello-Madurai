@@ -8,7 +8,11 @@ export async function GET(request: NextRequest) {
         createdAt: 'desc'
       },
       include: {
-        magazines: true
+        _count: {
+          select: {
+            magazines: true
+          }
+        }
       }
     })
 
