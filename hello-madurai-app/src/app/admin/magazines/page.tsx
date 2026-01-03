@@ -89,7 +89,7 @@ export default function AdminMagazinesPage() {
 
   const fetchCollections = async () => {
     try {
-      const response = await fetch('/api/magazines')
+      const response = await fetch('/api/magazines/collections')
       if (response.ok) {
         const data = await response.json()
         setCollections(data)
