@@ -11,9 +11,9 @@ const allowedFileTypes = {
 
 const maxFileSizes = {
   image: 5 * 1024 * 1024, // 5MB
-  pdf: 10 * 1024 * 1024, // 10MB
+  pdf: 50 * 1024 * 1024, // 50MB (via Cloudinary)
   audio: 50 * 1024 * 1024, // 50MB
-  document: 10 * 1024 * 1024 // 10MB
+  document: 50 * 1024 * 1024 // 50MB
 }
 
 export async function POST(request: NextRequest) {

@@ -168,16 +168,17 @@ model Business {
 }
 
 model MagazineCollection {
-  id             String     @id @default(cuid())
+  id             String         @id @default(cuid())
   name           String
   name_ta        String?
   description    String?
   description_ta String?
   coverImage     String?
-  featured       Boolean    @default(false)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  featured       Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   magazines      Magazine[]
+  pdfs           MagazinePdf[]
 
   @@map("magazine_collections")
 }
@@ -200,6 +201,7 @@ model Magazine {
   updatedAt      DateTime           @updatedAt
   collectionId   String
   collection     MagazineCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  pdfs           MagazinePdf[]
 
   @@map("magazines")
 }
@@ -419,6 +421,22 @@ model Audio {
   createdAt DateTime @default(now())
 
   @@map("audio_files")
+}
+
+model MagazinePdf {
+  id           String              @id @default(cuid())
+  filename     String
+  url          String?             @db.VarChar(500) // Cloudinary URL
+  publicId     String?             // Cloudinary public ID for management
+  mimeType     String
+  size         Int
+  magazineId   String?
+  collectionId String?
+  createdAt    DateTime            @default(now())
+  magazine     Magazine?           @relation(fields: [magazineId], references: [id], onDelete: SetNull)
+  collection   MagazineCollection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+
+  @@map("magazine_pdfs")
 }
 
 model Video {

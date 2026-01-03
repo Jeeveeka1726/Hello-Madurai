@@ -37,7 +37,7 @@ const fileTypeConfig = {
   pdf: {
     icon: DocumentIcon,
     accept: 'application/pdf',
-    maxSize: 10,
+    maxSize: 50,
     label: 'PDF'
   },
   audio: {
@@ -105,9 +105,11 @@ export default function FileUpload({
     setUploading(true)
 
     try {
-      // Use Cloudinary for audio files (better for large files and streaming)
+      // Use Cloudinary for audio and PDF files (better for large files and bypasses Vercel limits)
       if (fileType === 'audio') {
         await handleAudioUploadToCloudinary(file)
+      } else if (fileType === 'pdf') {
+        await handlePdfUploadToCloudinary(file)
       } else {
         // Use regular upload for other file types
         await handleRegularUpload(file)
@@ -187,6 +189,69 @@ export default function FileUpload({
 
     onFileUpload(cloudinaryData.secure_url)
     toast.success('✅ Audio file uploaded to Cloudinary successfully!')
+  }
+
+  const handlePdfUploadToCloudinary = async (file: File) => {
+    console.log('📄 Uploading PDF file to Cloudinary (direct upload)...')
+    console.log('📊 File size:', (file.size / 1024 / 1024).toFixed(2), 'MB')
+
+    // Step 1: Get upload signature from our API
+    const signatureResponse = await fetch('/api/upload/magazine-pdf')
+    if (!signatureResponse.ok) {
+      throw new Error('Failed to get PDF upload signature')
+    }
+    const { signature, timestamp, cloudName, apiKey, folder } = await signatureResponse.json()
+
+    console.log('🔑 Got PDF upload signature, uploading directly to Cloudinary...')
+
+    // Step 2: Upload directly to Cloudinary (raw resource type for PDFs)
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('signature', signature)
+    formData.append('timestamp', timestamp.toString())
+    formData.append('api_key', apiKey)
+    formData.append('folder', folder)
+    formData.append('resource_type', 'raw') // Important for PDFs
+
+    const cloudinaryResponse = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    )
+
+    if (!cloudinaryResponse.ok) {
+      const errorData = await cloudinaryResponse.json()
+      console.error('❌ Cloudinary PDF upload failed:', errorData)
+      throw new Error(errorData.error?.message || 'Cloudinary PDF upload failed')
+    }
+
+    const cloudinaryData = await cloudinaryResponse.json()
+    console.log('✅ Cloudinary PDF upload successful:', cloudinaryData.public_id)
+
+    // Step 3: Save metadata to our database
+    const metadataResponse = await fetch('/api/upload/save-pdf-metadata', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: cloudinaryData.secure_url,
+        publicId: cloudinaryData.public_id,
+        filename: file.name,
+        mimeType: file.type,
+        size: file.size,
+      }),
+    })
+
+    if (!metadataResponse.ok) {
+      throw new Error('Failed to save PDF metadata')
+    }
+
+    const metadataData = await metadataResponse.json()
+    console.log('✅ PDF metadata saved:', metadataData.id)
+
+    onFileUpload(cloudinaryData.secure_url)
+    toast.success('✅ PDF file uploaded to Cloudinary successfully!')
   }
 
   const handleRegularUpload = async (file: File) => {
