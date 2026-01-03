@@ -1,11 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useLanguage } from '@/hooks/useLanguage'
-import { TranslatedText } from '@/components/ui/TranslatedText'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { useLanguage } from '@/contexts/LanguageContext'
+import TranslatedText from '@/components/TranslatedText'
+import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
+import Button from '@/components/ui/Button'
 import { Download, Calendar, FileText, Folder } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
@@ -130,7 +129,7 @@ export default function EpaperPage() {
           </h2>
           <div className="flex flex-wrap gap-2">
             <Button
-              variant={selectedCollection === null ? "default" : "outline"}
+              variant={selectedCollection === null ? "primary" : "outline"}
               size="sm"
               onClick={() => setSelectedCollection(null)}
               className="mb-2"
@@ -141,19 +140,19 @@ export default function EpaperPage() {
             {collections.map((collection) => (
               <Button
                 key={collection.id}
-                variant={selectedCollection === collection.id ? "default" : "outline"}
+                variant={selectedCollection === collection.id ? "primary" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCollection(collection.id)}
                 className="mb-2"
               >
                 <Folder className="w-4 h-4 mr-2" />
-                <TranslatedText 
-                  english={collection.name} 
+                <TranslatedText
+                  english={collection.name}
                   tamil={collection.name_ta || collection.name}
                 />
-                <Badge variant="secondary" className="ml-2">
+                <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">
                   {collection._count.magazines}
-                </Badge>
+                </span>
               </Button>
             ))}
           </div>
@@ -177,21 +176,21 @@ export default function EpaperPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMagazines.map((magazine) => (
-            <Card key={magazine.id} className="hover:shadow-lg transition-shadow">
+            <Card key={magazine.id} hover className="transition-shadow">
               <CardHeader>
                 <CardTitle className="text-lg">
-                  <TranslatedText 
-                    english={magazine.title} 
+                  <TranslatedText
+                    english={magazine.title}
                     tamil={magazine.title_ta || magazine.title}
                   />
                 </CardTitle>
                 {magazine.collection && (
-                  <Badge variant="outline" className="w-fit">
-                    <TranslatedText 
-                      english={magazine.collection.name} 
+                  <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm mt-2">
+                    <TranslatedText
+                      english={magazine.collection.name}
                       tamil={magazine.collection.name_ta || magazine.collection.name}
                     />
-                  </Badge>
+                  </span>
                 )}
               </CardHeader>
               <CardContent>
@@ -208,9 +207,9 @@ export default function EpaperPage() {
                       language === 'ta' ? 'ta-IN' : 'en-IN'
                     )}
                   </div>
-                  <Button 
+                  <Button
                     onClick={() => handleDownload(magazine)}
-                    className="w-full"
+                    fullWidth
                     disabled={!magazine.pdfUrl}
                   >
                     <Download className="w-4 h-4 mr-2" />
