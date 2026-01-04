@@ -27,7 +27,8 @@ interface Magazine {
   issueNumber?: string
   publishedAt: string
   pdfUrl?: string
-  coverImageUrl?: string
+  coverImage?: string
+  featuredImage?: string
   collection?: {
     id: string
     name: string
@@ -64,6 +65,7 @@ function EpaperPageContent() {
       const response = await fetch('/api/magazines')
       if (response.ok) {
         const data = await response.json()
+        console.log('📄 Fetched magazines:', data)
         setMagazines(data)
       }
     } catch (error) {
@@ -179,6 +181,17 @@ function EpaperPageContent() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMagazines.map((magazine) => (
             <Card key={magazine.id} hover className="transition-shadow">
+              {/* Cover Image */}
+              {(magazine.coverImage || magazine.featuredImage) && (
+                <div className="aspect-w-3 aspect-h-4 overflow-hidden rounded-t-lg">
+                  <img
+                    src={magazine.coverImage || magazine.featuredImage}
+                    alt={`${magazine.title} cover`}
+                    className="w-full h-48 object-cover"
+                  />
+                </div>
+              )}
+
               <CardHeader>
                 <CardTitle className="text-lg">
                   <TranslatedText

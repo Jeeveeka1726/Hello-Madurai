@@ -105,11 +105,14 @@ export default function FileUpload({
     setUploading(true)
 
     try {
-      // Use Cloudinary for audio files, regular upload for others
+      // Use Cloudinary for audio files, base64 JSON for PDFs, regular upload for others
       if (fileType === 'audio') {
         await handleAudioUploadToCloudinary(file)
+      } else if (fileType === 'pdf') {
+        // Use base64 JSON upload for PDFs to bypass FormData size limits
+        await handleBase64JsonUpload(file)
       } else {
-        // Use regular upload for all other file types including PDFs
+        // Use regular upload for images and other file types
         await handleRegularUpload(file)
       }
     } catch (error) {
