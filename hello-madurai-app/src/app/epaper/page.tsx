@@ -306,6 +306,7 @@ function EpaperPageContent() {
           >
             <TranslatedText english="All Magazines" tamil="அனைத்து பத்திரிகைகள்" />
           </Button>
+          {console.log('🎯 Rendering collections:', collections)}
           {collections.map((collection) => (
             <Button
               key={collection.id}
@@ -319,7 +320,7 @@ function EpaperPageContent() {
                 tamil={collection.name_ta || collection.name}
               />
               <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">
-                {collection._count.magazines}
+                {collection._count?.magazines || 0}
               </span>
             </Button>
           ))}
