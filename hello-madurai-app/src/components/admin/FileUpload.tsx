@@ -37,7 +37,7 @@ const fileTypeConfig = {
   pdf: {
     icon: DocumentIcon,
     accept: 'application/pdf',
-    maxSize: 100, // Cloudinary free tier supports up to 100MB
+    maxSize: 50, // We'll compress PDFs to fit within limits
     label: 'PDF'
   },
   audio: {
@@ -105,11 +105,11 @@ export default function FileUpload({
     setUploading(true)
 
     try {
-      // Use Cloudinary for audio and PDF files (better for large files and bypasses Vercel limits)
+      // Use Cloudinary for audio files, compressed upload for PDFs, regular upload for others
       if (fileType === 'audio') {
         await handleAudioUploadToCloudinary(file)
       } else if (fileType === 'pdf') {
-        await handlePdfUploadToCloudinary(file)
+        await handleCompressedPdfUpload(file)
       } else {
         // Use regular upload for other file types
         await handleRegularUpload(file)
@@ -191,74 +191,105 @@ export default function FileUpload({
     toast.success('✅ Audio file uploaded to Cloudinary successfully!')
   }
 
-  const handlePdfUploadToCloudinary = async (file: File) => {
-    console.log('📄 Uploading PDF file to Cloudinary (direct upload)...')
-    console.log('📊 File size:', (file.size / 1024 / 1024).toFixed(2), 'MB')
+  const handleCompressedPdfUpload = async (file: File) => {
+    console.log('📄 Uploading PDF with compression...')
+    console.log('📊 Original file size:', (file.size / 1024 / 1024).toFixed(2), 'MB')
 
-    // Check file size limit (100MB for Cloudinary free tier)
-    const maxSizeBytes = 100 * 1024 * 1024 // 100MB - Cloudinary free tier limit
-    if (file.size > maxSizeBytes) {
-      const sizeMB = (file.size / 1024 / 1024).toFixed(2)
-      throw new Error(`PDF file is too large (${sizeMB}MB). Cloudinary free tier supports up to 100MB per file. Please compress your PDF or upgrade to a paid plan.`)
-    }
+    try {
+      // Step 1: Compress PDF if needed
+      let processedFile = file
+      const sizeMB = file.size / 1024 / 1024
 
-    // Step 1: Get upload signature from our API
-    const signatureResponse = await fetch('/api/upload/magazine-pdf')
-    if (!signatureResponse.ok) {
-      throw new Error('Failed to get PDF upload signature')
-    }
-    const { signature, timestamp, cloudName, apiKey, folder } = await signatureResponse.json()
+      if (sizeMB > 8) { // Compress if larger than 8MB to ensure it fits in 10MB limit after base64
+        console.log('🗜️ Compressing PDF...')
+        toast.loading('Compressing PDF...', { id: 'pdf-compress' })
 
-    console.log('🔑 Got PDF upload signature, uploading directly to Cloudinary...')
-
-    // Step 2: Upload directly to Cloudinary (raw resource type for PDFs)
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('signature', signature)
-    formData.append('timestamp', timestamp.toString())
-    formData.append('api_key', apiKey)
-    formData.append('folder', folder)
-    // NOTE: resource_type is NOT included in form data for /raw/upload endpoint
-
-    const cloudinaryResponse = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`,
-      {
-        method: 'POST',
-        body: formData,
+        processedFile = await compressPdf(file)
+        const compressedSizeMB = processedFile.size / 1024 / 1024
+        console.log('✅ PDF compressed:', compressedSizeMB.toFixed(2), 'MB')
+        toast.success(`PDF compressed to ${compressedSizeMB.toFixed(1)}MB`, { id: 'pdf-compress' })
       }
-    )
 
-    if (!cloudinaryResponse.ok) {
-      const errorData = await cloudinaryResponse.json()
-      console.error('❌ Cloudinary PDF upload failed:', errorData)
-      throw new Error(errorData.error?.message || 'Cloudinary PDF upload failed')
+      // Step 2: Convert to base64 and upload
+      console.log('📤 Converting to base64 and uploading...')
+      const base64 = await fileToBase64(processedFile)
+
+      const response = await fetch('/api/upload/force-base64', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          file: base64,
+          filename: file.name,
+          mimeType: file.type,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Upload failed')
+      }
+
+      const data = await response.json()
+      console.log('✅ PDF uploaded successfully')
+
+      onFileUpload(data.url)
+      toast.success('✅ PDF uploaded successfully!')
+    } catch (error) {
+      console.error('❌ PDF upload failed:', error)
+      throw error
     }
+  }
 
-    const cloudinaryData = await cloudinaryResponse.json()
-    console.log('✅ Cloudinary PDF upload successful:', cloudinaryData.public_id)
+  // Helper function to compress PDF using pdf-lib
+  const compressPdf = async (file: File): Promise<File> => {
+    try {
+      const { PDFDocument } = await import('pdf-lib')
 
-    // Step 3: Save metadata to our database
-    const metadataResponse = await fetch('/api/upload/save-pdf-metadata', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        url: cloudinaryData.secure_url,
-        publicId: cloudinaryData.public_id,
-        filename: file.name,
-        mimeType: file.type,
-        size: file.size,
-      }),
+      // Read the original PDF
+      const arrayBuffer = await file.arrayBuffer()
+      const pdfDoc = await PDFDocument.load(arrayBuffer)
+
+      // Create a new PDF with compression
+      const compressedPdfDoc = await PDFDocument.create()
+
+      // Copy all pages from original to new document
+      const pageIndices = pdfDoc.getPageIndices()
+      const copiedPages = await compressedPdfDoc.copyPages(pdfDoc, pageIndices)
+
+      // Add pages to the new document
+      copiedPages.forEach((page) => {
+        compressedPdfDoc.addPage(page)
+      })
+
+      // Save with compression
+      const compressedPdfBytes = await compressedPdfDoc.save({
+        useObjectStreams: false, // Reduces file size
+        addDefaultPage: false,
+      })
+
+      // Create compressed file
+      const compressedBlob = new Blob([new Uint8Array(compressedPdfBytes)], { type: 'application/pdf' })
+      const compressedFile = new File([compressedBlob], file.name, { type: 'application/pdf' })
+
+      return compressedFile
+    } catch (error) {
+      console.error('PDF compression failed:', error)
+      // If compression fails, return original file
+      return file
+    }
+  }
+
+  // Helper function to convert file to base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const base64 = (reader.result as string).split(',')[1]
+        resolve(base64)
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
     })
-
-    if (!metadataResponse.ok) {
-      throw new Error('Failed to save PDF metadata')
-    }
-
-    const metadataData = await metadataResponse.json()
-    console.log('✅ PDF metadata saved:', metadataData.id)
-
-    onFileUpload(cloudinaryData.secure_url)
-    toast.success('✅ PDF file uploaded to Cloudinary successfully!')
   }
 
   const handleRegularUpload = async (file: File) => {
