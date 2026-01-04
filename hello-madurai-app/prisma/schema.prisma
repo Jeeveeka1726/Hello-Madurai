@@ -426,7 +426,7 @@ model Audio {
 model MagazinePdf {
   id           String              @id @default(cuid())
   filename     String
-  url          String?             @db.VarChar(500) // Cloudinary URL
+  url          String?             @db.LongText // Changed to LongText for base64 data URLs
   publicId     String?             // Cloudinary public ID for management
   mimeType     String
   size         Int
@@ -437,6 +437,20 @@ model MagazinePdf {
   collection   MagazineCollection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
 
   @@map("magazine_pdfs")
+}
+
+model PdfChunk {
+  id          String   @id @default(cuid())
+  uploadId    String
+  chunkIndex  Int
+  chunkData   String   @db.LongText
+  filename    String
+  mimeType    String
+  totalChunks Int
+  createdAt   DateTime @default(now())
+
+  @@map("pdf_chunks")
+  @@index([uploadId])
 }
 
 model Video {
