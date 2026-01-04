@@ -5,6 +5,8 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import TranslatedText from '@/components/TranslatedText'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import NewspaperHeader from '@/components/NewspaperHeader'
+import NewHeader from '@/components/layout/NewHeader'
 import { Download, Calendar, FileText, Folder } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
@@ -33,7 +35,7 @@ interface Magazine {
   }
 }
 
-export default function EpaperPage() {
+function EpaperPageContent() {
   const { language, t } = useLanguage()
   const [collections, setCollections] = useState<Collection[]>([])
   const [magazines, setMagazines] = useState<Magazine[]>([])
@@ -221,6 +223,16 @@ export default function EpaperPage() {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+export default function EpaperPage() {
+  return (
+    <div>
+      <NewspaperHeader showTagline={true} />
+      <NewHeader />
+      <EpaperPageContent />
     </div>
   )
 }
