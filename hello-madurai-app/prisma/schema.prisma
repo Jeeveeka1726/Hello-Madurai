@@ -439,19 +439,7 @@ model MagazinePdf {
   @@map("magazine_pdfs")
 }
 
-model PdfChunk {
-  id          String   @id @default(cuid())
-  uploadId    String
-  chunkIndex  Int
-  chunkData   String   @db.LongText
-  filename    String
-  mimeType    String
-  totalChunks Int
-  createdAt   DateTime @default(now())
 
-  @@map("pdf_chunks")
-  @@index([uploadId])
-}
 
 model Video {
   id             String         @id @default(cuid())

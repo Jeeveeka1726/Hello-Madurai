@@ -37,7 +37,7 @@ const fileTypeConfig = {
   pdf: {
     icon: DocumentIcon,
     accept: 'application/pdf',
-    maxSize: 50, // We'll compress PDFs to fit within limits
+    maxSize: 10, // Keep it simple - 10MB limit
     label: 'PDF'
   },
   audio: {
@@ -105,13 +105,11 @@ export default function FileUpload({
     setUploading(true)
 
     try {
-      // Use Cloudinary for audio files, compressed upload for PDFs, regular upload for others
+      // Use Cloudinary for audio files, regular upload for others
       if (fileType === 'audio') {
         await handleAudioUploadToCloudinary(file)
-      } else if (fileType === 'pdf') {
-        await handleCompressedPdfUpload(file)
       } else {
-        // Use regular upload for other file types
+        // Use regular upload for all other file types including PDFs
         await handleRegularUpload(file)
       }
     } catch (error) {
@@ -191,183 +189,8 @@ export default function FileUpload({
     toast.success('✅ Audio file uploaded to Cloudinary successfully!')
   }
 
-  const handleCompressedPdfUpload = async (file: File) => {
-    console.log('📄 Uploading PDF with compression...')
-    console.log('📊 Original file size:', (file.size / 1024 / 1024).toFixed(2), 'MB')
 
-    try {
-      // Step 1: Compress PDF if needed
-      let processedFile = file
-      const sizeMB = file.size / 1024 / 1024
 
-      if (sizeMB > 8) { // Compress if larger than 8MB
-        console.log('🗜️ Compressing PDF...')
-        toast.loading('Compressing PDF...', { id: 'pdf-compress' })
-
-        processedFile = await compressPdf(file)
-        const compressedSizeMB = processedFile.size / 1024 / 1024
-        console.log('✅ PDF compressed:', compressedSizeMB.toFixed(2), 'MB')
-        toast.success(`PDF compressed to ${compressedSizeMB.toFixed(1)}MB`, { id: 'pdf-compress' })
-      }
-
-      // Step 2: Use chunked upload for large files
-      const finalSizeMB = processedFile.size / 1024 / 1024
-      if (finalSizeMB > 3) { // Use chunked upload for files > 3MB
-        console.log('📦 Using chunked upload...')
-        await handleChunkedPdfUpload(processedFile)
-      } else {
-        // Use regular base64 upload for smaller files
-        console.log('📤 Using regular upload...')
-        const base64 = await fileToBase64(processedFile)
-
-        const response = await fetch('/api/upload/force-base64', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            file: base64,
-            filename: file.name,
-            mimeType: file.type,
-          }),
-        })
-
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || 'Upload failed')
-        }
-
-        const data = await response.json()
-        onFileUpload(data.url)
-      }
-
-      console.log('✅ PDF uploaded successfully')
-      toast.success('✅ PDF uploaded successfully!')
-    } catch (error) {
-      console.error('❌ PDF upload failed:', error)
-      throw error
-    }
-  }
-
-  // Helper function to compress PDF more aggressively
-  const compressPdf = async (file: File): Promise<File> => {
-    try {
-      const { PDFDocument } = await import('pdf-lib')
-
-      // Read the original PDF
-      const arrayBuffer = await file.arrayBuffer()
-      const pdfDoc = await PDFDocument.load(arrayBuffer)
-
-      // Get page count for progress
-      const pageCount = pdfDoc.getPageCount()
-      console.log(`📄 Processing ${pageCount} pages...`)
-
-      // Create a new PDF with aggressive compression
-      const compressedPdfDoc = await PDFDocument.create()
-
-      // Copy pages with compression (sample every other page for very large files)
-      const pageIndices = pdfDoc.getPageIndices()
-      const samplesToKeep = file.size > 40 * 1024 * 1024 ?
-        pageIndices.filter((_, index) => index % 2 === 0) : // Keep every other page for files > 40MB
-        pageIndices // Keep all pages for smaller files
-
-      console.log(`📄 Keeping ${samplesToKeep.length} of ${pageCount} pages`)
-
-      const copiedPages = await compressedPdfDoc.copyPages(pdfDoc, samplesToKeep)
-
-      // Add pages to the new document
-      copiedPages.forEach((page) => {
-        compressedPdfDoc.addPage(page)
-      })
-
-      // Save with maximum compression
-      const compressedPdfBytes = await compressedPdfDoc.save({
-        useObjectStreams: false,
-        addDefaultPage: false,
-        objectsPerTick: 50, // Process in smaller chunks
-      })
-
-      // Create compressed file
-      const compressedBlob = new Blob([new Uint8Array(compressedPdfBytes)], { type: 'application/pdf' })
-      const compressedFile = new File([compressedBlob], file.name, { type: 'application/pdf' })
-
-      const compressionRatio = ((file.size - compressedFile.size) / file.size * 100).toFixed(1)
-      console.log(`🗜️ Compression: ${compressionRatio}% reduction`)
-
-      return compressedFile
-    } catch (error) {
-      console.error('PDF compression failed:', error)
-      // If compression fails, return original file
-      return file
-    }
-  }
-
-  // Helper function for chunked PDF upload
-  const handleChunkedPdfUpload = async (file: File) => {
-    const chunkSize = 2 * 1024 * 1024 // 2MB chunks to stay well under 4.5MB limit
-    const totalChunks = Math.ceil(file.size / chunkSize)
-    const uploadId = `pdf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-
-    console.log(`📦 Splitting into ${totalChunks} chunks of ~2MB each`)
-    toast.loading(`Uploading chunk 1/${totalChunks}...`, { id: 'chunk-upload' })
-
-    // Convert file to base64 first
-    const base64 = await fileToBase64(file)
-
-    // Upload chunks sequentially
-    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-      const start = chunkIndex * chunkSize
-      const end = Math.min(start + chunkSize, file.size)
-
-      // Calculate base64 chunk positions (base64 is ~33% larger than binary)
-      const base64ChunkSize = Math.ceil(chunkSize * 4 / 3)
-      const base64Start = Math.floor(start * 4 / 3)
-      const base64End = Math.min(base64Start + base64ChunkSize, base64.length)
-
-      const chunk = base64.slice(base64Start, base64End)
-
-      toast.loading(`Uploading chunk ${chunkIndex + 1}/${totalChunks}...`, { id: 'chunk-upload' })
-
-      const response = await fetch('/api/upload/chunked-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chunk,
-          chunkIndex,
-          totalChunks,
-          filename: file.name,
-          mimeType: file.type,
-          uploadId,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || `Failed to upload chunk ${chunkIndex + 1}`)
-      }
-
-      const data = await response.json()
-
-      // If this was the last chunk and assembly is complete
-      if (data.url) {
-        console.log('🎉 All chunks uploaded and assembled!')
-        toast.success('PDF assembled successfully!', { id: 'chunk-upload' })
-        onFileUpload(data.url)
-        return
-      }
-    }
-  }
-
-  // Helper function to convert file to base64
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => {
-        const base64 = (reader.result as string).split(',')[1]
-        resolve(base64)
-      }
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
-  }
 
   const handleRegularUpload = async (file: File) => {
     const formData = new FormData()
