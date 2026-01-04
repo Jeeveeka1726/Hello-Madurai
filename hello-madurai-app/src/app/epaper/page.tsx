@@ -7,7 +7,7 @@ import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import NewspaperHeader from '@/components/NewspaperHeader'
 import NewHeader from '@/components/layout/NewHeader'
-import { Download, Calendar, FileText, Folder } from 'lucide-react'
+import { Download, Calendar, FileText, Folder, Heart, Share2, Eye } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
 interface Collection {
@@ -29,6 +29,8 @@ interface Magazine {
   pdfUrl?: string
   coverImage?: string
   featuredImage?: string
+  likes?: number
+  downloads?: number
   collection?: {
     id: string
     name: string
@@ -42,6 +44,7 @@ function EpaperPageContent() {
   const [magazines, setMagazines] = useState<Magazine[]>([])
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [likedMagazines, setLikedMagazines] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetchCollections()
@@ -66,6 +69,7 @@ function EpaperPageContent() {
       if (response.ok) {
         const data = await response.json()
         console.log('📄 Fetched magazines:', data)
+        console.log('📄 First magazine collection:', data[0]?.collection)
         setMagazines(data)
       }
     } catch (error) {
@@ -89,8 +93,60 @@ function EpaperPageContent() {
       // Open PDF in new tab for viewing/downloading
       window.open(magazine.pdfUrl, '_blank')
       toast.success(t('download_started', 'Opening PDF...', 'PDF திறக்கப்படுகிறது...'))
+
+      // Update download count (optional - you can implement API call here)
+      console.log(`📄 Downloaded: ${magazine.title}`)
     } catch (error) {
       toast.error(t('download_failed', 'Download failed', 'பதிவிறக்கம் தோல்வியடைந்தது'))
+    }
+  }
+
+  const handleLike = async (magazine: Magazine) => {
+    const isLiked = likedMagazines.has(magazine.id)
+
+    try {
+      if (isLiked) {
+        // Unlike
+        setLikedMagazines(prev => {
+          const newSet = new Set(prev)
+          newSet.delete(magazine.id)
+          return newSet
+        })
+        toast.success(t('unliked', 'Removed from favorites', 'பிடித்தவைகளிலிருந்து நீக்கப்பட்டது'))
+      } else {
+        // Like
+        setLikedMagazines(prev => new Set(prev).add(magazine.id))
+        toast.success(t('liked', 'Added to favorites', 'பிடித்தவைகளில் சேர்க்கப்பட்டது'))
+      }
+
+      // You can implement API call here to update likes count
+      console.log(`❤️ ${isLiked ? 'Unliked' : 'Liked'}: ${magazine.title}`)
+    } catch (error) {
+      toast.error(t('like_failed', 'Action failed', 'செயல் தோல்வியடைந்தது'))
+    }
+  }
+
+  const handleShare = async (magazine: Magazine) => {
+    const shareData = {
+      title: magazine.title,
+      text: `Check out this magazine: ${magazine.title}`,
+      url: window.location.href
+    }
+
+    try {
+      if (navigator.share) {
+        // Use native share API if available
+        await navigator.share(shareData)
+        toast.success(t('shared', 'Shared successfully', 'வெற்றிகரமாக பகிரப்பட்டது'))
+      } else {
+        // Fallback to copying URL
+        await navigator.clipboard.writeText(window.location.href)
+        toast.success(t('link_copied', 'Link copied to clipboard', 'இணைப்பு கிளிப்போர்டில் நகலெடுக்கப்பட்டது'))
+      }
+
+      console.log(`🔗 Shared: ${magazine.title}`)
+    } catch (error) {
+      toast.error(t('share_failed', 'Share failed', 'பகிர்வு தோல்வியடைந்தது'))
     }
   }
 
@@ -180,7 +236,12 @@ function EpaperPageContent() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMagazines.map((magazine) => (
-            <Card key={magazine.id} hover className="transition-shadow">
+            <Card
+              key={magazine.id}
+              hover
+              className="transition-shadow cursor-pointer"
+              onClick={() => handleDownload(magazine)}
+            >
               {/* Cover Image */}
               {(magazine.coverImage || magazine.featuredImage) && (
                 <div className="aspect-w-3 aspect-h-4 overflow-hidden rounded-t-lg">
@@ -222,14 +283,57 @@ function EpaperPageContent() {
                       language === 'ta' ? 'ta-IN' : 'en-IN'
                     )}
                   </div>
-                  <Button
-                    onClick={() => handleDownload(magazine)}
-                    fullWidth
-                    disabled={!magazine.pdfUrl}
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    <TranslatedText english="Read PDF" tamil="PDF படிக்க" />
-                  </Button>
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 mt-4" onClick={(e) => e.stopPropagation()}>
+                    <Button
+                      onClick={() => handleDownload(magazine)}
+                      variant="primary"
+                      size="sm"
+                      disabled={!magazine.pdfUrl}
+                      className="flex-1"
+                    >
+                      <Download className="w-4 h-4 mr-1" />
+                      <TranslatedText english="Read" tamil="படிக்க" />
+                    </Button>
+
+                    <Button
+                      onClick={() => handleLike(magazine)}
+                      variant={likedMagazines.has(magazine.id) ? "primary" : "outline"}
+                      size="sm"
+                      className="px-3"
+                    >
+                      <Heart
+                        className={`w-4 h-4 ${likedMagazines.has(magazine.id) ? 'fill-current' : ''}`}
+                      />
+                    </Button>
+
+                    <Button
+                      onClick={() => handleShare(magazine)}
+                      variant="outline"
+                      size="sm"
+                      className="px-3"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
+                    <div className="flex items-center gap-3">
+                      {magazine.downloads && (
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          {magazine.downloads}
+                        </span>
+                      )}
+                      {magazine.likes && (
+                        <span className="flex items-center gap-1">
+                          <Heart className="w-3 h-3" />
+                          {magazine.likes}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
