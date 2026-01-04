@@ -57,6 +57,8 @@ function EpaperPageContent() {
       if (response.ok) {
         const data = await response.json()
         console.log('📂 Fetched collections:', data)
+        console.log('📂 Collections count:', data.length)
+        console.log('📂 First collection:', data[0])
         setCollections(data)
       }
     } catch (error) {
@@ -106,6 +108,27 @@ function EpaperPageContent() {
       window.open(pdfUrl, '_blank')
       toast.success(t('view_started', 'Opening PDF...', 'PDF திறக்கப்படுகிறது...'))
 
+      // Track view as download in database (since we don't have separate view tracking)
+      try {
+        const response = await fetch(`/api/magazines/${magazine.id}/download`, {
+          method: 'POST'
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          console.log(`✅ View tracked in DB. New count: ${data.downloads}`)
+
+          // Update the magazine data with new downloads count
+          setMagazines(prev => prev.map(m =>
+            m.id === magazine.id ? { ...m, downloads: data.downloads } : m
+          ))
+        } else {
+          console.error('Failed to track view in database')
+        }
+      } catch (apiError) {
+        console.error('View tracking API failed:', apiError)
+      }
+
       console.log(`👁️ Viewing: ${magazine.title} - URL: ${pdfUrl}`)
     } catch (error) {
       console.error('PDF view error:', error)
@@ -141,6 +164,27 @@ function EpaperPageContent() {
 
       toast.success(t('download_started', 'Download started...', 'பதிவிறக்கம் தொடங்கியது...'))
 
+      // Track download in database
+      try {
+        const response = await fetch(`/api/magazines/${magazine.id}/download`, {
+          method: 'POST'
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          console.log(`✅ Download tracked in DB. New count: ${data.downloads}`)
+
+          // Update the magazine data with new downloads count
+          setMagazines(prev => prev.map(m =>
+            m.id === magazine.id ? { ...m, downloads: data.downloads } : m
+          ))
+        } else {
+          console.error('Failed to track download in database')
+        }
+      } catch (apiError) {
+        console.error('Download tracking API failed:', apiError)
+      }
+
       console.log(`📥 Downloaded: ${magazine.title} - URL: ${downloadUrl}`)
     } catch (error) {
       console.error('PDF download error:', error)
@@ -164,9 +208,29 @@ function EpaperPageContent() {
         // Like
         setLikedMagazines(prev => new Set(prev).add(magazine.id))
         toast.success(t('liked', 'Added to favorites', 'பிடித்தவைகளில் சேர்க்கப்பட்டது'))
+
+        // Call API to increment likes in database
+        try {
+          const response = await fetch(`/api/magazines/${magazine.id}/like`, {
+            method: 'POST'
+          })
+
+          if (response.ok) {
+            const data = await response.json()
+            console.log(`✅ Like saved to DB. New count: ${data.likes}`)
+
+            // Update the magazine data with new likes count
+            setMagazines(prev => prev.map(m =>
+              m.id === magazine.id ? { ...m, likes: data.likes } : m
+            ))
+          } else {
+            console.error('Failed to save like to database')
+          }
+        } catch (apiError) {
+          console.error('API call failed:', apiError)
+        }
       }
 
-      // You can implement API call here to update likes count
       console.log(`❤️ ${isLiked ? 'Unliked' : 'Liked'}: ${magazine.title}`)
     } catch (error) {
       toast.error(t('like_failed', 'Action failed', 'செயல் தோல்வியடைந்தது'))
