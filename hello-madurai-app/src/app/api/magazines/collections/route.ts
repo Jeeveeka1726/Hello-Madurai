@@ -16,6 +16,13 @@ export async function GET(request: NextRequest) {
       }
     })
 
+    console.log('📂 API: Fetched collections:', collections.map(c => ({
+      id: c.id,
+      name: c.name,
+      name_ta: c.name_ta,
+      magazineCount: c._count.magazines
+    })))
+
     return NextResponse.json(collections)
   } catch (error) {
     console.error('Error fetching magazine collections:', error)
