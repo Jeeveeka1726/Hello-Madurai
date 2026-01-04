@@ -84,20 +84,32 @@ function EpaperPageContent() {
     : magazines
 
   const handleDownload = async (magazine: Magazine) => {
+    console.log('📄 Attempting to open PDF:', magazine.pdfUrl)
+
     if (!magazine.pdfUrl) {
       toast.error(t('download_error', 'PDF not available', 'PDF கிடைக்கவில்லை'))
       return
     }
 
     try {
+      // Convert Google Drive share link to direct view link if needed
+      let pdfUrl = magazine.pdfUrl
+      if (pdfUrl.includes('drive.google.com/file/d/')) {
+        const fileId = pdfUrl.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)?.[1]
+        if (fileId) {
+          pdfUrl = `https://drive.google.com/file/d/${fileId}/view`
+        }
+      }
+
       // Open PDF in new tab for viewing/downloading
-      window.open(magazine.pdfUrl, '_blank')
+      window.open(pdfUrl, '_blank')
       toast.success(t('download_started', 'Opening PDF...', 'PDF திறக்கப்படுகிறது...'))
 
       // Update download count (optional - you can implement API call here)
-      console.log(`📄 Downloaded: ${magazine.title}`)
+      console.log(`📄 Opened: ${magazine.title} - URL: ${pdfUrl}`)
     } catch (error) {
-      toast.error(t('download_failed', 'Download failed', 'பதிவிறக்கம் தோல்வியடைந்தது'))
+      console.error('PDF open error:', error)
+      toast.error(t('download_failed', 'Failed to open PDF', 'PDF திறக்க முடியவில்லை'))
     }
   }
 
@@ -182,42 +194,38 @@ function EpaperPageContent() {
       </div>
 
       {/* Collections Filter */}
-      {collections.length > 0 && (
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-3">
-            <TranslatedText english="Collections" tamil="தொகுப்புகள்" />
-          </h2>
-          <div className="flex flex-wrap gap-2">
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-3">
+          <TranslatedText english="Categories" tamil="வகைகள்" />
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={selectedCollection === null ? "primary" : "outline"}
+            size="sm"
+            onClick={() => setSelectedCollection(null)}
+            className="mb-2"
+          >
+            <TranslatedText english="All Magazines" tamil="அனைத்து பத்திரிகைகள்" />
+          </Button>
+          {collections.map((collection) => (
             <Button
-              variant={selectedCollection === null ? "primary" : "outline"}
+              key={collection.id}
+              variant={selectedCollection === collection.id ? "primary" : "outline"}
               size="sm"
-              onClick={() => setSelectedCollection(null)}
+              onClick={() => setSelectedCollection(collection.id)}
               className="mb-2"
             >
-              <Folder className="w-4 h-4 mr-2" />
-              <TranslatedText english="All" tamil="அனைத்தும்" />
+              <TranslatedText
+                english={collection.name}
+                tamil={collection.name_ta || collection.name}
+              />
+              <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">
+                {collection._count.magazines}
+              </span>
             </Button>
-            {collections.map((collection) => (
-              <Button
-                key={collection.id}
-                variant={selectedCollection === collection.id ? "primary" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCollection(collection.id)}
-                className="mb-2"
-              >
-                <Folder className="w-4 h-4 mr-2" />
-                <TranslatedText
-                  english={collection.name}
-                  tamil={collection.name_ta || collection.name}
-                />
-                <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">
-                  {collection._count.magazines}
-                </span>
-              </Button>
-            ))}
-          </div>
+          ))}
         </div>
-      )}
+      </div>
 
       {/* Magazines Grid */}
       {filteredMagazines.length === 0 ? (
@@ -320,16 +328,22 @@ function EpaperPageContent() {
                   {/* Stats */}
                   <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
                     <div className="flex items-center gap-3">
-                      {magazine.downloads && (
+                      {(magazine.downloads !== undefined && magazine.downloads > 0) && (
                         <span className="flex items-center gap-1">
                           <Eye className="w-3 h-3" />
                           {magazine.downloads}
                         </span>
                       )}
-                      {magazine.likes && (
+                      {(magazine.likes !== undefined && magazine.likes > 0) && (
                         <span className="flex items-center gap-1">
                           <Heart className="w-3 h-3" />
                           {magazine.likes}
+                        </span>
+                      )}
+                      {/* Always show if no stats */}
+                      {(!magazine.downloads || magazine.downloads === 0) && (!magazine.likes || magazine.likes === 0) && (
+                        <span className="text-gray-400">
+                          <TranslatedText english="New magazine" tamil="புதிய பத்திரிகை" />
                         </span>
                       )}
                     </div>
