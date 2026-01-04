@@ -360,15 +360,57 @@ export default function AdminMagazinesPage() {
                     }}
                   />
 
-                  {/* PDF Upload */}
-                  <FileUpload
-                    label={t('admin.magazinePdf', 'Magazine PDF', 'பத்திரிகை PDF')}
-                    fileType="pdf"
-                    currentFile={formData.pdfUrl}
-                    onFileUpload={(url) => setFormData({ ...formData, pdfUrl: url })}
-                    onUrlChange={(url) => setFormData({ ...formData, pdfUrl: url })}
-                    className="mb-6"
-                  />
+                  {/* PDF URL Input */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <TranslatedText
+                        english="PDF URL (Google Drive Link)"
+                        tamil="PDF URL (கூகுள் டிரைவ் இணைப்பு)"
+                      />
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.pdfUrl}
+                      onChange={(e) => setFormData({ ...formData, pdfUrl: e.target.value })}
+                      placeholder="https://drive.google.com/file/d/..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      <TranslatedText
+                        english="Upload your PDF to Google Drive and paste the shareable link here"
+                        tamil="உங்கள் PDF ஐ கூகுள் டிரைவில் பதிவேற்றி, பகிரக்கூடிய இணைப்பை இங்கே ஒட்டவும்"
+                      />
+                    </p>
+
+                    {/* Helper Instructions */}
+                    <div className="mt-2 p-3 bg-blue-50 rounded-md">
+                      <p className="text-xs text-blue-700 font-medium mb-1">
+                        <TranslatedText english="📋 How to get Google Drive link:" tamil="📋 கூகுள் டிரைவ் இணைப்பு எப்படி பெறுவது:" />
+                      </p>
+                      <ol className="text-xs text-blue-600 space-y-1 ml-3">
+                        <li>
+                          <TranslatedText
+                            english="1. Upload PDF to Google Drive"
+                            tamil="1. PDF ஐ கூகுள் டிரைவில் பதிவேற்றவும்"
+                          />
+                        </li>
+                        <li>
+                          <TranslatedText
+                            english="2. Right-click → Share → Copy link"
+                            tamil="2. வலது கிளிக் → பகிர் → இணைப்பை நகலெடுக்கவும்"
+                          />
+                        </li>
+                        <li>
+                          <TranslatedText
+                            english="3. Make sure 'Anyone with the link' can view"
+                            tamil="3. 'இணைப்பு உள்ளவர் யாரும்' பார்க்க முடியும் என்பதை உறுதிப்படுத்தவும்"
+                          />
+                        </li>
+                      </ol>
+                    </div>
+                  </div>
 
                   {/* Cover Image Upload */}
                   <FileUpload
