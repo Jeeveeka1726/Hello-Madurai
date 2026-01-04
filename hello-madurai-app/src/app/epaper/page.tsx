@@ -56,6 +56,7 @@ function EpaperPageContent() {
       const response = await fetch('/api/magazines/collections')
       if (response.ok) {
         const data = await response.json()
+        console.log('📂 Fetched collections:', data)
         setCollections(data)
       }
     } catch (error) {
@@ -83,11 +84,11 @@ function EpaperPageContent() {
     ? magazines.filter(mag => mag.collection?.id === selectedCollection)
     : magazines
 
-  const handleDownload = async (magazine: Magazine) => {
-    console.log('📄 Attempting to open PDF:', magazine.pdfUrl)
+  const handleView = async (magazine: Magazine) => {
+    console.log('👁️ Attempting to view PDF:', magazine.pdfUrl)
 
     if (!magazine.pdfUrl) {
-      toast.error(t('download_error', 'PDF not available', 'PDF கிடைக்கவில்லை'))
+      toast.error(t('view_error', 'PDF not available', 'PDF கிடைக்கவில்லை'))
       return
     }
 
@@ -101,15 +102,49 @@ function EpaperPageContent() {
         }
       }
 
-      // Open PDF in new tab for viewing/downloading
+      // Open PDF in new tab for viewing
       window.open(pdfUrl, '_blank')
-      toast.success(t('download_started', 'Opening PDF...', 'PDF திறக்கப்படுகிறது...'))
+      toast.success(t('view_started', 'Opening PDF...', 'PDF திறக்கப்படுகிறது...'))
 
-      // Update download count (optional - you can implement API call here)
-      console.log(`📄 Opened: ${magazine.title} - URL: ${pdfUrl}`)
+      console.log(`👁️ Viewing: ${magazine.title} - URL: ${pdfUrl}`)
     } catch (error) {
-      console.error('PDF open error:', error)
-      toast.error(t('download_failed', 'Failed to open PDF', 'PDF திறக்க முடியவில்லை'))
+      console.error('PDF view error:', error)
+      toast.error(t('view_failed', 'Failed to open PDF', 'PDF திறக்க முடியவில்லை'))
+    }
+  }
+
+  const handleDownload = async (magazine: Magazine) => {
+    console.log('📥 Attempting to download PDF:', magazine.pdfUrl)
+
+    if (!magazine.pdfUrl) {
+      toast.error(t('download_error', 'PDF not available', 'PDF கிடைக்கவில்லை'))
+      return
+    }
+
+    try {
+      // Convert Google Drive share link to direct download link
+      let downloadUrl = magazine.pdfUrl
+      if (downloadUrl.includes('drive.google.com/file/d/')) {
+        const fileId = downloadUrl.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)?.[1]
+        if (fileId) {
+          downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
+        }
+      }
+
+      // Create a temporary link to trigger download
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = `${magazine.title}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      toast.success(t('download_started', 'Download started...', 'பதிவிறக்கம் தொடங்கியது...'))
+
+      console.log(`📥 Downloaded: ${magazine.title} - URL: ${downloadUrl}`)
+    } catch (error) {
+      console.error('PDF download error:', error)
+      toast.error(t('download_failed', 'Download failed', 'பதிவிறக்கம் தோல்வியடைந்தது'))
     }
   }
 
@@ -248,7 +283,7 @@ function EpaperPageContent() {
               key={magazine.id}
               hover
               className="transition-shadow cursor-pointer"
-              onClick={() => handleDownload(magazine)}
+              onClick={() => handleView(magazine)}
             >
               {/* Cover Image */}
               {(magazine.coverImage || magazine.featuredImage) && (
@@ -301,7 +336,7 @@ function EpaperPageContent() {
                       className="flex-1"
                     >
                       <Download className="w-4 h-4 mr-1" />
-                      <TranslatedText english="Read" tamil="படிக்க" />
+                      <TranslatedText english="Download" tamil="பதிவிறக்கம்" />
                     </Button>
 
                     <Button
@@ -328,24 +363,17 @@ function EpaperPageContent() {
                   {/* Stats */}
                   <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
                     <div className="flex items-center gap-3">
-                      {(magazine.downloads !== undefined && magazine.downloads > 0) && (
-                        <span className="flex items-center gap-1">
-                          <Eye className="w-3 h-3" />
-                          {magazine.downloads}
-                        </span>
-                      )}
-                      {(magazine.likes !== undefined && magazine.likes > 0) && (
-                        <span className="flex items-center gap-1">
-                          <Heart className="w-3 h-3" />
-                          {magazine.likes}
-                        </span>
-                      )}
-                      {/* Always show if no stats */}
-                      {(!magazine.downloads || magazine.downloads === 0) && (!magazine.likes || magazine.likes === 0) && (
-                        <span className="text-gray-400">
-                          <TranslatedText english="New magazine" tamil="புதிய பத்திரிகை" />
-                        </span>
-                      )}
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-3 h-3" />
+                        {magazine.downloads || 0}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Heart className="w-3 h-3" />
+                        {magazine.likes || 0}
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-400">
+                      {magazine.publishedAt && new Date(magazine.publishedAt).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
