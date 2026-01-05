@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ['localhost', 'supabase.co'],
+    domains: ['localhost', 'supabase.co', 'hello-madurai-c5xr.vercel.app'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -26,12 +26,17 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'youtube.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'hello-madurai-c5xr.vercel.app',
+        pathname: '/uploads/**',
+      },
     ],
   },
   experimental: {
     serverActions: {
       allowedOrigins: ['localhost:3000'],
-      bodySizeLimit: '50mb', // Allow large file uploads (Vercel limit)
+      bodySizeLimit: '500mb', // Allow large PDF uploads to Hostinger
     },
   },
   async headers() {
