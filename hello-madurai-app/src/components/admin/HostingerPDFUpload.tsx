@@ -1,13 +1,11 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
+import Button from '@/components/ui/Button'
+import Card, { CardContent } from '@/components/ui/Card'
 import { DocumentIcon, CloudArrowUpIcon, LinkIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
-import { useLanguage } from '@/hooks/useLanguage'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface HostingerPDFUploadProps {
   label: string
@@ -94,7 +92,7 @@ export default function HostingerPDFUpload({
 
   return (
     <div className={`space-y-4 ${className}`}>
-      <Label className="text-sm font-medium">{label}</Label>
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
       
       {/* Upload Mode Toggle */}
       <div className="flex gap-2">
@@ -155,11 +153,12 @@ export default function HostingerPDFUpload({
         </Card>
       ) : (
         <div className="space-y-2">
-          <Input
+          <input
             type="url"
             placeholder="https://drive.google.com/file/d/..."
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
           <Button
             type="button"
