@@ -46,6 +46,25 @@ function EpaperPageContent() {
   const [loading, setLoading] = useState(true)
   const [likedMagazines, setLikedMagazines] = useState<Set<string>>(new Set())
 
+  // Load liked magazines from localStorage on mount
+  useEffect(() => {
+    const savedLikes = localStorage.getItem('hello-madurai-liked-magazines')
+    if (savedLikes) {
+      try {
+        const likedIds = JSON.parse(savedLikes)
+        setLikedMagazines(new Set(likedIds))
+      } catch (error) {
+        console.error('Error loading liked magazines:', error)
+      }
+    }
+  }, [])
+
+  // Save liked magazines to localStorage whenever it changes
+  const updateLikedMagazines = (newLikedSet: Set<string>) => {
+    setLikedMagazines(newLikedSet)
+    localStorage.setItem('hello-madurai-liked-magazines', JSON.stringify(Array.from(newLikedSet)))
+  }
+
   useEffect(() => {
     fetchCollections()
     fetchMagazines()
@@ -198,15 +217,14 @@ function EpaperPageContent() {
     try {
       if (isLiked) {
         // Unlike
-        setLikedMagazines(prev => {
-          const newSet = new Set(prev)
-          newSet.delete(magazine.id)
-          return newSet
-        })
-        toast.success(t('unliked', 'Removed from favorites', 'பிடித்தவைகளிலிருந்து நீக்கப்பட்டது'))
+        const newSet = new Set(likedMagazines)
+        newSet.delete(magazine.id)
+        updateLikedMagazines(newSet)
+        toast.success(t('unliked', 'Removed from favorites', 'பিடித்தவைகளிலிருந்து நீக்கப்பட்டது'))
       } else {
         // Like
-        setLikedMagazines(prev => new Set(prev).add(magazine.id))
+        const newSet = new Set(likedMagazines).add(magazine.id)
+        updateLikedMagazines(newSet)
         toast.success(t('liked', 'Added to favorites', 'பிடித்தவைகளில் சேர்க்கப்பட்டது'))
 
         // Call API to increment likes in database
@@ -293,39 +311,40 @@ function EpaperPageContent() {
       </div>
 
       {/* Collections Filter */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-3">
-          <TranslatedText english="Categories" tamil="வகைகள்" />
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant={selectedCollection === null ? "primary" : "outline"}
-            size="sm"
-            onClick={() => setSelectedCollection(null)}
-            className="mb-2"
-          >
-            <TranslatedText english="All Magazines" tamil="அனைத்து பத்திரிகைகள்" />
-          </Button>
-          {console.log('🎯 Rendering collections:', collections)}
-          {collections.map((collection) => (
+      {collections.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-3">
+            <TranslatedText english="Categories" tamil="வகைகள்" />
+          </h2>
+          <div className="flex flex-wrap gap-2">
             <Button
-              key={collection.id}
-              variant={selectedCollection === collection.id ? "primary" : "outline"}
+              variant={selectedCollection === null ? "primary" : "outline"}
               size="sm"
-              onClick={() => setSelectedCollection(collection.id)}
+              onClick={() => setSelectedCollection(null)}
               className="mb-2"
             >
-              <TranslatedText
-                english={collection.name}
-                tamil={collection.name_ta || collection.name}
-              />
-              <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">
-                {collection._count?.magazines || 0}
-              </span>
+              <TranslatedText english="All Magazines" tamil="அனைத்து பத்திரிகைகள்" />
             </Button>
-          ))}
+            {collections.map((collection) => (
+              <Button
+                key={collection.id}
+                variant={selectedCollection === collection.id ? "primary" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCollection(collection.id)}
+                className="mb-2"
+              >
+                <TranslatedText
+                  english={collection.name}
+                  tamil={collection.name_ta || collection.name}
+                />
+                <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">
+                  {collection._count?.magazines || 0}
+                </span>
+              </Button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Magazines Grid */}
       {filteredMagazines.length === 0 ? (
@@ -368,14 +387,7 @@ function EpaperPageContent() {
                     tamil={magazine.title_ta || magazine.title}
                   />
                 </CardTitle>
-                {magazine.collection && (
-                  <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm mt-2">
-                    <TranslatedText
-                      english={magazine.collection.name}
-                      tamil={magazine.collection.name_ta || magazine.collection.name}
-                    />
-                  </span>
-                )}
+
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
