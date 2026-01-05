@@ -1,85 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
-import { existsSync } from 'fs'
+import { v2 as cloudinary } from 'cloudinary'
 
-// Configure route for large PDF uploads to Hostinger
-export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
-export const maxDuration = 300 // 5 minutes for large files
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY || '187251687769698',
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'yf7cHBXxd4qOc3e3wQy-ct1BLqM',
+})
 
-const MAX_FILE_SIZE = 500 * 1024 * 1024 // 500MB limit
-const ALLOWED_TYPES = ['application/pdf']
-
-export async function POST(request: NextRequest) {
+// Generate Cloudinary upload signature for PDFs
+// This allows the browser to upload directly to Cloudinary, bypassing Vercel's 4.5MB limit
+export async function GET() {
   try {
-    console.log('📁 Hostinger PDF upload started')
-    
-    const formData = await request.formData()
-    const file = formData.get('file') as File
+    const timestamp = Math.round(Date.now() / 1000)
+    const folder = 'hello-madurai/magazines'
 
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No PDF file provided' },
-        { status: 400 }
-      )
+    // Parameters to sign (must match exactly what's sent to Cloudinary)
+    const paramsToSign = {
+      timestamp: timestamp,
+      folder: folder,
+      resource_type: 'raw', // Important: PDFs are 'raw' files in Cloudinary
     }
 
-    // Validate file type
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json(
-        { error: 'Invalid file type. Only PDF files are allowed.' },
-        { status: 400 }
-      )
-    }
+    // Generate signature for secure uploads
+    const signature = cloudinary.utils.api_sign_request(
+      paramsToSign,
+      process.env.CLOUDINARY_API_SECRET || 'yf7cHBXxd4qOc3e3wQy-ct1BLqM'
+    )
 
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      const maxSizeMB = Math.round(MAX_FILE_SIZE / (1024 * 1024))
-      return NextResponse.json(
-        { error: `File too large. Maximum size is ${maxSizeMB}MB.` },
-        { status: 413 }
-      )
-    }
+    console.log('🔑 Generated PDF signature for timestamp:', timestamp)
 
-    // Create unique filename
-    const timestamp = Date.now()
-    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-    const filename = `${timestamp}_${sanitizedName}`
-
-    // Create uploads directory structure
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'magazines')
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true })
-      console.log('📁 Created magazines directory:', uploadsDir)
-    }
-
-    // Convert file to buffer and save
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const filePath = join(uploadsDir, filename)
-
-    await writeFile(filePath, buffer)
-    console.log('✅ PDF saved to:', filePath)
-
-    // Generate public URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://hello-madurai-c5xr.vercel.app'
-    const publicUrl = `${baseUrl}/uploads/magazines/${filename}`
-
-    // Return success response
     return NextResponse.json({
-      success: true,
-      url: publicUrl,
-      filename: filename,
-      size: file.size,
-      type: file.type,
-      uploadedAt: new Date().toISOString()
+      signature,
+      timestamp,
+      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dbngxtspv',
+      apiKey: process.env.CLOUDINARY_API_KEY || '187251687769698',
+      folder,
+      resourceType: 'raw', // PDFs are raw files
     })
-
   } catch (error) {
-    console.error('❌ Hostinger PDF upload error:', error)
+    console.error('❌ Error generating PDF signature:', error)
     return NextResponse.json(
-      { error: 'Failed to upload PDF to Hostinger storage' },
+      { error: 'Failed to generate upload signature' },
       { status: 500 }
     )
   }

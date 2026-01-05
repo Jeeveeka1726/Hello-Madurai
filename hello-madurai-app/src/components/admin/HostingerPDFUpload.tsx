@@ -33,30 +33,49 @@ export default function HostingerPDFUpload({
       return
     }
 
-    // Check file size (500MB limit)
-    const maxSize = 500 * 1024 * 1024
+    // Check file size (100MB limit for Cloudinary)
+    const maxSize = 100 * 1024 * 1024
     if (file.size > maxSize) {
-      toast.error(t('file_too_large', 'File too large. Maximum size is 500MB.', 'கோப்பு மிகப் பெரியது. அதிகபட்ச அளவு 500MB.'))
+      toast.error(t('file_too_large', 'File too large. Maximum size is 100MB.', 'கோப்பு மிகப் பெரியது. அதிகபட்ச அளவு 100MB.'))
       return
     }
 
     setUploading(true)
-    const formData = new FormData()
-    formData.append('file', file)
 
     try {
-      const response = await fetch('/api/upload/hostinger-pdf', {
+      // Step 1: Get upload signature from our API
+      console.log('🔑 Getting upload signature...')
+      const signatureResponse = await fetch('/api/upload/hostinger-pdf')
+      if (!signatureResponse.ok) {
+        throw new Error('Failed to get upload signature')
+      }
+      const { signature, timestamp, cloudName, apiKey, folder, resourceType } = await signatureResponse.json()
+
+      // Step 2: Upload directly to Cloudinary
+      console.log('📤 Uploading PDF to Cloudinary...')
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('signature', signature)
+      formData.append('timestamp', timestamp.toString())
+      formData.append('api_key', apiKey)
+      formData.append('folder', folder)
+      formData.append('resource_type', resourceType)
+
+      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`, {
         method: 'POST',
         body: formData
       })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Upload failed')
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json()
+        throw new Error(errorData.error?.message || 'Cloudinary upload failed')
       }
 
-      const data = await response.json()
-      onUpload(data.url)
+      const uploadData = await uploadResponse.json()
+      console.log('✅ PDF uploaded to Cloudinary:', uploadData.secure_url)
+
+      // Step 3: Return the Cloudinary URL
+      onUpload(uploadData.secure_url)
       toast.success(t('upload_success', 'PDF uploaded successfully!', 'PDF வெற்றிகரமாக பதிவேற்றப்பட்டது!'))
     } catch (error) {
       console.error('Upload error:', error)
@@ -132,7 +151,7 @@ export default function HostingerPDFUpload({
               {t('drag_drop_pdf', 'Drag and drop PDF file here, or click to select', 'PDF கோப்பை இங்கே இழுத்து விடவும் அல்லது தேர்ந்தெடுக்க கிளிக் செய்யவும்')}
             </p>
             <p className="text-xs text-gray-500 mb-4">
-              {t('max_size_500mb', 'Maximum file size: 500MB', 'அதிகபட்ச கோப்பு அளவு: 500MB')}
+              {t('max_size_100mb', 'Maximum file size: 100MB', 'அதிகபட்ச கோப்பு அளவு: 100MB')}
             </p>
             <Button
               type="button"
