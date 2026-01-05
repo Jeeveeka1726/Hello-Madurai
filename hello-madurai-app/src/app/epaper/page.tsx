@@ -106,6 +106,7 @@ function EpaperPageContent() {
     : magazines
 
   const handleView = async (magazine: Magazine) => {
+    console.log('🎯 handleView called for:', magazine.title)
     console.log('👁️ Attempting to view PDF:', magazine.pdfUrl)
 
     if (!magazine.pdfUrl) {
@@ -311,40 +312,39 @@ function EpaperPageContent() {
       </div>
 
       {/* Collections Filter */}
-      {collections.length > 0 && (
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-3">
-            <TranslatedText english="Categories" tamil="வகைகள்" />
-          </h2>
-          <div className="flex flex-wrap gap-2">
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-3">
+          <TranslatedText english="Categories" tamil="வகைகள்" />
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={selectedCollection === null ? "primary" : "outline"}
+            size="sm"
+            onClick={() => setSelectedCollection(null)}
+            className="mb-2"
+          >
+            <TranslatedText english="All Magazines" tamil="அனைத்து பத்திரிகைகள்" />
+          </Button>
+          {console.log('🎯 Rendering collections in UI:', collections)}
+          {collections.map((collection) => (
             <Button
-              variant={selectedCollection === null ? "primary" : "outline"}
+              key={collection.id}
+              variant={selectedCollection === collection.id ? "primary" : "outline"}
               size="sm"
-              onClick={() => setSelectedCollection(null)}
+              onClick={() => setSelectedCollection(collection.id)}
               className="mb-2"
             >
-              <TranslatedText english="All Magazines" tamil="அனைத்து பத்திரிகைகள்" />
+              <TranslatedText
+                english={collection.name}
+                tamil={collection.name_ta || collection.name}
+              />
+              <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">
+                {collection._count?.magazines || 0}
+              </span>
             </Button>
-            {collections.map((collection) => (
-              <Button
-                key={collection.id}
-                variant={selectedCollection === collection.id ? "primary" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCollection(collection.id)}
-                className="mb-2"
-              >
-                <TranslatedText
-                  english={collection.name}
-                  tamil={collection.name_ta || collection.name}
-                />
-                <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">
-                  {collection._count?.magazines || 0}
-                </span>
-              </Button>
-            ))}
-          </div>
+          ))}
         </div>
-      )}
+      </div>
 
       {/* Magazines Grid */}
       {filteredMagazines.length === 0 ? (
@@ -367,7 +367,10 @@ function EpaperPageContent() {
               key={magazine.id}
               hover
               className="transition-shadow cursor-pointer"
-              onClick={() => handleView(magazine)}
+              onClick={(e) => {
+                console.log('🎯 Card clicked for:', magazine.title)
+                handleView(magazine)
+              }}
             >
               {/* Cover Image */}
               {(magazine.coverImage || magazine.featuredImage) && (
