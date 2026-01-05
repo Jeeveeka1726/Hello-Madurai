@@ -5,6 +5,34 @@
   box-sizing: border-box;
 }
 
+/* Touch optimization for ads and interactive elements */
+.touch-optimized {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* Fast click response for ads */
+.ad-clickable {
+  cursor: pointer;
+  transition: opacity 0.1s ease-out, transform 0.1s ease-out;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.ad-clickable:hover {
+  opacity: 0.9;
+}
+
+.ad-clickable:active {
+  opacity: 0.75;
+  transform: scale(0.98);
+}
+
 html {
   scroll-behavior: smooth;
   color-scheme: light;

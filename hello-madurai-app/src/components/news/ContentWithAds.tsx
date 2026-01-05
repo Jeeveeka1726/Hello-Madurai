@@ -287,15 +287,18 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
     return ''
   }
 
-  // Track ad clicks
+  // Track ad clicks - optimized for instant response
   useEffect(() => {
     // Add global click handler
-    (window as any).handleAdClick = async (adId: string, link: string) => {
-      try {
-        await fetch(`/api/ads/${adId}/click`, { method: 'POST' })
-      } catch (error) {
-        console.error('Error tracking click:', error)
+    (window as any).handleAdClick = (adId: string, link: string) => {
+      // Open link immediately for instant response
+      if (link) {
+        window.open(link, '_blank', 'noopener,noreferrer')
       }
+
+      // Track click in background (non-blocking)
+      fetch(`/api/ads/${adId}/click`, { method: 'POST' })
+        .catch(error => console.error('Error tracking click:', error))
     }
 
     return () => {

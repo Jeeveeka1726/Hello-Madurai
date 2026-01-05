@@ -231,14 +231,20 @@ function VideosPageContent() {
     }
   }
 
-  // Handle ad click
-  const handleAdClick = async (adId: string, link: string) => {
-    try {
-      await fetch(`/api/ads/${adId}/click`, { method: 'POST' })
-      window.open(link, '_blank', 'noopener,noreferrer')
-    } catch (error) {
-      console.error('Error tracking ad click:', error)
+  // Handle ad click - optimized for instant response
+  const handleAdClick = (adId: string, link: string, event?: React.MouseEvent | React.TouchEvent) => {
+    // Prevent default behavior for better control
+    if (event) {
+      event.preventDefault()
+      event.stopPropagation()
     }
+
+    // Open link IMMEDIATELY for instant response
+    window.open(link, '_blank', 'noopener,noreferrer')
+
+    // Track click in background (non-blocking)
+    fetch(`/api/ads/${adId}/click`, { method: 'POST' })
+      .catch(error => console.error('Error tracking ad click:', error))
   }
 
   // Render ad component
@@ -291,16 +297,18 @@ function VideosPageContent() {
 
             {ad.link ? (
               <div
-                onClick={() => handleAdClick(ad.id, ad.link!)}
-                className="cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={(e) => handleAdClick(ad.id, ad.link!, e)}
+                onTouchStart={(e) => handleAdClick(ad.id, ad.link!, e)}
+                className="ad-clickable touch-optimized"
               >
                 <img
                   src={ad.imageUrl}
                   alt={adTitle}
-                  className="w-full h-auto rounded-lg shadow-md max-w-4xl mx-auto"
+                  className="w-full h-auto rounded-lg shadow-md max-w-4xl mx-auto select-none"
                   onError={(e) => {
                     e.currentTarget.parentElement!.parentElement!.style.display = 'none'
                   }}
+                  draggable={false}
                 />
               </div>
             ) : (

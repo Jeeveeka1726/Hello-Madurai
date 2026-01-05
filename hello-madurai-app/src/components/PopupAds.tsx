@@ -85,11 +85,12 @@ export default function PopupAds({ className = '' }: PopupAdsProps) {
 
   const handleAction = () => {
     if (currentAd?.actionUrl) {
-      // Record click
+      // Open URL IMMEDIATELY for instant response
+      window.open(currentAd.actionUrl, '_blank', 'noopener,noreferrer')
+
+      // Record click in background (non-blocking)
       fetch(`/api/popup-ads/${currentAd.id}/click`, { method: 'POST' })
-      
-      // Open URL
-      window.open(currentAd.actionUrl, '_blank')
+        .catch(error => console.error('Error tracking popup click:', error))
     }
     handleClose()
   }
