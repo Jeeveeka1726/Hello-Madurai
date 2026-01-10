@@ -326,9 +326,12 @@ function DigitalFMPageContent() {
 
             setSelectedSinger(song.singer)
             setSongs(songsData)
-            setCurrentSong(song)
             setLoading(false)
             setLoadingSongs(false)
+
+            // Auto-play the shared song
+            console.log('🎵 Auto-playing shared song:', song.title)
+            playSong(song)
 
             // Scroll to the song after a short delay to ensure DOM is ready
             setTimeout(() => {

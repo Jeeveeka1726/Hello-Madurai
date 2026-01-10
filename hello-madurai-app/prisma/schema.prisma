@@ -97,11 +97,11 @@ model RadioShow {
 
 model DirectoryCategory {
   id            String                 @id @default(cuid())
-  name          String                 // English name
-  name_ta       String                 // Tamil name
-  orderNumber   Int                    @default(0) // Manual ordering
+  name          String
+  name_ta       String
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
+  orderNumber   Int                    @default(0)
   subcategories DirectorySubcategory[]
   businesses    Business[]
 
@@ -110,57 +110,56 @@ model DirectoryCategory {
 
 model DirectorySubcategory {
   id          String            @id @default(cuid())
-  name        String            // English name
-  name_ta     String            // Tamil name
-  icon        String?           // Emoji icon
-  orderNumber Int               @default(0) // Manual ordering
+  name        String
+  name_ta     String
   categoryId  String
-  category    DirectoryCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  businesses  Business[]
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
+  icon        String?
+  orderNumber Int               @default(0)
+  category    DirectoryCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  businesses  Business[]
 
   @@index([categoryId])
   @@map("directory_subcategories")
 }
 
 model Business {
-  id             String                @id @default(cuid())
-  name           String
-  name_ta        String?
-  category       String? // Legacy field - will be deprecated
-  categoryId     String?
-  mainCategory   DirectoryCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  subcategoryId  String?
-  subcategory    DirectorySubcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
-  phone          String?
-  email          String?
-  website        String?
-  mainImage      String?               // Main business image
-  mainVideoUrl   String?               // Main business video URL
-  address        String
-  address_ta     String?
-  description    String?               // Business description (restored from backup)
-  description_ta String?               // Tamil business description
-  instagramUrl   String?
-  facebookUrl    String?
-  bookingUrl     String?
-  // bookingPhone   String?               // Separate booking phone number - Will be added after database migration
-  directionsUrl  String?               // Custom directions URL (Google Maps, etc.)
-  youtubeUrl     String?
-  latitude       Float?                // Latitude coordinate for location
-  longitude      Float?                // Longitude coordinate for location
-  orderNumber    Int                   @default(0)
-  hasProfile     Boolean               @default(false) // Whether to show View Profile button
-  profileContent String?               @db.LongText // Rich text content for profile page
-  profileContent_ta String?            @db.LongText // Tamil rich text content for profile page
-  profileImage   String?               // Profile image URL
-  profileVideo   String?               // Profile video URL (YouTube, etc.)
-  verified       Boolean               @default(false)
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
-  comments       BusinessComment[]
-  shares         BusinessShare[]
+  id                String                @id @default(cuid())
+  name              String
+  name_ta           String?
+  description       String?
+  category          String?
+  phone             String?
+  email             String?
+  website           String?
+  address           String
+  address_ta        String?
+  instagramUrl      String?
+  facebookUrl       String?
+  bookingUrl        String?
+  verified          Boolean               @default(false)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  categoryId        String?
+  subcategoryId     String?
+  orderNumber       Int                   @default(0)
+  hasProfile        Boolean               @default(false)
+  youtubeUrl        String?
+  profileContent    String?               @db.LongText
+  profileContent_ta String?               @db.LongText
+  profileImage      String?
+  profileVideo      String?
+  mainImage         String?
+  mainVideoUrl      String?
+  directionsUrl     String?
+  latitude          Float?
+  longitude         Float?
+  description_ta    String?
+  mainCategory      DirectoryCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  subcategory       DirectorySubcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+  comments          BusinessComment[]
+  shares            BusinessShare[]
 
   @@index([categoryId])
   @@index([subcategoryId])
@@ -168,15 +167,15 @@ model Business {
 }
 
 model MagazineCollection {
-  id             String         @id @default(cuid())
+  id             String        @id @default(cuid())
   name           String
   name_ta        String?
   description    String?
   description_ta String?
   coverImage     String?
-  featured       Boolean        @default(false)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  featured       Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   magazines      Magazine[]
   pdfs           MagazinePdf[]
 
@@ -195,11 +194,11 @@ model Magazine {
   issueNumber    String
   publishedAt    DateTime           @default(now())
   downloads      Int                @default(0)
-  likes          Int                @default(0)
   featured       Boolean            @default(false)
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   collectionId   String
+  likes          Int                @default(0)
   collection     MagazineCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   pdfs           MagazinePdf[]
 
@@ -412,13 +411,13 @@ model Image {
 model Audio {
   id        String   @id @default(cuid())
   filename  String
-  data      Bytes?   // Legacy: binary data (deprecated, use url instead)
-  url       String?  // Cloudinary URL (new uploads use this)
-  publicId  String?  // Cloudinary public ID for management
+  data      Bytes?
   mimeType  String
   size      Int
-  duration  String?  // Duration in format "MM:SS" or "HH:MM:SS"
+  duration  String?
   createdAt DateTime @default(now())
+  publicId  String?
+  url       String?
 
   @@map("audio_files")
 }
@@ -426,8 +425,8 @@ model Audio {
 model MagazinePdf {
   id           String              @id @default(cuid())
   filename     String
-  url          String?             @db.LongText // Changed to LongText for base64 data URLs
-  publicId     String?             // Cloudinary public ID for management
+  url          String?             @db.LongText
+  publicId     String?
   mimeType     String
   size         Int
   magazineId   String?
@@ -439,27 +438,25 @@ model MagazinePdf {
   @@map("magazine_pdfs")
 }
 
-
-
 model Video {
-  id             String         @id @default(cuid())
-  title          String
-  title_ta       String?
-  videoUrl       String         // Can be uploaded file path or YouTube URL
-  videoType      String         @default("upload") // "upload" or "youtube"
-  thumbnailUrl   String?
-  category       String
-  orderNumber    Int            @default(0) // For manual ordering
-  duration       String?
-  views          Int            @default(0)
-  likes          Int            @default(0)
-  dislikes       Int            @default(0)
-  featured       Boolean        @default(false)
-  publishedAt    DateTime       @default(now())
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  comments       VideoComment[]
-  shares         VideoShare[]
+  id           String         @id @default(cuid())
+  title        String
+  title_ta     String?
+  videoUrl     String
+  thumbnailUrl String?
+  category     String
+  duration     String?
+  views        Int            @default(0)
+  likes        Int            @default(0)
+  dislikes     Int            @default(0)
+  featured     Boolean        @default(false)
+  publishedAt  DateTime       @default(now())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  orderNumber  Int            @default(0)
+  videoType    String         @default("upload")
+  comments     VideoComment[]
+  shares       VideoShare[]
 
   @@map("videos")
 }
@@ -490,9 +487,9 @@ model VideoShare {
 
 model RadioCategory {
   id          String   @id @default(cuid())
-  name        String   // English name (Songs, God Songs, Speech, Comedy)
-  name_ta     String   // Tamil name (பாடல்கள், பக்தி பாடல்கள், சொற்பொழிவு, நகைச்சுவை)
-  slug        String   @unique // URL-friendly identifier
+  name        String
+  name_ta     String
+  slug        String   @unique
   orderNumber Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -503,18 +500,18 @@ model RadioCategory {
 
 model Singer {
   id          String          @id @default(cuid())
-  name        String          // Singer name
-  name_ta     String?         // Tamil name (optional)
-  slug        String?         @unique // URL-friendly slug for persistent URLs
-  imageUrl    String?         // 400x400px square image
-  featured    Boolean         @default(false) // Featured singer
-  orderNumber Int             @default(0) // Manual ordering within category
+  name        String
+  name_ta     String?
+  imageUrl    String?
   categoryId  String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  featured    Boolean         @default(false)
+  slug        String?         @unique
+  orderNumber Int             @default(0)
   category    RadioCategory   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   songs       RadioSong[]
   comments    SingerComment[]
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
 
   @@index([categoryId])
   @@index([featured])
@@ -525,27 +522,26 @@ model Singer {
 
 model RadioSong {
   id        String     @id @default(cuid())
-  title     String     // Song title
-  title_ta  String?    // Tamil title (optional)
-  audioUrl  String     // Audio file URL or embeddable webpage URL
-  audioType String     @default("direct") // "direct" for audio files, "embed" for radio station webpages
-  duration  String?    // Duration (e.g., "3:45")
+  title     String
+  title_ta  String?
+  audioUrl  String
+  duration  String?
   plays     Int        @default(0)
-  shares    Int        @default(0)
   singerId  String
-  singer    Singer     @relation(fields: [singerId], references: [id], onDelete: Cascade)
-  likes     SongLike[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  shares    Int        @default(0)
+  audioType String     @default("direct")
+  singer    Singer     @relation(fields: [singerId], references: [id], onDelete: Cascade)
+  likes     SongLike[]
 
   @@index([singerId])
   @@map("radio_songs")
 }
 
-// Anonymous user model for tracking interactions
 model AnonymousUser {
   id           String          @id @default(cuid())
-  sessionToken String          @unique // Unique session token stored in cookie
+  sessionToken String          @unique
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
   lastSeenAt   DateTime        @default(now())
@@ -556,7 +552,6 @@ model AnonymousUser {
   @@map("anonymous_users")
 }
 
-// Track which user liked which song
 model SongLike {
   id        String        @id @default(cuid())
   userId    String
@@ -565,23 +560,22 @@ model SongLike {
   user      AnonymousUser @relation(fields: [userId], references: [id], onDelete: Cascade)
   song      RadioSong     @relation(fields: [songId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, songId]) // One like per user per song
+  @@unique([userId, songId])
   @@index([userId])
   @@index([songId])
   @@map("song_likes")
 }
 
-// Comments on singer/artist page
 model SingerComment {
   id           String          @id @default(cuid())
   content      String          @db.Text
-  author       String // Display name entered by user
+  author       String
   userId       String?
   singerId     String
-  parentId     String? // For replies
-  isAdminReply Boolean         @default(false)
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
+  isAdminReply Boolean         @default(false)
+  parentId     String?
   user         AnonymousUser?  @relation(fields: [userId], references: [id], onDelete: Cascade)
   singer       Singer          @relation(fields: [singerId], references: [id], onDelete: Cascade)
   parent       SingerComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -591,4 +585,17 @@ model SingerComment {
   @@index([singerId])
   @@index([parentId])
   @@map("singer_comments")
+}
+
+model pdf_chunks {
+  id          String   @id
+  uploadId    String
+  chunkIndex  Int
+  chunkData   String   @db.LongText
+  filename    String
+  mimeType    String
+  totalChunks Int
+  createdAt   DateTime @default(now())
+
+  @@index([uploadId])
 }
