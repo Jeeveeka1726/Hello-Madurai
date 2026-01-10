@@ -193,7 +193,7 @@ function NewsDetailPageContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
-      <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-8">
+      <div className="mx-auto max-w-full px-3 sm:px-4 lg:px-6 xl:px-8">
         {/* Back Button */}
         <div className="mb-4 sm:mb-6">
           <Link href="/news">
@@ -216,7 +216,12 @@ function NewsDetailPageContent() {
           {/* Article Card */}
           <div className="flex-1 w-full">
             <Card className="bg-white border-gray-200">
-              <CardContent className="p-4 sm:p-6 lg:p-8">
+              <CardContent className="p-4 sm:p-6 lg:p-8 select-none" style={{
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
+                msUserSelect: 'none',
+                userSelect: 'none'
+              }}>
                 {/* Article Header - Above Image */}
                 <div className="mb-4 sm:mb-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">

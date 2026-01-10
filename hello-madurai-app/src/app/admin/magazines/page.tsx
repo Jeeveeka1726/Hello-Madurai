@@ -361,13 +361,57 @@ export default function AdminMagazinesPage() {
                     }}
                   />
 
-                  {/* PDF Upload - Hostinger Storage */}
-                  <HostingerPDFUpload
-                    label={t('admin.pdfFile', 'Magazine PDF *', 'பத்திரிகை PDF *')}
-                    currentUrl={formData.pdfUrl}
-                    onUpload={(url) => setFormData({ ...formData, pdfUrl: url })}
-                    className="mb-6"
-                  />
+                  {/* PDF URL Input - Simple & Direct */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <TranslatedText
+                        english="PDF URL (Google Drive, Dropbox, or Direct Link)"
+                        tamil="PDF URL (கூகுள் டிரைவ், டிராப்பாக்ஸ் அல்லது நேரடி இணைப்பு)"
+                      />
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.pdfUrl}
+                      onChange={(e) => setFormData({ ...formData, pdfUrl: e.target.value })}
+                      placeholder="https://drive.google.com/file/d/... or https://your-domain.com/magazine.pdf"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      <TranslatedText
+                        english="Paste any PDF link: Google Drive, Dropbox, or direct PDF URL"
+                        tamil="எந்த PDF இணைப்பையும் ஒட்டவும்: கூகுள் டிரைவ், டிராப்பாக்ஸ் அல்லது நேரடி PDF URL"
+                      />
+                    </p>
+
+                    {/* Helper Instructions */}
+                    <div className="mt-2 p-3 bg-blue-50 rounded-md">
+                      <p className="text-xs text-blue-700 font-medium mb-1">
+                        <TranslatedText english="💡 Easy Options:" tamil="💡 எளிய விருப்பங்கள்:" />
+                      </p>
+                      <ul className="text-xs text-blue-600 space-y-1 ml-3">
+                        <li>
+                          <TranslatedText
+                            english="• Google Drive: Upload → Share → Copy link"
+                            tamil="• கூகுள் டிரைவ்: பதிவேற்று → பகிர் → இணைப்பை நகலெடு"
+                          />
+                        </li>
+                        <li>
+                          <TranslatedText
+                            english="• Dropbox: Upload → Share → Copy link"
+                            tamil="• டிராப்பாக்ஸ்: பதிவேற்று → பகிர் → இணைப்பை நகலெடு"
+                          />
+                        </li>
+                        <li>
+                          <TranslatedText
+                            english="• Direct URL: Any publicly accessible PDF link"
+                            tamil="• நேரடி URL: பொதுவில் அணுகக்கூடிய எந்த PDF இணைப்பும்"
+                          />
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
 
                   {/* Cover Image Upload */}
                   <FileUpload

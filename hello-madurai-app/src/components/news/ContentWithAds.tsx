@@ -308,14 +308,60 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
 
   return (
     <>
+      <script dangerouslySetInnerHTML={{ __html: `
+        // Disable right-click context menu on news content
+        document.addEventListener('DOMContentLoaded', function() {
+          const newsContent = document.querySelector('.news-content');
+          if (newsContent) {
+            // Disable right-click
+            newsContent.addEventListener('contextmenu', function(e) {
+              e.preventDefault();
+              return false;
+            });
+
+            // Disable common keyboard shortcuts for copying
+            newsContent.addEventListener('keydown', function(e) {
+              // Disable Ctrl+A (Select All), Ctrl+C (Copy), Ctrl+V (Paste), Ctrl+X (Cut)
+              if (e.ctrlKey && (e.key === 'a' || e.key === 'c' || e.key === 'v' || e.key === 'x')) {
+                e.preventDefault();
+                return false;
+              }
+              // Disable F12 (Developer Tools)
+              if (e.key === 'F12') {
+                e.preventDefault();
+                return false;
+              }
+            });
+
+            // Disable drag and drop
+            newsContent.addEventListener('dragstart', function(e) {
+              e.preventDefault();
+              return false;
+            });
+          }
+        });
+      ` }} />
       <style dangerouslySetInnerHTML={{ __html: `
         .news-content {
           word-wrap: break-word !important;
           overflow-wrap: break-word !important;
           color: #000000 !important;
+          /* Prevent text selection and copying */
+          -webkit-user-select: none !important;
+          -moz-user-select: none !important;
+          -ms-user-select: none !important;
+          user-select: none !important;
+          /* Disable right-click context menu */
+          -webkit-touch-callout: none !important;
+          -webkit-tap-highlight-color: transparent !important;
         }
         .news-content * {
           color: #000000 !important;
+          /* Prevent text selection on all child elements */
+          -webkit-user-select: none !important;
+          -moz-user-select: none !important;
+          -ms-user-select: none !important;
+          user-select: none !important;
         }
         .news-content ul {
           list-style-type: disc !important;
