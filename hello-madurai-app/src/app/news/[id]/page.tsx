@@ -251,12 +251,11 @@ function NewsDetailPageContent() {
 
                 {/* Featured Image - Below Title */}
                 {article.featuredImage ? (
-                  <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-lg mb-4">
+                  <div className="overflow-hidden rounded-lg mb-4">
                     <img
                       src={article.featuredImage}
                       alt={t(`news.${article.id}.title`, article.title, article.title_ta)}
-                      className="w-full h-full object-cover"
-                      style={{ maxHeight: '400px' }}
+                      className="w-full h-auto object-cover rounded-lg news-featured-image"
                     />
                   </div>
                 ) : (

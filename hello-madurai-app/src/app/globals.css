@@ -571,6 +571,25 @@ p {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
 }
 
+/* News article featured image - responsive without forced aspect ratio */
+.news-featured-image {
+  max-height: 300px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+@media (min-width: 640px) {
+  .news-featured-image {
+    max-height: 400px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .news-featured-image {
+    max-height: 500px !important;
+  }
+}
+
 /* Ad image styling with 1280x720 aspect ratio */
 .ad-image {
   aspect-ratio: 16/9 !important;
