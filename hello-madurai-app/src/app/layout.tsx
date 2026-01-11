@@ -17,14 +17,14 @@ export const metadata: Metadata = {
   keywords: "மதுரை, தமிழ்நாடு, செய்திகள், நிகழ்வுகள், வணிக முகவரி, உள்ளூர் தகவல்",
   icons: {
     icon: [
-      { url: '/favicon.ico?v=2', sizes: '32x32' },
+      { url: '/hello-madurai-icon.ico', sizes: '32x32' },
       { url: '/favicon-16x16.png?v=2', type: 'image/png', sizes: '16x16' },
       { url: '/favicon-32x32.png?v=2', type: 'image/png', sizes: '32x32' },
     ],
     apple: [
       { url: '/apple-touch-icon.png?v=2', sizes: '180x180', type: 'image/png' },
     ],
-    shortcut: '/favicon.ico?v=2',
+    shortcut: '/hello-madurai-icon.ico',
   },
   manifest: '/manifest.json',
   other: {
@@ -45,7 +45,8 @@ export default function RootLayout({
         {/* Disable browser auto-translate */}
         <meta name="google" content="notranslate" />
         {/* Favicon links for better browser support - Updated 2025-01-11 */}
-        <link rel="icon" href="/favicon.ico?v=2" sizes="32x32" />
+        <link rel="icon" href="/api/favicon" sizes="32x32" />
+        <link rel="icon" href="/hello-madurai-icon.ico" sizes="32x32" />
         <link rel="icon" href="/favicon-16x16.png?v=2" type="image/png" sizes="16x16" />
         <link rel="icon" href="/favicon-32x32.png?v=2" type="image/png" sizes="32x32" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" sizes="180x180" />
