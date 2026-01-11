@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://hellomadurai.com/sitemap.xml
+
+# Favicon
+Allow: /favicon.ico
+Allow: /hello-madurai-icon.ico
+Allow: /favicon-*.png
+Allow: /apple-touch-icon.png
+Allow: /android-chrome-*.png

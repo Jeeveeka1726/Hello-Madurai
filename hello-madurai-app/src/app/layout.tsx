@@ -17,14 +17,15 @@ export const metadata: Metadata = {
   keywords: "மதுரை, தமிழ்நாடு, செய்திகள், நிகழ்வுகள், வணிக முகவரி, உள்ளூர் தகவல்",
   icons: {
     icon: [
-      { url: '/hello-madurai-icon.ico', sizes: '32x32' },
-      { url: '/favicon-16x16.png?v=2', type: 'image/png', sizes: '16x16' },
-      { url: '/favicon-32x32.png?v=2', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon.ico?v=3', sizes: '32x32' },
+      { url: '/hello-madurai-icon.ico?v=3', sizes: '32x32' },
+      { url: '/favicon-16x16.png?v=3', type: 'image/png', sizes: '16x16' },
+      { url: '/favicon-32x32.png?v=3', type: 'image/png', sizes: '32x32' },
     ],
     apple: [
-      { url: '/apple-touch-icon.png?v=2', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon.png?v=3', sizes: '180x180', type: 'image/png' },
     ],
-    shortcut: '/hello-madurai-icon.ico',
+    shortcut: '/favicon.ico?v=3',
   },
   manifest: '/manifest.json',
   other: {
@@ -44,12 +45,12 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
         {/* Disable browser auto-translate */}
         <meta name="google" content="notranslate" />
-        {/* Favicon links for better browser support - Updated 2025-01-11 */}
-        <link rel="icon" href="/api/favicon" sizes="32x32" />
-        <link rel="icon" href="/hello-madurai-icon.ico" sizes="32x32" />
-        <link rel="icon" href="/favicon-16x16.png?v=2" type="image/png" sizes="16x16" />
-        <link rel="icon" href="/favicon-32x32.png?v=2" type="image/png" sizes="32x32" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" sizes="180x180" />
+        {/* Favicon links - Hello Madurai Logo */}
+        <link rel="icon" href="/favicon.ico?v=3" type="image/x-icon" />
+        <link rel="icon" href="/hello-madurai-icon.ico?v=3" sizes="32x32" />
+        <link rel="icon" href="/favicon-16x16.png?v=3" type="image/png" sizes="16x16" />
+        <link rel="icon" href="/favicon-32x32.png?v=3" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" sizes="180x180" />
         <meta name="theme-color" content="#2563eb" />
         {/* Pre-load language setting BEFORE React hydrates to prevent flash */}
         <script
