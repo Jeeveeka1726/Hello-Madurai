@@ -6,6 +6,7 @@ import Card, { CardContent } from '@/components/ui/Card'
 import { DocumentIcon, CloudArrowUpIcon, LinkIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
 import { useLanguage } from '@/contexts/LanguageContext'
+import PDFCompressionHelp from './PDFCompressionHelp'
 
 interface HostingerPDFUploadProps {
   label: string
@@ -33,10 +34,17 @@ export default function HostingerPDFUpload({
       return
     }
 
-    // Check file size (100MB limit for Cloudinary)
-    const maxSize = 100 * 1024 * 1024
+    // Check file size (10MB limit for Cloudinary free plan)
+    const maxSize = 10 * 1024 * 1024 // 10MB
     if (file.size > maxSize) {
-      toast.error(t('file_too_large', 'File too large. Maximum size is 100MB.', 'கோப்பு மிகப் பெரியது. அதிகபட்ச அளவு 100MB.'))
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1)
+      toast.error(
+        t('file_too_large',
+          `File too large (${fileSizeMB}MB). Maximum size is 10MB for free plan. Please compress your PDF or upgrade Cloudinary plan.`,
+          `கோப்பு மிகப் பெரியது (${fileSizeMB}MB). இலவச திட்டத்திற்கு அதிகபட்ச அளவு 10MB. தயவுசெய்து PDF ஐ சுருக்கவும் அல்லது Cloudinary திட்டத்தை மேம்படுத்தவும்.`
+        ),
+        { duration: 6000 }
+      )
       return
     }
 
@@ -68,7 +76,16 @@ export default function HostingerPDFUpload({
 
       if (!uploadResponse.ok) {
         const errorData = await uploadResponse.json()
-        throw new Error(errorData.error?.message || 'Cloudinary upload failed')
+        console.error('Cloudinary error:', errorData)
+
+        // Handle specific Cloudinary errors
+        if (errorData.error?.message?.includes('File size too large')) {
+          throw new Error('File size exceeds 10MB limit. Please compress your PDF or upgrade your Cloudinary plan.')
+        } else if (errorData.error?.message?.includes('Invalid file type')) {
+          throw new Error('Invalid file type. Please upload a PDF file.')
+        } else {
+          throw new Error(errorData.error?.message || 'Cloudinary upload failed')
+        }
       }
 
       const uploadData = await uploadResponse.json()
@@ -79,7 +96,14 @@ export default function HostingerPDFUpload({
       toast.success(t('upload_success', 'PDF uploaded successfully!', 'PDF வெற்றிகரமாக பதிவேற்றப்பட்டது!'))
     } catch (error) {
       console.error('Upload error:', error)
-      toast.error(t('upload_failed', 'Upload failed. Please try again.', 'பதிவேற்றம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.'))
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed. Please try again.'
+
+      // Show specific error message or fallback to generic message
+      if (errorMessage.includes('File size')) {
+        toast.error(errorMessage, { duration: 8000 })
+      } else {
+        toast.error(t('upload_failed', errorMessage, 'பதிவேற்றம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.'), { duration: 6000 })
+      }
     } finally {
       setUploading(false)
     }
@@ -151,8 +175,11 @@ export default function HostingerPDFUpload({
               {t('drag_drop_pdf', 'Drag and drop PDF file here, or click to select', 'PDF கோப்பை இங்கே இழுத்து விடவும் அல்லது தேர்ந்தெடுக்க கிளிக் செய்யவும்')}
             </p>
             <p className="text-xs text-gray-500 mb-4">
-              {t('max_size_100mb', 'Maximum file size: 100MB', 'அதிகபட்ச கோப்பு அளவு: 100MB')}
+              {t('max_size_10mb', 'Maximum file size: 10MB (Cloudinary free plan)', 'அதிகபட்ச கோப்பு அளவு: 10MB (Cloudinary இலவச திட்டம்)')}
             </p>
+            <div className="mb-4">
+              <PDFCompressionHelp />
+            </div>
             <Button
               type="button"
               variant="outline"
