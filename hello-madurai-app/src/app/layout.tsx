@@ -15,17 +15,30 @@ export const metadata: Metadata = {
   title: "ஹலோ மதுரை - உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம்",
   description: "மதுரையின் சமீபத்திய செய்திகள், நிகழ்வுகள், வணிக முகவரி மற்றும் உள்ளூர் தகவல்களை பெறுங்கள்",
   keywords: "மதுரை, தமிழ்நாடு, செய்திகள், நிகழ்வுகள், வணிக முகவரி, உள்ளூர் தகவல்",
+  openGraph: {
+    title: "ஹலோ மதுரை - Hello Madurai",
+    description: "மதுரையின் சமீபத்திய செய்திகள், நிகழ்வுகள், வணிக முகவரி மற்றும் உள்ளூர் தகவல்களை பெறுங்கள்",
+    url: "https://hellomadurai.com",
+    siteName: "Hello Madurai",
+    images: [
+      {
+        url: "/favicon-32x32.png",
+        width: 32,
+        height: 32,
+        alt: "Hello Madurai Logo",
+      },
+    ],
+  },
   icons: {
     icon: [
-      { url: '/favicon.ico?v=3', sizes: '32x32' },
-      { url: '/hello-madurai-icon.ico?v=3', sizes: '32x32' },
-      { url: '/favicon-16x16.png?v=3', type: 'image/png', sizes: '16x16' },
-      { url: '/favicon-32x32.png?v=3', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon.ico?t=20250111', sizes: '32x32' },
+      { url: '/favicon-16x16.png?t=20250111', type: 'image/png', sizes: '16x16' },
+      { url: '/favicon-32x32.png?t=20250111', type: 'image/png', sizes: '32x32' },
     ],
     apple: [
-      { url: '/apple-touch-icon.png?v=3', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon.png?t=20250111', sizes: '180x180', type: 'image/png' },
     ],
-    shortcut: '/favicon.ico?v=3',
+    shortcut: '/favicon.ico?t=20250111',
   },
   manifest: '/manifest.json',
   other: {
@@ -45,12 +58,12 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
         {/* Disable browser auto-translate */}
         <meta name="google" content="notranslate" />
-        {/* Favicon links - Hello Madurai Logo */}
-        <link rel="icon" href="/favicon.ico?v=3" type="image/x-icon" />
-        <link rel="icon" href="/hello-madurai-icon.ico?v=3" sizes="32x32" />
-        <link rel="icon" href="/favicon-16x16.png?v=3" type="image/png" sizes="16x16" />
-        <link rel="icon" href="/favicon-32x32.png?v=3" type="image/png" sizes="32x32" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" sizes="180x180" />
+        {/* Favicon links - Hello Madurai Logo - Force Cache Bust */}
+        <link rel="icon" href="/favicon.ico?t=20250111" type="image/x-icon" />
+        <link rel="icon" href="/favicon-32x32.png?t=20250111" type="image/png" sizes="32x32" />
+        <link rel="icon" href="/favicon-16x16.png?t=20250111" type="image/png" sizes="16x16" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?t=20250111" sizes="180x180" />
+        <link rel="shortcut icon" href="/favicon.ico?t=20250111" />
         <meta name="theme-color" content="#2563eb" />
         {/* Pre-load language setting BEFORE React hydrates to prevent flash */}
         <script
