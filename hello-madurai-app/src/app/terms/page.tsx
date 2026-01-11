@@ -9,108 +9,61 @@ export default function TermsOfServicePage() {
 
   const content = {
     en: {
-      title: '📋 Terms of Service',
-      subtitle: 'Hello Madurai Platform Terms',
-      lastUpdated: 'Last Updated: January 2025',
-      
-      acceptanceTitle: '1. Acceptance of Terms',
-      acceptance: 'By accessing and using Hello Madurai website and mobile application, you accept and agree to be bound by the terms and provision of this agreement.',
-      
-      servicesTitle: '2. Services Provided',
-      services: [
-        'News and information updates',
-        'Event listings and announcements',
-        'Digital FM radio streaming (external sources)',
-        'Video content and entertainment',
-        'E-Paper and digital publications',
-        'Business directory listings',
-        'Emergency helpline information'
+      title: '📜 Terms & Conditions',
+      subtitle: 'Service Usage Clause',
+
+      intro: 'Hello Madurai operates as a digital information and media platform. The application provides access to news, events, digital radio links, videos, e-papers, business listings, and help line information.',
+
+      digitalFmTitle: 'Digital FM (External Radios):',
+      digitalFm: [
+        'The Digital FM feature acts only as an access point to external radio streams.',
+        'Hello Madurai does not operate, control, or rebroadcast any radio station.',
+        'All copyrights and broadcast rights belong to the respective owners.'
       ],
-      
-      userConductTitle: '3. User Conduct',
-      userConduct: [
-        'Users must not misuse our services or interfere with their operation',
-        'Prohibited activities include spamming, harassment, or posting inappropriate content',
-        'Users are responsible for their own actions and content they may submit',
-        'We reserve the right to suspend access for violations of these terms'
+
+      contentOwnershipTitle: 'Content Ownership:',
+      contentOwnership: [
+        'All original content including text, audio, videos, graphics, and digital media produced by Hello Madurai are the intellectual property of Hello Madurai.',
+        'Unauthorized reproduction, redistribution, or misuse is prohibited.'
       ],
-      
-      contentTitle: '4. Content and Intellectual Property',
-      content: [
-        'Original content created by Hello Madurai is protected by copyright',
-        'External radio streams and third-party content remain property of their respective owners',
-        'Users may not reproduce, distribute, or commercially use our content without permission',
-        'We respect intellectual property rights and expect users to do the same'
+
+      thirdPartyTitle: 'Third-Party Content:',
+      thirdParty: [
+        'Content from external sources is displayed for informational purposes.',
+        'Hello Madurai does not take responsibility for third-party content, accuracy, or availability.'
       ],
-      
-      disclaimerTitle: '5. Disclaimer',
-      disclaimer: [
-        'Services are provided "as is" without warranties of any kind',
-        'We do not guarantee accuracy, completeness, or reliability of information',
-        'Business directory listings are for informational purposes only',
-        'We are not responsible for third-party content or external links'
-      ],
-      
-      limitationTitle: '6. Limitation of Liability',
-      limitation: 'Hello Madurai shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use our services.',
-      
-      changesTitle: '7. Changes to Terms',
-      changes: 'We reserve the right to modify these terms at any time. Continued use of our services constitutes acceptance of any changes.',
-      
-      contactTitle: '8. Contact Information',
-      contact: 'For questions about these terms, please contact us at: support@hellomadurai.com'
+
+      limitationTitle: 'Limitation of Liability:',
+      limitation: 'Hello Madurai shall not be held responsible for any loss or damage arising from the use of information, services, or external links provided through the platform.'
     },
     ta: {
-      title: '📋 சேவை விதிமுறைகள்',
-      subtitle: 'ஹலோ மதுரை தளத்தின் விதிமுறைகள்',
-      lastUpdated: 'கடைசியாக புதுப்பிக்கப்பட்டது: ஜனவரி 2025',
-      
-      acceptanceTitle: '1. விதிமுறைகளின் ஏற்றுக்கொள்ளல்',
-      acceptance: 'ஹலோ மதுரை வலைதளம் மற்றும் மொபைல் செயலியை அணுகி பயன்படுத்துவதன் மூலம், இந்த ஒப்பந்தத்தின் விதிமுறைகள் மற்றும் நிபந்தனைகளுக்கு நீங்கள் ஒப்புக்கொள்கிறீர்கள்.',
-      
-      servicesTitle: '2. வழங்கப்படும் சேவைகள்',
-      services: [
-        'செய்திகள் மற்றும் தகவல் புதுப்பிப்புகள்',
-        'நிகழ்வு பட்டியல்கள் மற்றும் அறிவிப்புகள்',
-        'டிஜிட்டல் எஃப்.எம் ரேடியோ ஸ்ட்ரீமிங் (வெளிப்புற மூலங்கள்)',
-        'வீடியோ உள்ளடக்கம் மற்றும் பொழுதுபோக்கு',
-        'இ-பேப்பர் மற்றும் டிஜிட்டல் வெளியீடுகள்',
-        'வணிக அடைவு பட்டியல்கள்',
-        'அவசர உதவி எண் தகவல்கள்'
+      title: '📜 விதிமுறைகள் & நிபந்தனைகள்',
+      subtitle: 'சேவை பயன்பாடு',
+
+      intro: 'ஹலோ மதுரை ஒரு டிஜிட்டல் தகவல் மற்றும் மீடியா தளமாக செயல்படுகிறது. இந்த செயலி - hellomadurai.com மூலம் செய்திகள், நிகழ்வுகள், வெளிப்புற ரேடியோ இணைப்புகள், வீடியோக்கள், இ-பேப்பர், வணிக பட்டியல்கள் மற்றும் உதவி எண் தகவல்கள் வழங்கப்படுகின்றன.',
+
+      digitalFmTitle: 'டிஜிட்டல் எஃப்.எம் (External Radios):',
+      digitalFm: [
+        'டிஜிட்டல் எஃப்.எம் பகுதி வெளிப்புற இணைய ரேடியோ ஒலிப்பதிவுகளுக்கான அணுகல் வசதியை மட்டும் வழங்குகிறது.',
+        'எந்தவொரு ரேடியோ நிலையத்தையும் ஹலோ மதுரை இயக்கவோ, கட்டுப்படுத்தவோ, மறுபரப்பவோ செய்யவில்லை.',
+        'அனைத்து ஒலிப்பதிவு மற்றும் ஒலிபரப்பு உரிமைகளும் சம்பந்தப்பட்ட உரிமையாளர்களுக்கே சொந்தமானவை.',
+        'இதில் ஹலோ மதுரை சொந்த ஒலிப்பதிவுகளும் வழங்கப்பட்டுள்ளது. அதன் உள்ளடக்க உரிமைகள் ஹலோ மதுரைக்கே.'
       ],
-      
-      userConductTitle: '3. பயனர் நடத்தை',
-      userConduct: [
-        'பயனர்கள் எங்கள் சேவைகளை தவறாக பயன்படுத்தவோ அல்லது அவற்றின் செயல்பாட்டில் தலையிடவோ கூடாது',
-        'தடைசெய்யப்பட்ட செயல்பாடுகளில் ஸ்பேம், துன்புறுத்தல் அல்லது பொருத்தமற்ற உள்ளடக்கத்தை இடுகை செய்தல் ஆகியவை அடங்கும்',
-        'பயனர்கள் தங்கள் சொந்த செயல்கள் மற்றும் அவர்கள் சமர்ப்பிக்கும் உள்ளடக்கத்திற்கு பொறுப்பு',
-        'இந்த விதிமுறைகளை மீறினால் அணுகலை நிறுத்தும் உரிமையை நாங்கள் வைத்துள்ளோம்'
+
+      contentOwnershipTitle: 'உள்ளடக்க உரிமைகள்:',
+      contentOwnership: [
+        'ஹலோ மதுரை மூலம் சுயமாக உருவாக்கப்படும் உரை, ஒலி, வீடியோ, படங்கள் மற்றும் டிஜிட்டல் உள்ளடக்கங்களின் அனைத்து அறிவுசார் உரிமைகளும் ஹலோ மதுரைக்கே சொந்தமானவை.',
+        'அனுமதி இல்லாமல் அவற்றை நகலெடுக்க, பகிர, மறுபயன்படுத்த கடுமையாகத் தடை செய்யப்படுகிறது.'
       ],
-      
-      contentTitle: '4. உள்ளடக்கம் மற்றும் அறிவுசார் சொத்து',
-      content: [
-        'ஹலோ மதுரையால் உருவாக்கப்பட்ட அசல் உள்ளடக்கம் பதிப்புரிமையால் பாதுகாக்கப்படுகிறது',
-        'வெளிப்புற ரேடியோ ஸ்ட்ரீம்கள் மற்றும் மூன்றாம் தரப்பு உள்ளடக்கம் அந்தந்த உரிமையாளர்களின் சொத்தாக இருக்கும்',
-        'அனுமதியின்றி எங்கள் உள்ளடக்கத்தை பயனர்கள் மறுஉற்பத்தி, விநியோகம் அல்லது வணிக ரீதியாக பயன்படுத்த முடியாது',
-        'நாங்கள் அறிவுசார் சொத்து உரிமைகளை மதிக்கிறோம் மற்றும் பயனர்களும் அவ்வாறே செய்ய எதிர்பார்க்கிறோம்'
+
+      thirdPartyTitle: 'மூன்றாம் தரப்பு உள்ளடக்கம்:',
+      thirdParty: [
+        'வெளிப்புற மூலங்களிலிருந்து காண்பிக்கப்படும் உள்ளடக்கங்கள் தகவல் நோக்கத்திற்காக மட்டுமே.',
+        'அவற்றின் துல்லியம், கிடைப்புத் தன்மை அல்லது உள்ளடக்கத்திற்கு ஹலோ மதுரை பொறுப்பல்ல.'
       ],
-      
-      disclaimerTitle: '5. மறுப்பு',
-      disclaimer: [
-        'சேவைகள் எந்தவிதமான உத்தரவாதமும் இல்லாமல் "அப்படியே" வழங்கப்படுகின்றன',
-        'தகவல்களின் துல்லியம், முழுமை அல்லது நம்பகத்தன்மைக்கு நாங்கள் உத்தரவாதம் அளிக்கவில்லை',
-        'வணிக அடைவு பட்டியல்கள் தகவல் நோக்கங்களுக்காக மட்டுமே',
-        'மூன்றாம் தரப்பு உள்ளடக்கம் அல்லது வெளிப்புற இணைப்புகளுக்கு நாங்கள் பொறுப்பல்ல'
-      ],
-      
-      limitationTitle: '6. பொறுப்பின் வரம்பு',
-      limitation: 'எங்கள் சேவைகளைப் பயன்படுத்துவதால் அல்லது பயன்படுத்த இயலாமையால் ஏற்படும் எந்தவொரு நேரடி, மறைமுக, தற்செயலான, சிறப்பு அல்லது விளைவு சேதங்களுக்கும் ஹலோ மதுரை பொறுப்பேற்காது.',
-      
-      changesTitle: '7. விதிமுறைகளில் மாற்றங்கள்',
-      changes: 'எந்த நேரத்திலும் இந்த விதிமுறைகளை மாற்றும் உரிமையை நாங்கள் வைத்துள்ளோம். எங்கள் சேவைகளின் தொடர்ச்சியான பயன்பாடு எந்தவொரு மாற்றங்களையும் ஏற்றுக்கொள்வதாக கருதப்படும்.',
-      
-      contactTitle: '8. தொடர்பு தகவல்',
-      contact: 'இந்த விதிமுறைகள் பற்றிய கேள்விகளுக்கு, தயவுசெய்து எங்களை தொடர்பு கொள்ளுங்கள்: support@hellomadurai.com'
+
+      limitationTitle: 'பொறுப்பு வரம்பு:',
+      limitation: 'இந்த செயலி - hellomadurai.com அல்லது வலைதளம் மூலம் வழங்கப்படும் தகவல்கள் அல்லது வெளிப்புற இணைப்புகளைப் பயன்படுத்துவதால் ஏற்படும் எந்தவொரு இழப்பு அல்லது சேதத்திற்கும் ஹலோ மதுரை பொறுப்பேற்காது.'
     }
   }
 
@@ -127,33 +80,27 @@ export default function TermsOfServicePage() {
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             {t_content.title}
           </h1>
-          <p className="text-lg text-gray-600 mb-2">
+          <p className="text-lg text-gray-600">
             {t_content.subtitle}
-          </p>
-          <p className="text-sm text-gray-500">
-            {t_content.lastUpdated}
           </p>
         </div>
 
         {/* Content */}
         <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 space-y-8">
-          {/* Acceptance */}
+          {/* Introduction */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-              {t_content.acceptanceTitle}
-            </h2>
-            <p className="text-gray-700 leading-relaxed">
-              {t_content.acceptance}
+            <p className="text-gray-700 leading-relaxed text-base sm:text-lg">
+              {t_content.intro}
             </p>
           </div>
 
-          {/* Services */}
+          {/* Digital FM */}
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-              {t_content.servicesTitle}
+              {t_content.digitalFmTitle}
             </h2>
             <ul className="space-y-2">
-              {t_content.services.map((item, index) => (
+              {t_content.digitalFm.map((item, index) => (
                 <li key={index} className="text-gray-700 leading-relaxed flex items-start">
                   <span className="text-blue-600 mr-2 mt-1">•</span>
                   <span>{item}</span>
@@ -162,13 +109,13 @@ export default function TermsOfServicePage() {
             </ul>
           </div>
 
-          {/* User Conduct */}
+          {/* Content Ownership */}
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-              {t_content.userConductTitle}
+              {t_content.contentOwnershipTitle}
             </h2>
             <ul className="space-y-2">
-              {t_content.userConduct.map((item, index) => (
+              {t_content.contentOwnership.map((item, index) => (
                 <li key={index} className="text-gray-700 leading-relaxed flex items-start">
                   <span className="text-blue-600 mr-2 mt-1">•</span>
                   <span>{item}</span>
@@ -177,28 +124,13 @@ export default function TermsOfServicePage() {
             </ul>
           </div>
 
-          {/* Content and IP */}
+          {/* Third Party Content */}
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-              {t_content.contentTitle}
+              {t_content.thirdPartyTitle}
             </h2>
             <ul className="space-y-2">
-              {t_content.content.map((item, index) => (
-                <li key={index} className="text-gray-700 leading-relaxed flex items-start">
-                  <span className="text-blue-600 mr-2 mt-1">•</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Disclaimer */}
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-              {t_content.disclaimerTitle}
-            </h2>
-            <ul className="space-y-2">
-              {t_content.disclaimer.map((item, index) => (
+              {t_content.thirdParty.map((item, index) => (
                 <li key={index} className="text-gray-700 leading-relaxed flex items-start">
                   <span className="text-blue-600 mr-2 mt-1">•</span>
                   <span>{item}</span>
@@ -217,23 +149,16 @@ export default function TermsOfServicePage() {
             </p>
           </div>
 
-          {/* Changes to Terms */}
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-              {t_content.changesTitle}
-            </h2>
-            <p className="text-gray-700 leading-relaxed">
-              {t_content.changes}
-            </p>
-          </div>
-
           {/* Contact Information */}
           <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-400">
             <h3 className="text-lg font-bold text-blue-900 mb-2">
-              {t_content.contactTitle}
+              {language === 'ta' ? '📞 தொடர்பு தகவல்' : '📞 Contact Information'}
             </h3>
             <p className="text-blue-800">
-              {t_content.contact}
+              {language === 'ta'
+                ? 'கேள்விகள் அல்லது கவலைகளுக்கு: support@hellomadurai.com'
+                : 'For questions or concerns: support@hellomadurai.com'
+              }
             </p>
           </div>
         </div>
