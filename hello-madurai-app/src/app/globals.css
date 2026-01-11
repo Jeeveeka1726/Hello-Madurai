@@ -916,7 +916,7 @@ img {
 
 /* News Content Typography - Enhanced Readability */
 .news-content {
-  font-size: 1rem !important; /* 16px - comfortable size */
+  font-size: 1.125rem !important; /* 18px - medium comfortable size */
   font-weight: 500 !important; /* Medium weight - not too bold */
   line-height: 2.1 !important; /* Strong focus on vertical spacing for Tamil */
   letter-spacing: 0.02em !important; /* Moderate letter spacing */
@@ -924,7 +924,7 @@ img {
 }
 
 .news-content p {
-  font-size: 1rem !important; /* 16px */
+  font-size: 1.125rem !important; /* 18px - medium size */
   font-weight: 500 !important; /* Medium weight */
   line-height: 2.1 !important; /* Strong focus on vertical spacing */
   margin-bottom: 1.5rem !important; /* Good space between paragraphs */
@@ -994,7 +994,7 @@ img {
 
 .news-content ul,
 .news-content ol {
-  font-size: 1rem !important; /* 16px */
+  font-size: 1.125rem !important; /* 18px - medium size */
   font-weight: 500 !important;
   line-height: 2.1 !important; /* Strong focus on vertical spacing */
   margin-bottom: 1.5rem !important;
@@ -1130,13 +1130,13 @@ img {
 @media (max-width: 640px) {
   .news-content,
   .event-description {
-    font-size: 0.9375rem !important; /* 15px on mobile */
+    font-size: 1.0625rem !important; /* 17px on mobile - medium size */
     letter-spacing: 0.02em !important; /* Moderate spacing */
   }
 
   .news-content p,
   .event-description p {
-    font-size: 0.9375rem !important; /* 15px on mobile */
+    font-size: 1.0625rem !important; /* 17px on mobile - medium size */
     line-height: 2.0 !important; /* Strong focus on vertical spacing */
     letter-spacing: 0.02em !important; /* Moderate spacing */
   }
