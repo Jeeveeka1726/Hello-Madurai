@@ -22,8 +22,8 @@ export default function HostingerDirectPDFUpload({
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Hostinger API endpoint - update with your actual domain
-  const HOSTINGER_API_URL = 'https://hellomadurai.com/api/upload-pdf.php'
+  // Hostinger API endpoint - moved to root directory to avoid restrictions
+  const HOSTINGER_API_URL = 'https://hellomadurai.com/upload-pdf.php'
 
   const handleFileUpload = async (file: File) => {
     if (!file.type.includes('pdf')) {

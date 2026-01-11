@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import FileUpload from '@/components/admin/FileUpload'
-import HostingerDirectPDFUpload from '@/components/admin/HostingerDirectPDFUpload'
+import HostingerPDFUpload from '@/components/admin/HostingerPDFUpload'
 import TranslatedText from '@/components/TranslatedText'
 import BilingualField from '@/components/admin/BilingualField'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -361,16 +361,17 @@ export default function AdminMagazinesPage() {
                     }}
                   />
 
-                  {/* PDF Upload - Direct to Hostinger */}
+                  {/* PDF Upload - Cloudinary (Working System) */}
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <TranslatedText
-                        english="Magazine PDF (Upload to Hostinger - Up to 512MB)"
-                        tamil="பத்திரிகை PDF (ஹோஸ்டிங்கரில் பதிவேற்றவும் - 512MB வரை)"
+                        english="Magazine PDF (Upload - Up to 100MB)"
+                        tamil="பத்திரிகை PDF (பதிவேற்றவும் - 100MB வரை)"
                       />
                       <span className="text-red-500 ml-1">*</span>
                     </label>
-                    <HostingerDirectPDFUpload
+                    <HostingerPDFUpload
+                      label=""
                       currentUrl={formData.pdfUrl}
                       onUpload={(url) => setFormData({ ...formData, pdfUrl: url })}
                     />
