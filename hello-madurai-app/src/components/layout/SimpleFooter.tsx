@@ -8,36 +8,36 @@ export default function SimpleFooter() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-gray-900 text-white py-6 mt-auto">
+    <footer className="bg-white border-t border-gray-200 py-6 mt-auto">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center">
           {/* Brand */}
           <div className="mb-4 md:mb-0">
             <Link href="/" className="flex items-center">
-              <span className="text-lg font-bold text-white">Hello Madurai</span>
-              <span className="ml-2 text-sm text-gray-300">ஹலோ மதுரை</span>
+              <span className="text-lg font-bold text-gray-900">Hello Madurai</span>
+              <span className="ml-2 text-sm text-gray-600">ஹலோ மதுரை</span>
             </Link>
           </div>
 
           {/* Links */}
           <div className="flex flex-wrap justify-center md:justify-end space-x-6 mb-4 md:mb-0">
-            <Link 
-              href="/privacy" 
-              className="text-gray-400 hover:text-white text-sm transition-colors duration-200" 
+            <Link
+              href="/privacy"
+              className="text-gray-600 hover:text-blue-600 text-sm transition-colors duration-200"
               suppressHydrationWarning
             >
               {t('footer.privacy', 'Privacy Policy', 'தனியுரிமை கொள்கை')}
             </Link>
-            <Link 
-              href="/terms" 
-              className="text-gray-400 hover:text-white text-sm transition-colors duration-200" 
+            <Link
+              href="/terms"
+              className="text-gray-600 hover:text-blue-600 text-sm transition-colors duration-200"
               suppressHydrationWarning
             >
               {t('footer.terms', 'Terms & Conditions', 'விதிமுறைகள்')}
             </Link>
-            <Link 
-              href="/contact" 
-              className="text-gray-400 hover:text-white text-sm transition-colors duration-200" 
+            <Link
+              href="/contact"
+              className="text-gray-600 hover:text-blue-600 text-sm transition-colors duration-200"
               suppressHydrationWarning
             >
               {t('footer.contact', 'Contact', 'தொடர்பு')}
@@ -46,7 +46,7 @@ export default function SimpleFooter() {
 
           {/* Copyright */}
           <div className="text-center md:text-right">
-            <p className="text-gray-400 text-xs" suppressHydrationWarning>
+            <p className="text-gray-500 text-xs" suppressHydrationWarning>
               © {currentYear} Hello Madurai. {t('footer.copyright', 'All rights reserved.', 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.')}
             </p>
           </div>

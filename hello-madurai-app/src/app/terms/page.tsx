@@ -156,8 +156,8 @@ export default function TermsOfServicePage() {
             </h3>
             <p className="text-blue-800">
               {language === 'ta'
-                ? 'கேள்விகள் அல்லது கவலைகளுக்கு: support@hellomadurai.com'
-                : 'For questions or concerns: support@hellomadurai.com'
+                ? 'கேள்விகள் அல்லது கவலைகளுக்கு: hellomadurai777@gmail.com'
+                : 'For questions or concerns: hellomadurai777@gmail.com'
               }
             </p>
           </div>
