@@ -15,6 +15,18 @@ export const metadata: Metadata = {
   title: "ஹலோ மதுரை - உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம்",
   description: "மதுரையின் சமீபத்திய செய்திகள், நிகழ்வுகள், வணிக முகவரி மற்றும் உள்ளூர் தகவல்களை பெறுங்கள்",
   keywords: "மதுரை, தமிழ்நாடு, செய்திகள், நிகழ்வுகள், வணிக முகவரி, உள்ளூர் தகவல்",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png', sizes: '32x32' },
+      { url: '/logo.jpg', type: 'image/jpeg', sizes: '1600x1600' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+  },
+  manifest: '/manifest.json',
   other: {
     'google': 'notranslate',
   },
@@ -32,6 +44,11 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
         {/* Disable browser auto-translate */}
         <meta name="google" content="notranslate" />
+        {/* Additional favicon support */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.png" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <meta name="theme-color" content="#2563eb" />
         {/* Pre-load language setting BEFORE React hydrates to prevent flash */}
         <script
           suppressHydrationWarning
