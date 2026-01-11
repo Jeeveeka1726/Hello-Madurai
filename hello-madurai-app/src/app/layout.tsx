@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext'
 import { RadioPlayerProvider } from '@/contexts/RadioPlayerContext'
 import PopupAds from '@/components/PopupAds'
 import GlobalRadioPlayer from '@/components/GlobalRadioPlayer'
+import ConditionalFooter from '@/components/layout/ConditionalFooter'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -49,7 +50,12 @@ export default function RootLayout({
           <LanguageProvider>
             <AdminProvider>
               <RadioPlayerProvider>
-                {children}
+                <div className="min-h-screen flex flex-col">
+                  <main className="flex-grow">
+                    {children}
+                  </main>
+                  <ConditionalFooter />
+                </div>
                 <PopupAds />
                 <GlobalRadioPlayer />
               </RadioPlayerProvider>

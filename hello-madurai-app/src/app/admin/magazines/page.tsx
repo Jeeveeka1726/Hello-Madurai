@@ -361,7 +361,7 @@ export default function AdminMagazinesPage() {
                     }}
                   />
 
-                  {/* PDF Upload - Cloudinary (Working System) */}
+                  {/* PDF Upload - Cloudinary Only */}
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <TranslatedText

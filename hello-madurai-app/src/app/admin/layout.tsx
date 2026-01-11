@@ -45,10 +45,10 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   return (
-    <AppWrapper showHeader={true} showFooter={false} noWrapper={true}>
+    <div className="min-h-screen bg-gray-50">
       <AdminLayoutContent>
         {children}
       </AdminLayoutContent>
-    </AppWrapper>
+    </div>
   )
 }
