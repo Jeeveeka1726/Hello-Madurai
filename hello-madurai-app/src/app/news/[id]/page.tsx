@@ -193,7 +193,7 @@ function NewsDetailPageContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
-      <div className="mx-auto max-w-full px-3 sm:px-4 lg:px-6 xl:px-8">
+      <div className="mx-auto max-w-6xl px-3 sm:px-4 lg:px-6 xl:px-8">
         {/* Back Button */}
         <div className="mb-4 sm:mb-6">
           <Link href="/news">
@@ -214,7 +214,7 @@ function NewsDetailPageContent() {
           </div>
 
           {/* Article Card */}
-          <div className="flex-1 w-full">
+          <div className="flex-1 w-full max-w-4xl mx-auto">
             <Card className="bg-white border-gray-200">
               <CardContent className="p-4 sm:p-6 lg:p-8 select-none" style={{
                 WebkitUserSelect: 'none',
