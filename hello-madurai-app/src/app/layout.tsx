@@ -17,12 +17,12 @@ export const metadata: Metadata = {
   keywords: "மதுரை, தமிழ்நாடு, செய்திகள், நிகழ்வுகள், வணிக முகவரி, உள்ளூர் தகவல்",
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/icon.png', type: 'image/png', sizes: '32x32' },
-      { url: '/logo.jpg', type: 'image/jpeg', sizes: '1600x1600' },
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/favicon-16x16.png', type: 'image/png', sizes: '16x16' },
+      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
     ],
     apple: [
-      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
     shortcut: '/favicon.ico',
   },
@@ -44,10 +44,11 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
         {/* Disable browser auto-translate */}
         <meta name="google" content="notranslate" />
-        {/* Additional favicon support */}
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon.png" type="image/png" sizes="32x32" />
-        <link rel="apple-touch-icon" href="/apple-icon.png" />
+        {/* Favicon links for better browser support */}
+        <link rel="icon" href="/favicon.ico" sizes="32x32" />
+        <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+        <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <meta name="theme-color" content="#2563eb" />
         {/* Pre-load language setting BEFORE React hydrates to prevent flash */}
         <script
