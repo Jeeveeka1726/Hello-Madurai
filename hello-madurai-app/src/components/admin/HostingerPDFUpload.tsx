@@ -3,11 +3,10 @@
 import { useState, useRef } from 'react'
 import Button from '@/components/ui/Button'
 import Card, { CardContent } from '@/components/ui/Card'
-import { DocumentIcon, CloudArrowUpIcon, LinkIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
+import { DocumentIcon, CloudArrowUpIcon, LinkIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
 import { useLanguage } from '@/contexts/LanguageContext'
 import PDFCompressionHelp from './PDFCompressionHelp'
-import { compressPDF, fallbackCompression, getRecommendedSettings } from '@/lib/pdfCompression'
 
 interface HostingerPDFUploadProps {
   label: string
@@ -23,85 +22,47 @@ export default function HostingerPDFUpload({
   className = ''
 }: HostingerPDFUploadProps) {
   const [uploading, setUploading] = useState(false)
-  const [compressing, setCompressing] = useState(false)
   const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file')
   const [urlInput, setUrlInput] = useState(currentUrl || '')
   const [isDragging, setIsDragging] = useState(false)
-  const [compressionEnabled, setCompressionEnabled] = useState(true)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { t } = useLanguage()
 
   const handleFileUpload = async (file: File) => {
+    console.log('🚀 handleFileUpload called with:', file.name, file.type, file.size)
+
     if (!file.type.includes('pdf')) {
+      console.log('❌ Invalid file type:', file.type)
       toast.error(t('invalid_pdf', 'Please select a PDF file', 'PDF கோப்பைத் தேர்ந்தெடுக்கவும்'))
       return
     }
 
-    // Check file size and compress if needed
+    // Check file size (10MB limit for Cloudinary free plan)
     const fileSizeKB = Math.round(file.size / 1024)
     const maxSizeKB = 10 * 1024 // 10MB in KB
 
-    let fileToUpload = file
+    console.log(`📊 File size: ${fileSizeKB}KB (max: ${maxSizeKB}KB)`)
 
-    // Compress PDF if enabled and file is large
-    if (compressionEnabled && fileSizeKB > 1000) { // Compress if > 1MB
-      setCompressing(true)
-      toast.loading('🔄 Compressing PDF using 11zon...', { id: 'compression' })
-
-      try {
-        const settings = getRecommendedSettings(fileSizeKB)
-        console.log(`📄 Compressing PDF: ${fileSizeKB}KB → target: ${settings.targetSizeKB}KB`)
-
-        // Try 11zon compression first
-        const compressionResult = await compressPDF(file, settings)
-
-        if (compressionResult.success && compressionResult.compressedUrl) {
-          // Convert compressed URL back to File object for upload
-          const response = await fetch(compressionResult.compressedUrl)
-          const blob = await response.blob()
-          fileToUpload = new File([blob], file.name, { type: 'application/pdf' })
-
-          toast.success(
-            `✅ PDF compressed: ${compressionResult.originalSize}KB → ${compressionResult.compressedSize}KB`,
-            { id: 'compression', duration: 4000 }
-          )
-        } else {
-          // Fallback compression
-          const fallbackResult = await fallbackCompression(file)
-          if (fallbackResult.success && fallbackResult.compressedUrl) {
-            const response = await fetch(fallbackResult.compressedUrl)
-            const blob = await response.blob()
-            fileToUpload = new File([blob], file.name, { type: 'application/pdf' })
-          }
-
-          toast.dismiss('compression')
-          toast.warning('⚠️ Using fallback compression')
-        }
-      } catch (error) {
-        console.error('Compression error:', error)
-        toast.dismiss('compression')
-        toast.warning('⚠️ Compression failed, uploading original file')
-      } finally {
-        setCompressing(false)
-      }
-    }
-
-    // Final size check after compression
-    const finalSizeKB = Math.round(fileToUpload.size / 1024)
-    if (fileToUpload.size > maxSizeKB * 1024) {
-      const fileSizeMB = (fileToUpload.size / (1024 * 1024)).toFixed(1)
+    if (file.size > maxSizeKB * 1024) {
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1)
+      console.log('❌ File too large:', fileSizeMB, 'MB')
       toast.error(
         t('file_too_large',
-          `File too large (${fileSizeMB}MB). Maximum size is 10MB. Please use external compression: https://bigpdf.11zon.com`,
-          `கோப்பு மிகப் பெரியது (${fileSizeMB}MB). அதிகபட்ச அளவு 10MB. வெளிப்புற சுருக்கத்தைப் பயன்படுத்தவும்: https://bigpdf.11zon.com`
+          `File too large (${fileSizeMB}MB). Maximum size is 10MB. Please compress your PDF first: https://bigpdf.11zon.com`,
+          `கோப்பு மிகப் பெரியது (${fileSizeMB}MB). அதிகபட்ச அளவு 10MB. முதலில் PDF ஐ சுருக்கவும்: https://bigpdf.11zon.com`
         ),
         { duration: 8000 }
       )
       return
     }
 
-    console.log(`📤 Uploading PDF: ${finalSizeKB}KB`)
-    await uploadToCloudinary(fileToUpload)
+    console.log(`📤 Starting upload for PDF: ${fileSizeKB}KB`)
+    try {
+      await uploadToCloudinary(file)
+    } catch (error) {
+      console.error('❌ Upload failed:', error)
+      toast.error('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
+    }
   }
 
   const uploadToCloudinary = async (file: File) => {
@@ -178,9 +139,13 @@ export default function HostingerPDFUpload({
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('📁 File input changed:', e.target.files)
     const files = e.target.files
     if (files && files.length > 0) {
+      console.log('📄 Selected file:', files[0].name, files[0].size, 'bytes')
       handleFileUpload(files[0])
+    } else {
+      console.log('❌ No files selected')
     }
   }
 
@@ -236,34 +201,21 @@ export default function HostingerPDFUpload({
               {t('max_size_10mb', 'Maximum file size: 10MB (Cloudinary free plan)', 'அதிகபட்ச கோப்பு அளவு: 10MB (Cloudinary இலவச திட்டம்)')}
             </p>
 
-            {/* Compression Toggle */}
+            {/* Compression Help */}
             <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center justify-between mb-2">
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={compressionEnabled}
-                    onChange={(e) => setCompressionEnabled(e.target.checked)}
-                    className="mr-2 rounded"
-                  />
-                  <span className="text-sm font-medium text-blue-800">
-                    {t('enable_compression', 'Auto-compress large PDFs', 'பெரிய PDF களை தானாக சுருக்கவும்')}
-                  </span>
-                </label>
-                {compressing && (
-                  <ArrowPathIcon className="w-4 h-4 text-blue-600 animate-spin" />
-                )}
-              </div>
-              <p className="text-xs text-blue-600">
-                {t('compression_help', 'Uses 11zon.com API to compress PDFs > 1MB automatically', '1MB க்கும் அதிகமான PDF களை 11zon.com API பயன்படுத்தி தானாக சுருக்கும்')}
+              <p className="text-sm font-medium text-blue-800 mb-2">
+                {t('compression_help_title', 'Need to compress your PDF?', 'உங்கள் PDF ஐ சுருக்க வேண்டுமா?')}
+              </p>
+              <p className="text-xs text-blue-600 mb-2">
+                {t('compression_help', 'If your PDF is larger than 10MB, compress it first using 11zon', 'உங்கள் PDF 10MB க்கும் அதிகமாக இருந்தால், முதலில் 11zon பயன்படுத்தி சுருக்கவும்')}
               </p>
               <a
                 href="https://bigpdf.11zon.com/en/compress-pdf/compress-pdf-to-chosen-size.php"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-blue-500 hover:text-blue-700 underline"
+                className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 underline"
               >
-                {t('manual_compression', 'Manual compression tool →', 'கைமுறை சுருக்க கருவி →')}
+                {t('manual_compression', 'Open 11zon Compression Tool →', '11zon சுருக்க கருவியைத் திறக்கவும் →')}
               </a>
             </div>
 
