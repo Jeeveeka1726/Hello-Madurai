@@ -91,7 +91,14 @@ function EpaperPageContent() {
       if (response.ok) {
         const data = await response.json()
         console.log('📄 Fetched magazines:', data)
-        console.log('📄 First magazine collection:', data[0]?.collection)
+        console.log('📄 First magazine details:', data[0] ? {
+          id: data[0].id,
+          title: data[0].title,
+          pdfUrl: data[0].pdfUrl,
+          coverImage: data[0].coverImage,
+          featuredImage: data[0].featuredImage,
+          collection: data[0].collection
+        } : 'No magazines found')
         setMagazines(data)
       }
     } catch (error) {
@@ -107,9 +114,16 @@ function EpaperPageContent() {
 
   const handleView = async (magazine: Magazine) => {
     console.log('🎯 handleView called for:', magazine.title)
-    console.log('👁️ Attempting to view PDF:', magazine.pdfUrl)
+    console.log('👁️ Magazine data:', {
+      id: magazine.id,
+      title: magazine.title,
+      pdfUrl: magazine.pdfUrl,
+      coverImage: magazine.coverImage,
+      featuredImage: magazine.featuredImage
+    })
 
     if (!magazine.pdfUrl) {
+      console.log('❌ No PDF URL found for magazine:', magazine.title)
       toast.error(t('view_error', 'PDF not available', 'PDF கிடைக்கவில்லை'))
       return
     }
@@ -370,30 +384,44 @@ function EpaperPageContent() {
               }}
             >
               {/* Cover Image - Clickable to Open PDF */}
-              {(magazine.coverImage || magazine.featuredImage) && (
-                <div className="relative aspect-w-3 aspect-h-4 overflow-hidden rounded-t-lg group">
+              <div className="relative aspect-w-3 aspect-h-4 overflow-hidden rounded-t-lg group">
+                {(magazine.coverImage || magazine.featuredImage) ? (
                   <img
                     src={magazine.coverImage || magazine.featuredImage}
                     alt={`${magazine.title} cover`}
                     className="w-full h-48 object-cover transition-transform group-hover:scale-105"
+                    onError={(e) => {
+                      console.log('❌ Image failed to load:', magazine.coverImage || magazine.featuredImage)
+                      e.currentTarget.style.display = 'none'
+                      e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                    }}
                   />
-                  {/* PDF Open Indicator */}
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 rounded-full p-3">
-                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </div>
-                  </div>
-                  {/* Click to Open PDF Label */}
-                  <div className="absolute bottom-2 left-2 right-2">
-                    <div className="bg-blue-600 bg-opacity-90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-center">
-                      <TranslatedText english="Click to open PDF" tamil="PDF திறக்க கிளிக் செய்யவும்" />
-                    </div>
+                ) : null}
+
+                {/* Fallback placeholder when no image */}
+                <div className={`w-full h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center transition-transform group-hover:scale-105 ${(magazine.coverImage || magazine.featuredImage) ? 'hidden' : ''}`}>
+                  <div className="text-center">
+                    <FileText className="w-12 h-12 text-blue-400 mx-auto mb-2" />
+                    <p className="text-sm text-blue-600 font-medium">
+                      <TranslatedText english="PDF Magazine" tamil="PDF இதழ்" />
+                    </p>
                   </div>
                 </div>
-              )}
+
+                {/* PDF Open Indicator */}
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 rounded-full p-3">
+                    <Eye className="w-6 h-6 text-blue-600" />
+                  </div>
+                </div>
+
+                {/* Click to Open PDF Label */}
+                <div className="absolute bottom-2 left-2 right-2">
+                  <div className="bg-blue-600 bg-opacity-90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-center">
+                    <TranslatedText english="Click to open PDF" tamil="PDF திறக்க கிளிக் செய்யவும்" />
+                  </div>
+                </div>
+              </div>
 
               <CardHeader>
                 <CardTitle className="text-lg">

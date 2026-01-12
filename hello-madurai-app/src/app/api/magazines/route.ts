@@ -23,8 +23,12 @@ export async function GET() {
       id: m.id,
       title: m.title,
       pdfUrl: m.pdfUrl,
+      coverImage: m.coverImage,
+      featuredImage: m.featuredImage,
       collection: m.collection
     })))
+
+    console.log('📊 API: Total magazines found:', magazines.length)
 
     return NextResponse.json(magazines || [])
   } catch (error) {
