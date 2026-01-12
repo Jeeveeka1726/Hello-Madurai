@@ -377,14 +377,16 @@ function EpaperPageContent() {
             <Card
               key={magazine.id}
               hover
-              className="transition-shadow cursor-pointer"
-              onClick={(e) => {
-                console.log('🎯 Card clicked for:', magazine.title)
-                handleView(magazine)
-              }}
+              className="transition-shadow"
             >
               {/* Cover Image - Clickable to Open PDF */}
-              <div className="relative aspect-w-3 aspect-h-4 overflow-hidden rounded-t-lg group">
+              <div
+                className="relative aspect-w-3 aspect-h-4 overflow-hidden rounded-t-lg group cursor-pointer"
+                onClick={(e) => {
+                  console.log('🎯 Cover clicked for:', magazine.title)
+                  handleView(magazine)
+                }}
+              >
                 {(magazine.coverImage || magazine.featuredImage) ? (
                   <img
                     src={magazine.coverImage || magazine.featuredImage}
@@ -423,17 +425,18 @@ function EpaperPageContent() {
                 </div>
               </div>
 
-              <CardHeader>
-                <CardTitle className="text-lg">
+              {/* Magazine Details */}
+              <div className="p-4">
+                {/* Title */}
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
                   <TranslatedText
                     english={magazine.title}
                     tamil={magazine.title_ta || magazine.title}
                   />
-                </CardTitle>
+                </h3>
 
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
+                {/* Magazine Info */}
+                <div className="space-y-2 mb-4">
                   {magazine.issueNumber && (
                     <div className="flex items-center text-sm text-gray-600">
                       <FileText className="w-4 h-4 mr-2" />
@@ -446,58 +449,63 @@ function EpaperPageContent() {
                       language === 'ta' ? 'ta-IN' : 'en-IN'
                     )}
                   </div>
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 mt-4" onClick={(e) => e.stopPropagation()}>
-                    <Button
-                      onClick={() => handleDownload(magazine)}
-                      variant="primary"
-                      size="sm"
-                      disabled={!magazine.pdfUrl}
-                      className="flex-1"
-                    >
-                      <Download className="w-4 h-4 mr-1" />
-                      <TranslatedText english="Download" tamil="பதிவிறக்கம்" />
-                    </Button>
-
-                    <Button
-                      onClick={() => handleLike(magazine)}
-                      variant={likedMagazines.has(magazine.id) ? "primary" : "outline"}
-                      size="sm"
-                      className="px-3"
-                    >
-                      <Heart
-                        className={`w-4 h-4 ${likedMagazines.has(magazine.id) ? 'fill-current' : ''}`}
-                      />
-                    </Button>
-
-                    <Button
-                      onClick={() => handleShare(magazine)}
-                      variant="outline"
-                      size="sm"
-                      className="px-3"
-                    >
-                      <Share2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1">
-                        <Eye className="w-3 h-3" />
-                        {magazine.downloads || 0}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Heart className="w-3 h-3" />
-                        {magazine.likes || 0}
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-400">
-                      {magazine.publishedAt && new Date(magazine.publishedAt).toLocaleDateString()}
-                    </div>
-                  </div>
                 </div>
-              </CardContent>
+
+                {/* Stats */}
+                <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
+                  <span className="flex items-center gap-1">
+                    <Eye className="w-3 h-3" />
+                    {magazine.downloads || 0} <TranslatedText english="views" tamil="பார்வைகள்" />
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Heart className="w-3 h-3" />
+                    {magazine.likes || 0} <TranslatedText english="likes" tamil="விருப்பங்கள்" />
+                  </span>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDownload(magazine)
+                    }}
+                    variant="primary"
+                    size="sm"
+                    disabled={!magazine.pdfUrl}
+                    className="flex-1"
+                  >
+                    <Download className="w-4 h-4 mr-1" />
+                    <TranslatedText english="Download" tamil="பதிவிறக்கம்" />
+                  </Button>
+
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleLike(magazine)
+                    }}
+                    variant={likedMagazines.has(magazine.id) ? "primary" : "outline"}
+                    size="sm"
+                    className="px-3"
+                  >
+                    <Heart
+                      className={`w-4 h-4 ${likedMagazines.has(magazine.id) ? 'fill-current' : ''}`}
+                    />
+                  </Button>
+
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleShare(magazine)
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="px-3"
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
             </Card>
           ))}
         </div>
