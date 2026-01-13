@@ -151,9 +151,19 @@ function EpaperPageContent() {
         }
       }
 
-      // Open PDF in new tab for viewing
-      window.open(pdfUrl, '_blank')
-      toast.success(t('view_started', 'Opening PDF...', 'PDF திறக்கப்படுகிறது...'))
+      console.log(`🌐 Final PDF URL to open: ${pdfUrl}`)
+
+      // Open PDF in new tab for viewing - with better error handling
+      const newWindow = window.open(pdfUrl, '_blank', 'noopener,noreferrer')
+
+      if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+        console.log('❌ Popup blocked or failed to open')
+        // Fallback: try to navigate to PDF directly
+        window.location.href = pdfUrl
+        toast.warning(t('popup_blocked', 'Opening PDF in current tab...', 'தற்போதைய டேபில் PDF திறக்கப்படுகிறது...'))
+      } else {
+        toast.success(t('view_started', 'Opening PDF in new tab...', 'புதிய டேபில் PDF திறக்கப்படுகிறது...'))
+      }
 
       // Track view as download in database (since we don't have separate view tracking)
       try {
@@ -385,16 +395,16 @@ function EpaperPageContent() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
           {filteredMagazines.map((magazine) => (
             <Card
               key={magazine.id}
               hover
-              className="transition-shadow"
+              className="transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white rounded-lg overflow-hidden"
             >
               {/* Cover Image - Clickable to Open PDF */}
               <div
-                className="relative w-full h-48 overflow-hidden rounded-t-lg group cursor-pointer bg-gradient-to-br from-blue-100 to-blue-200"
+                className="relative w-full h-64 sm:h-72 md:h-80 overflow-hidden group cursor-pointer bg-gradient-to-br from-blue-100 to-blue-200"
                 onClick={(e) => {
                   console.log('🎯 Cover clicked for:', magazine.title)
                   console.log('🔗 PDF URL:', magazine.pdfUrl)
