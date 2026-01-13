@@ -99,6 +99,17 @@ function EpaperPageContent() {
           featuredImage: data[0].featuredImage,
           collection: data[0].collection
         } : 'No magazines found')
+
+        // Debug all magazines
+        data.forEach((mag: Magazine, index: number) => {
+          console.log(`📖 Magazine ${index + 1}:`, {
+            title: mag.title,
+            hasImage: !!(mag.coverImage || mag.featuredImage),
+            imageUrl: mag.coverImage || mag.featuredImage,
+            hasPdf: !!mag.pdfUrl,
+            pdfUrl: mag.pdfUrl
+          })
+        })
         setMagazines(data)
       }
     } catch (error) {
@@ -124,9 +135,11 @@ function EpaperPageContent() {
 
     if (!magazine.pdfUrl) {
       console.log('❌ No PDF URL found for magazine:', magazine.title)
-      toast.error(t('view_error', 'PDF not available', 'PDF கிடைக்கவில்லை'))
+      toast.error(t('view_error', 'PDF not available for this magazine', 'இந்த இதழுக்கு PDF கிடைக்கவில்லை'))
       return
     }
+
+    console.log('🚀 Opening PDF:', magazine.pdfUrl)
 
     try {
       // Convert Google Drive share link to direct view link if needed
@@ -381,48 +394,65 @@ function EpaperPageContent() {
             >
               {/* Cover Image - Clickable to Open PDF */}
               <div
-                className="relative aspect-w-3 aspect-h-4 overflow-hidden rounded-t-lg group cursor-pointer"
+                className="relative w-full h-48 overflow-hidden rounded-t-lg group cursor-pointer bg-gradient-to-br from-blue-100 to-blue-200"
                 onClick={(e) => {
                   console.log('🎯 Cover clicked for:', magazine.title)
+                  console.log('🔗 PDF URL:', magazine.pdfUrl)
                   handleView(magazine)
                 }}
               >
+                {/* Cover Image */}
                 {(magazine.coverImage || magazine.featuredImage) ? (
                   <img
                     src={magazine.coverImage || magazine.featuredImage}
                     alt={`${magazine.title} cover`}
-                    className="w-full h-48 object-cover transition-transform group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    onLoad={() => console.log('✅ Image loaded successfully:', magazine.coverImage || magazine.featuredImage)}
                     onError={(e) => {
                       console.log('❌ Image failed to load:', magazine.coverImage || magazine.featuredImage)
-                      e.currentTarget.style.display = 'none'
-                      e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                      const target = e.currentTarget as HTMLImageElement
+                      target.style.display = 'none'
+                      // Show fallback
+                      const fallback = target.parentElement?.querySelector('.fallback-placeholder') as HTMLElement
+                      if (fallback) {
+                        fallback.style.display = 'flex'
+                      }
                     }}
                   />
                 ) : null}
 
-                {/* Fallback placeholder when no image */}
-                <div className={`w-full h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center transition-transform group-hover:scale-105 ${(magazine.coverImage || magazine.featuredImage) ? 'hidden' : ''}`}>
+                {/* Fallback placeholder */}
+                <div
+                  className={`fallback-placeholder absolute inset-0 w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center transition-transform group-hover:scale-105 ${(magazine.coverImage || magazine.featuredImage) ? 'hidden' : 'flex'}`}
+                >
                   <div className="text-center">
                     <FileText className="w-12 h-12 text-blue-400 mx-auto mb-2" />
                     <p className="text-sm text-blue-600 font-medium">
                       <TranslatedText english="PDF Magazine" tamil="PDF இதழ்" />
                     </p>
+                    <p className="text-xs text-blue-500 mt-1">
+                      <TranslatedText english="Click to open" tamil="திறக்க கிளிக் செய்யவும்" />
+                    </p>
                   </div>
                 </div>
 
-                {/* PDF Open Indicator */}
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 rounded-full p-3">
-                    <Eye className="w-6 h-6 text-blue-600" />
+                {/* PDF Open Indicator - only show on hover when image exists */}
+                {(magazine.coverImage || magazine.featuredImage) && (
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 rounded-full p-3">
+                      <Eye className="w-6 h-6 text-blue-600" />
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* Click to Open PDF Label */}
-                <div className="absolute bottom-2 left-2 right-2">
-                  <div className="bg-blue-600 bg-opacity-90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-center">
-                    <TranslatedText english="Click to open PDF" tamil="PDF திறக்க கிளிக் செய்யவும்" />
+                {/* Click to Open PDF Label - only show when image exists */}
+                {(magazine.coverImage || magazine.featuredImage) && (
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <div className="bg-blue-600 bg-opacity-90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-center">
+                      <TranslatedText english="Click to open PDF" tamil="PDF திறக்க கிளிக் செய்யவும்" />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Magazine Details */}
