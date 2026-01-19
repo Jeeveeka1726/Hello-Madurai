@@ -1,13 +1,46 @@
 'use client'
 
 import Link from 'next/link'
+import {
+  UserIcon,
+  TruckIcon,
+  WrenchScrewdriverIcon,
+  ChartBarIcon,
+  EnvelopeIcon,
+  MagnifyingGlassIcon,
+  CogIcon,
+  BuildingOfficeIcon
+} from '@heroicons/react/24/outline'
 import NewHeader from '@/components/layout/NewHeader'
+import NewspaperHeader from '@/components/NewspaperHeader'
 
-export default function RootPage() {
+export default function NewDesignHomePage() {
+  // Service cards matching the design (2 rows of 7 cards each)
+  const services = [
+    // First row
+    { name: 'My Account', icon: UserIcon, href: '/account' },
+    { name: 'Inventory', icon: TruckIcon, href: '/inventory' },
+    { name: 'Search Mechanic', icon: WrenchScrewdriverIcon, href: '/mechanic' },
+    { name: 'Analytics', icon: ChartBarIcon, href: '/analytics' },
+    { name: 'Contact us', icon: EnvelopeIcon, href: '/contact' },
+    { name: 'My Account', icon: UserIcon, href: '/account' },
+    { name: 'Inventory', icon: TruckIcon, href: '/inventory' },
+    
+    // Second row
+    { name: 'My Account', icon: UserIcon, href: '/account' },
+    { name: 'Inventory', icon: TruckIcon, href: '/inventory' },
+    { name: 'Search Mechanic', icon: WrenchScrewdriverIcon, href: '/mechanic' },
+    { name: 'Analytics', icon: ChartBarIcon, href: '/analytics' },
+    { name: 'Contact us', icon: EnvelopeIcon, href: '/contact' },
+    { name: 'My Account', icon: UserIcon, href: '/account' },
+    { name: 'Inventory', icon: TruckIcon, href: '/inventory' },
+  ]
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <NewspaperHeader showTagline={true} />
       <NewHeader />
-
+      
       {/* Hero Section - Blue Background */}
       <section className="bg-blue-500 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -30,9 +63,7 @@ export default function RootPage() {
       <section className="py-8 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative">
-            <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               placeholder="Search artists or songs across all categories..."
@@ -46,31 +77,14 @@ export default function RootPage() {
       <section className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-7 gap-6">
-            {[
-              { name: 'My Account', href: '/account' },
-              { name: 'Inventory', href: '/inventory' },
-              { name: 'Search Mechanic', href: '/mechanic' },
-              { name: 'Analytics', href: '/analytics' },
-              { name: 'Contact us', href: '/contact' },
-              { name: 'My Account', href: '/account' },
-              { name: 'Inventory', href: '/inventory' },
-              { name: 'My Account', href: '/account' },
-              { name: 'Inventory', href: '/inventory' },
-              { name: 'Search Mechanic', href: '/mechanic' },
-              { name: 'Analytics', href: '/analytics' },
-              { name: 'Contact us', href: '/contact' },
-              { name: 'My Account', href: '/account' },
-              { name: 'Inventory', href: '/inventory' },
-            ].map((service, index) => (
+            {services.map((service, index) => (
               <Link
                 key={index}
                 href={service.href}
                 className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 text-center border border-gray-200"
               >
                 <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <service.icon className="w-8 h-8 text-blue-600" />
                 </div>
                 <h3 className="text-sm font-medium text-gray-900">
                   {service.name}
@@ -88,7 +102,7 @@ export default function RootPage() {
           <div className="bg-blue-900 text-white py-4 px-6 rounded-t-lg">
             <h2 className="text-2xl font-bold text-center">AD Slide</h2>
           </div>
-
+          
           {/* Rectangle boxes for reels */}
           <div className="bg-white p-6 rounded-b-lg shadow-lg">
             <div className="grid grid-cols-5 gap-4">

@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 4000",
     "build": "prisma generate && next build",
     "postinstall": "prisma generate",
     "start": "node server.js",
-    "lint": "eslint"
+    "lint": "eslint",
+    "update-favicon": "node force-favicon-update.js"
   },
   "dependencies": {
     "@google-cloud/translate": "^9.2.0",

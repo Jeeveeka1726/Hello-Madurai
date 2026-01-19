@@ -31,14 +31,14 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.ico?t=20250111', sizes: '32x32' },
-      { url: '/favicon-16x16.png?t=20250111', type: 'image/png', sizes: '16x16' },
-      { url: '/favicon-32x32.png?t=20250111', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon.ico?t=20260119', sizes: '32x32' },
+      { url: '/favicon-16x16.png?t=20260119', type: 'image/png', sizes: '16x16' },
+      { url: '/favicon-32x32.png?t=20260119', type: 'image/png', sizes: '32x32' },
     ],
     apple: [
-      { url: '/apple-touch-icon.png?t=20250111', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon.png?t=20260119', sizes: '180x180', type: 'image/png' },
     ],
-    shortcut: '/favicon.ico?t=20250111',
+    shortcut: '/favicon.ico?t=20260119',
   },
   manifest: '/manifest.json',
   other: {
@@ -59,11 +59,11 @@ export default function RootLayout({
         {/* Disable browser auto-translate */}
         <meta name="google" content="notranslate" />
         {/* Favicon links - Hello Madurai Logo - Force Cache Bust */}
-        <link rel="icon" href="/favicon.ico?t=20250111" type="image/x-icon" />
-        <link rel="icon" href="/favicon-32x32.png?t=20250111" type="image/png" sizes="32x32" />
-        <link rel="icon" href="/favicon-16x16.png?t=20250111" type="image/png" sizes="16x16" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png?t=20250111" sizes="180x180" />
-        <link rel="shortcut icon" href="/favicon.ico?t=20250111" />
+        <link rel="icon" href="/favicon.ico?t=20260119" type="image/x-icon" />
+        <link rel="icon" href="/favicon-32x32.png?t=20260119" type="image/png" sizes="32x32" />
+        <link rel="icon" href="/favicon-16x16.png?t=20260119" type="image/png" sizes="16x16" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?t=20260119" sizes="180x180" />
+        <link rel="shortcut icon" href="/favicon.ico?t=20260119" />
         <meta name="theme-color" content="#2563eb" />
         {/* Pre-load language setting BEFORE React hydrates to prevent flash */}
         <script
