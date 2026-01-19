@@ -1,113 +1,205 @@
 'use client'
 
+import { useLanguage } from '@/contexts/LanguageContext'
 import Link from 'next/link'
+import {
+  NewspaperIcon,
+  VideoCameraIcon,
+  MicrophoneIcon,
+  DocumentIcon,
+  PhoneIcon,
+  CalendarIcon,
+  BuildingOfficeIcon,
+  CreditCardIcon,
+  ChatBubbleLeftRightIcon
+} from '@heroicons/react/24/outline'
 import NewHeader from '@/components/layout/NewHeader'
+import SubscriptionButton from '@/components/SubscriptionButton'
+import TranslatedText from '@/components/TranslatedText'
 
 export default function RootPage() {
+  const { t } = useLanguage()
+
+  const features = [
+    {
+      nameEn: 'News',
+      nameTa: 'செய்திகள்',
+      descEn: 'Latest news from Madurai',
+      descTa: 'மதுரையின் சமீபத்திய செய்திகள்',
+      href: '/news',
+      icon: NewspaperIcon,
+      color: 'bg-red-500'
+    },
+    {
+      nameEn: 'Digital FM',
+      nameTa: 'டிஜிட்டல் எஃப்.எம்',
+      descEn: 'Listen to Digital FM',
+      descTa: 'டிஜிட்டல் எஃப்.எம் கேளுங்கள்',
+      href: '/radio',
+      icon: MicrophoneIcon,
+      color: 'bg-green-500'
+    },
+    {
+      nameEn: 'Videos',
+      nameTa: 'வீடியோக்கள்',
+      descEn: 'Watch videos from Madurai',
+      descTa: 'மதுரையின் வீடியோக்களைப் பார்க்கவும்',
+      href: '/videos',
+      icon: VideoCameraIcon,
+      color: 'bg-purple-500'
+    },
+    {
+      nameEn: 'Directory',
+      nameTa: 'வணிக முகவரி',
+      descEn: 'Business listings and contacts',
+      descTa: 'வணிக பட்டியல்கள் மற்றும் தொடர்புகள்',
+      href: '/directory',
+      icon: BuildingOfficeIcon,
+      color: 'bg-indigo-500'
+    },
+    {
+      nameEn: 'Events',
+      nameTa: 'நிகழ்வுகள்',
+      descEn: 'Discover local events',
+      descTa: 'உள்ளூர் நிகழ்வுகளைக் கண்டறியுங்கள்',
+      href: '/events',
+      icon: CalendarIcon,
+      color: 'bg-orange-500'
+    },
+    {
+      nameEn: 'E-Paper',
+      nameTa: 'பத்திரிகை',
+      descEn: 'Read digital newspapers',
+      descTa: 'டிஜிட்டல் பத்திரிகைகளைப் படியுங்கள்',
+      href: '/magazine',
+      icon: DocumentIcon,
+      color: 'bg-blue-500'
+    },
+    {
+      nameEn: 'Help Line',
+      nameTa: 'உதவி எண்',
+      descEn: 'Emergency and helpline numbers',
+      descTa: 'அவசர மற்றும் உதவி எண்கள்',
+      href: '/helpline',
+      icon: PhoneIcon,
+      color: 'bg-red-600'
+    },
+    {
+      nameEn: 'Discount Card',
+      nameTa: 'தள்ளுபடி அட்டை',
+      descEn: 'Get discounts across Madurai',
+      descTa: 'நமது வணிக வாடிக்கையாளர்களின் தள்ளுபடிகளைப் பெறுங்கள்',
+      href: '/discount',
+      icon: CreditCardIcon,
+      color: 'bg-yellow-500'
+    },
+    {
+      nameEn: 'Contact',
+      nameTa: 'தொடர்பு',
+      descEn: 'Get in touch with us',
+      descTa: 'எங்களுடன் தொடர்பு கொள்ளுங்கள்',
+      href: '/contact',
+      icon: ChatBubbleLeftRightIcon,
+      color: 'bg-blue-500'
+    }
+  ]
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <NewHeader />
-
-      {/* Hero Section - Blue Background */}
-      <section className="bg-blue-500 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-4">
-            Hello Madurai
-          </h1>
-          <p className="text-xl mb-8 text-blue-100">
-            Your gateway to Madurai - News, Radio & More
-          </p>
-          <Link
-            href="/news"
-            className="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-          >
-            Explore Latest News
-          </Link>
-        </div>
-      </section>
-
-      {/* Search Bar */}
-      <section className="py-8 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative">
-            <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search artists or songs across all categories..."
-              className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Service Cards Grid */}
-      <section className="py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-7 gap-6">
-            {[
-              { name: 'My Account', href: '/account' },
-              { name: 'Inventory', href: '/inventory' },
-              { name: 'Search Mechanic', href: '/mechanic' },
-              { name: 'Analytics', href: '/analytics' },
-              { name: 'Contact us', href: '/contact' },
-              { name: 'My Account', href: '/account' },
-              { name: 'Inventory', href: '/inventory' },
-              { name: 'My Account', href: '/account' },
-              { name: 'Inventory', href: '/inventory' },
-              { name: 'Search Mechanic', href: '/mechanic' },
-              { name: 'Analytics', href: '/analytics' },
-              { name: 'Contact us', href: '/contact' },
-              { name: 'My Account', href: '/account' },
-              { name: 'Inventory', href: '/inventory' },
-            ].map((service, index) => (
+      <div className="min-h-screen bg-white">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+            <div className="text-center">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: '#ffffff' }}>
+                <TranslatedText tamil="ஹலோ மதுரை">Hello Madurai</TranslatedText>
+              </h1>
+              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto" style={{ color: '#ffffff' }}>
+                <TranslatedText tamil="மதுரைக்கான உங்கள் நுழைவாயில் - செய்திகள், வானொலி மற்றும் பலவும்">Your gateway to Madurai - News, Radio & More</TranslatedText>
+              </p>
               <Link
-                key={index}
-                href={service.href}
-                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 text-center border border-gray-200"
+                href="/news"
+                className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-gray-50 transition-colors duration-200"
               >
-                <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <h3 className="text-sm font-medium text-gray-900">
-                  {service.name}
-                </h3>
+                <TranslatedText tamil="சமீபத்திய செய்திகளை ஆராயுங்கள்">Explore Latest News</TranslatedText>
               </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* AD Slide Section */}
-      <section className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* AD Slide Header */}
-          <div className="bg-blue-900 text-white py-4 px-6 rounded-t-lg">
-            <h2 className="text-2xl font-bold text-center">AD Slide</h2>
-          </div>
-
-          {/* Rectangle boxes for reels */}
-          <div className="bg-white p-6 rounded-b-lg shadow-lg">
-            <div className="grid grid-cols-5 gap-4">
-              {[1, 2, 3, 4, 5].map((item) => (
-                <div
-                  key={item}
-                  className="aspect-[3/4] bg-gray-400 rounded-lg flex items-center justify-center text-white font-semibold cursor-pointer hover:bg-gray-500 transition-colors"
-                >
-                  <div className="text-center">
-                    <div className="text-lg mb-2">📹</div>
-                    <div className="text-sm">Reel {item}</div>
-                    <div className="text-xs mt-1 opacity-75">Click to upload</div>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
-      </section>
+
+        {/* Features Section */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center mb-12">
+            <TranslatedText as="h2" className="text-3xl font-bold text-gray-900 mb-4" tamil="மதுரையை கண்டறியுங்கள்">
+              Discover Madurai
+            </TranslatedText>
+            <TranslatedText as="p" className="text-lg text-gray-600 max-w-2xl mx-auto" tamil="உங்கள் நகரத்துடன் இணைந்திருக்க தேவையான அனைத்தும்">
+              Everything you need to stay connected with your city
+            </TranslatedText>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature) => {
+              const Icon = feature.icon
+              return (
+                <Link key={feature.nameEn} href={feature.href} className="no-underline">
+                  <div className="bg-blue-600 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 p-6 cursor-pointer group h-full flex flex-col border-2 border-blue-700 hover:border-blue-800">
+                    <div className={`inline-flex items-center justify-center w-12 h-12 ${feature.color} rounded-lg mb-4 group-hover:scale-110 transition-transform duration-200`}>
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">
+                      <TranslatedText tamil={feature.nameTa}>{feature.nameEn}</TranslatedText>
+                    </h3>
+                    <p className="flex-grow">
+                      <TranslatedText tamil={feature.descTa}>{feature.descEn}</TranslatedText>
+                    </p>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="bg-gray-50 border-t-2 border-blue-600">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="text-center">
+              <TranslatedText as="h2" className="text-3xl font-bold text-gray-900 mb-4" tamil="புதுப்பித்த நிலையில் இருங்கள்">
+                Stay Updated
+              </TranslatedText>
+              <TranslatedText as="p" className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto" tamil="மதுரையின் சமீபத்திய செய்திகள் மற்றும் உள்ளடக்கத்தை உங்களுக்கு வழங்கப்படும்">
+                Get the latest news and content from Madurai delivered to you
+              </TranslatedText>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <SubscriptionButton className="text-lg px-8 py-3" />
+                <Link
+                  href="/news"
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
+                >
+                  <span style={{ color: '#ffffff' }}>
+                    <TranslatedText tamil="செய்திகளைப் படியுங்கள்">Read News</TranslatedText>
+                  </span>
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center px-6 py-3 border border-blue-600 text-base font-medium rounded-md bg-white hover:bg-blue-50 transition-colors duration-200"
+                >
+                  <span style={{ color: '#2563eb' }}>
+                    <TranslatedText tamil="எங்களை தொடர்பு கொள்ளுங்கள்">Contact Us</TranslatedText>
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Subscription Banner */}
+        <SubscriptionButton variant="banner" />
+
+        {/* Floating Subscription Button */}
+        <SubscriptionButton variant="floating" />
+      </div>
     </div>
   )
 }
