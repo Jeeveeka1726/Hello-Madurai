@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import { toast } from 'react-hot-toast'
+import AdminSearchBox from '@/components/admin/AdminSearchBox'
 
 interface Ad {
   id: string
@@ -25,9 +26,11 @@ interface Ad {
 export default function AdminAdsPage() {
   const { language } = useLanguage()
   const [ads, setAds] = useState<Ad[]>([])
+  const [filteredAds, setFilteredAds] = useState<Ad[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingAd, setEditingAd] = useState<Ad | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [uploading, setUploading] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
@@ -50,12 +53,34 @@ export default function AdminAdsPage() {
       if (response.ok) {
         const data = await response.json()
         setAds(data)
+        setFilteredAds(data)
       }
     } catch (error) {
       console.error('Error fetching ads:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    if (!query.trim()) {
+      setFilteredAds(ads)
+      return
+    }
+
+    const filtered = ads.filter(ad => {
+      const searchFields = [
+        ad.title,
+        ad.title_ta,
+        ad.category,
+        ad.link
+      ].filter(Boolean).join(' ').toLowerCase()
+
+      return searchFields.includes(query.toLowerCase())
+    })
+
+    setFilteredAds(filtered)
   }
 
   const handleImageUpload = async (file: File) => {
@@ -408,9 +433,32 @@ export default function AdminAdsPage() {
           </div>
         )}
 
+        {/* Search Box */}
+        <div className="mb-6">
+          <AdminSearchBox
+            placeholder="Search ads by title, category, or link..."
+            placeholderTa="தலைப்பு, வகை அல்லது இணைப்பு மூலம் விளம்பரங்களைத் தேடுங்கள்..."
+            onSearch={handleSearch}
+            className="max-w-md"
+          />
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-600">
+              Found {filteredAds.length} ads for "{searchQuery}"
+            </p>
+          )}
+        </div>
+
         {/* Ads List */}
         <div className="space-y-4">
-          {ads.map((ad) => (
+          {filteredAds.length === 0 && !loading ? (
+            <div className="text-center py-8">
+              <PhotoIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">
+                {searchQuery ? 'No ads found matching your search' : 'No ads found. Add your first ad!'}
+              </p>
+            </div>
+          ) : (
+            filteredAds.map((ad) => (
             <Card key={ad.id} className="bg-white border-gray-200">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
@@ -467,16 +515,7 @@ export default function AdminAdsPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
-
-          {ads.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">
-                {language === 'ta' 
-                  ? 'இதுவரை விளம்பரங்கள் எதுவும் இல்லை. முதல் விளம்பரத்தை உருவாக்குங்கள்!'
-                  : 'No ads yet. Create your first ad!'}
-              </p>
-            </div>
+            ))
           )}
         </div>
       </div>
