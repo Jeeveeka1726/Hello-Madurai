@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button'
 import FileUpload from '@/components/admin/FileUpload'
 import BilingualField from '@/components/admin/BilingualField'
 import RichTextEditor from '@/components/admin/RichTextEditor'
+import AdminSearchBox from '@/components/admin/AdminSearchBox'
 import { toast } from 'react-hot-toast'
 
 interface NewsItem {
@@ -31,9 +32,11 @@ interface NewsItem {
 export default function AdminNewsPage() {
   const { language } = useLanguage()
   const [news, setNews] = useState<NewsItem[]>([])
+  const [filteredNews, setFilteredNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingNews, setEditingNews] = useState<NewsItem | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [formData, setFormData] = useState({
     title: '',
     title_ta: '',
@@ -74,12 +77,38 @@ export default function AdminNewsPage() {
       if (response.ok) {
         const data = await response.json()
         setNews(data)
+        setFilteredNews(data)
       }
     } catch (error) {
       console.error('Error fetching news:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    if (!query.trim()) {
+      setFilteredNews(news)
+      return
+    }
+
+    const filtered = news.filter(item => {
+      const searchFields = [
+        item.title,
+        item.title_ta,
+        item.content,
+        item.content_ta,
+        item.excerpt,
+        item.excerpt_ta,
+        item.category,
+        item.author
+      ].filter(Boolean).join(' ').toLowerCase()
+
+      return searchFields.includes(query.toLowerCase())
+    })
+
+    setFilteredNews(filtered)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -235,6 +264,24 @@ export default function AdminNewsPage() {
           </div>
         </div>
 
+        {/* Search Box */}
+        <div className="mb-6">
+          <AdminSearchBox
+            placeholder="Search news by title, content, category, or author..."
+            placeholderTa="தலைப்பு, உள்ளடக்கம், வகை அல்லது ஆசிரியர் மூலம் செய்திகளைத் தேடுங்கள்..."
+            onSearch={handleSearch}
+            className="max-w-md"
+          />
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-600">
+              {language === 'ta'
+                ? `${filteredNews.length} செய்திகள் கண்டறியப்பட்டன "${searchQuery}" க்கு`
+                : `Found ${filteredNews.length} news articles for "${searchQuery}"`
+              }
+            </p>
+          )}
+        </div>
+
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
@@ -379,7 +426,17 @@ export default function AdminNewsPage() {
 
         {/* News List */}
         <div className="space-y-4">
-          {news.map((newsItem) => (
+          {filteredNews.length === 0 && !loading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">
+                {searchQuery
+                  ? (language === 'ta' ? 'தேடலுக்கு பொருந்தும் செய்திகள் எதுவும் கிடைக்கவில்லை' : 'No news found matching your search')
+                  : (language === 'ta' ? 'செய்திகள் எதுவும் கிடைக்கவில்லை' : 'No news articles found')
+                }
+              </p>
+            </div>
+          ) : (
+            filteredNews.map((newsItem) => (
             <Card key={newsItem.id} className="bg-white border-gray-200">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
@@ -441,14 +498,7 @@ export default function AdminNewsPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
-
-          {news.length === 0 && !loading && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">
-                {language === 'ta' ? 'செய்தி கட்டுரைகள் இல்லை. உங்கள் முதல் கட்டுரையை உருவாக்குங்கள்!' : 'No news articles found. Create your first article!'}
-              </p>
-            </div>
+            ))
           )}
         </div>
       </div>

@@ -8,6 +8,7 @@ import TranslatedText from '@/components/TranslatedText'
 import BilingualField from '@/components/admin/BilingualField'
 import RichTextEditor from '@/components/admin/RichTextEditor'
 import FileUpload from '@/components/admin/FileUpload'
+import AdminSearchBox from '@/components/admin/AdminSearchBox'
 import { 
   BuildingOfficeIcon, 
   PlusIcon, 
@@ -74,10 +75,12 @@ interface Business {
 export default function AdminDirectoryPage() {
   const { isAdmin, isLoading } = useAdmin()
   const [businesses, setBusinesses] = useState<Business[]>([])
+  const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingBusiness, setEditingBusiness] = useState<Business | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [formData, setFormData] = useState({
     name: '',
     name_ta: '',
@@ -159,12 +162,40 @@ export default function AdminDirectoryPage() {
       if (response.ok) {
         const data = await response.json()
         setBusinesses(data)
+        setFilteredBusinesses(data)
       }
     } catch (error) {
       console.error('Error fetching businesses:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    if (!query.trim()) {
+      setFilteredBusinesses(businesses)
+      return
+    }
+
+    const filtered = businesses.filter(business => {
+      const searchFields = [
+        business.name,
+        business.name_ta,
+        business.address,
+        business.address_ta,
+        business.phone,
+        business.email,
+        business.category?.name,
+        business.category?.name_ta,
+        business.subcategory?.name,
+        business.subcategory?.name_ta
+      ].filter(Boolean).join(' ').toLowerCase()
+
+      return searchFields.includes(query.toLowerCase())
+    })
+
+    setFilteredBusinesses(filtered)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1049,6 +1080,25 @@ export default function AdminDirectoryPage() {
           </Card>
         </div>
 
+        {/* Search Box */}
+        <div className="mb-6">
+          <AdminSearchBox
+            placeholder="Search businesses by name, address, phone, or category..."
+            placeholderTa="பெயர், முகவரி, தொலைபேசி அல்லது வகை மூலம் வணிகங்களைத் தேடுங்கள்..."
+            onSearch={handleSearch}
+            className="max-w-md"
+          />
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-600">
+              <TranslatedText
+                tamil={`${filteredBusinesses.length} வணிகங்கள் கண்டறியப்பட்டன "${searchQuery}" க்கு`}
+              >
+                Found {filteredBusinesses.length} businesses for "{searchQuery}"
+              </TranslatedText>
+            </p>
+          )}
+        </div>
+
         {/* Business List */}
         <Card className="bg-white border-gray-200">
           <CardHeader>
@@ -1062,14 +1112,20 @@ export default function AdminDirectoryPage() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
                 <p className="mt-2 text-gray-600">Loading...</p>
               </div>
-            ) : businesses.length === 0 ? (
+            ) : filteredBusinesses.length === 0 ? (
               <div className="text-center py-8">
                 <BuildingOfficeIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No businesses found. Add your first business!</p>
+                <p className="text-gray-600">
+                  <TranslatedText
+                    tamil={searchQuery ? 'தேடலுக்கு பொருந்தும் வணிகங்கள் எதுவும் கிடைக்கவில்லை' : 'வணிகங்கள் எதுவும் கிடைக்கவில்லை. உங்கள் முதல் வணிகத்தைச் சேர்க்கவும்!'}
+                  >
+                    {searchQuery ? 'No businesses found matching your search' : 'No businesses found. Add your first business!'}
+                  </TranslatedText>
+                </p>
               </div>
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {businesses.map((business) => (
+                {filteredBusinesses.map((business) => (
                   <Card key={business.id} className="bg-gray-50 border-gray-200">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">

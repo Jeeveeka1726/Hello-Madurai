@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import AppWrapper from '@/components/AppWrapper'
 import { useAdmin } from '@/contexts/AdminContext'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import NewHeader from '@/components/layout/NewHeader'
+import NewspaperHeader from '@/components/NewspaperHeader'
 
 function AdminLayoutContent({
   children,
@@ -33,9 +35,13 @@ function AdminLayoutContent({
   }
 
   return (
-    <AdminSidebar>
-      {children}
-    </AdminSidebar>
+    <div className="min-h-screen bg-white">
+      <NewspaperHeader showTagline={true} />
+      <NewHeader />
+      <AdminSidebar>
+        {children}
+      </AdminSidebar>
+    </div>
   )
 }
 

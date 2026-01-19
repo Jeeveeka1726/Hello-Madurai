@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button'
 import TranslatedText from '@/components/TranslatedText'
 import FileUpload from '@/components/admin/FileUpload'
 import RichTextEditor from '@/components/admin/RichTextEditor'
+import AdminSearchBox from '@/components/admin/AdminSearchBox'
 import { 
   CalendarIcon, 
   PlusIcon, 
@@ -54,9 +55,11 @@ const eventCategories = [
 export default function AdminEventsPage() {
   const { isAdmin, isLoading } = useAdmin()
   const [events, setEvents] = useState<Event[]>([])
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [formData, setFormData] = useState({
     title: '',
     title_ta: '',
@@ -87,12 +90,37 @@ export default function AdminEventsPage() {
       if (response.ok) {
         const data = await response.json()
         setEvents(data)
+        setFilteredEvents(data)
       }
     } catch (error) {
       console.error('Error fetching events:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    if (!query.trim()) {
+      setFilteredEvents(events)
+      return
+    }
+
+    const filtered = events.filter(event => {
+      const searchFields = [
+        event.title,
+        event.title_ta,
+        event.description,
+        event.description_ta,
+        event.location,
+        event.location_ta,
+        event.category
+      ].filter(Boolean).join(' ').toLowerCase()
+
+      return searchFields.includes(query.toLowerCase())
+    })
+
+    setFilteredEvents(filtered)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -517,9 +545,39 @@ export default function AdminEventsPage() {
           </div>
         )}
 
+        {/* Search Box */}
+        <div className="mb-6">
+          <AdminSearchBox
+            placeholder="Search events by title, description, location, or category..."
+            placeholderTa="தலைப்பு, விளக்கம், இடம் அல்லது வகை மூலம் நிகழ்வுகளைத் தேடுங்கள்..."
+            onSearch={handleSearch}
+            className="max-w-md"
+          />
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-600">
+              <TranslatedText
+                tamil={`${filteredEvents.length} நிகழ்வுகள் கண்டறியப்பட்டன "${searchQuery}" க்கு`}
+              >
+                Found {filteredEvents.length} events for "{searchQuery}"
+              </TranslatedText>
+            </p>
+          )}
+        </div>
+
         {/* Events List */}
         <div className="space-y-4">
-          {events.map((event) => (
+          {filteredEvents.length === 0 && !loading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">
+                <TranslatedText
+                  tamil={searchQuery ? 'தேடலுக்கு பொருந்தும் நிகழ்வுகள் எதுவும் கிடைக்கவில்லை' : 'நிகழ்வுகள் எதுவும் கிடைக்கவில்லை'}
+                >
+                  {searchQuery ? 'No events found matching your search' : 'No events found'}
+                </TranslatedText>
+              </p>
+            </div>
+          ) : (
+            filteredEvents.map((event) => (
             <Card key={event.id} className="bg-white border-gray-200">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
@@ -586,20 +644,7 @@ export default function AdminEventsPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
-          
-          {events.length === 0 && !loading && (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <CalendarIcon className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-4 text-lg font-medium text-gray-900">
-                  <TranslatedText>No events yet</TranslatedText>
-                </h3>
-                <p className="mt-2 text-gray-600">
-                  <TranslatedText>Get started by adding your first event.</TranslatedText>
-                </p>
-              </CardContent>
-            </Card>
+            ))
           )}
         </div>
       </div>
