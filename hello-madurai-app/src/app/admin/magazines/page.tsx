@@ -8,6 +8,7 @@ import HostingerPDFUpload from '@/components/admin/HostingerPDFUpload'
 import TranslatedText from '@/components/TranslatedText'
 import BilingualField from '@/components/admin/BilingualField'
 import { useLanguage } from '@/contexts/LanguageContext'
+import AdminSearchBox from '@/components/admin/AdminSearchBox'
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, DocumentIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
 
@@ -42,11 +43,13 @@ interface MagazineCollection {
 export default function AdminMagazinesPage() {
   const { t } = useLanguage()
   const [magazines, setMagazines] = useState<Magazine[]>([])
+  const [filteredMagazines, setFilteredMagazines] = useState<Magazine[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [showCollectionForm, setShowCollectionForm] = useState(false)
   const [editingMagazine, setEditingMagazine] = useState<Magazine | null>(null)
   const [editingCollection, setEditingCollection] = useState<MagazineCollection | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [formData, setFormData] = useState({
     title: '',
     title_ta: '',
@@ -77,6 +80,7 @@ export default function AdminMagazinesPage() {
           new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
         )
         setMagazines(sortedData)
+        setFilteredMagazines(sortedData)
       } else {
         toast.error('பத்திரிகைகளை பெறுவதில் பிழை')
       }
@@ -86,6 +90,28 @@ export default function AdminMagazinesPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    if (!query.trim()) {
+      setFilteredMagazines(magazines)
+      return
+    }
+
+    const filtered = magazines.filter(magazine => {
+      const searchFields = [
+        magazine.title,
+        magazine.title_ta,
+        magazine.issueNumber,
+        magazine.collection?.name,
+        magazine.collection?.name_ta
+      ].filter(Boolean).join(' ').toLowerCase()
+
+      return searchFields.includes(query.toLowerCase())
+    })
+
+    setFilteredMagazines(filtered)
   }
 
   const fetchCollections = async () => {
@@ -535,9 +561,40 @@ export default function AdminMagazinesPage() {
           </div>
         </div>
 
+        {/* Search Box */}
+        <div className="mb-6">
+          <AdminSearchBox
+            placeholder="Search magazines by title, issue number, or collection..."
+            placeholderTa="தலைப்பு, இதழ் எண் அல்லது தொகுப்பு மூலம் பத்திரிகைகளைத் தேடுங்கள்..."
+            onSearch={handleSearch}
+            className="max-w-md"
+          />
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-600">
+              <TranslatedText
+                tamil={`${filteredMagazines.length} பத்திரிகைகள் கண்டறியப்பட்டன "${searchQuery}" க்கு`}
+              >
+                Found {filteredMagazines.length} magazines for "{searchQuery}"
+              </TranslatedText>
+            </p>
+          )}
+        </div>
+
         {/* Magazines List */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {magazines.map((magazine) => (
+          {filteredMagazines.length === 0 && !loading ? (
+            <div className="col-span-full text-center py-8">
+              <DocumentIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">
+                <TranslatedText
+                  tamil={searchQuery ? 'தேடலுக்கு பொருந்தும் பத்திரிகைகள் எதுவும் கிடைக்கவில்லை' : 'பத்திரிகைகள் எதுவும் கிடைக்கவில்லை. உங்கள் முதல் பத்திரிகையைச் சேர்க்கவும்!'}
+                >
+                  {searchQuery ? 'No magazines found matching your search' : 'No magazines found. Add your first magazine!'}
+                </TranslatedText>
+              </p>
+            </div>
+          ) : (
+            filteredMagazines.map((magazine) => (
             <Card key={magazine.id} hover className="h-full">
               <CardContent>
                 {magazine.coverImage && (
@@ -619,22 +676,9 @@ export default function AdminMagazinesPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+            ))
+          )}
         </div>
-
-        {magazines.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <DocumentIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              <TranslatedText tamil="பத்திரிகைகள் இல்லை">No magazines found</TranslatedText>
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              <TranslatedText tamil="புதிய பத்திரிகையை உருவாக்குவதன் மூலம் தொடங்குங்கள்.">
-                Get started by creating your first magazine.
-              </TranslatedText>
-            </p>
-          </div>
-        )}
       </div>
     </div>
   )

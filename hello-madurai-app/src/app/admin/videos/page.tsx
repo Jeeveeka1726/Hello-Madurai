@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import AdminSearchBox from '@/components/admin/AdminSearchBox'
 
 interface Video {
   id: string
@@ -47,11 +48,13 @@ const videoCategories = [
 
 export default function AdminVideosPage() {
   const [videos, setVideos] = useState<Video[]>([])
+  const [filteredVideos, setFilteredVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingVideo, setEditingVideo] = useState<Video | null>(null)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [searchQuery, setSearchQuery] = useState('')
   const [formData, setFormData] = useState({
     title: '',
     title_ta: '',
@@ -74,12 +77,34 @@ export default function AdminVideosPage() {
       if (response.ok) {
         const data = await response.json()
         setVideos(data)
+        setFilteredVideos(data)
       }
     } catch (error) {
       console.error('Error fetching videos:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    if (!query.trim()) {
+      setFilteredVideos(videos)
+      return
+    }
+
+    const filtered = videos.filter(video => {
+      const searchFields = [
+        video.title,
+        video.title_ta,
+        video.category,
+        video.videoType
+      ].filter(Boolean).join(' ').toLowerCase()
+
+      return searchFields.includes(query.toLowerCase())
+    })
+
+    setFilteredVideos(filtered)
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -459,10 +484,25 @@ export default function AdminVideosPage() {
           </Card>
         )}
 
+        {/* Search Box */}
+        <div className="mb-6">
+          <AdminSearchBox
+            placeholder="Search videos by title, category, or type..."
+            placeholderTa="தலைப்பு, வகை அல்லது வகை மூலம் வீடியோக்களைத் தேடுங்கள்..."
+            onSearch={handleSearch}
+            className="max-w-md"
+          />
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-600">
+              Found {filteredVideos.length} videos for "{searchQuery}"
+            </p>
+          )}
+        </div>
+
         {/* Videos List */}
         <Card>
           <CardHeader>
-            <CardTitle>All Videos ({videos.length})</CardTitle>
+            <CardTitle>All Videos ({filteredVideos.length})</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -495,7 +535,17 @@ export default function AdminVideosPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {videos.map((video) => (
+                    {filteredVideos.length === 0 && !loading ? (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                          {searchQuery
+                            ? 'No videos found matching your search'
+                            : 'No videos found. Add your first video!'
+                          }
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredVideos.map((video) => (
                       <tr key={video.id}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{video.title}</div>
@@ -543,7 +593,8 @@ export default function AdminVideosPage() {
                           </button>
                         </td>
                       </tr>
-                    ))}
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
