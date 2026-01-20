@@ -42,6 +42,21 @@ interface RadioPlayerContextType {
 
 const RadioPlayerContext = createContext<RadioPlayerContextType | undefined>(undefined)
 
+// Utility function to test if URL is accessible
+const testAudioUrl = async (url: string): Promise<boolean> => {
+  try {
+    const response = await fetch(url, {
+      method: 'HEAD',
+      mode: 'cors'
+    })
+    console.log('🔍 URL test response:', response.status, response.statusText)
+    return response.ok
+  } catch (error) {
+    console.warn('⚠️ URL test failed:', error)
+    return false
+  }
+}
+
 // Utility function to validate and potentially fix audio URLs
 const validateAndFixAudioUrl = (url: string): string => {
   if (!url) return url
@@ -370,11 +385,19 @@ export function RadioPlayerProvider({
       // Validate and fix the audio URL
       const fixedUrl = validateAndFixAudioUrl(song.audioUrl)
 
-      // Set new source
+      // Set new source and configure audio element
       audioRef.current.src = fixedUrl
+      audioRef.current.crossOrigin = 'anonymous' // Handle CORS issues
+      audioRef.current.preload = 'metadata' // Preload metadata for duration
 
       // Test URL accessibility
       console.log('🔍 Testing audio URL accessibility:', fixedUrl)
+      testAudioUrl(fixedUrl).then(isAccessible => {
+        console.log('🔍 URL accessibility test result:', isAccessible)
+        if (!isAccessible) {
+          console.warn('⚠️ URL may not be accessible, but attempting to play anyway')
+        }
+      })
 
       // Add error handling with retry mechanism
       const handleError = (e: Event) => {
@@ -482,8 +505,26 @@ export function RadioPlayerProvider({
       audioRef.current.addEventListener('canplay', handleCanPlay)
       audioRef.current.addEventListener('loadedmetadata', handleLoadedMetadata)
 
-      // Load the audio
+      // Load the audio with timeout
+      console.log('🔄 Loading audio file...')
       audioRef.current.load()
+
+      // Add a timeout to detect loading issues
+      const loadTimeout = setTimeout(() => {
+        if (audioRef.current && audioRef.current.readyState === 0) {
+          console.error('⏰ Audio loading timeout - file may be inaccessible')
+          console.error('🔗 Problematic URL:', fixedUrl)
+        }
+      }, 10000) // 10 second timeout
+
+      // Clear timeout when audio loads successfully
+      const clearTimeoutOnLoad = () => {
+        clearTimeout(loadTimeout)
+        console.log('✅ Audio loaded successfully, clearing timeout')
+      }
+
+      audioRef.current.addEventListener('loadstart', clearTimeoutOnLoad, { once: true })
+      audioRef.current.addEventListener('canplay', clearTimeoutOnLoad, { once: true })
 
       // Track play count
       fetch(`/api/radio-songs/${song.id}/play`, { method: 'POST' })
@@ -647,7 +688,12 @@ export function RadioPlayerProvider({
     >
       {children}
       {/* Global audio element */}
-      <audio ref={audioRef} preload="metadata" />
+      <audio
+        ref={audioRef}
+        preload="metadata"
+        crossOrigin="anonymous"
+        controls={false}
+      />
     </RadioPlayerContext.Provider>
   )
 }
