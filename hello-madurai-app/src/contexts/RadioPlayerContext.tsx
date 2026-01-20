@@ -169,7 +169,27 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
       // Auto-play next song if enabled and playlist exists
       if (isAutoPlayEnabled && currentPlaylist.length > 0 && currentIndex < currentPlaylist.length - 1) {
         console.log('🎵 Auto-playing next song in playlist')
-        playNext()
+        setTimeout(() => {
+          const nextIndex = currentIndex + 1
+          const nextSong = currentPlaylist[nextIndex]
+
+          if (nextSong) {
+            console.log('⏭️ Auto-playing next song:', nextSong.title)
+            setCurrentIndex(nextIndex)
+            setCurrentSong(nextSong)
+
+            // Start playing the next song
+            const audio = audioRef.current
+            if (audio) {
+              const validatedUrl = validateAndFixAudioUrl(nextSong.audioUrl)
+              audio.src = validatedUrl
+              audio.load()
+              audio.play().catch(error => {
+                console.error('❌ Error auto-playing next song:', error)
+              })
+            }
+          }
+        }, 500) // Small delay to ensure clean transition
       }
     }
     const handlePlay = () => {
@@ -369,13 +389,38 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
           })
       }
 
+      const handleLoadedMetadata = () => {
+        if (audioRef.current) {
+          const audioDuration = audioRef.current.duration
+          console.log('✅ Audio metadata loaded, duration:', audioDuration)
+          setDuration(audioDuration)
+
+          // Update the song duration in the database if it's not set
+          if (!song.duration && !isNaN(audioDuration) && audioDuration > 0) {
+            const formattedDuration = `${Math.floor(audioDuration / 60)}:${String(Math.floor(audioDuration % 60)).padStart(2, '0')}`
+            console.log('📝 Updating song duration in database:', formattedDuration)
+
+            fetch(`/api/admin/radio-songs/${song.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                ...song,
+                duration: formattedDuration
+              })
+            }).catch(err => console.error('Error updating song duration:', err))
+          }
+        }
+      }
+
       // Remove any existing event listeners
       audioRef.current.removeEventListener('error', handleError)
       audioRef.current.removeEventListener('canplay', handleCanPlay)
+      audioRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata)
 
       // Add new event listeners
       audioRef.current.addEventListener('error', handleError)
       audioRef.current.addEventListener('canplay', handleCanPlay)
+      audioRef.current.addEventListener('loadedmetadata', handleLoadedMetadata)
 
       // Load the audio
       audioRef.current.load()
