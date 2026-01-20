@@ -564,8 +564,13 @@ function DigitalFMPageContent() {
       togglePlayPause()
     } else {
       console.log('🎵 Playing new song via playSong()')
-      // Play new song using global player (handles both direct and embed types)
-      playSong(song)
+
+      // Create playlist from current artist's songs
+      const artistSongs = songs.filter(s => s.singer?.id === song.singer?.id)
+      console.log('🎵 Creating playlist with', artistSongs.length, 'songs from artist:', song.singer?.name)
+
+      // Play new song using global player with playlist
+      playSong(song, artistSongs)
     }
   }
 

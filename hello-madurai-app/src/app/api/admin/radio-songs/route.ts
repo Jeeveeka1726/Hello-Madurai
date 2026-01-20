@@ -43,7 +43,10 @@ export async function POST(request: NextRequest) {
         audioUrl: body.audioUrl,
         audioType: body.audioType || 'direct',
         duration: body.duration || null,
-        singerId: body.singerId
+        singerId: body.singerId,
+        // Auto-update timestamps for uploaded audio files
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       include: {
         singer: {
@@ -54,6 +57,13 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    // Also update the singer's updatedAt timestamp when new audio is added
+    await prisma.radioSinger.update({
+      where: { id: body.singerId },
+      data: { updatedAt: new Date() }
+    })
+
+    console.log('✅ Created new radio song with auto-updated timestamps:', song.title)
     return NextResponse.json(song, { status: 201 })
   } catch (error) {
     console.error('Error creating radio song:', error)

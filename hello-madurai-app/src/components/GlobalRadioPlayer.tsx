@@ -2,12 +2,28 @@
 
 import { useRadioPlayer } from '@/contexts/RadioPlayerContext'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { PlayIcon, PauseIcon, XMarkIcon, MusicalNoteIcon } from '@heroicons/react/24/solid'
+import { PlayIcon, PauseIcon, XMarkIcon, MusicalNoteIcon, ForwardIcon, BackwardIcon } from '@heroicons/react/24/solid'
 import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
 
 export default function GlobalRadioPlayer() {
-  const { currentSong, isPlaying, currentTime, duration, togglePlayPause, seekTo, setCurrentSong, pauseSong, audioRef } = useRadioPlayer()
+  const {
+    currentSong,
+    isPlaying,
+    currentTime,
+    duration,
+    togglePlayPause,
+    seekTo,
+    setCurrentSong,
+    pauseSong,
+    audioRef,
+    playNext,
+    playPrevious,
+    currentPlaylist,
+    currentIndex,
+    isAutoPlayEnabled,
+    setAutoPlayEnabled
+  } = useRadioPlayer()
   const { language } = useLanguage()
   const pathname = usePathname()
   const router = useRouter()
@@ -84,6 +100,11 @@ export default function GlobalRadioPlayer() {
             </h4>
             <p className="text-xs text-white/80 truncate">
               {artistName}
+              {currentPlaylist.length > 1 && (
+                <span className="ml-2 bg-white/20 px-2 py-0.5 rounded-full text-xs">
+                  {currentIndex + 1}/{currentPlaylist.length}
+                </span>
+              )}
             </p>
           </div>
 
@@ -134,6 +155,17 @@ export default function GlobalRadioPlayer() {
 
           {/* Controls */}
           <div className="flex items-center gap-2">
+            {/* Previous Button - Only show if playlist exists and not first song */}
+            {currentPlaylist.length > 1 && currentIndex > 0 && (
+              <button
+                onClick={playPrevious}
+                className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                aria-label="Previous song"
+              >
+                <BackwardIcon className="w-4 h-4 text-white" />
+              </button>
+            )}
+
             {/* Play/Pause Button - Same behavior for all audio types */}
             <button
               onClick={togglePlayPause}
@@ -146,6 +178,33 @@ export default function GlobalRadioPlayer() {
                 <PlayIcon className="w-5 h-5 ml-0.5 fill-purple-900" />
               )}
             </button>
+
+            {/* Next Button - Only show if playlist exists and not last song */}
+            {currentPlaylist.length > 1 && currentIndex < currentPlaylist.length - 1 && (
+              <button
+                onClick={playNext}
+                className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                aria-label="Next song"
+              >
+                <ForwardIcon className="w-4 h-4 text-white" />
+              </button>
+            )}
+
+            {/* Auto-play Toggle - Only show if playlist exists */}
+            {currentPlaylist.length > 1 && (
+              <button
+                onClick={() => setAutoPlayEnabled(!isAutoPlayEnabled)}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors text-xs font-bold ${
+                  isAutoPlayEnabled
+                    ? 'bg-yellow-400 text-purple-900'
+                    : 'bg-white/20 hover:bg-white/30 text-white'
+                }`}
+                aria-label={`Auto-play ${isAutoPlayEnabled ? 'enabled' : 'disabled'}`}
+                title={`Auto-play ${isAutoPlayEnabled ? 'ON' : 'OFF'}`}
+              >
+                AP
+              </button>
+            )}
 
             {/* Close Button */}
             <button

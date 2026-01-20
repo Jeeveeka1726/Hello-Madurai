@@ -10,6 +10,14 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
     
+    // Get the current song to check if audio URL changed
+    const currentSong = await prisma.radioSong.findUnique({
+      where: { id },
+      select: { audioUrl: true, singerId: true }
+    })
+
+    const audioUrlChanged = currentSong?.audioUrl !== body.audioUrl
+
     const song = await prisma.radioSong.update({
       where: { id },
       data: {
@@ -18,7 +26,9 @@ export async function PUT(
         audioUrl: body.audioUrl,
         audioType: body.audioType || 'direct',
         duration: body.duration || null,
-        singerId: body.singerId
+        singerId: body.singerId,
+        // Auto-update timestamp when audio URL changes
+        ...(audioUrlChanged && { updatedAt: new Date() })
       },
       include: {
         singer: {
@@ -28,6 +38,15 @@ export async function PUT(
         }
       }
     })
+
+    // Also update the singer's updatedAt timestamp when audio is updated
+    if (audioUrlChanged) {
+      await prisma.radioSinger.update({
+        where: { id: body.singerId },
+        data: { updatedAt: new Date() }
+      })
+      console.log('✅ Updated radio song with auto-updated timestamps:', song.title)
+    }
 
     return NextResponse.json(song)
   } catch (error) {

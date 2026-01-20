@@ -25,12 +25,18 @@ interface RadioPlayerContextType {
   currentTime: number
   duration: number
   audioRef: React.RefObject<HTMLAudioElement>
-  playSong: (song: RadioSong) => Promise<void>
+  playSong: (song: RadioSong, playlist?: RadioSong[]) => Promise<void>
   pauseSong: () => void
   resumeSong: () => void
   togglePlayPause: () => void
   seekTo: (time: number) => void
   setCurrentSong: (song: RadioSong | null) => void
+  playNext: () => void
+  playPrevious: () => void
+  currentPlaylist: RadioSong[]
+  currentIndex: number
+  isAutoPlayEnabled: boolean
+  setAutoPlayEnabled: (enabled: boolean) => void
 }
 
 const RadioPlayerContext = createContext<RadioPlayerContextType | undefined>(undefined)
@@ -101,6 +107,9 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [currentPlaylist, setCurrentPlaylist] = useState<RadioSong[]>([])
+  const [currentIndex, setCurrentIndex] = useState(-1)
+  const [isAutoPlayEnabled, setAutoPlayEnabled] = useState(true)
   const audioRef = useRef<HTMLAudioElement>(null)
   const isClosingRef = useRef(false)
 
@@ -156,6 +165,12 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
     const handleEnded = () => {
       console.log('🔚 Audio ended')
       setIsPlaying(false)
+
+      // Auto-play next song if enabled and playlist exists
+      if (isAutoPlayEnabled && currentPlaylist.length > 0 && currentIndex < currentPlaylist.length - 1) {
+        console.log('🎵 Auto-playing next song in playlist')
+        playNext()
+      }
     }
     const handlePlay = () => {
       console.log('▶️ Audio play event - currentSong exists:', !!currentSong, 'isClosing:', isClosingRef.current)
@@ -190,7 +205,7 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const playSong = async (song: RadioSong) => {
+  const playSong = async (song: RadioSong, playlist?: RadioSong[]) => {
     console.log('🎵 Playing song:', song.title, 'URL:', song.audioUrl, 'Type:', song.audioType)
     console.log('🔍 Full song object:', JSON.stringify(song, null, 2))
 
@@ -203,6 +218,14 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
     }
 
     setCurrentSong(song)
+
+    // Set up playlist if provided
+    if (playlist && playlist.length > 0) {
+      setCurrentPlaylist(playlist)
+      const songIndex = playlist.findIndex(s => s.id === song.id)
+      setCurrentIndex(songIndex >= 0 ? songIndex : 0)
+      console.log('🎵 Playlist set with', playlist.length, 'songs, current index:', songIndex >= 0 ? songIndex : 0)
+    }
 
     // Handle embedded radio stations
     if (song.audioType === 'embed') {
@@ -462,6 +485,38 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
     setCurrentSong(song)
   }
 
+  const playNext = async () => {
+    if (currentPlaylist.length === 0 || currentIndex >= currentPlaylist.length - 1) {
+      console.log('🔚 No next song available')
+      return
+    }
+
+    const nextIndex = currentIndex + 1
+    const nextSong = currentPlaylist[nextIndex]
+
+    if (nextSong) {
+      console.log('⏭️ Playing next song:', nextSong.title)
+      setCurrentIndex(nextIndex)
+      await playSong(nextSong, currentPlaylist)
+    }
+  }
+
+  const playPrevious = async () => {
+    if (currentPlaylist.length === 0 || currentIndex <= 0) {
+      console.log('🔚 No previous song available')
+      return
+    }
+
+    const prevIndex = currentIndex - 1
+    const prevSong = currentPlaylist[prevIndex]
+
+    if (prevSong) {
+      console.log('⏮️ Playing previous song:', prevSong.title)
+      setCurrentIndex(prevIndex)
+      await playSong(prevSong, currentPlaylist)
+    }
+  }
+
   return (
     <RadioPlayerContext.Provider
       value={{
@@ -476,6 +531,12 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
         togglePlayPause,
         seekTo,
         setCurrentSong: handleSetCurrentSong,
+        playNext,
+        playPrevious,
+        currentPlaylist,
+        currentIndex,
+        isAutoPlayEnabled,
+        setAutoPlayEnabled,
       }}
     >
       {children}
