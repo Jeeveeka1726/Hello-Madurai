@@ -410,24 +410,32 @@ export function RadioPlayerProvider({
           console.log('✅ Audio metadata loaded, duration:', audioDuration)
           setDuration(audioDuration)
 
-          // Update the song duration in the database if it's not set
-          if (!song.duration && !isNaN(audioDuration) && audioDuration > 0) {
+          // Update the song duration in the database if it's not set or if it's different
+          if (!isNaN(audioDuration) && audioDuration > 0) {
             const formattedDuration = `${Math.floor(audioDuration / 60)}:${String(Math.floor(audioDuration % 60)).padStart(2, '0')}`
-            console.log('📝 Updating song duration in database:', formattedDuration)
 
-            fetch(`/api/admin/radio-songs/${song.id}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                ...song,
-                duration: formattedDuration
-              })
-            }).then(() => {
-              // Notify parent component about duration update
-              if (onSongMetadataUpdate) {
-                onSongMetadataUpdate(song.id, formattedDuration)
-              }
-            }).catch(err => console.error('Error updating song duration:', err))
+            // Update if no duration exists or if the current duration is different
+            if (!song.duration || song.duration === '0:00' || song.duration !== formattedDuration) {
+              console.log('📝 Updating song duration in database:', formattedDuration, '(was:', song.duration, ')')
+
+              fetch(`/api/admin/radio-songs/${song.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  ...song,
+                  duration: formattedDuration
+                })
+              }).then(() => {
+                console.log('✅ Duration updated successfully in database')
+                // Update the current song object with the new duration
+                setCurrentSong(prev => prev ? { ...prev, duration: formattedDuration } : null)
+
+                // Notify parent component about duration update
+                if (onSongMetadataUpdate) {
+                  onSongMetadataUpdate(song.id, formattedDuration)
+                }
+              }).catch(err => console.error('Error updating song duration:', err))
+            }
           }
         }
       }

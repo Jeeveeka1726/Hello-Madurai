@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useRef, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import React, { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import {
   PlayIcon,
   PauseIcon,
@@ -51,6 +51,7 @@ interface RadioSong {
   duration: string | null
   plays: number
   shares: number
+  createdAt: string
   singer?: Singer
 }
 
@@ -73,21 +74,14 @@ interface Comment {
 
 function DigitalFMPageContent() {
   const { language } = useLanguage()
-  const router = useRouter()
   const searchParams = useSearchParams()
 
   // Use global radio player
   const {
     currentSong,
     isPlaying: isMusicPlaying,
-    currentTime: musicCurrentTime,
-    duration: musicDuration,
     playSong,
-    pauseSong,
-    resumeSong,
-    togglePlayPause,
-    seekTo,
-    setCurrentSong
+    togglePlayPause
   } = useRadioPlayer()
 
   // State
@@ -491,6 +485,25 @@ function DigitalFMPageContent() {
 
   // Note: Audio playback is now managed by global RadioPlayerContext
   // Duration update logic is handled there as well
+
+  // Handle duration updates from the radio player
+  const handleSongMetadataUpdate = (songId: string, duration: string) => {
+    console.log('📝 Updating song duration in UI:', songId, duration)
+
+    // Update the songs list with the new duration
+    setSongs(prevSongs =>
+      prevSongs.map(song =>
+        song.id === songId ? { ...song, duration } : song
+      )
+    )
+
+    // Also update allSongs if it contains this song
+    setAllSongs(prevAllSongs =>
+      prevAllSongs.map(song =>
+        song.id === songId ? { ...song, duration } : song
+      )
+    )
+  }
 
   // Handlers
   const handleSingerClick = async (singer: Singer) => {
