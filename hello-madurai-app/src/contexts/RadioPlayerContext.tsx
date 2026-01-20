@@ -37,6 +37,7 @@ interface RadioPlayerContextType {
   currentIndex: number
   isAutoPlayEnabled: boolean
   setAutoPlayEnabled: (enabled: boolean) => void
+  onSongMetadataUpdate?: (songId: string, duration: string) => void
 }
 
 const RadioPlayerContext = createContext<RadioPlayerContextType | undefined>(undefined)
@@ -102,7 +103,13 @@ const validateAndFixAudioUrl = (url: string): string => {
   return url
 }
 
-export function RadioPlayerProvider({ children }: { children: ReactNode }) {
+export function RadioPlayerProvider({
+  children,
+  onSongMetadataUpdate
+}: {
+  children: ReactNode
+  onSongMetadataUpdate?: (songId: string, duration: string) => void
+}) {
   const [currentSong, setCurrentSong] = useState<RadioSong | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -231,7 +238,7 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
       audio.removeEventListener('play', handlePlay)
       audio.removeEventListener('pause', handlePause)
     }
-  }, [])
+  }, [isAutoPlayEnabled, currentPlaylist, currentIndex, currentSong])
 
   const playSong = async (song: RadioSong, playlist?: RadioSong[]) => {
     console.log('🎵 Playing song:', song.title, 'URL:', song.audioUrl, 'Type:', song.audioType)
@@ -415,6 +422,11 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
                 ...song,
                 duration: formattedDuration
               })
+            }).then(() => {
+              // Notify parent component about duration update
+              if (onSongMetadataUpdate) {
+                onSongMetadataUpdate(song.id, formattedDuration)
+              }
             }).catch(err => console.error('Error updating song duration:', err))
           }
         }
@@ -590,6 +602,7 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
         currentIndex,
         isAutoPlayEnabled,
         setAutoPlayEnabled,
+        onSongMetadataUpdate,
       }}
     >
       {children}
