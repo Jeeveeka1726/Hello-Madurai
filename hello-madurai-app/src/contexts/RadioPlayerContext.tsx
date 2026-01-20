@@ -93,6 +93,19 @@ const validateAndFixAudioUrl = (url: string): string => {
     return url
   }
 
+  // Handle Cloudinary URLs - ensure they're properly formatted
+  if (url.includes('cloudinary.com')) {
+    // Ensure Cloudinary URLs use the correct format for audio streaming
+    if (url.includes('/video/upload/') && !url.includes('fl_streaming_attachment')) {
+      // Add streaming attachment flag for better compatibility
+      const fixedUrl = url.replace('/video/upload/', '/video/upload/fl_streaming_attachment/')
+      console.log('🔧 Enhanced Cloudinary URL for streaming:', fixedUrl)
+      return fixedUrl
+    }
+    console.log('✅ Cloudinary URL appears correct:', url)
+    return url
+  }
+
   // Handle common radio streaming formats
   if (url.includes('.m3u8') || url.includes('.pls') || url.includes('.m3u')) {
     console.log('🎵 Detected streaming format:', url)
@@ -360,10 +373,13 @@ export function RadioPlayerProvider({
       // Set new source
       audioRef.current.src = fixedUrl
 
-      // Add error handling
+      // Test URL accessibility
+      console.log('🔍 Testing audio URL accessibility:', fixedUrl)
+
+      // Add error handling with retry mechanism
       const handleError = (e: Event) => {
         console.error('❌ Audio playback error:', e)
-        console.error('❌ Audio URL that failed:', song.audioUrl)
+        console.error('❌ Audio URL that failed:', fixedUrl)
         console.error('❌ Audio element error:', audioRef.current?.error)
         setIsPlaying(false)
 
@@ -384,6 +400,22 @@ export function RadioPlayerProvider({
               break
             case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
               errorMessage = 'Audio format not supported or URL not accessible'
+
+              // Try alternative URL format for Cloudinary
+              if (song.audioUrl.includes('cloudinary.com') && !fixedUrl.includes('fl_streaming_attachment')) {
+                console.log('🔄 Retrying with alternative Cloudinary URL format...')
+                const alternativeUrl = song.audioUrl.replace('/video/upload/', '/video/upload/fl_streaming_attachment,f_auto/')
+                console.log('🔄 Alternative URL:', alternativeUrl)
+
+                if (audioRef.current) {
+                  audioRef.current.src = alternativeUrl
+                  audioRef.current.load()
+                  audioRef.current.play().catch(retryError => {
+                    console.error('❌ Alternative URL also failed:', retryError)
+                  })
+                }
+                return
+              }
               break
           }
 

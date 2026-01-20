@@ -571,18 +571,18 @@ function DigitalFMPageContent() {
     console.log('🔍 Current song ID:', currentSong?.id, 'New song ID:', song.id)
 
     // Handle both direct audio files and embedded radio stations using global player
-    if (currentSong?.id === song.id) {
-      console.log('🔄 Toggling play/pause for current song')
-      // Toggle play/pause for current song
+    if (currentSong?.id === song.id && isMusicPlaying) {
+      console.log('🔄 Pausing current playing song')
+      // Pause current song if it's playing
       togglePlayPause()
     } else {
-      console.log('🎵 Playing new song via playSong()')
+      console.log('🎵 Playing song via playSong()')
 
       // Create playlist from current artist's songs
       const artistSongs = songs.filter(s => s.singer?.id === song.singer?.id)
       console.log('🎵 Creating playlist with', artistSongs.length, 'songs from artist:', song.singer?.name)
 
-      // Play new song using global player with playlist
+      // Always play the song (whether it's new or current but paused)
       playSong(song, artistSongs)
     }
   }
