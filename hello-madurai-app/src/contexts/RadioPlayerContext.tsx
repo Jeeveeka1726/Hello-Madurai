@@ -24,7 +24,7 @@ interface RadioPlayerContextType {
   isPlaying: boolean
   currentTime: number
   duration: number
-  audioRef: React.RefObject<HTMLAudioElement>
+  audioRef: React.RefObject<HTMLAudioElement | null>
   playSong: (song: RadioSong, playlist?: RadioSong[]) => Promise<void>
   pauseSong: () => void
   resumeSong: () => void
@@ -164,6 +164,7 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
     const handleDurationChange = () => setDuration(audio.duration)
     const handleEnded = () => {
       console.log('🔚 Audio ended')
+      console.log('🔍 Auto-play check - isAutoPlayEnabled:', isAutoPlayEnabled, 'playlist length:', currentPlaylist.length, 'currentIndex:', currentIndex)
       setIsPlaying(false)
 
       // Auto-play next song if enabled and playlist exists
@@ -174,7 +175,7 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
           const nextSong = currentPlaylist[nextIndex]
 
           if (nextSong) {
-            console.log('⏭️ Auto-playing next song:', nextSong.title)
+            console.log('⏭️ Auto-playing next song:', nextSong.title, 'at index:', nextIndex)
             setCurrentIndex(nextIndex)
             setCurrentSong(nextSong)
 
@@ -182,14 +183,21 @@ export function RadioPlayerProvider({ children }: { children: ReactNode }) {
             const audio = audioRef.current
             if (audio) {
               const validatedUrl = validateAndFixAudioUrl(nextSong.audioUrl)
+              console.log('🔗 Loading next song URL:', validatedUrl)
               audio.src = validatedUrl
               audio.load()
-              audio.play().catch(error => {
+              audio.play().then(() => {
+                console.log('✅ Next song started playing successfully')
+                setIsPlaying(true)
+              }).catch(error => {
                 console.error('❌ Error auto-playing next song:', error)
+                setIsPlaying(false)
               })
             }
           }
         }, 500) // Small delay to ensure clean transition
+      } else {
+        console.log('🛑 Auto-play conditions not met - stopping playback')
       }
     }
     const handlePlay = () => {
