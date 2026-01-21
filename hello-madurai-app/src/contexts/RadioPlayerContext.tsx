@@ -108,16 +108,9 @@ const validateAndFixAudioUrl = (url: string): string => {
     return url
   }
 
-  // Handle Cloudinary URLs - ensure they're properly formatted
+  // Handle Cloudinary URLs - keep them as-is (they work fine)
   if (url.includes('cloudinary.com')) {
-    // Ensure Cloudinary URLs use the correct format for audio streaming
-    if (url.includes('/video/upload/') && !url.includes('fl_streaming_attachment')) {
-      // Add streaming attachment flag for better compatibility
-      const fixedUrl = url.replace('/video/upload/', '/video/upload/fl_streaming_attachment/')
-      console.log('🔧 Enhanced Cloudinary URL for streaming:', fixedUrl)
-      return fixedUrl
-    }
-    console.log('✅ Cloudinary URL appears correct:', url)
+    console.log('✅ Cloudinary URL - using original format:', url)
     return url
   }
 
@@ -423,22 +416,6 @@ export function RadioPlayerProvider({
               break
             case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
               errorMessage = 'Audio format not supported or URL not accessible'
-
-              // Try alternative URL format for Cloudinary
-              if (song.audioUrl.includes('cloudinary.com') && !fixedUrl.includes('fl_streaming_attachment')) {
-                console.log('🔄 Retrying with alternative Cloudinary URL format...')
-                const alternativeUrl = song.audioUrl.replace('/video/upload/', '/video/upload/fl_streaming_attachment,f_auto/')
-                console.log('🔄 Alternative URL:', alternativeUrl)
-
-                if (audioRef.current) {
-                  audioRef.current.src = alternativeUrl
-                  audioRef.current.load()
-                  audioRef.current.play().catch(retryError => {
-                    console.error('❌ Alternative URL also failed:', retryError)
-                  })
-                }
-                return
-              }
               break
           }
 
@@ -469,8 +446,9 @@ export function RadioPlayerProvider({
           if (!isNaN(audioDuration) && audioDuration > 0) {
             const formattedDuration = `${Math.floor(audioDuration / 60)}:${String(Math.floor(audioDuration % 60)).padStart(2, '0')}`
 
-            // Update if no duration exists or if the current duration is different
-            if (!song.duration || song.duration === '0:00' || song.duration !== formattedDuration) {
+            // Update if no duration exists, is invalid, or is different
+            const isInvalidDuration = !song.duration || song.duration === '0:00' || song.duration.includes('Infinity') || song.duration.includes('NaN')
+            if (isInvalidDuration || song.duration !== formattedDuration) {
               console.log('📝 Updating song duration in database:', formattedDuration, '(was:', song.duration, ')')
 
               fetch(`/api/admin/radio-songs/${song.id}`, {

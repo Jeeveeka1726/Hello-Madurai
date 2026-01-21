@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Test</title>
+</head>
+<body>
+    <h1>Audio URL Test</h1>
+    <audio controls crossorigin="anonymous" preload="metadata">
+        <source src="https://res.cloudinary.com/dbngxtspv/video/upload/v1768891372/hello-madurai/radio-audio/hof95o5bmm4mkh3kul3w.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <br><br>
+    
+    <h2>Alternative URL Test</h2>
+    <audio controls crossorigin="anonymous" preload="metadata">
+        <source src="https://res.cloudinary.com/dbngxtspv/video/upload/fl_streaming_attachment/v1768891372/hello-madurai/radio-audio/hof95o5bmm4mkh3kul3w.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <script>
+        // Test URL accessibility
+        const testUrl = "https://res.cloudinary.com/dbngxtspv/video/upload/v1768891372/hello-madurai/radio-audio/hof95o5bmm4mkh3kul3w.mp3";
+        
+        fetch(testUrl, { method: 'HEAD' })
+            .then(response => {
+                console.log('URL Test Result:', response.status, response.statusText);
+                console.log('Content-Type:', response.headers.get('content-type'));
+                console.log('Content-Length:', response.headers.get('content-length'));
+            })
+            .catch(error => {
+                console.error('URL Test Error:', error);
+            });
+    </script>
+</body>
+</html>
