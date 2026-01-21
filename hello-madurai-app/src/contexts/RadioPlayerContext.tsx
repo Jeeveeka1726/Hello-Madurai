@@ -247,12 +247,8 @@ export function RadioPlayerProvider({
     audio.addEventListener('pause', handlePause)
 
     return () => {
-      // Always stop any streams on unmount (don't check song type to avoid dependency issues)
-      console.log('🛑 Component unmounting - stopping all audio streams')
-      audio.pause()
-      audio.src = ''
-      audio.load()
-
+      // Only remove event listeners, don't clear audio source
+      console.log('🔄 Updating event listeners - removing old ones')
       audio.removeEventListener('timeupdate', handleTimeUpdate)
       audio.removeEventListener('durationchange', handleDurationChange)
       audio.removeEventListener('ended', handleEnded)
@@ -260,6 +256,20 @@ export function RadioPlayerProvider({
       audio.removeEventListener('pause', handlePause)
     }
   }, [isAutoPlayEnabled, currentPlaylist, currentIndex, currentSong])
+
+  // Cleanup on actual component unmount
+  useEffect(() => {
+    return () => {
+      // Only clear audio source on actual unmount
+      const audio = audioRef.current
+      if (audio) {
+        console.log('🛑 Component unmounting - stopping all audio streams')
+        audio.pause()
+        audio.src = ''
+        audio.load()
+      }
+    }
+  }, [])
 
   const playSong = async (song: RadioSong, playlist?: RadioSong[]) => {
     console.log('🎵 Playing song:', song.title, 'URL:', song.audioUrl, 'Type:', song.audioType)
