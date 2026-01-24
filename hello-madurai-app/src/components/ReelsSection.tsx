@@ -143,7 +143,7 @@ export default function ReelsSection() {
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
-                          target.src = '/placeholder-video.jpg'
+                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMzAgMTEwTDE3MCA5MEwxNzAgMTMwTDEzMCAxMTBaIiBmaWxsPSIjOUNBM0FGIi8+Cjx0ZXh0IHg9IjE2MCIgeT0iMTU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNkI3MjgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiPk5vIFRodW1ibmFpbDwvdGV4dD4KPC9zdmc+'
                         }}
                       />
                       
@@ -179,6 +179,36 @@ export default function ReelsSection() {
                   </div>
                 </div>
               ))}
+
+              {/* View All Videos Card */}
+              <div
+                onClick={() => router.push('/videos')}
+                className="flex-shrink-0 w-64 cursor-pointer group"
+              >
+                <div className="relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform group-hover:scale-105 h-full">
+                  <div className="aspect-video bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                    <div className="text-center text-white">
+                      <PlayIcon className="w-12 h-12 mx-auto mb-2 opacity-80" />
+                      <div className="text-lg font-semibold">
+                        <TranslatedText tamil="அனைத்து வீடியோக்களும்">View All</TranslatedText>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 text-white">
+                    <h3 className="font-semibold text-sm mb-2">
+                      <TranslatedText tamil="மேலும் வீடியோக்களைப் பார்க்கவும்">
+                        Watch More Videos
+                      </TranslatedText>
+                    </h3>
+                    <div className="text-xs opacity-80">
+                      <TranslatedText tamil="வீடியோ பிரிவுக்குச் செல்லுங்கள்">
+                        Go to Videos Section
+                      </TranslatedText>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ) : (
