@@ -131,7 +131,18 @@ export default function RootPage() {
 
         {/* Features Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-12">
+          {/* Mobile Title */}
+          <div className="text-center mb-8 md:hidden">
+            <TranslatedText as="h2" className="text-2xl font-bold text-gray-900 mb-2" tamil="வரவிருக்கும் நிகழ்வுகள்">
+              வரவிருக்கும் நிகழ்வுகள்
+            </TranslatedText>
+            <TranslatedText as="p" className="text-sm text-gray-600" tamil="மதுரையில் வரவிருக்கும் திருவிழாக்கள், கண்காட்சிகள், கண்காட்சிகள் மற்றும் கண்டறியுங்கள்">
+              மதுரையில் வரவிருக்கும் திருவிழாக்கள், கண்காட்சிகள், கண்காட்சிகள் மற்றும் கண்டறியுங்கள்
+            </TranslatedText>
+          </div>
+
+          {/* Desktop Title */}
+          <div className="text-center mb-12 hidden md:block">
             <TranslatedText as="h2" className="text-3xl font-bold text-gray-900 mb-4" tamil="மதுரையை கண்டறியுங்கள்">
               Discover Madurai
             </TranslatedText>
@@ -140,7 +151,31 @@ export default function RootPage() {
             </TranslatedText>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Mobile View - Horizontal Scrolling Categories */}
+          <div className="md:hidden">
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 px-1">
+              {features.map((feature) => {
+                const Icon = feature.icon
+                return (
+                  <Link key={feature.nameEn} href={feature.href} className="no-underline">
+                    <div className="flex-shrink-0 bg-gray-100 rounded-full px-4 py-2 hover:bg-gray-200 transition-colors duration-200 cursor-pointer border border-gray-300">
+                      <div className="flex items-center gap-2">
+                        <div className={`inline-flex items-center justify-center w-6 h-6 ${feature.color} rounded-full`}>
+                          <Icon className="h-4 w-4 text-white" />
+                        </div>
+                        <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                          <TranslatedText tamil={feature.nameTa}>{feature.nameEn}</TranslatedText>
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Desktop View - Grid Layout */}
+          <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature) => {
               const Icon = feature.icon
               return (
