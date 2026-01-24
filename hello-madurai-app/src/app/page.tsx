@@ -16,6 +16,7 @@ import {
 import NewHeader from '@/components/layout/NewHeader'
 import SubscriptionButton from '@/components/SubscriptionButton'
 import TranslatedText from '@/components/TranslatedText'
+import ReelsSection from '@/components/ReelsSection'
 
 export default function RootPage() {
   const { t } = useLanguage()
@@ -161,38 +162,8 @@ export default function RootPage() {
           </div>
         </div>
 
-        {/* CTA Section */}
-        <div className="bg-gray-50 border-t-2 border-blue-600">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div className="text-center">
-              <TranslatedText as="h2" className="text-3xl font-bold text-gray-900 mb-4" tamil="புதுப்பித்த நிலையில் இருங்கள்">
-                Stay Updated
-              </TranslatedText>
-              <TranslatedText as="p" className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto" tamil="மதுரையின் சமீபத்திய செய்திகள் மற்றும் உள்ளடக்கத்தை உங்களுக்கு வழங்கப்படும்">
-                Get the latest news and content from Madurai delivered to you
-              </TranslatedText>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <SubscriptionButton className="text-lg px-8 py-3" />
-                <Link
-                  href="/news"
-                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
-                >
-                  <span style={{ color: '#ffffff' }}>
-                    <TranslatedText tamil="செய்திகளைப் படியுங்கள்">Read News</TranslatedText>
-                  </span>
-                </Link>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center px-6 py-3 border border-blue-600 text-base font-medium rounded-md bg-white hover:bg-blue-50 transition-colors duration-200"
-                >
-                  <span style={{ color: '#2563eb' }}>
-                    <TranslatedText tamil="எங்களை தொடர்பு கொள்ளுங்கள்">Contact Us</TranslatedText>
-                  </span>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Reels Section */}
+        <ReelsSection />
 
         {/* Subscription Banner */}
         <SubscriptionButton variant="banner" />
