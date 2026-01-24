@@ -19,6 +19,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { useRadioPlayer } from '@/contexts/RadioPlayerContext'
 import NewHeader from '@/components/layout/NewHeader'
 import NewspaperHeader from '@/components/NewspaperHeader'
+import CategoryNavigation from '@/components/CategoryNavigation'
 import { toast } from 'react-hot-toast'
 
 interface RadioCategory {
@@ -1315,6 +1316,7 @@ export default function DigitalFMPage() {
     <>
       <NewspaperHeader />
       <NewHeader />
+      <CategoryNavigation />
       <DigitalFMPageWrapper />
     </>
   )

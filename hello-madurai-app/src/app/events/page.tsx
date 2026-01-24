@@ -5,6 +5,7 @@ import { CalendarIcon, MapPinIcon, ClockIcon, PhoneIcon, GlobeAltIcon, EyeIcon, 
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import NewspaperHeader from '@/components/NewspaperHeader'
+import CategoryNavigation from '@/components/CategoryNavigation'
 import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import {
@@ -537,6 +538,7 @@ export default function EventsPage() {
     <div>
       <NewspaperHeader showTagline={true} />
       <NewHeader />
+      <CategoryNavigation />
       <EventsPageContent />
     </div>
   )

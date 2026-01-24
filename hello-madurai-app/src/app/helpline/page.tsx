@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
+import CategoryNavigation from '@/components/CategoryNavigation'
 import { PhoneIcon } from '@heroicons/react/24/outline'
 
 interface Helpline {
@@ -64,6 +65,7 @@ export default function HelplinePage() {
   return (
     <div className="min-h-screen bg-blue-800">
       <NewHeader />
+      <CategoryNavigation />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-4">

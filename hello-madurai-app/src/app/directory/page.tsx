@@ -19,6 +19,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import NewspaperHeader from '@/components/NewspaperHeader'
+import CategoryNavigation from '@/components/CategoryNavigation'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Comments from '@/components/Comments'
@@ -1933,6 +1934,7 @@ export default function DirectoryPage() {
     <div>
       <NewspaperHeader showTagline={true} />
       <NewHeader />
+      <CategoryNavigation />
       <Suspense fallback={
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">

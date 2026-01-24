@@ -6,6 +6,7 @@ import { CalendarIcon, EyeIcon, UserIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import NewspaperHeader from '@/components/NewspaperHeader'
+import CategoryNavigation from '@/components/CategoryNavigation'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
@@ -325,6 +326,7 @@ export default function NewsPage() {
     <div>
       <NewspaperHeader showTagline={true} />
       <NewHeader />
+      <CategoryNavigation />
       <NewsPageContent />
     </div>
   )

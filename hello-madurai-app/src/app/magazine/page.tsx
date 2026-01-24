@@ -7,6 +7,7 @@ import { DocumentArrowDownIcon, EyeIcon, CalendarIcon, FolderIcon, ChevronRightI
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import NewspaperHeader from '@/components/NewspaperHeader'
+import CategoryNavigation from '@/components/CategoryNavigation'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
@@ -392,6 +393,7 @@ export default function MagazinePage() {
     <div>
       <NewspaperHeader showTagline={true} />
       <NewHeader />
+      <CategoryNavigation />
       <MagazinePageContent />
     </div>
   )
