@@ -85,18 +85,18 @@ export default function CategoryNavigation({ className = '' }: CategoryNavigatio
   const { language } = useLanguage()
 
   return (
-    <div className={`bg-white border-b border-gray-200 ${className}`}>
+    <div className={`bg-white border-b border-gray-200 md:hidden ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex gap-3 overflow-x-auto scrollbar-hide py-4">
           {categories.map((category) => {
             const Icon = category.icon
             const isActive = pathname === category.href
-            
+
             return (
               <Link key={category.nameEn} href={category.href} className="no-underline">
                 <div className={`flex-shrink-0 rounded-full px-4 py-2 transition-colors duration-200 cursor-pointer border ${
-                  isActive 
-                    ? 'bg-blue-100 border-blue-300 text-blue-700' 
+                  isActive
+                    ? 'bg-blue-100 border-blue-300 text-blue-700'
                     : 'bg-gray-100 border-gray-300 hover:bg-gray-200'
                 }`}>
                   <div className="flex items-center gap-2">
