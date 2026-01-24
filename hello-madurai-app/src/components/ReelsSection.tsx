@@ -85,7 +85,7 @@ export default function ReelsSection() {
             <div className="h-4 bg-gray-300 rounded w-96 mx-auto mb-8"></div>
             <div className="flex gap-4 overflow-hidden">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-64 h-80 bg-gray-300 rounded-lg"></div>
+                <div key={i} className="flex-shrink-0 w-48 bg-gray-300 rounded-lg" style={{ height: '400px' }}></div>
               ))}
             </div>
           </div>
@@ -132,18 +132,18 @@ export default function ReelsSection() {
                 <div
                   key={video.id}
                   onClick={() => handleVideoClick(video)}
-                  className="flex-shrink-0 w-64 cursor-pointer group"
+                  className="flex-shrink-0 w-48 cursor-pointer group"
                 >
                   <div className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
-                    {/* Thumbnail */}
-                    <div className="relative aspect-video bg-gray-200">
+                    {/* Thumbnail - Instagram Reel 9:16 aspect ratio */}
+                    <div className="relative bg-gray-200" style={{ aspectRatio: '9/16', height: '320px' }}>
                       <img
                         src={video.thumbnailUrl || (video.videoType === 'youtube' ? getYouTubeThumbnail(video.videoUrl) : '/placeholder-video.jpg')}
                         alt={language === 'ta' && video.title_ta ? video.title_ta : video.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
-                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMzAgMTEwTDE3MCA5MEwxNzAgMTMwTDEzMCAxMTBaIiBmaWxsPSIjOUNBM0FGIi8+Cjx0ZXh0IHg9IjE2MCIgeT0iMTU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNkI3MjgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiPk5vIFRodW1ibmFpbDwvdGV4dD4KPC9zdmc+'
+                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDE4MCAzMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMzIwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik03MCAyMDBMMTEwIDE4MEwxMTAgMjIwTDcwIDIwMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHR4dCB4PSI5MCIgeT0iMjUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNkI3MjgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiPk5vIFRodW1ibmFpbDwvdGV4dD4KPC9zdmc+'
                         }}
                       />
                       
@@ -163,17 +163,17 @@ export default function ReelsSection() {
                     </div>
 
                     {/* Video info */}
-                    <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm">
+                    <div className="p-3">
+                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-xs leading-tight">
                         {language === 'ta' && video.title_ta ? video.title_ta : video.title}
                       </h3>
-                      
+
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         <div className="flex items-center gap-1">
                           <EyeIcon className="w-3 h-3" />
-                          <span>{formatViews(video.views)}</span>
+                          <span className="text-xs">{formatViews(video.views)}</span>
                         </div>
-                        <span className="capitalize">{video.category}</span>
+                        <span className="capitalize text-xs truncate ml-1">{video.category}</span>
                       </div>
                     </div>
                   </div>
@@ -183,10 +183,10 @@ export default function ReelsSection() {
               {/* View All Videos Card */}
               <div
                 onClick={() => router.push('/videos')}
-                className="flex-shrink-0 w-64 cursor-pointer group"
+                className="flex-shrink-0 w-48 cursor-pointer group"
               >
                 <div className="relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform group-hover:scale-105 h-full">
-                  <div className="aspect-video bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center" style={{ aspectRatio: '9/16', height: '320px' }}>
                     <div className="text-center text-white">
                       <PlayIcon className="w-12 h-12 mx-auto mb-2 opacity-80" />
                       <div className="text-lg font-semibold">
@@ -195,15 +195,15 @@ export default function ReelsSection() {
                     </div>
                   </div>
 
-                  <div className="p-4 text-white">
-                    <h3 className="font-semibold text-sm mb-2">
-                      <TranslatedText tamil="மேலும் வீடியோக்களைப் பார்க்கவும்">
-                        Watch More Videos
+                  <div className="p-3 text-white">
+                    <h3 className="font-semibold text-xs mb-1 leading-tight">
+                      <TranslatedText tamil="மேலும் வீடியோக்கள்">
+                        More Videos
                       </TranslatedText>
                     </h3>
-                    <div className="text-xs opacity-80">
-                      <TranslatedText tamil="வீடியோ பிரிவுக்குச் செல்லுங்கள்">
-                        Go to Videos Section
+                    <div className="text-xs opacity-80 leading-tight">
+                      <TranslatedText tamil="அனைத்தும் பார்க்க">
+                        View All
                       </TranslatedText>
                     </div>
                   </div>
