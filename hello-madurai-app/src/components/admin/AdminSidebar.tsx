@@ -73,6 +73,13 @@ const navigation = [
     badge: 'new'
   },
   {
+    name: 'Reels',
+    name_ta: 'ரீல்கள்',
+    href: '/admin/reels',
+    icon: VideoCameraIcon,
+    badge: 'new'
+  },
+  {
     name: 'Ads',
     name_ta: 'விளம்பரங்கள்',
     href: '/admin/ads',

@@ -485,6 +485,27 @@ model VideoShare {
   @@map("video_shares")
 }
 
+model Reel {
+  id           String   @id @default(cuid())
+  title        String
+  title_ta     String?
+  videoUrl     String
+  thumbnailUrl String?
+  reelType     String   @default("youtube") // "youtube", "instagram", "upload"
+  duration     String?
+  views        Int      @default(0)
+  likes        Int      @default(0)
+  active       Boolean  @default(true)
+  orderNumber  Int      @default(0)
+  publishedAt  DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([active])
+  @@index([orderNumber])
+  @@map("reels")
+}
+
 model RadioCategory {
   id          String   @id @default(cuid())
   name        String

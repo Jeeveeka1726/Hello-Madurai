@@ -6,42 +6,41 @@ import { PlayIcon, EyeIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons
 import { useLanguage } from '@/contexts/LanguageContext'
 import TranslatedText from '@/components/TranslatedText'
 
-interface Video {
+interface Reel {
   id: string
   title: string
   title_ta?: string
   videoUrl: string
-  videoType: string
+  reelType: string
   thumbnailUrl?: string
-  category: string
   duration?: string
   views: number
   likes: number
-  featured: boolean
+  active: boolean
+  orderNumber: number
   publishedAt: string
 }
 
 export default function ReelsSection() {
-  const [videos, setVideos] = useState<Video[]>([])
+  const [reels, setReels] = useState<Reel[]>([])
   const [loading, setLoading] = useState(true)
   const [scrollPosition, setScrollPosition] = useState(0)
   const { language } = useLanguage()
   const router = useRouter()
 
   useEffect(() => {
-    fetchVideos()
+    fetchReels()
   }, [])
 
-  const fetchVideos = async () => {
+  const fetchReels = async () => {
     try {
-      const response = await fetch('/api/videos')
+      const response = await fetch('/api/reels?active=true')
       if (response.ok) {
         const data = await response.json()
-        // Get latest 10 videos for reels
-        setVideos(data.slice(0, 10))
+        setReels(data)
       }
     } catch (error) {
-      console.error('Error fetching videos:', error)
+      console.error('Error fetching reels:', error)
     } finally {
       setLoading(false)
     }
@@ -61,12 +60,17 @@ export default function ReelsSection() {
     }
   }
 
-  const handleVideoClick = (video: Video) => {
-    router.push(`/videos/${video.id}`)
+  const handleReelClick = (reel: Reel) => {
+    // Open reel URL directly for YouTube/Instagram, or navigate to video page for uploads
+    if (reel.reelType === 'youtube' || reel.reelType === 'instagram') {
+      window.open(reel.videoUrl, '_blank')
+    } else {
+      router.push(`/videos/${reel.id}`)
+    }
   }
 
   const getYouTubeThumbnail = (url: string) => {
-    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
+    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
     return videoId ? `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg` : null
   }
 
@@ -106,7 +110,7 @@ export default function ReelsSection() {
           </TranslatedText>
         </div>
 
-        {videos.length > 0 ? (
+        {reels.length > 0 ? (
           <div className="relative">
             {/* Scroll buttons */}
             <button
@@ -128,18 +132,18 @@ export default function ReelsSection() {
               className="flex gap-4 overflow-x-auto scrollbar-hide pb-4"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {videos.map((video) => (
+              {reels.map((reel) => (
                 <div
-                  key={video.id}
-                  onClick={() => handleVideoClick(video)}
+                  key={reel.id}
+                  onClick={() => handleReelClick(reel)}
                   className="flex-shrink-0 w-48 cursor-pointer group"
                 >
                   <div className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
                     {/* Thumbnail - Instagram Reel 9:16 aspect ratio */}
                     <div className="relative bg-gray-200" style={{ aspectRatio: '9/16', height: '320px' }}>
                       <img
-                        src={video.thumbnailUrl || (video.videoType === 'youtube' ? getYouTubeThumbnail(video.videoUrl) : '/placeholder-video.jpg')}
-                        alt={language === 'ta' && video.title_ta ? video.title_ta : video.title}
+                        src={reel.thumbnailUrl || (reel.reelType === 'youtube' ? getYouTubeThumbnail(reel.videoUrl) : '/placeholder-video.jpg')}
+                        alt={language === 'ta' && reel.title_ta ? reel.title_ta : reel.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
@@ -155,32 +159,37 @@ export default function ReelsSection() {
                       </div>
 
                       {/* Duration badge */}
-                      {video.duration && (
+                      {reel.duration && (
                         <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                          {video.duration}
+                          {reel.duration}
                         </div>
                       )}
+
+                      {/* Reel type badge */}
+                      <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                        {reel.reelType.toUpperCase()}
+                      </div>
                     </div>
 
-                    {/* Video info */}
+                    {/* Reel info */}
                     <div className="p-3">
                       <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-xs leading-tight">
-                        {language === 'ta' && video.title_ta ? video.title_ta : video.title}
+                        {language === 'ta' && reel.title_ta ? reel.title_ta : reel.title}
                       </h3>
 
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         <div className="flex items-center gap-1">
                           <EyeIcon className="w-3 h-3" />
-                          <span className="text-xs">{formatViews(video.views)}</span>
+                          <span className="text-xs">{formatViews(reel.views)}</span>
                         </div>
-                        <span className="capitalize text-xs truncate ml-1">{video.category}</span>
+                        <span className="capitalize text-xs truncate ml-1">{reel.reelType}</span>
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
 
-              {/* View All Videos Card */}
+              {/* View All Reels Card */}
               <div
                 onClick={() => router.push('/videos')}
                 className="flex-shrink-0 w-48 cursor-pointer group"
@@ -190,15 +199,15 @@ export default function ReelsSection() {
                     <div className="text-center text-white">
                       <PlayIcon className="w-12 h-12 mx-auto mb-2 opacity-80" />
                       <div className="text-lg font-semibold">
-                        <TranslatedText tamil="அனைத்து வீடியோக்களும்">View All</TranslatedText>
+                        <TranslatedText tamil="அனைத்து ரீல்கள்">View All</TranslatedText>
                       </div>
                     </div>
                   </div>
 
                   <div className="p-3 text-white">
                     <h3 className="font-semibold text-xs mb-1 leading-tight">
-                      <TranslatedText tamil="மேலும் வீடியோக்கள்">
-                        More Videos
+                      <TranslatedText tamil="மேலும் ரீல்கள்">
+                        More Reels
                       </TranslatedText>
                     </h3>
                     <div className="text-xs opacity-80 leading-tight">
@@ -213,8 +222,8 @@ export default function ReelsSection() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <TranslatedText className="text-gray-500" tamil="வீடியோக்கள் இல்லை">
-              No videos available
+            <TranslatedText className="text-gray-500" tamil="ரீல்கள் இல்லை">
+              No reels available
             </TranslatedText>
           </div>
         )}
