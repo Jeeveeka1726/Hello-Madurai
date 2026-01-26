@@ -47,12 +47,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Auto-generate thumbnail for YouTube videos
+    // Auto-generate thumbnail for YouTube and Instagram videos
     let finalThumbnailUrl = thumbnailUrl
-    if (reelType === 'youtube' && !thumbnailUrl) {
-      const videoId = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
-      if (videoId) {
-        finalThumbnailUrl = `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg`
+
+    if (!thumbnailUrl && videoUrl) {
+      if (reelType === 'youtube') {
+        const videoId = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
+        if (videoId && videoId[1]) {
+          finalThumbnailUrl = `https://img.youtube.com/vi/${videoId[1]}/hqdefault.jpg`
+        }
+      } else if (reelType === 'instagram') {
+        const reelMatch = videoUrl.match(/instagram\.com\/(?:reel|p)\/([A-Za-z0-9_-]+)/)
+        if (reelMatch && reelMatch[1]) {
+          finalThumbnailUrl = `https://www.instagram.com/p/${reelMatch[1]}/media/?size=l`
+        }
       }
     }
 

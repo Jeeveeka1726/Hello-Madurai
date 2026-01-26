@@ -50,15 +50,21 @@ export async function PUT(
       orderNumber
     } = body
 
-    // Auto-generate thumbnail for YouTube videos
+    // Auto-generate thumbnail for YouTube and Instagram videos
     let finalThumbnailUrl = thumbnailUrl
 
-    // If videoUrl is being updated and it's a YouTube video, regenerate thumbnail
-    if (videoUrl && (reelType === 'youtube' || (!reelType && body.reelType === 'youtube'))) {
-      const videoId = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
-      if (videoId) {
-        // Use maxresdefault for best quality, fallback to hqdefault if needed
-        finalThumbnailUrl = `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg`
+    // If videoUrl is being updated, regenerate thumbnail based on platform
+    if (!thumbnailUrl && videoUrl) {
+      if (reelType === 'youtube') {
+        const videoId = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
+        if (videoId && videoId[1]) {
+          finalThumbnailUrl = `https://img.youtube.com/vi/${videoId[1]}/hqdefault.jpg`
+        }
+      } else if (reelType === 'instagram') {
+        const reelMatch = videoUrl.match(/instagram\.com\/(?:reel|p)\/([A-Za-z0-9_-]+)/)
+        if (reelMatch && reelMatch[1]) {
+          finalThumbnailUrl = `https://www.instagram.com/p/${reelMatch[1]}/media/?size=l`
+        }
       }
     }
 

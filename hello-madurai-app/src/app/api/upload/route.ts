@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
     const data = await request.formData()
     const file: File | null = data.get('file') as unknown as File
     const fileType = (data.get('type') as string) || 'image'
+    const skipResize = data.get('skipResize') === 'true'
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
@@ -56,15 +57,15 @@ export async function POST(request: NextRequest) {
     let originalHeight = 0
 
     // Process images with sharp (resize + optimize)
-    if (fileType === 'image' && file.type !== 'image/svg+xml') {
+    if (fileType === 'image' && file.type !== 'image/svg+xml' && !skipResize) {
       try {
         const metadata = await sharp(buffer).metadata()
         originalWidth = metadata.width || 0
         originalHeight = metadata.height || 0
 
         // Check if resize is needed (for featured images, use news config)
-        const needsResize = 
-          originalWidth !== IMAGE_CONFIG.news.width || 
+        const needsResize =
+          originalWidth !== IMAGE_CONFIG.news.width ||
           originalHeight !== IMAGE_CONFIG.news.height
 
         if (needsResize) {

@@ -99,25 +99,40 @@ export default function ReelsSection() {
     setSelectedReel(null)
   }
 
-  const getYouTubeThumbnail = (url: string) => {
-    if (!url) return null
-    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
-    if (videoId && videoId[1]) {
-      return `https://img.youtube.com/vi/${videoId[1]}/hqdefault.jpg`
+  const handleNextReel = () => {
+    if (!selectedReel) return
+    const currentIndex = reels.findIndex(r => r.id === selectedReel.id)
+    if (currentIndex < reels.length - 1) {
+      const nextReel = reels[currentIndex + 1]
+      setSelectedReel(nextReel)
+      // Increment view count for next reel
+      fetch(`/api/reels/${nextReel.id}/view`, { method: 'POST' }).catch(() => {})
     }
-    return null
+  }
+
+  const handlePreviousReel = () => {
+    if (!selectedReel) return
+    const currentIndex = reels.findIndex(r => r.id === selectedReel.id)
+    if (currentIndex > 0) {
+      const previousReel = reels[currentIndex - 1]
+      setSelectedReel(previousReel)
+      // Increment view count for previous reel
+      fetch(`/api/reels/${previousReel.id}/view`, { method: 'POST' }).catch(() => {})
+    }
+  }
+
+  const getCurrentReelIndex = () => {
+    if (!selectedReel) return -1
+    return reels.findIndex(r => r.id === selectedReel.id)
   }
 
   const getThumbnailUrl = (reel: Reel) => {
-    // Priority: 1. thumbnailUrl from DB, 2. Auto-generate from YouTube, 3. Placeholder
+    // Only use manually uploaded thumbnails from DB
     if (reel.thumbnailUrl) {
       return reel.thumbnailUrl
     }
 
-    if (reel.reelType === 'youtube' && reel.videoUrl) {
-      return getYouTubeThumbnail(reel.videoUrl)
-    }
-
+    // No auto-generation - use placeholder if no thumbnail uploaded
     return '/placeholder-video.jpg'
   }
 
@@ -184,54 +199,59 @@ export default function ReelsSection() {
                 <div
                   key={reel.id}
                   onClick={() => handleReelClick(reel)}
-                  className="flex-shrink-0 w-44 cursor-pointer group"
+                  className="flex-shrink-0 cursor-pointer group"
+                  style={{ width: '160px' }}
                 >
-                  <div className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
-                    {/* Thumbnail - Instagram Reel 9:16 aspect ratio */}
-                    <div className="relative bg-gray-200 w-full" style={{ aspectRatio: '9/16' }}>
-                      <img
-                        src={getThumbnailUrl(reel) || '/placeholder-video.jpg'}
-                        alt={language === 'ta' && reel.title_ta ? reel.title_ta : reel.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement
-                          console.log('Thumbnail failed to load for reel:', reel.id, 'URL:', target.src)
-                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDE4MCAzMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMzIwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik03MCAyMDBMMTEwIDE4MEwxMTAgMjIwTDcwIDIwMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHR4dCB4PSI5MCIgeT0iMjUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNkI3MjgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiPk5vIFRodW1ibmFpbDwvdGV4dD4KPC9zdmc+'
-                        }}
-                      />
-                      
-                      {/* Play button overlay */}
-                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <div className="bg-white/90 rounded-full p-3">
-                          <PlayIcon className="w-8 h-8 text-blue-600" />
-                        </div>
-                      </div>
+                  {/* Card with thumbnail covering entire area */}
+                  <div
+                    className="relative bg-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300"
+                    style={{ width: '160px', height: '280px' }}
+                  >
+                    {/* Thumbnail - Full coverage */}
+                    <img
+                      src={getThumbnailUrl(reel) || '/placeholder-video.jpg'}
+                      alt={language === 'ta' && reel.title_ta ? reel.title_ta : reel.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement
+                        // Fallback to placeholder SVG
+                        target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDE2MCAyODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNjAiIGhlaWdodD0iMjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik02MCAyMDBMMTAwIDE4MEwxMDAgMjIwTDYwIDIwMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHR4dCB4PSI4MCIgeT0iMjUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNkI3MjgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiPk5vIFRodW1ibmFpbDwvdGV4dD4KPC9zdmc+'
+                      }}
+                    />
 
-                      {/* Duration badge */}
-                      {reel.duration && (
-                        <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                          {reel.duration}
-                        </div>
-                      )}
+                    {/* Dark gradient overlay at bottom for text readability */}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent h-24"></div>
 
-                      {/* Reel type badge */}
-                      <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                        {reel.reelType.toUpperCase()}
+                    {/* Play button overlay */}
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <div className="bg-white/90 rounded-full p-3">
+                        <PlayIcon className="w-8 h-8 text-blue-600" />
                       </div>
                     </div>
 
-                    {/* Reel info */}
-                    <div className="p-3">
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-xs leading-tight">
+                    {/* Reel type badge */}
+                    <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                      {reel.reelType.toUpperCase()}
+                    </div>
+
+                    {/* Duration badge */}
+                    {reel.duration && (
+                      <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                        {reel.duration}
+                      </div>
+                    )}
+
+                    {/* Reel info - Overlaid at bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 text-white z-10">
+                      <h3 className="font-semibold mb-1 line-clamp-2 text-xs leading-tight">
                         {language === 'ta' && reel.title_ta ? reel.title_ta : reel.title}
                       </h3>
 
-                      <div className="flex items-center justify-between text-xs text-gray-500">
+                      <div className="flex items-center gap-2 text-xs opacity-90">
                         <div className="flex items-center gap-1">
                           <EyeIcon className="w-3 h-3" />
-                          <span className="text-xs">{formatViews(reel.views)}</span>
+                          <span>{formatViews(reel.views)}</span>
                         </div>
-                        <span className="capitalize text-xs truncate ml-1">{reel.reelType}</span>
                       </div>
                     </div>
                   </div>
@@ -241,28 +261,20 @@ export default function ReelsSection() {
               {/* View All Reels Card */}
               <div
                 onClick={() => router.push('/videos')}
-                className="flex-shrink-0 w-44 cursor-pointer group"
+                className="flex-shrink-0 cursor-pointer group"
+                style={{ width: '176px' }}
               >
-                <div className="relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
-                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center w-full" style={{ aspectRatio: '9/16' }}>
-                    <div className="text-center text-white">
-                      <PlayIcon className="w-12 h-12 mx-auto mb-2 opacity-80" />
-                      <div className="text-lg font-semibold">
-                        <TranslatedText tamil="அனைத்து ரீல்கள்">View All</TranslatedText>
-                      </div>
+                <div
+                  className="relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex items-center justify-center"
+                  style={{ width: '176px', height: '312px' }}
+                >
+                  <div className="text-center text-white">
+                    <PlayIcon className="w-12 h-12 mx-auto mb-3 opacity-80" />
+                    <div className="text-lg font-semibold mb-2">
+                      <TranslatedText tamil="அனைத்து ரீல்கள்">View All</TranslatedText>
                     </div>
-                  </div>
-
-                  <div className="p-3 text-white">
-                    <h3 className="font-semibold text-xs mb-1 leading-tight">
-                      <TranslatedText tamil="மேலும் ரீல்கள்">
-                        More Reels
-                      </TranslatedText>
-                    </h3>
-                    <div className="text-xs opacity-80 leading-tight">
-                      <TranslatedText tamil="அனைத்தும் பார்க்க">
-                        View All
-                      </TranslatedText>
+                    <div className="text-sm opacity-90">
+                      <TranslatedText tamil="மேலும் ரீல்கள்">More Reels</TranslatedText>
                     </div>
                   </div>
                 </div>
@@ -287,6 +299,10 @@ export default function ReelsSection() {
           videoUrl={selectedReel.videoUrl}
           videoType={selectedReel.reelType as 'youtube' | 'instagram' | 'upload'}
           title={language === 'ta' && selectedReel.title_ta ? selectedReel.title_ta : selectedReel.title}
+          onNext={handleNextReel}
+          onPrevious={handlePreviousReel}
+          hasNext={getCurrentReelIndex() < reels.length - 1}
+          hasPrevious={getCurrentReelIndex() > 0}
         />
       )}
     </>

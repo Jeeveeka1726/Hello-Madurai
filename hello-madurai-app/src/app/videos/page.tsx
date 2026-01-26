@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { MagnifyingGlassIcon, EyeIcon, ClockIcon, ShareIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -420,8 +420,8 @@ function VideosPageContent() {
               const adIndex = Math.floor(index / 4) % ads.length
 
               return (
-                <>
-                  <Card key={video.id} className="!p-0 overflow-hidden hover:shadow-xl transition-all bg-white border-gray-200 flex flex-col h-full">
+                <React.Fragment key={video.id}>
+                  <Card className="!p-0 overflow-hidden hover:shadow-xl transition-all bg-white border-gray-200 flex flex-col h-full">
                     {/* Video Player - Full Width, No Black Bars */}
                     <div className="relative w-full aspect-video bg-black">
                       {isYouTube && youtubeId ? (
@@ -606,7 +606,7 @@ function VideosPageContent() {
 
                   {/* Show ad after every 4 videos (2 rows of 2) */}
                   {shouldShowAd && renderAd(ads[adIndex], adIndex)}
-                </>
+                </React.Fragment>
               )
             })}
           </div>

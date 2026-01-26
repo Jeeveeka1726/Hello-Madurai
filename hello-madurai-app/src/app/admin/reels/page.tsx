@@ -135,7 +135,41 @@ export default function AdminReelsPage() {
 
   const getYouTubeThumbnail = (url: string) => {
     const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
-    return videoId ? `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg` : null
+    return videoId ? `https://img.youtube.com/vi/${videoId[1]}/hqdefault.jpg` : null
+  }
+
+  const getInstagramThumbnail = (url: string) => {
+    if (!url) return null
+    const reelMatch = url.match(/instagram\.com\/(?:reel|p)\/([A-Za-z0-9_-]+)/)
+    if (reelMatch && reelMatch[1]) {
+      return `https://www.instagram.com/p/${reelMatch[1]}/media/?size=l`
+    }
+    return null
+  }
+
+  const getThumbnailUrl = (reel: Reel) => {
+    // First priority: explicit thumbnail URL
+    if (reel.thumbnailUrl) {
+      console.log(`Reel "${reel.title}" - Using stored thumbnail:`, reel.thumbnailUrl)
+      return reel.thumbnailUrl
+    }
+
+    // Second priority: auto-generate based on reel type
+    if (reel.videoUrl) {
+      if (reel.reelType === 'youtube') {
+        const ytThumb = getYouTubeThumbnail(reel.videoUrl)
+        console.log(`Reel "${reel.title}" - Generated YouTube thumbnail:`, ytThumb)
+        return ytThumb
+      } else if (reel.reelType === 'instagram') {
+        const igThumb = getInstagramThumbnail(reel.videoUrl)
+        console.log(`Reel "${reel.title}" - Generated Instagram thumbnail:`, igThumb)
+        return igThumb
+      }
+    }
+
+    // Fallback: placeholder
+    console.log(`Reel "${reel.title}" - Using placeholder`)
+    return '/placeholder-video.jpg'
   }
 
   const formatViews = (views: number) => {
@@ -224,12 +258,23 @@ export default function AdminReelsPage() {
 
                               {/* Thumbnail */}
                               <div className="flex-shrink-0">
-                                <div className="w-16 h-28 bg-gray-200 rounded-lg overflow-hidden">
+                                <div className="w-24 h-40 bg-gray-200 rounded-lg overflow-hidden relative flex items-center justify-center">
                                   <img
-                                    src={reel.thumbnailUrl || getYouTubeThumbnail(reel.videoUrl) || '/placeholder-video.jpg'}
+                                    src={getThumbnailUrl(reel)}
                                     alt={reel.title}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover absolute inset-0"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement
+                                      // Silently hide failed images - don't spam console
+                                      target.style.display = 'none'
+                                    }}
                                   />
+                                  <div className="text-gray-400 text-xs font-medium uppercase z-0 text-center px-1">
+                                    {reel.reelType}
+                                    {reel.reelType === 'instagram' && !reel.thumbnailUrl?.startsWith('/api/') && !reel.thumbnailUrl?.startsWith('/uploads/') && (
+                                      <div className="text-[10px] text-red-500 mt-1">No Thumb</div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
 
