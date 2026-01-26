@@ -236,17 +236,28 @@ export default function ReelForm({ reel, onClose, onSave }: ReelFormProps) {
           {formData.videoUrl && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Preview
+                Thumbnail Preview
               </label>
-              <div className="w-32 h-56 bg-gray-200 rounded-lg overflow-hidden">
-                {formData.thumbnailUrl && (
+              <div className="w-32 h-56 bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+                {formData.thumbnailUrl ? (
                   <img
                     src={formData.thumbnailUrl}
                     alt="Reel preview"
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                    }}
                   />
+                ) : (
+                  <div className="text-center text-gray-500 text-xs p-2">
+                    No thumbnail
+                  </div>
                 )}
               </div>
+              {formData.reelType === 'youtube' && formData.thumbnailUrl && (
+                <p className="text-xs text-gray-500 mt-1">Auto-generated from YouTube</p>
+              )}
             </div>
           )}
 

@@ -6,11 +6,12 @@ const prisma = new PrismaClient()
 // GET /api/reels/[id] - Get a specific reel
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const reel = await prisma.reel.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!reel) {
@@ -33,9 +34,10 @@ export async function GET(
 // PUT /api/reels/[id] - Update a specific reel
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const {
       title,
@@ -48,17 +50,25 @@ export async function PUT(
       orderNumber
     } = body
 
-    // Auto-generate thumbnail for YouTube videos if not provided
+    // Auto-generate thumbnail for YouTube videos
     let finalThumbnailUrl = thumbnailUrl
-    if (reelType === 'youtube' && videoUrl && !thumbnailUrl) {
+
+    // If videoUrl is being updated and it's a YouTube video, regenerate thumbnail
+    if (videoUrl && (reelType === 'youtube' || (!reelType && body.reelType === 'youtube'))) {
       const videoId = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
       if (videoId) {
+        // Use maxresdefault for best quality, fallback to hqdefault if needed
         finalThumbnailUrl = `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg`
       }
     }
 
+    // If thumbnail is explicitly provided, use it
+    if (thumbnailUrl !== undefined) {
+      finalThumbnailUrl = thumbnailUrl
+    }
+
     const reel = await prisma.reel.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(title !== undefined && { title }),
         ...(title_ta !== undefined && { title_ta }),
@@ -84,11 +94,12 @@ export async function PUT(
 // DELETE /api/reels/[id] - Delete a specific reel
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await prisma.reel.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Reel deleted successfully' })

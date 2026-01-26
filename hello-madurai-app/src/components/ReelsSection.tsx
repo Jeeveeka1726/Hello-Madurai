@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { PlayIcon, EyeIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
 import { useLanguage } from '@/contexts/LanguageContext'
 import TranslatedText from '@/components/TranslatedText'
+import VideoPlayerModal from '@/components/VideoPlayerModal'
 
 interface Reel {
   id: string
@@ -25,18 +26,42 @@ export default function ReelsSection() {
   const [reels, setReels] = useState<Reel[]>([])
   const [loading, setLoading] = useState(true)
   const [scrollPosition, setScrollPosition] = useState(0)
+  const [selectedReel, setSelectedReel] = useState<Reel | null>(null)
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false)
   const { language } = useLanguage()
   const router = useRouter()
 
   useEffect(() => {
     fetchReels()
+
+    // Auto-refresh reels every 30 seconds to get latest updates
+    const interval = setInterval(() => {
+      fetchReels()
+    }, 30000)
+
+    return () => clearInterval(interval)
   }, [])
 
   const fetchReels = async () => {
     try {
-      const response = await fetch('/api/reels?active=true')
+      const response = await fetch('/api/reels?active=true', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      })
       if (response.ok) {
         const data = await response.json()
+        console.log('Fetched reels:', data)
+        data.forEach((reel: Reel) => {
+          console.log(`Reel ${reel.id}:`, {
+            title: reel.title,
+            reelType: reel.reelType,
+            videoUrl: reel.videoUrl,
+            thumbnailUrl: reel.thumbnailUrl,
+            generatedThumbnail: getThumbnailUrl(reel)
+          })
+        })
         setReels(data)
       }
     } catch (error) {
@@ -61,17 +86,39 @@ export default function ReelsSection() {
   }
 
   const handleReelClick = (reel: Reel) => {
-    // Open reel URL directly for YouTube/Instagram, or navigate to video page for uploads
-    if (reel.reelType === 'youtube' || reel.reelType === 'instagram') {
-      window.open(reel.videoUrl, '_blank')
-    } else {
-      router.push(`/videos/${reel.id}`)
-    }
+    // Open video in modal player
+    setSelectedReel(reel)
+    setIsPlayerOpen(true)
+
+    // Increment view count
+    fetch(`/api/reels/${reel.id}/view`, { method: 'POST' }).catch(() => {})
+  }
+
+  const handleClosePlayer = () => {
+    setIsPlayerOpen(false)
+    setSelectedReel(null)
   }
 
   const getYouTubeThumbnail = (url: string) => {
+    if (!url) return null
     const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
-    return videoId ? `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg` : null
+    if (videoId && videoId[1]) {
+      return `https://img.youtube.com/vi/${videoId[1]}/hqdefault.jpg`
+    }
+    return null
+  }
+
+  const getThumbnailUrl = (reel: Reel) => {
+    // Priority: 1. thumbnailUrl from DB, 2. Auto-generate from YouTube, 3. Placeholder
+    if (reel.thumbnailUrl) {
+      return reel.thumbnailUrl
+    }
+
+    if (reel.reelType === 'youtube' && reel.videoUrl) {
+      return getYouTubeThumbnail(reel.videoUrl)
+    }
+
+    return '/placeholder-video.jpg'
   }
 
   const formatViews = (views: number) => {
@@ -99,16 +146,17 @@ export default function ReelsSection() {
   }
 
   return (
-    <div className="bg-gray-50 border-t-2 border-blue-600">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-8">
-          <TranslatedText as="h2" className="text-3xl font-bold text-gray-900 mb-4" tamil="சமீபத்திய வீடியோக்கள்">
-            Latest Reels
-          </TranslatedText>
-          <TranslatedText as="p" className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto" tamil="மதுரையின் சமீபத்திய வீடியோக்கள் மற்றும் ரீல்ஸ்களைப் பார்க்கவும்">
-            Watch the latest videos and reels from Madurai
-          </TranslatedText>
-        </div>
+    <>
+      <div className="bg-gray-50 border-t-2 border-blue-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center mb-8">
+            <TranslatedText as="h2" className="text-3xl font-bold text-gray-900 mb-4" tamil="சமீபத்திய வீடியோக்கள்">
+              Latest Reels
+            </TranslatedText>
+            <TranslatedText as="p" className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto" tamil="மதுரையின் சமீபத்திய வீடியோக்கள் மற்றும் ரீல்ஸ்களைப் பார்க்கவும்">
+              Watch the latest videos and reels from Madurai
+            </TranslatedText>
+          </div>
 
         {reels.length > 0 ? (
           <div className="relative">
@@ -136,17 +184,18 @@ export default function ReelsSection() {
                 <div
                   key={reel.id}
                   onClick={() => handleReelClick(reel)}
-                  className="flex-shrink-0 w-48 cursor-pointer group"
+                  className="flex-shrink-0 w-44 cursor-pointer group"
                 >
                   <div className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
                     {/* Thumbnail - Instagram Reel 9:16 aspect ratio */}
-                    <div className="relative bg-gray-200" style={{ aspectRatio: '9/16', height: '320px' }}>
+                    <div className="relative bg-gray-200 w-full" style={{ aspectRatio: '9/16' }}>
                       <img
-                        src={reel.thumbnailUrl || (reel.reelType === 'youtube' ? getYouTubeThumbnail(reel.videoUrl) : '/placeholder-video.jpg')}
+                        src={getThumbnailUrl(reel) || '/placeholder-video.jpg'}
                         alt={language === 'ta' && reel.title_ta ? reel.title_ta : reel.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
+                          console.log('Thumbnail failed to load for reel:', reel.id, 'URL:', target.src)
                           target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDE4MCAzMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMzIwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik03MCAyMDBMMTEwIDE4MEwxMTAgMjIwTDcwIDIwMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHR4dCB4PSI5MCIgeT0iMjUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNkI3MjgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiPk5vIFRodW1ibmFpbDwvdGV4dD4KPC9zdmc+'
                         }}
                       />
@@ -192,10 +241,10 @@ export default function ReelsSection() {
               {/* View All Reels Card */}
               <div
                 onClick={() => router.push('/videos')}
-                className="flex-shrink-0 w-48 cursor-pointer group"
+                className="flex-shrink-0 w-44 cursor-pointer group"
               >
-                <div className="relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform group-hover:scale-105 h-full">
-                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center" style={{ aspectRatio: '9/16', height: '320px' }}>
+                <div className="relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
+                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center w-full" style={{ aspectRatio: '9/16' }}>
                     <div className="text-center text-white">
                       <PlayIcon className="w-12 h-12 mx-auto mb-2 opacity-80" />
                       <div className="text-lg font-semibold">
@@ -227,7 +276,19 @@ export default function ReelsSection() {
             </TranslatedText>
           </div>
         )}
+        </div>
       </div>
-    </div>
+
+      {/* Video Player Modal */}
+      {selectedReel && (
+        <VideoPlayerModal
+          isOpen={isPlayerOpen}
+          onClose={handleClosePlayer}
+          videoUrl={selectedReel.videoUrl}
+          videoType={selectedReel.reelType as 'youtube' | 'instagram' | 'upload'}
+          title={language === 'ta' && selectedReel.title_ta ? selectedReel.title_ta : selectedReel.title}
+        />
+      )}
+    </>
   )
 }
