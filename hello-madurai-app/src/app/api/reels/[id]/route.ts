@@ -50,36 +50,14 @@ export async function PUT(
       orderNumber
     } = body
 
-    // Auto-generate thumbnail for YouTube and Instagram videos
-    let finalThumbnailUrl = thumbnailUrl
-
-    // If videoUrl is being updated, regenerate thumbnail based on platform
-    if (!thumbnailUrl && videoUrl) {
-      if (reelType === 'youtube') {
-        const videoId = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
-        if (videoId && videoId[1]) {
-          finalThumbnailUrl = `https://img.youtube.com/vi/${videoId[1]}/hqdefault.jpg`
-        }
-      } else if (reelType === 'instagram') {
-        const reelMatch = videoUrl.match(/instagram\.com\/(?:reel|p)\/([A-Za-z0-9_-]+)/)
-        if (reelMatch && reelMatch[1]) {
-          finalThumbnailUrl = `https://www.instagram.com/p/${reelMatch[1]}/media/?size=l`
-        }
-      }
-    }
-
-    // If thumbnail is explicitly provided, use it
-    if (thumbnailUrl !== undefined) {
-      finalThumbnailUrl = thumbnailUrl
-    }
-
+    // No auto-generation - use only manually provided thumbnails
     const reel = await prisma.reel.update({
       where: { id },
       data: {
         ...(title !== undefined && { title }),
         ...(title_ta !== undefined && { title_ta }),
         ...(videoUrl !== undefined && { videoUrl }),
-        ...(finalThumbnailUrl !== undefined && { thumbnailUrl: finalThumbnailUrl }),
+        ...(thumbnailUrl !== undefined && { thumbnailUrl }),
         ...(reelType !== undefined && { reelType }),
         ...(duration !== undefined && { duration }),
         ...(active !== undefined && { active }),

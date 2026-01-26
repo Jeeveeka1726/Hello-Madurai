@@ -260,13 +260,13 @@ export default function ReelsSection() {
 
               {/* View All Reels Card */}
               <div
-                onClick={() => router.push('/videos')}
+                onClick={() => window.open('https://www.youtube.com/@hellomadurai/shorts', '_blank')}
                 className="flex-shrink-0 cursor-pointer group"
-                style={{ width: '176px' }}
+                style={{ width: '160px' }}
               >
                 <div
                   className="relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex items-center justify-center"
-                  style={{ width: '176px', height: '312px' }}
+                  style={{ width: '160px', height: '280px' }}
                 >
                   <div className="text-center text-white">
                     <PlayIcon className="w-12 h-12 mx-auto mb-3 opacity-80" />

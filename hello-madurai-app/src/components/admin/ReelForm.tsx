@@ -90,22 +90,11 @@ export default function ReelForm({ reel, onClose, onSave }: ReelFormProps) {
   const handleVideoUrlChange = (url: string) => {
     setFormData(prev => ({ ...prev, videoUrl: url }))
 
-    // Auto-detect reel type and generate thumbnail
+    // Auto-detect reel type only (no thumbnail auto-generation)
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
       setFormData(prev => ({ ...prev, reelType: 'youtube' }))
-
-      // Auto-generate thumbnail for YouTube
-      const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
-      if (videoId && videoId[1]) {
-        setFormData(prev => ({
-          ...prev,
-          thumbnailUrl: `https://img.youtube.com/vi/${videoId[1]}/hqdefault.jpg`
-        }))
-      }
     } else if (url.includes('instagram.com')) {
       setFormData(prev => ({ ...prev, reelType: 'instagram' }))
-      // Note: Instagram thumbnails cannot be auto-generated due to API restrictions
-      // User must manually provide a thumbnail URL or upload an image
     } else {
       setFormData(prev => ({ ...prev, reelType: 'upload' }))
     }
@@ -248,21 +237,19 @@ export default function ReelForm({ reel, onClose, onSave }: ReelFormProps) {
           {/* Thumbnail URL */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Thumbnail URL {formData.reelType === 'instagram' && !formData.thumbnailUrl && <span className="text-red-600">*</span>}
+              Thumbnail URL
             </label>
             <input
               type="text"
               value={formData.thumbnailUrl}
               onChange={(e) => setFormData(prev => ({ ...prev, thumbnailUrl: e.target.value }))}
-              placeholder={formData.reelType === 'instagram' ? 'Optional - upload image below instead' : 'Auto-generated for YouTube'}
+              placeholder="Paste thumbnail URL or upload image below"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="text-xs text-gray-500 mt-1">
-              {formData.reelType === 'instagram'
-                ? (formData.thumbnailUrl
-                    ? '✓ Thumbnail URL set. You can paste a different URL or upload a new image below.'
-                    : '⚠️ Instagram thumbnails must be manually provided. Paste a URL here or upload an image below.')
-                : 'Leave empty for auto-generation (YouTube only)'}
+              {formData.thumbnailUrl
+                ? '✓ Thumbnail URL set. You can paste a different URL or upload a new image below.'
+                : 'Paste a thumbnail URL here or upload an image below.'}
             </p>
 
             {/* File Upload Option */}
@@ -354,9 +341,6 @@ export default function ReelForm({ reel, onClose, onSave }: ReelFormProps) {
                   </div>
                 )}
               </div>
-              {formData.reelType === 'youtube' && formData.thumbnailUrl && (
-                <p className="text-xs text-gray-500 mt-1">Auto-generated from YouTube</p>
-              )}
             </div>
           )}
 
