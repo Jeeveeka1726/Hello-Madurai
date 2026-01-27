@@ -113,11 +113,11 @@ export default function OffersPage() {
                 className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
               >
                 {/* Offer Image */}
-                <div className="relative h-48 overflow-hidden">
+                <div className="relative h-48 bg-gray-100 flex items-center justify-center">
                   <img
                     src={offer.imageUrl}
                     alt={language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
 

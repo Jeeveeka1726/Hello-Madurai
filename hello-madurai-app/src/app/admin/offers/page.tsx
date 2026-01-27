@@ -294,11 +294,13 @@ export default function AdminOffersPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
                     {offer.imageUrl && (
-                      <img
-                        src={offer.imageUrl}
-                        alt={offer.title}
-                        className="w-32 h-32 object-cover rounded-lg"
-                      />
+                      <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <img
+                          src={offer.imageUrl}
+                          alt={offer.title}
+                          className="w-full h-full object-contain rounded-lg"
+                        />
+                      </div>
                     )}
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg">{offer.title}</h3>
