@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
-import AdminSidebar from '@/components/admin/AdminSidebar'
 import Button from '@/components/ui/Button'
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
@@ -149,30 +148,29 @@ export default function AdminOffersPage() {
   }
 
   return (
-    <AdminSidebar>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {language === 'ta' ? 'சலுகைகள் நிர்வாகம்' : 'Offers Management'}
-          </h1>
-          <Button
-            onClick={() => {
-              setShowForm(!showForm)
-              setEditingOffer(null)
-              setFormData({
-                title: '',
-                title_ta: '',
-                imageUrl: '',
-                bookNowUrl: '',
-                active: true,
-                orderNumber: 0
-              })
-            }}
-          >
-            <PlusIcon className="h-5 w-5 mr-2" />
-            {language === 'ta' ? 'புதிய சலுகை' : 'New Offer'}
-          </Button>
-        </div>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">
+          {language === 'ta' ? 'சலுகைகள் நிர்வாகம்' : 'Offers Management'}
+        </h1>
+        <Button
+          onClick={() => {
+            setShowForm(!showForm)
+            setEditingOffer(null)
+            setFormData({
+              title: '',
+              title_ta: '',
+              imageUrl: '',
+              bookNowUrl: '',
+              active: true,
+              orderNumber: 0
+            })
+          }}
+        >
+          <PlusIcon className="h-5 w-5 mr-2" />
+          {language === 'ta' ? 'புதிய சலுகை' : 'New Offer'}
+        </Button>
+      </div>
 
         {/* Form */}
         {showForm && (
@@ -349,7 +347,7 @@ export default function AdminOffersPage() {
           )}
         </div>
       </div>
-    </AdminSidebar>
+    </div>
   )
 }
 
