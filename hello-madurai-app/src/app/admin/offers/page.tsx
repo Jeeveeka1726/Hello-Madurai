@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import AdminSidebar from '@/components/admin/AdminSidebar'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Button from '@/components/ui/Button'
+import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
-import ImageUpload from '@/components/admin/ImageUpload'
+import FileUpload from '@/components/admin/FileUpload'
 
 interface Offer {
   id: string
@@ -212,12 +212,12 @@ export default function AdminOffersPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {language === 'ta' ? 'படம்' : 'Image'}
-                  </label>
-                  <ImageUpload
-                    onImageUploaded={(url) => setFormData({ ...formData, imageUrl: url })}
-                    currentImageUrl={formData.imageUrl}
+                  <FileUpload
+                    label={language === 'ta' ? 'படம்' : 'Image'}
+                    fileType="image"
+                    currentFile={formData.imageUrl}
+                    onFileUpload={(url) => setFormData({ ...formData, imageUrl: url })}
+                    onUrlChange={(url) => setFormData({ ...formData, imageUrl: url })}
                   />
                 </div>
 
