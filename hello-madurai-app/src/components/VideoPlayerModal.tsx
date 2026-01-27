@@ -57,7 +57,10 @@ export default function VideoPlayerModal({
       // Extract video ID from various YouTube URL formats
       const videoId = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
       if (videoId) {
-        return `https://www.youtube.com/embed/${videoId[1]}?autoplay=1`
+        // Add parameters for iPhone autoplay support
+        // mute=1 is required for autoplay on iOS (browsers block unmuted autoplay)
+        // playsinline=1 allows inline playback on iOS instead of fullscreen
+        return `https://www.youtube.com/embed/${videoId[1]}?autoplay=1&mute=1&playsinline=1&rel=0&controls=1`
       }
     } else if (videoType === 'instagram') {
       // Instagram embed URL - support both /reel/ and /p/ patterns
