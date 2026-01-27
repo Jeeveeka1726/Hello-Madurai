@@ -172,8 +172,8 @@ export default function AdminOffersPage() {
         </Button>
       </div>
 
-        {/* Form */}
-        {showForm && (
+      {/* Form */}
+      {showForm && (
           <Card className="mb-6">
             <CardHeader>
               <CardTitle>
@@ -276,10 +276,10 @@ export default function AdminOffersPage() {
               </form>
             </CardContent>
           </Card>
-        )}
+      )}
 
-        {/* Offers List */}
-        <div className="grid gap-4">
+      {/* Offers List */}
+      <div className="grid gap-4">
           {loading && offers.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               {language === 'ta' ? 'ஏற்றுகிறது...' : 'Loading...'}
@@ -345,7 +345,6 @@ export default function AdminOffersPage() {
               </Card>
             ))
           )}
-        </div>
       </div>
     </div>
   )
