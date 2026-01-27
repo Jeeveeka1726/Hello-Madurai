@@ -10,7 +10,7 @@ import {
   PhoneIcon,
   CalendarIcon,
   BuildingOfficeIcon,
-  CreditCardIcon,
+  GiftIcon,
   ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
 import NewHeader from '@/components/layout/NewHeader'
@@ -86,12 +86,12 @@ export default function RootPage() {
       color: 'bg-red-600'
     },
     {
-      nameEn: 'Discount Card',
-      nameTa: 'தள்ளுபடி அட்டை',
-      descEn: 'Get discounts across Madurai',
-      descTa: 'நமது வணிக வாடிக்கையாளர்களின் தள்ளுபடிகளைப் பெறுங்கள்',
-      href: '/discount',
-      icon: CreditCardIcon,
+      nameEn: 'Offers',
+      nameTa: 'சலுகைகள்',
+      descEn: 'Get the best offers across Madurai',
+      descTa: 'மதுரை முழுவதும் சிறந்த சலுகைகளைப் பெறுங்கள்',
+      href: '/offers',
+      icon: GiftIcon,
       color: 'bg-yellow-500'
     },
     {
@@ -188,7 +188,7 @@ export default function RootPage() {
 
                 {/* Instagram */}
                 <a
-                  href="https://www.instagram.com/hellomadurai"
+                  href="https://www.instagram.com/hello_madurai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white hover:bg-pink-50 rounded-lg p-3 md:p-4 transition-all duration-200 hover:scale-110 shadow-lg"

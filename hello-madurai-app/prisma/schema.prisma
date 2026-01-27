@@ -408,6 +408,22 @@ model Image {
   @@map("images")
 }
 
+model Offer {
+  id          String   @id @default(cuid())
+  title       String
+  title_ta    String?
+  imageUrl    String
+  bookNowUrl  String
+  active      Boolean  @default(true)
+  orderNumber Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active])
+  @@index([orderNumber])
+  @@map("offers")
+}
+
 model Audio {
   id        String   @id @default(cuid())
   filename  String

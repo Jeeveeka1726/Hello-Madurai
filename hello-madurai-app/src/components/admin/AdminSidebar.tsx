@@ -14,7 +14,8 @@ import {
   XMarkIcon,
   ChartBarIcon,
   MegaphoneIcon,
-  VideoCameraIcon
+  VideoCameraIcon,
+  GiftIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAdmin } from '@/contexts/AdminContext'
@@ -84,6 +85,13 @@ const navigation = [
     name_ta: 'விளம்பரங்கள்',
     href: '/admin/ads',
     icon: MegaphoneIcon,
+    badge: 'new'
+  },
+  {
+    name: 'Offers',
+    name_ta: 'சலுகைகள்',
+    href: '/admin/offers',
+    icon: GiftIcon,
     badge: 'new'
   }
 ]

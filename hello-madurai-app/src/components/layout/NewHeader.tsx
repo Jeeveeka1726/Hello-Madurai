@@ -50,8 +50,8 @@ export default function NewHeader() {
 
   const othersDropdown = [
     {
-      name: t('nav.discount', 'Discount Card', 'தள்ளுபடி அட்டை'),
-      href: '/discount'
+      name: t('nav.offers', 'Offers', 'சலுகைகள்'),
+      href: '/offers'
     },
     {
       name: t('nav.helpline', 'Help Line', 'உதவி எண்'),
