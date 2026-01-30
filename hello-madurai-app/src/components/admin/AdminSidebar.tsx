@@ -15,7 +15,8 @@ import {
   ChartBarIcon,
   MegaphoneIcon,
   VideoCameraIcon,
-  GiftIcon
+  GiftIcon,
+  TagIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAdmin } from '@/contexts/AdminContext'
@@ -92,6 +93,13 @@ const navigation = [
     name_ta: 'சலுகைகள்',
     href: '/admin/offers',
     icon: GiftIcon,
+    badge: 'new'
+  },
+  {
+    name: 'Offer Categories',
+    name_ta: 'சலுகை வகைகள்',
+    href: '/admin/offer-categories',
+    icon: TagIcon,
     badge: 'new'
   }
 ]

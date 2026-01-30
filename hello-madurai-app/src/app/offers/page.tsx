@@ -15,17 +15,29 @@ interface Offer {
   bookNowUrl: string
   active: boolean
   orderNumber: number
+  category?: string
   createdAt: string
   updatedAt: string
+}
+
+interface Category {
+  id: string
+  name: string
+  name_ta: string | null
+  orderNumber: number
+  active: boolean
 }
 
 export default function OffersPage() {
   const { t, language } = useLanguage()
   const [offers, setOffers] = useState<Offer[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
 
   useEffect(() => {
     fetchOffers()
+    fetchCategories()
   }, [])
 
   const fetchOffers = async () => {
@@ -39,6 +51,22 @@ export default function OffersPage() {
       console.error('Error fetching offers:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/offer-categories')
+      if (response.ok) {
+        const data = await response.json()
+        setCategories(data)
+        // Set first category as default
+        if (data.length > 0) {
+          setSelectedCategory(data[0].id)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
     }
   }
 
@@ -62,6 +90,10 @@ export default function OffersPage() {
     }
   }
 
+  const filteredOffers = selectedCategory
+    ? offers.filter(offer => offer.category === selectedCategory)
+    : offers
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -84,21 +116,41 @@ export default function OffersPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <GiftIcon className="h-12 w-12 text-blue-600 mr-3" />
+          <div className="flex items-center justify-center mb-2">
+            <GiftIcon className="h-10 w-10 text-blue-600 mr-3" />
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              {language === 'ta' ? 'சலுகைகள்' : 'Offers'}
+              {language === 'ta' ? 'ஹலோ மதுரை தள்ளுபடி' : 'Hello Madurai Discount'}
             </h1>
           </div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {language === 'ta' 
-              ? 'மதுரை முழுவதும் சிறந்த சலுகைகளைப் பெறுங்கள்'
-              : 'Get the best offers across Madurai'}
+          <p className="text-lg text-gray-600 font-medium mb-6">
+            {language === 'ta' ? 'எல்லா நாட்களிலும் தள்ளுபடி' : 'Discount On All Days'}
           </p>
+
+          {/* Category Filter */}
+          <div className="mb-6">
+            <p className="text-gray-700 font-semibold mb-3">
+              {language === 'ta' ? 'வகையைத் தேர்ந்தெடுக்கவும்' : 'Select Category'}
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                    selectedCategory === category.id
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  {language === 'ta' ? category.name_ta : category.name}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Offers Grid */}
-        {offers.length === 0 ? (
+        {filteredOffers.length === 0 ? (
           <div className="text-center py-12">
             <GiftIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">
@@ -107,44 +159,44 @@ export default function OffersPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {offers.map((offer) => (
+            {filteredOffers.map((offer) => (
               <div
                 key={offer.id}
-                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                className="bg-white rounded-lg shadow-md overflow-hidden"
               >
+                {/* Offer Title */}
+                <div className="p-3 text-center border-b border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-900 uppercase">
+                    {language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}
+                  </h3>
+                </div>
+
                 {/* Offer Image */}
-                <div className="relative h-48 bg-gray-100 flex items-center justify-center">
+                <div className="relative bg-white">
                   <img
                     src={offer.imageUrl}
                     alt={language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}
-                    className="w-full h-full object-contain"
+                    className="w-full h-auto object-contain"
                   />
                 </div>
 
-                {/* Offer Content */}
-                <div className="p-4">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    {language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}
-                  </h3>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 mt-4">
-                    <a
-                      href={offer.bookNowUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg text-center transition-colors"
-                    >
-                      {language === 'ta' ? 'இப்போது முன்பதிவு செய்யுங்கள்' : 'Book Now'}
-                    </a>
-                    <button
-                      onClick={() => handleShare(offer)}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded-lg transition-colors"
-                      aria-label="Share"
-                    >
-                      <ShareIcon className="h-6 w-6" />
-                    </button>
-                  </div>
+                {/* Action Buttons */}
+                <div className="p-3 flex gap-2 border-t border-gray-200">
+                  <a
+                    href={offer.bookNowUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded text-center transition-colors"
+                  >
+                    {language === 'ta' ? 'இப்போது முன்பதிவு செய்யுங்கள்' : 'Book Now'}
+                  </a>
+                  <button
+                    onClick={() => handleShare(offer)}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded transition-colors"
+                    aria-label="Share"
+                  >
+                    <ShareIcon className="h-5 w-5" />
+                  </button>
                 </div>
               </div>
             ))}

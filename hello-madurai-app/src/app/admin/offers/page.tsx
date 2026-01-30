@@ -14,15 +14,25 @@ interface Offer {
   title_ta: string | null
   imageUrl: string
   bookNowUrl: string
+  category: string | null
   active: boolean
   orderNumber: number
   createdAt: string
   updatedAt: string
 }
 
+interface Category {
+  id: string
+  name: string
+  name_ta: string | null
+  orderNumber: number
+  active: boolean
+}
+
 export default function AdminOffersPage() {
   const { language } = useLanguage()
   const [offers, setOffers] = useState<Offer[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingOffer, setEditingOffer] = useState<Offer | null>(null)
@@ -31,12 +41,14 @@ export default function AdminOffersPage() {
     title_ta: '',
     imageUrl: '',
     bookNowUrl: '',
+    category: '',
     active: true,
     orderNumber: 0
   })
 
   useEffect(() => {
     fetchOffers()
+    fetchCategories()
   }, [])
 
   const fetchOffers = async () => {
@@ -51,6 +63,18 @@ export default function AdminOffersPage() {
       toast.error('Failed to fetch offers')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/offer-categories?includeInactive=true')
+      if (response.ok) {
+        const data = await response.json()
+        setCategories(data)
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
     }
   }
 
@@ -101,6 +125,7 @@ export default function AdminOffersPage() {
       title_ta: offer.title_ta || '',
       imageUrl: offer.imageUrl,
       bookNowUrl: offer.bookNowUrl,
+      category: offer.category || '',
       active: offer.active,
       orderNumber: offer.orderNumber
     })
@@ -162,6 +187,7 @@ export default function AdminOffersPage() {
               title_ta: '',
               imageUrl: '',
               bookNowUrl: '',
+              category: '',
               active: true,
               orderNumber: 0
             })
@@ -231,6 +257,24 @@ export default function AdminOffersPage() {
                     placeholder="https://example.com/book"
                     required
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {language === 'ta' ? 'வகை' : 'Category'}
+                  </label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  >
+                    <option value="">{language === 'ta' ? 'வகையைத் தேர்ந்தெடுக்கவும்' : 'Select Category'}</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {language === 'ta' ? cat.name_ta : cat.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
@@ -306,6 +350,11 @@ export default function AdminOffersPage() {
                       <h3 className="font-semibold text-lg">{offer.title}</h3>
                       {offer.title_ta && (
                         <p className="text-gray-600">{offer.title_ta}</p>
+                      )}
+                      {offer.category && (
+                        <p className="text-sm text-blue-600 mt-1">
+                          {language === 'ta' ? 'வகை:' : 'Category:'} {categories.find(c => c.id === offer.category)?.[language === 'ta' ? 'name_ta' : 'name'] || offer.category}
+                        </p>
                       )}
                       <p className="text-sm text-gray-500 mt-1">
                         {language === 'ta' ? 'முன்பதிவு URL:' : 'Book Now URL:'} {offer.bookNowUrl}
