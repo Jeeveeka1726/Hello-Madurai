@@ -13,7 +13,8 @@ interface Offer {
   title: string
   title_ta: string | null
   imageUrl: string
-  bookNowUrl: string
+  bookNowUrl: string | null
+  bookNowPhone: string | null
   category: string | null
   active: boolean
   orderNumber: number
@@ -41,6 +42,7 @@ export default function AdminOffersPage() {
     title_ta: '',
     imageUrl: '',
     bookNowUrl: '',
+    bookNowPhone: '',
     category: '',
     active: true,
     orderNumber: 0
@@ -103,6 +105,7 @@ export default function AdminOffersPage() {
           title_ta: '',
           imageUrl: '',
           bookNowUrl: '',
+          bookNowPhone: '',
           active: true,
           orderNumber: 0
         })
@@ -124,7 +127,8 @@ export default function AdminOffersPage() {
       title: offer.title,
       title_ta: offer.title_ta || '',
       imageUrl: offer.imageUrl,
-      bookNowUrl: offer.bookNowUrl,
+      bookNowUrl: offer.bookNowUrl || '',
+      bookNowPhone: offer.bookNowPhone || '',
       category: offer.category || '',
       active: offer.active,
       orderNumber: offer.orderNumber
@@ -187,6 +191,7 @@ export default function AdminOffersPage() {
               title_ta: '',
               imageUrl: '',
               bookNowUrl: '',
+              bookNowPhone: '',
               category: '',
               active: true,
               orderNumber: 0
@@ -245,18 +250,38 @@ export default function AdminOffersPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {language === 'ta' ? 'இப்போது முன்பதிவு செய்யுங்கள் URL' : 'Book Now URL'}
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.bookNowUrl}
-                    onChange={(e) => setFormData({ ...formData, bookNowUrl: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    placeholder="https://example.com/book"
-                    required
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {language === 'ta' ? 'முன்பதிவு URL (விரும்பினால்)' : 'Book Now URL (Optional)'}
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.bookNowUrl}
+                      onChange={(e) => setFormData({ ...formData, bookNowUrl: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      placeholder="https://example.com/book"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {language === 'ta' ? 'URL அல்லது தொலைபேசி எண்ணில் ஒன்றை நிரப்பவும்' : 'Fill either URL or Phone Number'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {language === 'ta' ? 'முன்பதிவு தொலைபேசி எண் (விரும்பினால்)' : 'Book Now Phone (Optional)'}
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.bookNowPhone}
+                      onChange={(e) => setFormData({ ...formData, bookNowPhone: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      placeholder="9876543210"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {language === 'ta' ? 'URL அல்லது தொலைபேசி எண்ணில் ஒன்றை நிரப்பவும்' : 'Fill either URL or Phone Number'}
+                    </p>
+                  </div>
                 </div>
 
                 <div>
@@ -356,9 +381,16 @@ export default function AdminOffersPage() {
                           {language === 'ta' ? 'வகை:' : 'Category:'} {categories.find(c => c.id === offer.category)?.[language === 'ta' ? 'name_ta' : 'name'] || offer.category}
                         </p>
                       )}
-                      <p className="text-sm text-gray-500 mt-1">
-                        {language === 'ta' ? 'முன்பதிவு URL:' : 'Book Now URL:'} {offer.bookNowUrl}
-                      </p>
+                      {offer.bookNowUrl && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          {language === 'ta' ? 'முன்பதிவு URL:' : 'Book Now URL:'} {offer.bookNowUrl}
+                        </p>
+                      )}
+                      {offer.bookNowPhone && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          {language === 'ta' ? 'முன்பதிவு தொலைபேசி:' : 'Book Now Phone:'} {offer.bookNowPhone}
+                        </p>
+                      )}
                       <p className="text-sm text-gray-500">
                         {language === 'ta' ? 'வரிசை:' : 'Order:'} {offer.orderNumber}
                       </p>

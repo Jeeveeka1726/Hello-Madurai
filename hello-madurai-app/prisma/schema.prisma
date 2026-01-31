@@ -423,16 +423,17 @@ model OfferCategory {
 }
 
 model Offer {
-  id          String   @id @default(cuid())
-  title       String
-  title_ta    String?
-  imageUrl    String
-  bookNowUrl  String
-  category    String?
-  active      Boolean  @default(true)
-  orderNumber Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  title          String
+  title_ta       String?
+  imageUrl       String
+  bookNowUrl     String?
+  bookNowPhone   String?
+  category       String?
+  active         Boolean  @default(true)
+  orderNumber    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@index([active])
   @@index([orderNumber])

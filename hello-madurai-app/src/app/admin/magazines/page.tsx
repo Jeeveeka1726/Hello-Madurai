@@ -391,8 +391,8 @@ export default function AdminMagazinesPage() {
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <TranslatedText
-                        english="Magazine PDF (Upload - Up to 100MB)"
-                        tamil="பத்திரிகை PDF (பதிவேற்றவும் - 100MB வரை)"
+                        english="Magazine PDF (Upload - Up to 10MB)"
+                        tamil="பத்திரிகை PDF (பதிவேற்றவும் - 10MB வரை)"
                       />
                       <span className="text-red-500 ml-1">*</span>
                     </label>

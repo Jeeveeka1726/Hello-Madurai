@@ -12,7 +12,8 @@ interface Offer {
   title: string
   title_ta: string | null
   imageUrl: string
-  bookNowUrl: string
+  bookNowUrl: string | null
+  bookNowPhone: string | null
   active: boolean
   orderNumber: number
   category?: string
@@ -90,9 +91,11 @@ export default function OffersPage() {
     }
   }
 
-  const filteredOffers = selectedCategory && categories.length > 0
-    ? offers.filter(offer => offer.category === selectedCategory)
-    : offers
+  // Show all offers if no categories exist
+  // If categories exist but offer has no category, show it in all categories
+  const filteredOffers = !selectedCategory || categories.length === 0
+    ? offers
+    : offers.filter(offer => !offer.category || offer.category === selectedCategory)
 
   if (loading) {
     return (
@@ -162,48 +165,57 @@ export default function OffersPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredOffers.map((offer) => (
-              <div
-                key={offer.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
-              >
-                {/* Offer Title */}
-                <div className="p-3 text-center border-b border-gray-200">
-                  <h3 className="text-sm font-semibold text-gray-900 uppercase">
-                    {language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}
-                  </h3>
-                </div>
+          <div className="flex flex-col gap-8 max-w-4xl mx-auto">
+            {filteredOffers.map((offer) => {
+              // Determine the booking link - prefer phone number if available, otherwise use URL
+              const bookingContact = offer.bookNowPhone || offer.bookNowUrl
+              if (!bookingContact) return null // Skip offers without booking info
 
-                {/* Offer Image */}
-                <div className="relative bg-white">
-                  <img
-                    src={offer.imageUrl}
-                    alt={language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}
-                    className="w-full h-auto object-contain"
-                  />
-                </div>
+              const isPhoneNumber = offer.bookNowPhone || (offer.bookNowUrl && /^[\d\s\-\+\(\)]+$/.test(offer.bookNowUrl))
+              const bookNowHref = isPhoneNumber
+                ? (bookingContact.startsWith('tel:') ? bookingContact : `tel:${bookingContact}`)
+                : bookingContact
 
-                {/* Action Buttons */}
-                <div className="p-3 flex gap-2 border-t border-gray-200">
-                  <a
-                    href={offer.bookNowUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded text-center transition-colors"
-                  >
-                    {language === 'ta' ? 'இப்போது முன்பதிவு செய்யுங்கள்' : 'Book Now'}
-                  </a>
-                  <button
-                    onClick={() => handleShare(offer)}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded transition-colors"
-                    aria-label="Share"
-                  >
-                    <ShareIcon className="h-5 w-5" />
-                  </button>
+              return (
+                <div key={offer.id} className="flex flex-col gap-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all p-6">
+                  {/* Offer Title */}
+                  <div className="text-center">
+                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 uppercase tracking-wide">
+                      {language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}
+                    </h3>
+                  </div>
+
+                  {/* Offer Image - Bigger and Separate */}
+                  <div className="relative rounded-xl overflow-hidden shadow-lg">
+                    <img
+                      src={offer.imageUrl}
+                      alt={language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}
+                      className="w-full h-auto object-contain"
+                    />
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 items-center justify-center">
+                    <a
+                      href={bookNowHref}
+                      target={isPhoneNumber ? '_self' : '_blank'}
+                      rel={isPhoneNumber ? undefined : 'noopener noreferrer'}
+                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-8 rounded-lg text-center transition-all shadow-md hover:shadow-lg text-base transform hover:scale-105"
+                    >
+                      {language === 'ta' ? 'முன்பதிவு' : 'Book Now'}
+                    </a>
+                    <button
+                      onClick={() => handleShare(offer)}
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-all shadow-sm hover:shadow-md border border-gray-300"
+                      aria-label="Share"
+                      title={language === 'ta' ? 'பகிர்' : 'Share'}
+                    >
+                      <ShareIcon className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

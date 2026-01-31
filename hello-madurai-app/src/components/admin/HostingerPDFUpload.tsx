@@ -3,10 +3,9 @@
 import { useState, useRef } from 'react'
 import Button from '@/components/ui/Button'
 import Card, { CardContent } from '@/components/ui/Card'
-import { DocumentIcon, CloudArrowUpIcon, LinkIcon } from '@heroicons/react/24/outline'
+import { DocumentIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
 import { useLanguage } from '@/contexts/LanguageContext'
-import PDFCompressionHelp from './PDFCompressionHelp'
 
 interface HostingerPDFUploadProps {
   label: string
@@ -22,8 +21,6 @@ export default function HostingerPDFUpload({
   className = ''
 }: HostingerPDFUploadProps) {
   const [uploading, setUploading] = useState(false)
-  const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file')
-  const [urlInput, setUrlInput] = useState(currentUrl || '')
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { t } = useLanguage()
@@ -37,7 +34,7 @@ export default function HostingerPDFUpload({
       return
     }
 
-    // Check file size (10MB limit for Cloudinary free plan)
+    // Check file size (10MB limit for Cloudinary free plan - raw files)
     const fileSizeKB = Math.round(file.size / 1024)
     const maxSizeKB = 10 * 1024 // 10MB in KB
 
@@ -96,10 +93,11 @@ export default function HostingerPDFUpload({
       if (!uploadResponse.ok) {
         const errorData = await uploadResponse.json()
         console.error('Cloudinary error:', errorData)
+        console.error('Full error details:', JSON.stringify(errorData, null, 2))
 
         // Handle specific Cloudinary errors
         if (errorData.error?.message?.includes('File size too large')) {
-          throw new Error('File size exceeds 10MB limit. Please compress your PDF or upgrade your Cloudinary plan.')
+          throw new Error('File size exceeds 10MB limit. Please compress your PDF using https://bigpdf.11zon.com')
         } else if (errorData.error?.message?.includes('Invalid file type')) {
           throw new Error('Invalid file type. Please upload a PDF file.')
         } else {
@@ -149,40 +147,12 @@ export default function HostingerPDFUpload({
     }
   }
 
-  const handleUrlSubmit = () => {
-    if (urlInput.trim()) {
-      onUpload(urlInput.trim())
-      toast.success(t('url_saved', 'URL saved successfully!', 'URL வெற்றிகரமாக சேமிக்கப்பட்டது!'))
-    }
-  }
-
   return (
     <div className={`space-y-4 ${className}`}>
       <label className="block text-sm font-medium text-gray-700">{label}</label>
-      
-      {/* Upload Mode Toggle */}
-      <div className="flex gap-2">
-        <Button
-          type="button"
-          variant={uploadMode === 'file' ? 'primary' : 'outline'}
-          size="sm"
-          onClick={() => setUploadMode('file')}
-        >
-          <CloudArrowUpIcon className="w-4 h-4 mr-1" />
-          {t('upload_file', 'Upload File', 'கோப்பு பதிவேற்றம்')}
-        </Button>
-        <Button
-          type="button"
-          variant={uploadMode === 'url' ? 'primary' : 'outline'}
-          size="sm"
-          onClick={() => setUploadMode('url')}
-        >
-          <LinkIcon className="w-4 h-4 mr-1" />
-          {t('enter_url', 'Enter URL', 'URL உள்ளிடவும்')}
-        </Button>
-      </div>
 
-      {uploadMode === 'file' ? (
+      {/* File Upload Only - No URL option */}
+      <div>
         <Card
           className={`border-2 border-dashed transition-colors ${
             isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
@@ -201,27 +171,6 @@ export default function HostingerPDFUpload({
               {t('max_size_10mb', 'Maximum file size: 10MB (Cloudinary free plan)', 'அதிகபட்ச கோப்பு அளவு: 10MB (Cloudinary இலவச திட்டம்)')}
             </p>
 
-            {/* Compression Help */}
-            <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-sm font-medium text-blue-800 mb-2">
-                {t('compression_help_title', 'Need to compress your PDF?', 'உங்கள் PDF ஐ சுருக்க வேண்டுமா?')}
-              </p>
-              <p className="text-xs text-blue-600 mb-2">
-                {t('compression_help', 'If your PDF is larger than 10MB, compress it first using 11zon', 'உங்கள் PDF 10MB க்கும் அதிகமாக இருந்தால், முதலில் 11zon பயன்படுத்தி சுருக்கவும்')}
-              </p>
-              <a
-                href="https://bigpdf.11zon.com/en/compress-pdf/compress-pdf-to-chosen-size.php"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 underline"
-              >
-                {t('manual_compression', 'Open 11zon Compression Tool →', '11zon சுருக்க கருவியைத் திறக்கவும் →')}
-              </a>
-            </div>
-
-            <div className="mb-4">
-              <PDFCompressionHelp />
-            </div>
             <Button
               type="button"
               variant="outline"
@@ -239,25 +188,7 @@ export default function HostingerPDFUpload({
             />
           </CardContent>
         </Card>
-      ) : (
-        <div className="space-y-2">
-          <input
-            type="url"
-            placeholder="https://drive.google.com/file/d/..."
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          <Button
-            type="button"
-            onClick={handleUrlSubmit}
-            disabled={!urlInput.trim()}
-            size="sm"
-          >
-            {t('save_url', 'Save URL', 'URL சேமிக்கவும்')}
-          </Button>
-        </div>
-      )}
+      </div>
 
       {/* Current File Display */}
       {currentUrl && (
