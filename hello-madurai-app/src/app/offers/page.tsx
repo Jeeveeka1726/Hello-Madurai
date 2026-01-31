@@ -90,7 +90,7 @@ export default function OffersPage() {
     }
   }
 
-  const filteredOffers = selectedCategory
+  const filteredOffers = selectedCategory && categories.length > 0
     ? offers.filter(offer => offer.category === selectedCategory)
     : offers
 
@@ -119,7 +119,7 @@ export default function OffersPage() {
           <div className="flex items-center justify-center mb-2">
             <GiftIcon className="h-10 w-10 text-blue-600 mr-3" />
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              {language === 'ta' ? 'ஹலோ மதுரை தள்ளுபடி' : 'Hello Madurai Discount'}
+              {language === 'ta' ? 'தள்ளுபடிகள்' : 'Discounts'}
             </h1>
           </div>
           <p className="text-lg text-gray-600 font-medium mb-6">
@@ -127,26 +127,30 @@ export default function OffersPage() {
           </p>
 
           {/* Category Filter */}
-          <div className="mb-6">
-            <p className="text-gray-700 font-semibold mb-3">
-              {language === 'ta' ? 'வகையைத் தேர்ந்தெடுக்கவும்' : 'Select Category'}
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    selectedCategory === category.id
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  {language === 'ta' ? category.name_ta : category.name}
-                </button>
-              ))}
+          {categories.length > 0 && (
+            <div className="mb-6">
+              <p className="text-gray-700 font-semibold mb-3 text-center">
+                {language === 'ta' ? 'வகையைத் தேர்ந்தெடுக்கவும்' : 'Select Category'}
+              </p>
+              <div className="overflow-x-auto scrollbar-hide">
+                <div className="flex gap-2 px-4 min-w-max justify-center">
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => setSelectedCategory(category.id)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap flex-shrink-0 ${
+                        selectedCategory === category.id
+                          ? 'bg-blue-600 text-white shadow-md'
+                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {language === 'ta' ? category.name_ta || category.name : category.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Offers Grid */}
