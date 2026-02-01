@@ -177,7 +177,7 @@ export default function OffersPage() {
                 : bookingContact
 
               return (
-                <div key={offer.id} className="flex flex-col gap-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all p-6">
+                <div key={offer.id} className="flex flex-col gap-6">
                   {/* Offer Title */}
                   <div className="text-center">
                     <h3 className="text-2xl md:text-3xl font-bold text-gray-900 uppercase tracking-wide">
@@ -186,11 +186,11 @@ export default function OffersPage() {
                   </div>
 
                   {/* Offer Image - Bigger and Separate */}
-                  <div className="relative rounded-xl overflow-hidden shadow-lg">
+                  <div className="relative">
                     <img
                       src={offer.imageUrl}
                       alt={language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}
-                      className="w-full h-auto object-contain"
+                      className="w-full h-auto object-contain border-4 border-blue-500 rounded-lg"
                     />
                   </div>
 
