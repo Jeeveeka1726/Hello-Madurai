@@ -50,7 +50,7 @@ export default function NewHeader() {
 
   const othersDropdown = [
     {
-      name: t('nav.offers', 'Offers', 'சலுகைகள்'),
+      name: t('nav.discount', 'Discount', 'தள்ளுபடி'),
       href: '/offers'
     },
     {
