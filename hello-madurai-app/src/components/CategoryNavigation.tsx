@@ -2,15 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { 
-  NewspaperIcon, 
-  CalendarIcon, 
-  RadioIcon, 
-  VideoCameraIcon, 
-  DocumentIcon, 
-  BuildingOfficeIcon, 
+import {
+  NewspaperIcon,
+  CalendarIcon,
+  RadioIcon,
+  VideoCameraIcon,
+  DocumentIcon,
+  BuildingOfficeIcon,
   PhoneIcon,
   CreditCardIcon,
+  GiftIcon,
   ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -25,6 +26,13 @@ interface CategoryItem {
 }
 
 const categories: CategoryItem[] = [
+  {
+    nameEn: 'Business',
+    nameTa: 'வணிகம்',
+    href: '/directory',
+    icon: BuildingOfficeIcon,
+    color: 'bg-indigo-500'
+  },
   {
     nameEn: 'News',
     nameTa: 'செய்திகள்',
@@ -54,18 +62,18 @@ const categories: CategoryItem[] = [
     color: 'bg-purple-500'
   },
   {
+    nameEn: 'Discounts',
+    nameTa: 'தள்ளுபடிகள்',
+    href: '/offers',
+    icon: GiftIcon,
+    color: 'bg-pink-500'
+  },
+  {
     nameEn: 'E-Paper',
     nameTa: 'பத்திரிகை',
     href: '/magazine',
     icon: DocumentIcon,
     color: 'bg-blue-500'
-  },
-  {
-    nameEn: 'Business',
-    nameTa: 'வணிகம்',
-    href: '/directory',
-    icon: BuildingOfficeIcon,
-    color: 'bg-indigo-500'
   },
   {
     nameEn: 'Help',

@@ -864,6 +864,20 @@ p {
   }
 }
 
+/* News ticker scrolling animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+}
+
 /* Faster transitions */
 .transition-fast {
   transition: all 0.15s ease-in-out;
@@ -875,13 +889,32 @@ img {
   height: auto;
 }
 
-/* Mobile-specific fixes ONLY - No global changes */
-@media (max-width: 768px) {
+/* Responsive fixes for different screen sizes */
+
+/* Small mobiles (up to 480px) - smaller height to prevent cutting */
+@media (max-width: 480px) {
   /* Prevent any element from causing horizontal scroll */
   body {
     position: relative;
   }
-  
+
+  /* Remove all padding from main element on mobile for offers page */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Offer images - smaller height for small screens */
+  .offer-image-mobile {
+    width: 100vw !important;
+    height: 45vh !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    margin-left: calc(-50vw + 50%) !important;
+    margin-right: calc(-50vw + 50%) !important;
+    max-width: none !important;
+  }
+
   /* Fix for images */
   img,
   video,
@@ -889,13 +922,13 @@ img {
     max-width: 100% !important;
     height: auto !important;
   }
-  
+
   /* Fix for tables */
   table {
     max-width: 100% !important;
     overflow-x: auto !important;
   }
-  
+
   /* Fix for pre and code blocks */
   pre,
   code {
@@ -903,18 +936,92 @@ img {
     overflow-x: auto !important;
     word-wrap: break-word !important;
   }
-  
-  /* Fix for text wrapping */
-  p,
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
+}
+
+/* Regular mobiles (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  /* Prevent any element from causing horizontal scroll */
+  body {
+    position: relative;
   }
+
+  /* Remove all padding from main element on mobile for offers page */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Offer images - good height for regular mobiles */
+  .offer-image-mobile {
+    width: 100vw !important;
+    height: 60vh !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    margin-left: calc(-50vw + 50%) !important;
+    margin-right: calc(-50vw + 50%) !important;
+    max-width: none !important;
+  }
+
+  /* Fix for images */
+  img,
+  video,
+  iframe {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Fix for tables */
+  table {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+  }
+
+  /* Fix for pre and code blocks */
+  pre,
+  code {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    word-wrap: break-word !important;
+  }
+}
+
+/* Small Tablets (769px to 900px) - responsive scaling */
+@media (min-width: 769px) and (max-width: 900px) {
+  .offer-image-mobile {
+    height: clamp(300px, 45vh, 400px) !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+}
+
+/* Large Tablets (901px to 1024px) - bigger responsive scaling */
+@media (min-width: 901px) and (max-width: 1024px) {
+  .offer-image-mobile {
+    height: clamp(350px, 50vh, 450px) !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+}
+
+/* Laptops/Desktop (1025px+) - bigger images */
+@media (min-width: 1025px) {
+  .offer-image-mobile {
+    height: 500px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+}
+
+/* Fix for text wrapping */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
 }
 
 /* Print styles */
