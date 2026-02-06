@@ -77,6 +77,15 @@ export default function RootPage() {
       color: 'bg-blue-500'
     },
     {
+      nameEn: 'Discounts',
+      nameTa: 'தள்ளுபடிகள்',
+      descEn: 'Discount On All Days',
+      descTa: 'எல்லா நாட்களிலும் தள்ளுபடி',
+      href: '/offers',
+      icon: GiftIcon,
+      color: 'bg-yellow-500'
+    },
+    {
       nameEn: 'Help Line',
       nameTa: 'உதவி எண்',
       descEn: 'Emergency and helpline numbers',
@@ -84,15 +93,6 @@ export default function RootPage() {
       href: '/helpline',
       icon: PhoneIcon,
       color: 'bg-red-600'
-    },
-    {
-      nameEn: 'Offers',
-      nameTa: 'சலுகைகள்',
-      descEn: 'Get the best offers across Madurai',
-      descTa: 'மதுரை முழுவதும் சிறந்த சலுகைகளைப் பெறுங்கள்',
-      href: '/offers',
-      icon: GiftIcon,
-      color: 'bg-yellow-500'
     },
     {
       nameEn: 'Contact',
