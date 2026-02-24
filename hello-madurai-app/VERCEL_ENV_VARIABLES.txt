@@ -13,6 +13,10 @@ NODE_ENV=production
 # Public App URL (Used for Open Graph images and social media sharing)
 NEXT_PUBLIC_APP_URL=https://hello-madurai-c5xr.vercel.app
 
+# Hostinger PDF Upload URL (server-side — DO NOT add NEXT_PUBLIC_ prefix)
+# Set this to the URL of upload-pdf-simple.php on your Hostinger server
+HOSTINGER_PDF_UPLOAD_URL=https://hellomadurai.com/upload-pdf.php
+
 # ========================================
 # PERFORMANCE OPTIMIZATIONS APPLIED
 # ========================================

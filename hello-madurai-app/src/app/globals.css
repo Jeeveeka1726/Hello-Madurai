@@ -685,6 +685,32 @@ p {
   }
 }
 
+/* Profile popup video containers - avoid aspect-video class conflicts */
+.profile-vertical-video {
+  height: 80vh !important;
+  max-height: 700px !important;
+  aspect-ratio: auto !important;
+}
+
+.profile-horizontal-video {
+  padding-bottom: 56.25% !important; /* 16:9 aspect ratio */
+  height: 0 !important;
+  aspect-ratio: auto !important;
+}
+
+/* Mobile specific overrides for profile videos */
+@media (max-width: 640px) {
+  .profile-vertical-video {
+    height: 75vh !important;
+    max-height: 600px !important;
+  }
+
+  .profile-horizontal-video {
+    padding-bottom: 56.25% !important;
+    height: 0 !important;
+  }
+}
+
 /* Mobile-first responsive typography */
 /* REMOVED: Global .prose white color rules - these were breaking admin editor */
 /* Typography rules are now only in .news-content and .event-description sections below */

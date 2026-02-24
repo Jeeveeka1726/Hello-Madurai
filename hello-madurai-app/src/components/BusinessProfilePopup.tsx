@@ -51,22 +51,87 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
   if (!isOpen) return null
 
   const getYouTubeEmbedUrl = (url: string) => {
-    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
+    // Match YouTube regular videos, shorts, and youtu.be links
+    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
     return videoId ? `https://www.youtube.com/embed/${videoId[1]}` : null
   }
 
+  const getInstagramEmbedUrl = (url: string) => {
+    // Match Instagram posts and reels
+    const match = url.match(/instagram\.com\/(p|reel|reels)\/([^/?#]+)/)
+    if (match) {
+      return `https://www.instagram.com/${match[1]}/${match[2]}/embed`
+    }
+    return null
+  }
+
+  const isVerticalVideo = (url: string) => {
+    // Check if it's a YouTube Short or Instagram video (vertical format)
+    return url.includes('/shorts/') || url.includes('instagram.com')
+  }
+
   const renderVideoContent = () => {
-    if (business.mainVideoUrl) {
-      const embedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
-      if (embedUrl) {
+    // Check profileVideo first, then fall back to mainVideoUrl
+    const videoUrl = business.profileVideo || business.mainVideoUrl
+
+    if (videoUrl) {
+      const isVertical = isVerticalVideo(videoUrl)
+
+      // Try YouTube first
+      const youtubeEmbedUrl = getYouTubeEmbedUrl(videoUrl)
+      if (youtubeEmbedUrl) {
+        if (isVertical) {
+          // Vertical video (YouTube Shorts) - use fixed height approach
+          return (
+            <div className="w-full mb-4 sm:mb-6 -mx-3 sm:mx-0 flex justify-center bg-black">
+              <div className="w-full sm:w-auto sm:max-w-md">
+                <div className="relative w-full profile-vertical-video">
+                  <iframe
+                    src={youtubeEmbedUrl}
+                    className="absolute inset-0 w-full h-full sm:rounded-lg"
+                    allowFullScreen
+                    title="Business Video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  />
+                </div>
+              </div>
+            </div>
+          )
+        } else {
+          // Horizontal video - standard 16:9
+          return (
+            <div className="w-full mb-4 sm:mb-6 -mx-3 sm:mx-0">
+              <div className="relative w-full profile-horizontal-video">
+                <iframe
+                  src={youtubeEmbedUrl}
+                  className="absolute inset-0 w-full h-full sm:rounded-lg"
+                  allowFullScreen
+                  title="Business Video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                />
+              </div>
+            </div>
+          )
+        }
+      }
+
+      // Try Instagram
+      const instagramEmbedUrl = getInstagramEmbedUrl(videoUrl)
+      if (instagramEmbedUrl) {
         return (
-          <div className="aspect-video w-full mb-4 sm:mb-6 -mx-3 sm:mx-0">
-            <iframe
-              src={embedUrl}
-              className="w-full h-full sm:rounded-lg"
-              allowFullScreen
-              title="Business Video"
-            />
+          <div className="w-full mb-4 sm:mb-6 -mx-3 sm:mx-0 flex justify-center bg-black">
+            <div className="w-full sm:w-auto sm:max-w-md">
+              <div className="relative w-full profile-vertical-video">
+                <iframe
+                  src={instagramEmbedUrl}
+                  className="absolute inset-0 w-full h-full sm:rounded-lg"
+                  allowFullScreen
+                  title="Business Video"
+                  scrolling="no"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                />
+              </div>
+            </div>
           </div>
         )
       }

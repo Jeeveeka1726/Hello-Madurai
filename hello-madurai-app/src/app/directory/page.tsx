@@ -24,6 +24,7 @@ import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Comments from '@/components/Comments'
 import BusinessProfilePopup from '@/components/BusinessProfilePopup'
+import TranslatedText from '@/components/TranslatedText'
 
 interface Subcategory {
   id: string
@@ -695,10 +696,12 @@ function DirectoryPageContent() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-            {t('directory.title', 'Business Directory', 'வணிக முகவரி')}
+            <TranslatedText tamil="வணிக முகவரி">Business Directory</TranslatedText>
           </h1>
           <p className="mt-2 text-base sm:text-lg text-gray-600 leading-relaxed">
-            {t('directory.subtitle', 'Find local businesses and services in Madurai', 'மதுரையில் உள்ளூர் வணிகங்கள் மற்றும் சேவைகளைக் கண்டறியுங்கள்')}
+            <TranslatedText tamil="மதுரையில் உள்ளூர் வணிகங்கள் மற்றும் சேவைகளைக் கண்டறியுங்கள்">
+              Find local businesses and services in Madurai
+            </TranslatedText>
           </p>
         </div>
 
@@ -707,7 +710,7 @@ function DirectoryPageContent() {
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
             <p className="mt-4 text-gray-600">
-              {t('directory.loading', 'Loading businesses...', 'வணிகங்கள் ஏற்றப்படுகின்றன...')}
+              <TranslatedText tamil="வணிகங்கள் ஏற்றப்படுகின்றன...">Loading businesses...</TranslatedText>
             </p>
           </div>
         )}
@@ -867,7 +870,7 @@ function DirectoryPageContent() {
                             </span>
                             {business.verified && (
                               <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
-                                ✓ {t('directory.verified', 'Verified', 'சரிபார்க்கப்பட்டது')}
+                                ✓ <TranslatedText tamil="சரிபார்க்கப்பட்டது">Verified</TranslatedText>
                               </span>
                             )}
                           </div>
@@ -1143,7 +1146,7 @@ function DirectoryPageContent() {
             {!loading && categories.length > 0 && !showNearbyBusinesses && (
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4 text-center">
-                  {t('directory.selectCategory', 'Select Category', 'வகையைத் தேர்ந்தெடுக்கவும்')}
+                  <TranslatedText tamil="வகையைத் தேர்ந்தெடுக்கவும்">Select Category</TranslatedText>
                 </h2>
                 <div className="overflow-x-auto pb-2">
                   <div className="flex gap-3 min-w-max px-4">
@@ -1195,7 +1198,7 @@ function DirectoryPageContent() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  <span>{t('directory.backToCategory', 'Back to Category', 'வகைக்கு திரும்பு')}</span>
+                  <span><TranslatedText tamil="வகைக்கு திரும்பு">Back to Category</TranslatedText></span>
                 </button>
               </div>
             )}
@@ -1206,7 +1209,7 @@ function DirectoryPageContent() {
                 {selectedCategoryObj.subcategories.length > 0 ? (
                   <>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-                      {t('directory.selectSubcategory', 'Select Subcategory', 'துணை வகையைத் தேர்ந்தெடுக்கவும்')}
+                      <TranslatedText tamil="துணை வகையைத் தேர்ந்தெடுக்கவும்">Select Subcategory</TranslatedText>
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                       {selectedCategoryObj.subcategories.map((subcategory) => (
@@ -1497,7 +1500,7 @@ function DirectoryPageContent() {
                         </div>
                         {business.verified && (
                           <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
-                            ✓ {t('directory.verified', 'Verified', 'சரிபார்க்கப்பட்டது')}
+                            ✓ <TranslatedText tamil="சரிபார்க்கப்பட்டது">Verified</TranslatedText>
                           </span>
                         )}
                       </div>
@@ -1776,7 +1779,9 @@ function DirectoryPageContent() {
               {filteredBusinesses.length === 0 && (
                 <div className="text-center py-12">
                   <p className="text-gray-500">
-                    {t('directory.noBusinesses', 'No businesses found matching your criteria', 'உங்கள் அளவுகோலுக்கு பொருந்தும் வணிகங்கள் எதுவும் கிடைக்கவில்லை')}
+                    <TranslatedText tamil="உங்கள் அளவுகோலுக்கு பொருந்தும் வணிகங்கள் எதுவும் கிடைக்கவில்லை">
+                      No businesses found matching your criteria
+                    </TranslatedText>
                   </p>
                 </div>
               )}

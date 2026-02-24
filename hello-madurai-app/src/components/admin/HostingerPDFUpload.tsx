@@ -34,9 +34,9 @@ export default function HostingerPDFUpload({
       return
     }
 
-    // Check file size (10MB limit for Cloudinary free plan - raw files)
+    // Check file size (50MB limit — Hostinger supports large uploads)
     const fileSizeKB = Math.round(file.size / 1024)
-    const maxSizeKB = 10 * 1024 // 10MB in KB
+    const maxSizeKB = 50 * 1024 // 50MB in KB
 
     console.log(`📊 File size: ${fileSizeKB}KB (max: ${maxSizeKB}KB)`)
 
@@ -45,8 +45,8 @@ export default function HostingerPDFUpload({
       console.log('❌ File too large:', fileSizeMB, 'MB')
       toast.error(
         t('file_too_large',
-          `File too large (${fileSizeMB}MB). Maximum size is 10MB. Please compress your PDF first: https://bigpdf.11zon.com`,
-          `கோப்பு மிகப் பெரியது (${fileSizeMB}MB). அதிகபட்ச அளவு 10MB. முதலில் PDF ஐ சுருக்கவும்: https://bigpdf.11zon.com`
+          `File too large (${fileSizeMB}MB). Maximum size is 50MB. Please compress your PDF first: https://bigpdf.11zon.com`,
+          `கோப்பு மிகப் பெரியது (${fileSizeMB}MB). அதிகபட்ச அளவு 50MB. முதலில் PDF ஐ சுருக்கவும்: https://bigpdf.11zon.com`
         ),
         { duration: 8000 }
       )
@@ -55,68 +55,55 @@ export default function HostingerPDFUpload({
 
     console.log(`📤 Starting upload for PDF: ${fileSizeKB}KB`)
     try {
-      await uploadToCloudinary(file)
+      await uploadToHostinger(file)
     } catch (error) {
       console.error('❌ Upload failed:', error)
       toast.error('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
     }
   }
 
-  const uploadToCloudinary = async (file: File) => {
+  const uploadToHostinger = async (file: File) => {
 
     setUploading(true)
 
     try {
-      // Step 1: Get upload signature from our API
-      console.log('🔑 Getting upload signature...')
-      const signatureResponse = await fetch('/api/upload/magazine-pdf')
-      if (!signatureResponse.ok) {
-        throw new Error('Failed to get upload signature')
-      }
-      const { signature, timestamp, cloudName, apiKey, folder, resourceType } = await signatureResponse.json()
+      // Upload via Next.js proxy route — keeps Hostinger URL server-side, avoids CORS
+      const uploadUrl = '/api/upload/magazine-pdf'
 
-      // Step 2: Upload directly to Cloudinary
-      console.log('📤 Uploading PDF to Cloudinary...')
+      console.log('📤 Uploading PDF to Hostinger via proxy...')
       const formData = new FormData()
-      formData.append('file', file)
-      formData.append('signature', signature)
-      formData.append('timestamp', timestamp.toString())
-      formData.append('api_key', apiKey)
-      formData.append('folder', folder)
-      // Note: resource_type is NOT included in form data for /raw/upload endpoint
+      formData.append('pdf', file)
 
-      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`, {
+      const uploadResponse = await fetch(uploadUrl, {
         method: 'POST',
         body: formData
       })
 
       if (!uploadResponse.ok) {
-        const errorData = await uploadResponse.json()
-        console.error('Cloudinary error:', errorData)
-        console.error('Full error details:', JSON.stringify(errorData, null, 2))
-
-        // Handle specific Cloudinary errors
-        if (errorData.error?.message?.includes('File size too large')) {
-          throw new Error('File size exceeds 10MB limit. Please compress your PDF using https://bigpdf.11zon.com')
-        } else if (errorData.error?.message?.includes('Invalid file type')) {
-          throw new Error('Invalid file type. Please upload a PDF file.')
-        } else {
-          throw new Error(errorData.error?.message || 'Cloudinary upload failed')
+        let errorMessage = `Upload failed (${uploadResponse.status})`
+        try {
+          const errorData = await uploadResponse.json()
+          errorMessage = errorData?.error || errorMessage
+        } catch {
+          // ignore JSON parse errors
         }
+        throw new Error(errorMessage)
       }
 
       const uploadData = await uploadResponse.json()
-      console.log('✅ PDF uploaded to Cloudinary:', uploadData.secure_url)
+      if (!uploadData?.url) {
+        throw new Error('Upload succeeded but no URL returned')
+      }
 
-      // Step 3: Return the Cloudinary URL
-      onUpload(uploadData.secure_url)
+      console.log('✅ PDF uploaded to Hostinger:', uploadData.url)
+      onUpload(uploadData.url)
       toast.success(t('upload_success', 'PDF uploaded successfully!', 'PDF வெற்றிகரமாக பதிவேற்றப்பட்டது!'))
     } catch (error) {
       console.error('Upload error:', error)
       const errorMessage = error instanceof Error ? error.message : 'Upload failed. Please try again.'
 
       // Show specific error message or fallback to generic message
-      if (errorMessage.includes('File size')) {
+      if (errorMessage.includes('File size') || errorMessage.includes('large') || errorMessage.includes('too large')) {
         toast.error(errorMessage, { duration: 8000 })
       } else {
         toast.error(t('upload_failed', errorMessage, 'பதிவேற்றம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.'), { duration: 6000 })
@@ -129,7 +116,7 @@ export default function HostingerPDFUpload({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
-    
+
     const files = Array.from(e.dataTransfer.files)
     if (files.length > 0) {
       handleFileUpload(files[0])
@@ -154,9 +141,8 @@ export default function HostingerPDFUpload({
       {/* File Upload Only - No URL option */}
       <div>
         <Card
-          className={`border-2 border-dashed transition-colors ${
-            isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
-          }`}
+          className={`border-2 border-dashed transition-colors ${isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
+            }`}
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onDragEnter={() => setIsDragging(true)}
@@ -168,7 +154,7 @@ export default function HostingerPDFUpload({
               {t('drag_drop_pdf', 'Drag and drop PDF file here, or click to select', 'PDF கோப்பை இங்கே இழுத்து விடவும் அல்லது தேர்ந்தெடுக்க கிளிக் செய்யவும்')}
             </p>
             <p className="text-xs text-gray-500 mb-4">
-              {t('max_size_10mb', 'Maximum file size: 10MB (Cloudinary free plan)', 'அதிகபட்ச கோப்பு அளவு: 10MB (Cloudinary இலவச திட்டம்)')}
+              {t('max_size_50mb', 'Maximum file size: 50MB', 'அதிகபட்ச கோப்பு அளவு: 50MB')}
             </p>
 
             <Button
