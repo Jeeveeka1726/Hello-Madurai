@@ -67,10 +67,16 @@ export default function HostingerPDFUpload({
     setUploading(true)
 
     try {
-      // Upload via Next.js proxy route — keeps Hostinger URL server-side, avoids CORS
-      const uploadUrl = '/api/upload/magazine-pdf'
+      // Upload directly to Hostinger PHP endpoint from browser.
+      // This bypasses Next.js body size limits (4.5MB default in App Router).
+      // CORS is enabled on Hostinger via .htaccess (Access-Control-Allow-Origin: *)
+      const uploadUrl = process.env.NEXT_PUBLIC_HOSTINGER_PDF_UPLOAD_URL
 
-      console.log('📤 Uploading PDF to Hostinger via proxy...')
+      if (!uploadUrl) {
+        throw new Error('PDF upload URL not configured. Set NEXT_PUBLIC_HOSTINGER_PDF_UPLOAD_URL.')
+      }
+
+      console.log('📤 Uploading PDF directly to Hostinger...')
       const formData = new FormData()
       formData.append('pdf', file)
 
@@ -104,6 +110,8 @@ export default function HostingerPDFUpload({
 
       // Show specific error message or fallback to generic message
       if (errorMessage.includes('File size') || errorMessage.includes('large') || errorMessage.includes('too large')) {
+        toast.error(errorMessage, { duration: 8000 })
+      } else if (errorMessage.includes('not configured')) {
         toast.error(errorMessage, { duration: 8000 })
       } else {
         toast.error(t('upload_failed', errorMessage, 'பதிவேற்றம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.'), { duration: 6000 })
