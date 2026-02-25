@@ -14,6 +14,9 @@ interface HostingerPDFUploadProps {
   className?: string
 }
 
+const CHUNK_SIZE = 1 * 1024 * 1024 // 1MB per chunk — safely under any server limit
+const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB max total
+
 export default function HostingerPDFUpload({
   label,
   currentUrl,
@@ -21,6 +24,7 @@ export default function HostingerPDFUpload({
   className = ''
 }: HostingerPDFUploadProps) {
   const [uploading, setUploading] = useState(false)
+  const [progress, setProgress] = useState(0) // 0–100
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { t } = useLanguage()
@@ -29,106 +33,109 @@ export default function HostingerPDFUpload({
     console.log('🚀 handleFileUpload called with:', file.name, file.type, file.size)
 
     if (!file.type.includes('pdf')) {
-      console.log('❌ Invalid file type:', file.type)
       toast.error(t('invalid_pdf', 'Please select a PDF file', 'PDF கோப்பைத் தேர்ந்தெடுக்கவும்'))
       return
     }
 
-    // Check file size (50MB limit — Hostinger supports large uploads)
-    const fileSizeKB = Math.round(file.size / 1024)
-    const maxSizeKB = 50 * 1024 // 50MB in KB
-
-    console.log(`📊 File size: ${fileSizeKB}KB (max: ${maxSizeKB}KB)`)
-
-    if (file.size > maxSizeKB * 1024) {
+    if (file.size > MAX_FILE_SIZE) {
       const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1)
-      console.log('❌ File too large:', fileSizeMB, 'MB')
       toast.error(
         t('file_too_large',
-          `File too large (${fileSizeMB}MB). Maximum size is 50MB. Please compress your PDF first: https://bigpdf.11zon.com`,
-          `கோப்பு மிகப் பெரியது (${fileSizeMB}MB). அதிகபட்ச அளவு 50MB. முதலில் PDF ஐ சுருக்கவும்: https://bigpdf.11zon.com`
+          `File too large (${fileSizeMB}MB). Maximum size is 50MB. Compress at: https://bigpdf.11zon.com`,
+          `கோப்பு மிகப் பெரியது (${fileSizeMB}MB). அதிகபட்ச அளவு 50MB.`
         ),
         { duration: 8000 }
       )
       return
     }
 
+    const fileSizeKB = Math.round(file.size / 1024)
+    console.log(`📊 File size: ${fileSizeKB}KB (max: ${MAX_FILE_SIZE / 1024}KB)`)
     console.log(`📤 Starting upload for PDF: ${fileSizeKB}KB`)
+
     try {
-      await uploadToHostinger(file)
+      await uploadInChunks(file)
     } catch (error) {
       console.error('❌ Upload failed:', error)
       toast.error('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
     }
   }
 
-  const uploadToHostinger = async (file: File) => {
+  const uploadInChunks = async (file: File) => {
+    const uploadUrl = process.env.NEXT_PUBLIC_HOSTINGER_PDF_UPLOAD_URL
+
+    if (!uploadUrl) {
+      throw new Error('PDF upload URL not configured. Set NEXT_PUBLIC_HOSTINGER_PDF_UPLOAD_URL.')
+    }
 
     setUploading(true)
+    setProgress(0)
 
-    try {
-      // Upload directly to Hostinger PHP endpoint from browser.
-      // This bypasses Next.js body size limits (4.5MB default in App Router).
-      // CORS is enabled on Hostinger via .htaccess (Access-Control-Allow-Origin: *)
-      const uploadUrl = process.env.NEXT_PUBLIC_HOSTINGER_PDF_UPLOAD_URL
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
+    // Unique ID for this upload session (used by PHP to group chunks)
+    const fileId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+    const cleanFilename = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
 
-      if (!uploadUrl) {
-        throw new Error('PDF upload URL not configured. Set NEXT_PUBLIC_HOSTINGER_PDF_UPLOAD_URL.')
-      }
+    console.log(`📦 Uploading in ${totalChunks} chunk(s) of ${CHUNK_SIZE / 1024}KB each`)
 
-      console.log('📤 Uploading PDF directly to Hostinger...')
+    let finalUrl: string | null = null
+
+    for (let i = 0; i < totalChunks; i++) {
+      const start = i * CHUNK_SIZE
+      const end = Math.min(start + CHUNK_SIZE, file.size)
+      const chunk = file.slice(start, end)
+
       const formData = new FormData()
-      formData.append('pdf', file)
+      formData.append('chunk', chunk, cleanFilename)
+      formData.append('chunkIndex', i.toString())
+      formData.append('totalChunks', totalChunks.toString())
+      formData.append('fileId', fileId)
+      formData.append('filename', cleanFilename)
 
-      const uploadResponse = await fetch(uploadUrl, {
+      console.log(`📤 Uploading chunk ${i + 1}/${totalChunks} (${Math.round(chunk.size / 1024)}KB)`)
+
+      const response = await fetch(uploadUrl, {
         method: 'POST',
-        body: formData
+        body: formData,
       })
 
-      if (!uploadResponse.ok) {
-        let errorMessage = `Upload failed (${uploadResponse.status})`
+      if (!response.ok) {
+        let errorMessage = `Chunk ${i + 1} upload failed (${response.status})`
         try {
-          const errorData = await uploadResponse.json()
+          const errorData = await response.json()
           errorMessage = errorData?.error || errorMessage
-        } catch {
-          // ignore JSON parse errors
-        }
+        } catch { /* ignore */ }
         throw new Error(errorMessage)
       }
 
-      const uploadData = await uploadResponse.json()
-      if (!uploadData?.url) {
-        throw new Error('Upload succeeded but no URL returned')
-      }
+      const data = await response.json()
 
-      console.log('✅ PDF uploaded to Hostinger:', uploadData.url)
-      onUpload(uploadData.url)
-      toast.success(t('upload_success', 'PDF uploaded successfully!', 'PDF வெற்றிகரமாக பதிவேற்றப்பட்டது!'))
-    } catch (error) {
-      console.error('Upload error:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Upload failed. Please try again.'
+      // Update progress bar
+      const pct = Math.round(((i + 1) / totalChunks) * 100)
+      setProgress(pct)
 
-      // Show specific error message or fallback to generic message
-      if (errorMessage.includes('File size') || errorMessage.includes('large') || errorMessage.includes('too large')) {
-        toast.error(errorMessage, { duration: 8000 })
-      } else if (errorMessage.includes('not configured')) {
-        toast.error(errorMessage, { duration: 8000 })
-      } else {
-        toast.error(t('upload_failed', errorMessage, 'பதிவேற்றம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.'), { duration: 6000 })
+      // Last chunk returns the assembled file URL
+      if (data.url) {
+        finalUrl = data.url
+        console.log('✅ PDF assembled and saved:', finalUrl)
       }
-    } finally {
-      setUploading(false)
     }
+
+    if (!finalUrl) {
+      throw new Error('Upload completed but no URL returned from server')
+    }
+
+    onUpload(finalUrl)
+    toast.success(t('upload_success', 'PDF uploaded successfully!', 'PDF வெற்றிகரமாக பதிவேற்றப்பட்டது!'))
+    setUploading(false)
+    setProgress(0)
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(false)
-
     const files = Array.from(e.dataTransfer.files)
-    if (files.length > 0) {
-      handleFileUpload(files[0])
-    }
+    if (files.length > 0) handleFileUpload(files[0])
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -137,8 +144,6 @@ export default function HostingerPDFUpload({
     if (files && files.length > 0) {
       console.log('📄 Selected file:', files[0].name, files[0].size, 'bytes')
       handleFileUpload(files[0])
-    } else {
-      console.log('❌ No files selected')
     }
   }
 
@@ -146,24 +151,37 @@ export default function HostingerPDFUpload({
     <div className={`space-y-4 ${className}`}>
       <label className="block text-sm font-medium text-gray-700">{label}</label>
 
-      {/* File Upload Only - No URL option */}
-      <div>
-        <Card
-          className={`border-2 border-dashed transition-colors ${isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
-            }`}
-          onDrop={handleDrop}
-          onDragOver={(e) => e.preventDefault()}
-          onDragEnter={() => setIsDragging(true)}
-          onDragLeave={() => setIsDragging(false)}
-        >
-          <CardContent className="p-6 text-center">
+      <div
+        onDrop={handleDrop}
+        onDragOver={(e) => e.preventDefault()}
+        onDragEnter={() => setIsDragging(true)}
+        onDragLeave={() => setIsDragging(false)}
+      >
+        <div className={`border-2 border-dashed rounded-lg transition-colors ${isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
+          }`}>
+          <div className="p-6 text-center">
             <DocumentIcon className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-600 mb-1">
               {t('drag_drop_pdf', 'Drag and drop PDF file here, or click to select', 'PDF கோப்பை இங்கே இழுத்து விடவும் அல்லது தேர்ந்தெடுக்க கிளிக் செய்யவும்')}
             </p>
             <p className="text-xs text-gray-500 mb-4">
               {t('max_size_50mb', 'Maximum file size: 50MB', 'அதிகபட்ச கோப்பு அளவு: 50MB')}
             </p>
+
+            {/* Progress bar (visible while uploading) */}
+            {uploading && (
+              <div className="mb-4">
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <p className="text-xs text-blue-600 mt-1">
+                  {t('uploading_progress', `Uploading... ${progress}%`, `பதிவேற்றுகிறது... ${progress}%`)}
+                </p>
+              </div>
+            )}
 
             <Button
               type="button"
@@ -171,7 +189,9 @@ export default function HostingerPDFUpload({
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
             >
-              {uploading ? t('uploading', 'Uploading...', 'பதிவேற்றுகிறது...') : t('select_file', 'Select File', 'கோப்பைத் தேர்ந்தெடுக்கவும்')}
+              {uploading
+                ? t('uploading', `Uploading ${progress}%...`, `பதிவேற்றுகிறது ${progress}%...`)
+                : t('select_file', 'Select File', 'கோப்பைத் தேர்ந்தெடுக்கவும்')}
             </Button>
             <input
               ref={fileInputRef}
@@ -180,8 +200,8 @@ export default function HostingerPDFUpload({
               onChange={handleFileSelect}
               className="hidden"
             />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Current File Display */}
