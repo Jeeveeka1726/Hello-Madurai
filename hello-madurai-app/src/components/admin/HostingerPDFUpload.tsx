@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react'
 import Button from '@/components/ui/Button'
-import Card, { CardContent } from '@/components/ui/Card'
 import { DocumentIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -14,8 +13,8 @@ interface HostingerPDFUploadProps {
   className?: string
 }
 
-const CHUNK_SIZE = 1 * 1024 * 1024 // 1MB per chunk — safely under any server limit
-const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB max total
+const MAX_FILE_SIZE_MB = 10
+const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024
 
 export default function HostingerPDFUpload({
   label,
@@ -24,7 +23,7 @@ export default function HostingerPDFUpload({
   className = ''
 }: HostingerPDFUploadProps) {
   const [uploading, setUploading] = useState(false)
-  const [progress, setProgress] = useState(0) // 0–100
+  const [progress, setProgress] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { t } = useLanguage()
@@ -41,8 +40,8 @@ export default function HostingerPDFUpload({
       const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1)
       toast.error(
         t('file_too_large',
-          `File too large (${fileSizeMB}MB). Maximum size is 50MB. Compress at: https://bigpdf.11zon.com`,
-          `கோப்பு மிகப் பெரியது (${fileSizeMB}MB). அதிகபட்ச அளவு 50MB.`
+          `File too large (${fileSizeMB}MB). Maximum is ${MAX_FILE_SIZE_MB}MB. Compress at: https://bigpdf.11zon.com`,
+          `கோப்பு மிகப் பெரியது (${fileSizeMB}MB). அதிகபட்ச அளவு ${MAX_FILE_SIZE_MB}MB. சுருக்கவும்: https://bigpdf.11zon.com`
         ),
         { duration: 8000 }
       )
@@ -51,82 +50,62 @@ export default function HostingerPDFUpload({
 
     const fileSizeKB = Math.round(file.size / 1024)
     console.log(`📊 File size: ${fileSizeKB}KB (max: ${MAX_FILE_SIZE / 1024}KB)`)
-    console.log(`📤 Starting upload for PDF: ${fileSizeKB}KB`)
 
     try {
-      await uploadInChunks(file)
+      setUploading(true)
+      setProgress(10)
+      await uploadToCloudinary(file)
     } catch (error) {
       console.error('❌ Upload failed:', error)
-      toast.error('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
+      const msg = error instanceof Error ? error.message : 'Upload failed'
+      toast.error(t('upload_failed', msg, 'பதிவேற்றம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.'), { duration: 6000 })
+    } finally {
+      setUploading(false)
+      setProgress(0)
     }
   }
 
-  const uploadInChunks = async (file: File) => {
-    // Upload via internal Next.js API — each 1MB chunk is safely under any body size limit.
-    // The API assembles chunks and saves the final PDF to /public/uploads/magazines/.
-    const uploadUrl = '/api/upload/magazine-pdf'
-
-    setUploading(true)
-    setProgress(0)
-
-    const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
-    // Unique ID for this upload session (used by PHP to group chunks)
-    const fileId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-    const cleanFilename = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
-
-    console.log(`📦 Uploading in ${totalChunks} chunk(s) of ${CHUNK_SIZE / 1024}KB each`)
-
-    let finalUrl: string | null = null
-
-    for (let i = 0; i < totalChunks; i++) {
-      const start = i * CHUNK_SIZE
-      const end = Math.min(start + CHUNK_SIZE, file.size)
-      const chunk = file.slice(start, end)
-
-      const formData = new FormData()
-      formData.append('chunk', chunk, cleanFilename)
-      formData.append('chunkIndex', i.toString())
-      formData.append('totalChunks', totalChunks.toString())
-      formData.append('fileId', fileId)
-      formData.append('filename', cleanFilename)
-
-      console.log(`📤 Uploading chunk ${i + 1}/${totalChunks} (${Math.round(chunk.size / 1024)}KB)`)
-
-      const response = await fetch(uploadUrl, {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (!response.ok) {
-        let errorMessage = `Chunk ${i + 1} upload failed (${response.status})`
-        try {
-          const errorData = await response.json()
-          errorMessage = errorData?.error || errorMessage
-        } catch { /* ignore */ }
-        throw new Error(errorMessage)
-      }
-
-      const data = await response.json()
-
-      // Update progress bar
-      const pct = Math.round(((i + 1) / totalChunks) * 100)
-      setProgress(pct)
-
-      // Last chunk returns the assembled file URL
-      if (data.url) {
-        finalUrl = data.url
-        console.log('✅ PDF assembled and saved:', finalUrl)
-      }
+  const uploadToCloudinary = async (file: File) => {
+    // Step 1: get signed upload token from our API (server keeps the secret)
+    setProgress(20)
+    const sigRes = await fetch('/api/upload/magazine-pdf')
+    if (!sigRes.ok) {
+      const err = await sigRes.json().catch(() => ({}))
+      throw new Error(err?.error || 'Failed to get upload signature')
     }
 
-    if (!finalUrl) {
-      throw new Error('Upload completed but no URL returned from server')
+    const { signature, timestamp, cloudName, apiKey, folder, resourceType } = await sigRes.json()
+
+    // Step 2: upload directly to Cloudinary — bypasses Vercel entirely, no body size limit
+    setProgress(40)
+    console.log('📤 Uploading PDF directly to Cloudinary...')
+
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('signature', signature)
+    formData.append('timestamp', String(timestamp))
+    formData.append('api_key', apiKey)
+    formData.append('folder', folder)
+
+    const uploadRes = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+      { method: 'POST', body: formData }
+    )
+
+    setProgress(90)
+
+    if (!uploadRes.ok) {
+      const errData = await uploadRes.json().catch(() => ({}))
+      throw new Error(errData?.error?.message || `Cloudinary upload failed (${uploadRes.status})`)
     }
 
-    onUpload(finalUrl)
+    const data = await uploadRes.json()
+    if (!data.secure_url) throw new Error('No URL returned from Cloudinary')
+
+    console.log('✅ PDF uploaded to Cloudinary:', data.secure_url)
+    setProgress(100)
+    onUpload(data.secure_url)
     toast.success(t('upload_success', 'PDF uploaded successfully!', 'PDF வெற்றிகரமாக பதிவேற்றப்பட்டது!'))
-    setUploading(false)
-    setProgress(0)
   }
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -137,7 +116,6 @@ export default function HostingerPDFUpload({
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('📁 File input changed:', e.target.files)
     const files = e.target.files
     if (files && files.length > 0) {
       console.log('📄 Selected file:', files[0].name, files[0].size, 'bytes')
@@ -163,20 +141,24 @@ export default function HostingerPDFUpload({
               {t('drag_drop_pdf', 'Drag and drop PDF file here, or click to select', 'PDF கோப்பை இங்கே இழுத்து விடவும் அல்லது தேர்ந்தெடுக்க கிளிக் செய்யவும்')}
             </p>
             <p className="text-xs text-gray-500 mb-4">
-              {t('max_size_50mb', 'Maximum file size: 50MB', 'அதிகபட்ச கோப்பு அளவு: 50MB')}
+              {t('max_size_10mb', `Maximum file size: ${MAX_FILE_SIZE_MB}MB`, `அதிகபட்ச கோப்பு அளவு: ${MAX_FILE_SIZE_MB}MB`)}
             </p>
 
-            {/* Progress bar (visible while uploading) */}
-            {uploading && (
+            {/* Progress bar */}
+            {uploading && progress > 0 && (
               <div className="mb-4">
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
-                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
                 <p className="text-xs text-blue-600 mt-1">
-                  {t('uploading_progress', `Uploading... ${progress}%`, `பதிவேற்றுகிறது... ${progress}%`)}
+                  {progress < 40
+                    ? t('getting_token', 'Preparing upload...', 'பதிவேற்றத்திற்கு தயாரிக்கிறது...')
+                    : progress < 90
+                      ? t('uploading', 'Uploading to Cloudinary...', 'Cloudinary-ல் பதிவேற்றுகிறது...')
+                      : t('finishing', 'Finishing...', 'முடிக்கிறது...')}
                 </p>
               </div>
             )}
@@ -188,7 +170,7 @@ export default function HostingerPDFUpload({
               disabled={uploading}
             >
               {uploading
-                ? t('uploading', `Uploading ${progress}%...`, `பதிவேற்றுகிறது ${progress}%...`)
+                ? t('uploading', 'Uploading...', 'பதிவேற்றுகிறது...')
                 : t('select_file', 'Select File', 'கோப்பைத் தேர்ந்தெடுக்கவும்')}
             </Button>
             <input
@@ -202,7 +184,7 @@ export default function HostingerPDFUpload({
         </div>
       </div>
 
-      {/* Current File Display */}
+      {/* Current file */}
       {currentUrl && (
         <div className="p-3 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-600">
