@@ -62,11 +62,9 @@ export default function HostingerPDFUpload({
   }
 
   const uploadInChunks = async (file: File) => {
-    const uploadUrl = process.env.NEXT_PUBLIC_HOSTINGER_PDF_UPLOAD_URL
-
-    if (!uploadUrl) {
-      throw new Error('PDF upload URL not configured. Set NEXT_PUBLIC_HOSTINGER_PDF_UPLOAD_URL.')
-    }
+    // Upload via internal Next.js API — each 1MB chunk is safely under any body size limit.
+    // The API assembles chunks and saves the final PDF to /public/uploads/magazines/.
+    const uploadUrl = '/api/upload/magazine-pdf'
 
     setUploading(true)
     setProgress(0)

@@ -1,24 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { writeFileSync, mkdirSync, readdirSync, readFileSync, unlinkSync, rmdirSync, existsSync } from 'fs'
+import { join } from 'path'
+import { tmpdir } from 'os'
 
-// Hostinger PDF Upload Proxy
-// Receives PDF from admin browser → forwards to Hostinger PHP script → returns public URL
-// This keeps HOSTINGER_PDF_UPLOAD_URL as a server-side secret and avoids CORS issues.
-
-const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+// Final PDFs are stored in /public/uploads/magazines/ and served statically by Next.js
+const UPLOAD_DIR = join(process.cwd(), 'public', 'uploads', 'magazines')
+// Chunks go to OS temp dir (writable on both Hostinger VPS and Vercel)
+const TEMP_BASE = join(tmpdir(), 'pdf-chunks')
 
 export async function POST(request: NextRequest) {
   try {
-    const hostingerUploadUrl = process.env.HOSTINGER_PDF_UPLOAD_URL
-
-    if (!hostingerUploadUrl) {
-      console.error('❌ HOSTINGER_PDF_UPLOAD_URL environment variable is not set')
-      return NextResponse.json(
-        { error: 'PDF upload service is not configured. Set HOSTINGER_PDF_UPLOAD_URL.' },
-        { status: 500 }
-      )
-    }
-
-    // Parse multipart form data from the browser
     let formData: FormData
     try {
       formData = await request.formData()
@@ -26,63 +17,81 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid form data' }, { status: 400 })
     }
 
-    const file = formData.get('pdf') as File | null
-    if (!file) {
-      return NextResponse.json({ error: 'No PDF file provided' }, { status: 400 })
+    const chunk = formData.get('chunk') as File | null
+    const chunkIndex = parseInt((formData.get('chunkIndex') as string) ?? '-1')
+    const totalChunks = parseInt((formData.get('totalChunks') as string) ?? '0')
+    const rawFileId = (formData.get('fileId') as string) ?? ''
+    const rawFilename = (formData.get('filename') as string) ?? ''
+
+    const fileId = rawFileId.replace(/[^a-zA-Z0-9_-]/g, '')
+    const filename = rawFilename.replace(/[^a-zA-Z0-9._-]/g, '_')
+
+    if (!chunk || isNaN(chunkIndex) || totalChunks < 1 || !fileId || !filename) {
+      return NextResponse.json({ error: 'Missing fields: chunk, chunkIndex, totalChunks, fileId, filename' }, { status: 400 })
     }
 
-    if (!file.type.includes('pdf')) {
-      return NextResponse.json({ error: 'Only PDF files are allowed' }, { status: 400 })
+    // ── Save incoming chunk to temp dir ───────────────────────────────────────
+    const sessionDir = join(TEMP_BASE, fileId)
+    mkdirSync(sessionDir, { recursive: true })
+
+    const chunkBuffer = Buffer.from(await chunk.arrayBuffer())
+    const chunkPath = join(sessionDir, `chunk_${String(chunkIndex).padStart(5, '0')}`)
+    writeFileSync(chunkPath, chunkBuffer)
+
+    console.log(`📦 Saved chunk ${chunkIndex + 1}/${totalChunks} for ${fileId} (${chunkBuffer.length} bytes)`)
+
+    // ── Check if all chunks have arrived ──────────────────────────────────────
+    const received = readdirSync(sessionDir).filter(f => f.startsWith('chunk_'))
+
+    if (received.length < totalChunks) {
+      return NextResponse.json({
+        success: false,
+        received: received.length,
+        total: totalChunks,
+        message: 'Chunk saved, waiting for more',
+      })
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1)
-      return NextResponse.json(
-        { error: `File too large (${fileSizeMB}MB). Maximum size is 50MB.` },
-        { status: 413 }
-      )
+    // ── All chunks received → assemble ────────────────────────────────────────
+    console.log(`🔧 All ${totalChunks} chunks received, assembling PDF...`)
+
+    const sortedChunks = received.sort()
+    const buffers = sortedChunks.map(c => readFileSync(join(sessionDir, c)))
+    const assembled = Buffer.concat(buffers)
+
+    // Verify PDF magic bytes (%PDF-)
+    if (assembled.slice(0, 5).toString('ascii') !== '%PDF-') {
+      // Cleanup and reject
+      sortedChunks.forEach(c => { try { unlinkSync(join(sessionDir, c)) } catch { } })
+      try { rmdirSync(sessionDir) } catch { }
+      return NextResponse.json({ error: 'Assembled file is not a valid PDF' }, { status: 400 })
     }
 
-    console.log(`📤 Proxying PDF to Hostinger: ${file.name} (${Math.round(file.size / 1024)}KB)`)
+    // ── Save to public/uploads/magazines/ ─────────────────────────────────────
+    mkdirSync(UPLOAD_DIR, { recursive: true })
+    const finalFilename = `${Date.now()}_${filename}`
+    const finalPath = join(UPLOAD_DIR, finalFilename)
+    writeFileSync(finalPath, assembled)
 
-    // Forward to Hostinger PHP script
-    const uploadForm = new FormData()
-    uploadForm.append('pdf', file)
+    // Cleanup temp chunks
+    sortedChunks.forEach(c => { try { unlinkSync(join(sessionDir, c)) } catch { } })
+    try { rmdirSync(sessionDir) } catch { }
 
-    const hostingerResponse = await fetch(hostingerUploadUrl, {
-      method: 'POST',
-      body: uploadForm,
-    })
+    // Build public URL — use request host so it works on both hellomadurai.com and vercel.app
+    const host = request.headers.get('host') ?? 'hellomadurai.com'
+    const protocol = host.includes('localhost') ? 'http' : 'https'
+    const url = `${protocol}://${host}/uploads/magazines/${finalFilename}`
 
-    if (!hostingerResponse.ok) {
-      let errorMessage = `Hostinger upload failed (${hostingerResponse.status})`
-      try {
-        const errorData = await hostingerResponse.json()
-        errorMessage = errorData?.error || errorMessage
-      } catch {
-        // ignore JSON parse errors
-      }
-      console.error('❌', errorMessage)
-      return NextResponse.json({ error: errorMessage }, { status: 502 })
-    }
+    console.log(`✅ PDF saved: ${url} (${Math.round(assembled.length / 1024)}KB)`)
 
-    const responseData = await hostingerResponse.json()
-
-    if (!responseData?.url) {
-      return NextResponse.json(
-        { error: 'Upload succeeded but no URL returned from Hostinger' },
-        { status: 502 }
-      )
-    }
-
-    console.log('✅ PDF uploaded to Hostinger:', responseData.url)
     return NextResponse.json({
-      url: responseData.url,
-      filename: responseData.filename,
-      size: responseData.size,
+      success: true,
+      url,
+      filename: finalFilename,
+      size: assembled.length,
     })
   } catch (error) {
-    console.error('❌ Error proxying PDF upload:', error)
-    return NextResponse.json({ error: 'Internal server error during upload' }, { status: 500 })
+    console.error('❌ Upload error:', error)
+    return NextResponse.json({ error: 'Upload failed: ' + (error as Error).message }, { status: 500 })
   }
 }
