@@ -125,13 +125,6 @@ function EpaperPageContent() {
 
   const handleView = async (magazine: Magazine) => {
     console.log('🎯 handleView called for:', magazine.title)
-    console.log('👁️ Magazine data:', {
-      id: magazine.id,
-      title: magazine.title,
-      pdfUrl: magazine.pdfUrl,
-      coverImage: magazine.coverImage,
-      featuredImage: magazine.featuredImage
-    })
 
     if (!magazine.pdfUrl) {
       console.log('❌ No PDF URL found for magazine:', magazine.title)
@@ -139,33 +132,37 @@ function EpaperPageContent() {
       return
     }
 
-    console.log('🚀 Opening PDF:', magazine.pdfUrl)
+    // Open window IMMEDIATELY to avoid popup blockers
+    const pdfUrl = magazine.pdfUrl
+    const newWindow = window.open('about:blank', '_blank', 'noopener,noreferrer')
+
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      console.log('❌ Popup blocked or failed to open')
+      toast.error(t('popup_blocked', 'Popup blocked. Attempting to open in current tab...', 'பாப்-அப் தடுக்கப்பட்டது. தற்போதைய டேபில் திறக்கப்படுகிறது...'), { icon: '⚠️' })
+    } else {
+      toast.success(t('view_started', 'Opening PDF...', 'PDF திறக்கப்படுகிறது...'))
+    }
 
     try {
-      // Convert Google Drive share link to direct view link if needed
-      let pdfUrl = magazine.pdfUrl
-      if (pdfUrl.includes('drive.google.com/file/d/')) {
-        const fileId = pdfUrl.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)?.[1]
+      // Process URL if needed
+      let finalUrl = pdfUrl
+      if (finalUrl.includes('drive.google.com/file/d/')) {
+        const fileId = finalUrl.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)?.[1]
         if (fileId) {
-          pdfUrl = `https://drive.google.com/file/d/${fileId}/view`
+          finalUrl = `https://drive.google.com/file/d/${fileId}/view`
         }
       }
 
-      console.log(`🌐 Final PDF URL to open: ${pdfUrl}`)
+      console.log(`🌐 Final PDF URL: ${finalUrl}`)
 
-      // Open PDF in new tab for viewing - with better error handling
-      const newWindow = window.open(pdfUrl, '_blank', 'noopener,noreferrer')
-
-      if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-        console.log('❌ Popup blocked or failed to open')
-        // Fallback: try to navigate to PDF directly
-        window.location.href = pdfUrl
-        toast.warning(t('popup_blocked', 'Opening PDF in current tab...', 'தற்போதைய டேபில் PDF திறக்கப்படுகிறது...'))
+      // Update the opened window or navigate if blocked
+      if (newWindow) {
+        newWindow.location.href = finalUrl
       } else {
-        toast.success(t('view_started', 'Opening PDF in new tab...', 'புதிய டேபில் PDF திறக்கப்படுகிறது...'))
+        window.location.href = finalUrl
       }
 
-      // Track view as download in database (since we don't have separate view tracking)
+      // Track view as download in database
       try {
         const response = await fetch(`/api/magazines/${magazine.id}/download`, {
           method: 'POST'
@@ -179,8 +176,6 @@ function EpaperPageContent() {
           setMagazines(prev => prev.map(m =>
             m.id === magazine.id ? { ...m, downloads: data.downloads } : m
           ))
-        } else {
-          console.error('Failed to track view in database')
         }
       } catch (apiError) {
         console.error('View tracking API failed:', apiError)
@@ -235,8 +230,6 @@ function EpaperPageContent() {
           setMagazines(prev => prev.map(m =>
             m.id === magazine.id ? { ...m, downloads: data.downloads } : m
           ))
-        } else {
-          console.error('Failed to track download in database')
         }
       } catch (apiError) {
         console.error('Download tracking API failed:', apiError)
@@ -258,7 +251,7 @@ function EpaperPageContent() {
         const newSet = new Set(likedMagazines)
         newSet.delete(magazine.id)
         updateLikedMagazines(newSet)
-        toast.success(t('unliked', 'Removed from favorites', 'பিடித்தவைகளிலிருந்து நீக்கப்பட்டது'))
+        toast.success(t('unliked', 'Removed from favorites', 'பிடித்தவைகளிலிருந்து நீக்கப்பட்டது'))
       } else {
         // Like
         const newSet = new Set(likedMagazines).add(magazine.id)
@@ -279,8 +272,6 @@ function EpaperPageContent() {
             setMagazines(prev => prev.map(m =>
               m.id === magazine.id ? { ...m, likes: data.likes } : m
             ))
-          } else {
-            console.error('Failed to save like to database')
           }
         } catch (apiError) {
           console.error('API call failed:', apiError)
@@ -323,10 +314,9 @@ function EpaperPageContent() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">
-            <TranslatedText 
-              english="Loading magazines..." 
-              tamil="பத்திரிகைகள் ஏற்றப்படுகின்றன..."
-            />
+            <TranslatedText tamil="பத்திரிகைகள் ஏற்றப்படுகின்றன...">
+              Loading magazines...
+            </TranslatedText>
           </p>
         </div>
       </div>
@@ -338,13 +328,12 @@ function EpaperPageContent() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          <TranslatedText english="E-Paper" tamil="மின்னிதழ்" />
+          <TranslatedText tamil="மின்னிதழ்">E-Paper</TranslatedText>
         </h1>
         <p className="text-gray-600">
-          <TranslatedText 
-            english="Read and download our digital magazines" 
-            tamil="எங்கள் டிஜிட்டல் பத்திரிகைகளைப் படித்து பதிவிறக்கம் செய்யுங்கள்"
-          />
+          <TranslatedText tamil="எங்கள் டிஜிட்டல் பத்திரிகைகளைப் படித்து பதிவிறக்கம் செய்யுங்கள்">
+            Read and download our digital magazines
+          </TranslatedText>
         </p>
       </div>
 
@@ -362,7 +351,6 @@ function EpaperPageContent() {
           >
             {t('epaper.all_magazines', 'All Magazines', 'அனைத்து பத்திரிகைகள்')}
           </Button>
-          {console.log('🎯 Rendering collections in UI:', collections)}
           {collections.map((collection) => (
             <Button
               key={collection.id}
@@ -385,13 +373,12 @@ function EpaperPageContent() {
         <div className="text-center py-12">
           <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            <TranslatedText english="No magazines found" tamil="பத்திரிகைகள் எதுவும் கிடைக்கவில்லை" />
+            <TranslatedText tamil="பத்திரிகைகள் எதுவும் கிடைக்கவில்லை">No magazines found</TranslatedText>
           </h3>
           <p className="text-gray-600">
-            <TranslatedText 
-              english="Check back later for new publications" 
-              tamil="புதிய வெளியீடுகளுக்கு பின்னர் சரிபார்க்கவும்"
-            />
+            <TranslatedText tamil="புதிய வெளியீடுகளுக்கு பின்னர் சரிபார்க்கவும்">
+              Check back later for new publications
+            </TranslatedText>
           </p>
         </div>
       ) : (
@@ -438,10 +425,10 @@ function EpaperPageContent() {
                   <div className="text-center">
                     <FileText className="w-12 h-12 text-blue-400 mx-auto mb-2" />
                     <p className="text-sm text-blue-600 font-medium">
-                      <TranslatedText english="PDF Magazine" tamil="PDF இதழ்" />
+                      <TranslatedText tamil="PDF இதழ்">PDF Magazine</TranslatedText>
                     </p>
                     <p className="text-xs text-blue-500 mt-1">
-                      <TranslatedText english="Click to open" tamil="திறக்க கிளிக் செய்யவும்" />
+                      <TranslatedText tamil="திறக்க கிளிக் செய்யவும்">Click to open</TranslatedText>
                     </p>
                   </div>
                 </div>
@@ -459,7 +446,7 @@ function EpaperPageContent() {
                 {(magazine.coverImage || magazine.featuredImage) && (
                   <div className="absolute bottom-2 left-2 right-2">
                     <div className="bg-blue-600 bg-opacity-90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-center">
-                      <TranslatedText english="Click to open PDF" tamil="PDF திறக்க கிளிக் செய்யவும்" />
+                      <TranslatedText tamil="PDF திறக்க கிளிக் செய்யவும்">Click to open PDF</TranslatedText>
                     </div>
                   </div>
                 )}
@@ -469,10 +456,9 @@ function EpaperPageContent() {
               <div className="p-4">
                 {/* Title */}
                 <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                  <TranslatedText
-                    english={magazine.title}
-                    tamil={magazine.title_ta || magazine.title}
-                  />
+                  <TranslatedText tamil={magazine.title_ta || magazine.title}>
+                    {magazine.title}
+                  </TranslatedText>
                 </h3>
 
                 {/* Magazine Info */}
@@ -480,7 +466,7 @@ function EpaperPageContent() {
                   {magazine.issueNumber && (
                     <div className="flex items-center text-sm text-gray-600">
                       <FileText className="w-4 h-4 mr-2" />
-                      <TranslatedText english="Issue" tamil="இதழ்" />: {magazine.issueNumber}
+                      <TranslatedText tamil="இதழ்">Issue</TranslatedText>: {magazine.issueNumber}
                     </div>
                   )}
                   <div className="flex items-center text-sm text-gray-600">
@@ -495,11 +481,11 @@ function EpaperPageContent() {
                 <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
                   <span className="flex items-center gap-1">
                     <Eye className="w-3 h-3" />
-                    {magazine.downloads || 0} <TranslatedText english="views" tamil="பார்வைகள்" />
+                    {magazine.downloads || 0} <TranslatedText tamil="பார்வைகள்">views</TranslatedText>
                   </span>
                   <span className="flex items-center gap-1">
                     <Heart className="w-3 h-3" />
-                    {magazine.likes || 0} <TranslatedText english="likes" tamil="விருப்பங்கள்" />
+                    {magazine.likes || 0} <TranslatedText tamil="விருப்பங்கள்">likes</TranslatedText>
                   </span>
                 </div>
 
@@ -516,7 +502,7 @@ function EpaperPageContent() {
                     className="flex-1"
                   >
                     <Download className="w-4 h-4 mr-1" />
-                    <TranslatedText english="Download" tamil="பதிவிறக்கம்" />
+                    <TranslatedText tamil="பதிவிறக்கம்">Download</TranslatedText>
                   </Button>
 
                   <Button

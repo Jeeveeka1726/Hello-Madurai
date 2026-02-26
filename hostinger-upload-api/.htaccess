@@ -1,38 +1,29 @@
-# Hostinger PDF Upload API Configuration
-# Place this in /public_html/api/ directory
+# Hostinger Upload Configuration
+# Place this in the SAME directory as upload-pdf-simple.php (e.g. /public_html/)
 
-# Multiple server-level upload limits
-LimitRequestBody 536870912
-# 512MB in bytes (512 * 1024 * 1024)
-
-# Nginx-style limits (if Hostinger uses Nginx)
-client_max_body_size 512M;
-
-# Apache mod_fcgid limits
-FcgidMaxRequestLen 536870912
-
-# Increase PHP limits for large file uploads
-php_value upload_max_filesize 512M
-php_value post_max_size 512M
-php_value memory_limit 512M
+# ── PHP limits (Apache / LiteSpeed shared hosting) ───────────────────────────
+php_value upload_max_filesize 100M
+php_value post_max_size 100M
+php_value memory_limit 256M
 php_value max_execution_time 300
 php_value max_input_time 300
 
-# Enable CORS for all domains
-Header always set Access-Control-Allow-Origin "*"
-Header always set Access-Control-Allow-Methods "POST, OPTIONS, GET"
-Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
-Header always set Access-Control-Max-Age "3600"
+# Apache request body limit (100MB)
+LimitRequestBody 104857600
 
-# Allow all file access (less restrictive)
+# ── CORS headers ─────────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "POST, OPTIONS, GET"
+    Header always set Access-Control-Allow-Headers "Content-Type, Accept"
+    Header always set Access-Control-Max-Age "3600"
+</IfModule>
+
+# ── Allow access to all files in this directory ───────────────────────────────
 <Files "*">
     Order Allow,Deny
     Allow from all
 </Files>
 
-# Enable error logging
+# ── Error logging ─────────────────────────────────────────────────────────────
 php_flag log_errors on
-php_value error_log error.log
-
-# Additional server limits for large uploads
-RewriteEngine On

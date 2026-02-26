@@ -131,13 +131,14 @@ export default function AdminMagazinesPage() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/admin/magazines', {
+      const url = editingMagazine
+        ? `/api/admin/magazines/${editingMagazine.id}`
+        : '/api/admin/magazines'
+
+      const response = await fetch(url, {
         method: editingMagazine ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          ...(editingMagazine && { id: editingMagazine.id })
-        }),
+        body: JSON.stringify(formData),
       })
 
       if (response.ok) {
@@ -390,10 +391,9 @@ export default function AdminMagazinesPage() {
                   {/* PDF Upload - Cloudinary Only */}
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <TranslatedText
-                        english="Magazine PDF (Upload - Up to 10MB)"
-                        tamil="பத்திரிகை PDF (பதிவேற்றவும் - 10MB வரை)"
-                      />
+                      <TranslatedText tamil="பத்திரிகை PDF (பதிவேற்றவும் - 10MB வரை)">
+                        Magazine PDF (Upload - Up to 10MB)
+                      </TranslatedText>
                       <span className="text-red-500 ml-1">*</span>
                     </label>
                     <HostingerPDFUpload
@@ -411,6 +411,7 @@ export default function AdminMagazinesPage() {
                     onFileUpload={(url) => setFormData({ ...formData, coverImage: url })}
                     onUrlChange={(url) => setFormData({ ...formData, coverImage: url })}
                     className="mb-6"
+                    skipResize={true}
                   />
 
                   <div className="grid gap-6 md:grid-cols-2">
@@ -574,7 +575,7 @@ export default function AdminMagazinesPage() {
               <TranslatedText
                 tamil={`${filteredMagazines.length} பத்திரிகைகள் கண்டறியப்பட்டன "${searchQuery}" க்கு`}
               >
-                Found {filteredMagazines.length} magazines for "{searchQuery}"
+                {`Found ${filteredMagazines.length} magazines for "${searchQuery}"`}
               </TranslatedText>
             </p>
           )}
@@ -595,87 +596,87 @@ export default function AdminMagazinesPage() {
             </div>
           ) : (
             filteredMagazines.map((magazine) => (
-            <Card key={magazine.id} hover className="h-full">
-              <CardContent>
-                {magazine.coverImage && (
-                  <img
-                    src={magazine.coverImage}
-                    alt={magazine.title}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                  />
-                )}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {magazine.title}
-                    </h3>
-                    {magazine.featured && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        <TranslatedText tamil="சிறப்பு">Featured</TranslatedText>
-                      </span>
-                    )}
-                  </div>
-                  {magazine.title_ta && (
-                    <h4 className="text-md text-gray-600">
-                      {magazine.title_ta}
-                    </h4>
+              <Card key={magazine.id} hover className="h-full">
+                <CardContent>
+                  {magazine.coverImage && (
+                    <img
+                      src={magazine.coverImage}
+                      alt={magazine.title}
+                      className="w-full h-48 object-cover rounded-lg mb-4"
+                    />
                   )}
-                  <div className="text-xs text-gray-500">
-                    <p>
-                      <TranslatedText tamil="தொகுப்பு:">Collection:</TranslatedText> {magazine.collection?.name}
-                    </p>
-                    <p>
-                      <TranslatedText tamil="வெளியீட்டு தேதி:">Published Date:</TranslatedText> {new Date(magazine.publishedAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>
-                      <TranslatedText tamil="இதழ்:">Issue:</TranslatedText> {magazine.issueNumber}
-                    </span>
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center">
-                        <EyeIcon className="h-4 w-4 mr-1" />
-                        {magazine.downloads || 0}
-                      </div>
-                      <div className="flex items-center">
-                        <svg className="h-4 w-4 mr-1 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                        {magazine.likes || 0}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {magazine.title}
+                      </h3>
+                      {magazine.featured && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <TranslatedText tamil="சிறப்பு">Featured</TranslatedText>
+                        </span>
+                      )}
+                    </div>
+                    {magazine.title_ta && (
+                      <h4 className="text-md text-gray-600">
+                        {magazine.title_ta}
+                      </h4>
+                    )}
+                    <div className="text-xs text-gray-500">
+                      <p>
+                        <TranslatedText tamil="தொகுப்பு:">Collection:</TranslatedText> {magazine.collection?.name}
+                      </p>
+                      <p>
+                        <TranslatedText tamil="வெளியீட்டு தேதி:">Published Date:</TranslatedText> {new Date(magazine.publishedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <span>
+                        <TranslatedText tamil="இதழ்:">Issue:</TranslatedText> {magazine.issueNumber}
+                      </span>
+                      <div className="flex items-center space-x-3">
+                        <div className="flex items-center">
+                          <EyeIcon className="h-4 w-4 mr-1" />
+                          {magazine.downloads || 0}
+                        </div>
+                        <div className="flex items-center">
+                          <svg className="h-4 w-4 mr-1 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                          </svg>
+                          {magazine.likes || 0}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="mt-4 flex justify-between">
-                  <div className="flex space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleEdit(magazine)}
-                    >
-                      <PencilIcon className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      onClick={() => handleDelete(magazine.id)}
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                    </Button>
+                  <div className="mt-4 flex justify-between">
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEdit(magazine)}
+                      >
+                        <PencilIcon className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => handleDelete(magazine.id)}
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {magazine.pdfUrl && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => window.open(magazine.pdfUrl, '_blank')}
+                      >
+                        <DocumentIcon className="h-4 w-4 mr-1" />
+                        <TranslatedText tamil="PDF பார்க்க">View PDF</TranslatedText>
+                      </Button>
+                    )}
                   </div>
-                  {magazine.pdfUrl && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => window.open(magazine.pdfUrl, '_blank')}
-                    >
-                      <DocumentIcon className="h-4 w-4 mr-1" />
-                      <TranslatedText tamil="PDF பார்க்க">View PDF</TranslatedText>
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
             ))
           )}
         </div>

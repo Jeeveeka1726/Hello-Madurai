@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { 
-  PhotoIcon, 
-  DocumentIcon, 
-  XMarkIcon, 
-  ArrowPathIcon, 
+import {
+  PhotoIcon,
+  DocumentIcon,
+  XMarkIcon,
+  ArrowPathIcon,
   CloudArrowUpIcon,
   LinkIcon,
   SpeakerWaveIcon
@@ -25,6 +25,7 @@ interface FileUploadProps {
   maxSize?: number // in MB
   showUrlOption?: boolean
   showFileUpload?: boolean
+  skipResize?: boolean
 }
 
 const fileTypeConfig = {
@@ -71,7 +72,8 @@ export default function FileUpload({
   accept,
   maxSize,
   showUrlOption = true,
-  showFileUpload = true
+  showFileUpload = true,
+  skipResize = false
 }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -105,12 +107,9 @@ export default function FileUpload({
     setUploading(true)
 
     try {
-      // Use Cloudinary for audio files, base64 JSON for PDFs, regular upload for others
+      // Use Cloudinary for audio files, regular upload for others
       if (fileType === 'audio') {
         await handleAudioUploadToCloudinary(file)
-      } else if (fileType === 'pdf') {
-        // Use base64 JSON upload for PDFs to bypass FormData size limits
-        await handleBase64JsonUpload(file)
       } else {
         // Use regular upload for images and other file types
         await handleRegularUpload(file)
@@ -199,6 +198,9 @@ export default function FileUpload({
     const formData = new FormData()
     formData.append('file', file)
     formData.append('type', fileType)
+    if (skipResize) {
+      formData.append('skipResize', 'true')
+    }
 
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
@@ -298,7 +300,7 @@ export default function FileUpload({
       setTimeout(() => {
         if (testingUrl) {
           console.warn('⏰ Audio URL test timeout:', url)
-          toast.warning('⏰ Audio URL test timed out - URL might be slow to load')
+          toast.error('⏰ Audio URL test timed out - URL might be slow to load', { icon: '⚠️' })
           cleanup()
           resolve(false)
         }
@@ -367,11 +369,10 @@ export default function FileUpload({
         <div>
           {!currentFileUrl ? (
             <div
-              className={`relative border-2 border-dashed rounded-lg p-6 text-center hover:bg-gray-50 transition-colors ${
-                isDragging
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-300'
-              }`}
+              className={`relative border-2 border-dashed rounded-lg p-6 text-center hover:bg-gray-50 transition-colors ${isDragging
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-300'
+                }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -385,7 +386,7 @@ export default function FileUpload({
                 disabled={uploading}
                 value=""
               />
-              
+
               <div className="flex flex-col items-center space-y-2">
                 <IconComponent className="h-12 w-12 text-gray-400" />
                 <div className="text-sm text-gray-600">
@@ -437,7 +438,7 @@ export default function FileUpload({
                   <XMarkIcon className="h-4 w-4" />
                 </Button>
               </div>
-              
+
               {fileType === 'image' && currentFileUrl && (
                 <div className="mt-3">
                   <img
@@ -510,7 +511,7 @@ export default function FileUpload({
               Set URL
             </Button>
           </div>
-          
+
           {currentUrl && (
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
               <div className="flex items-center space-x-2">
