@@ -26,6 +26,8 @@ interface FileUploadProps {
   showUrlOption?: boolean
   showFileUpload?: boolean
   skipResize?: boolean
+  useCloudinary?: boolean
+  cloudinaryFolder?: string
 }
 
 const fileTypeConfig = {
@@ -73,7 +75,9 @@ export default function FileUpload({
   maxSize,
   showUrlOption = true,
   showFileUpload = true,
-  skipResize = false
+  skipResize = false,
+  useCloudinary = false,
+  cloudinaryFolder = 'hello-madurai/uploads'
 }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -107,9 +111,9 @@ export default function FileUpload({
     setUploading(true)
 
     try {
-      // Use Cloudinary for audio files, regular upload for others
-      if (fileType === 'audio') {
-        await handleAudioUploadToCloudinary(file)
+      // Use Cloudinary for audio files, or if useCloudinary is specifically requested
+      if (fileType === 'audio' || useCloudinary) {
+        await handleCloudinaryUpload(file)
       } else {
         // Use regular upload for images and other file types
         await handleRegularUpload(file)
@@ -189,6 +193,49 @@ export default function FileUpload({
 
     onFileUpload(cloudinaryData.secure_url)
     toast.success('✅ Audio file uploaded to Cloudinary successfully!')
+  }
+
+  const handleCloudinaryUpload = async (file: File) => {
+    console.log(`📤 Uploading ${fileType} to Cloudinary (direct)...`)
+
+    // Step 1: Get upload signature
+    const resourceType = fileType === 'audio' ? 'video' : (fileType === 'pdf' || fileType === 'document' ? 'raw' : 'image')
+    const folder = cloudinaryFolder || `hello-madurai/${fileType}s`
+
+    const signatureResponse = await fetch(`/api/upload/cloudinary-signature?folder=${folder}&resourceType=${resourceType}`)
+    if (!signatureResponse.ok) {
+      throw new Error('Failed to get upload signature')
+    }
+    const { signature, timestamp, cloudName, apiKey } = await signatureResponse.json()
+
+    // Step 2: Upload directly to Cloudinary
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('signature', signature)
+    formData.append('timestamp', timestamp.toString())
+    formData.append('api_key', apiKey)
+    formData.append('folder', folder)
+    if (resourceType !== 'image') {
+      formData.append('resource_type', resourceType)
+    }
+
+    const cloudinaryResponse = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    )
+
+    if (!cloudinaryResponse.ok) {
+      const errorData = await cloudinaryResponse.json()
+      console.error('❌ Cloudinary upload failed:', errorData)
+      throw new Error(errorData.error?.message || 'Cloudinary upload failed')
+    }
+
+    const cloudinaryData = await cloudinaryResponse.json()
+    onFileUpload(cloudinaryData.secure_url)
+    toast.success(`✅ ${config.label} uploaded to Cloudinary!`)
   }
 
 

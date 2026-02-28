@@ -411,7 +411,8 @@ export default function AdminMagazinesPage() {
                     onFileUpload={(url) => setFormData({ ...formData, coverImage: url })}
                     onUrlChange={(url) => setFormData({ ...formData, coverImage: url })}
                     className="mb-6"
-                    skipResize={true}
+                    useCloudinary={true}
+                    cloudinaryFolder="hello-madurai/magazines"
                   />
 
                   <div className="grid gap-6 md:grid-cols-2">

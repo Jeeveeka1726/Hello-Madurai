@@ -12,17 +12,9 @@ cloudinary.config({
 // The browser uploads directly to Cloudinary (not through Vercel), so there is NO body size limit.
 export async function GET() {
   try {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME
-    const apiKey = process.env.CLOUDINARY_API_KEY
-    const apiSecret = process.env.CLOUDINARY_API_SECRET
-
-    if (!cloudName || !apiKey || !apiSecret) {
-      console.error('❌ Missing Cloudinary environment variables')
-      return NextResponse.json(
-        { error: 'Cloudinary is not configured. Check CLOUDINARY_* env vars.' },
-        { status: 500 }
-      )
-    }
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || 'dbngxtspv'
+    const apiKey = process.env.CLOUDINARY_API_KEY || '187251687769698'
+    const apiSecret = process.env.CLOUDINARY_API_SECRET || 'yf7cHBXxd4qOc3e3wQy-ct1BLqM'
 
     const timestamp = Math.round(Date.now() / 1000)
     const folder = 'hello-madurai/magazines'
@@ -31,7 +23,7 @@ export async function GET() {
     const paramsToSign = { timestamp, folder }
     const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret)
 
-    console.log('🔑 Generated Cloudinary PDF signature for timestamp:', timestamp)
+    console.log('🔑 Generated Cloudinary PDF signature:', { timestamp, folder, signature: signature.substring(0, 5) + '...' })
 
     return NextResponse.json({
       signature,
@@ -39,7 +31,7 @@ export async function GET() {
       cloudName,
       apiKey,
       folder,
-      resourceType: 'raw', // PDFs must use raw resource type
+      resourceType: 'raw',
     })
   } catch (error) {
     console.error('❌ Error generating Cloudinary signature:', error)

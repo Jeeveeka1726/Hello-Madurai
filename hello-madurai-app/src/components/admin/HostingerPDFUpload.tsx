@@ -29,7 +29,7 @@ export default function HostingerPDFUpload({
   const { t } = useLanguage()
 
   const handleFileUpload = async (file: File) => {
-    console.log('🚀 handleFileUpload called with:', file.name, file.type, file.size)
+    console.log('🚀 [PDF Upload] Starting...', { name: file.name, type: file.type, size: `${(file.size / 1024 / 1024).toFixed(2)}MB` })
 
     if (!file.type.includes('pdf')) {
       toast.error(t('invalid_pdf', 'Please select a PDF file', 'PDF கோப்பைத் தேர்ந்தெடுக்கவும்'))
@@ -40,25 +40,23 @@ export default function HostingerPDFUpload({
       const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1)
       toast.error(
         t('file_too_large',
-          `File too large (${fileSizeMB}MB). Maximum is ${MAX_FILE_SIZE_MB}MB. Compress at: https://bigpdf.11zon.com`,
-          `கோப்பு மிகப் பெரியது (${fileSizeMB}MB). அதிகபட்ச அளவு ${MAX_FILE_SIZE_MB}MB. சுருக்கவும்: https://bigpdf.11zon.com`
+          `File too large (${fileSizeMB}MB). Maximum is ${MAX_FILE_SIZE_MB}MB.`,
+          `கோப்பு மிகப் பெரியது (${fileSizeMB}MB). அதிகபட்ச அளவு ${MAX_FILE_SIZE_MB}MB.`
         ),
         { duration: 8000 }
       )
       return
     }
 
-    const fileSizeKB = Math.round(file.size / 1024)
-    console.log(`📊 File size: ${fileSizeKB}KB (max: ${MAX_FILE_SIZE / 1024}KB)`)
-
     try {
       setUploading(true)
       setProgress(10)
+      console.log('⏳ [PDF Upload] 10% - Requesting signature from API...')
       await uploadToCloudinary(file)
     } catch (error) {
-      console.error('❌ Upload failed:', error)
+      console.error('❌ [PDF Upload] Failed:', error)
       const msg = error instanceof Error ? error.message : 'Upload failed'
-      toast.error(t('upload_failed', msg, 'பதிவேற்றம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.'), { duration: 6000 })
+      toast.error(`❌ Upload failed: ${msg}`, { duration: 6000 })
     } finally {
       setUploading(false)
       setProgress(0)
@@ -67,18 +65,22 @@ export default function HostingerPDFUpload({
 
   const uploadToCloudinary = async (file: File) => {
     // Step 1: get signed upload token from our API (server keeps the secret)
-    setProgress(20)
-    const sigRes = await fetch('/api/upload/magazine-pdf')
+    const folder = 'hello-madurai/magazines'
+    const resourceType = 'raw'
+
+    const sigRes = await fetch(`/api/upload/cloudinary-signature?folder=${folder}&resourceType=${resourceType}`)
     if (!sigRes.ok) {
       const err = await sigRes.json().catch(() => ({}))
-      throw new Error(err?.error || 'Failed to get upload signature')
+      console.error('❌ [PDF Upload] Signature API failed:', sigRes.status, err)
+      throw new Error(err?.error || `Failed to get upload signature (${sigRes.status})`)
     }
 
-    const { signature, timestamp, cloudName, apiKey, folder, resourceType } = await sigRes.json()
+    const { signature, timestamp, cloudName, apiKey } = await sigRes.json()
+    console.log('🔑 [PDF Upload] 20% - Signature received:', { cloudName, folder, resourceType })
 
-    // Step 2: upload directly to Cloudinary — bypasses Vercel entirely, no body size limit
-    setProgress(40)
-    console.log('📤 Uploading PDF directly to Cloudinary...')
+    // Step 2: upload directly to Cloudinary
+    setProgress(30)
+    console.log('📤 [PDF Upload] 30% - Uploading to Cloudinary...')
 
     const formData = new FormData()
     formData.append('file', file)
@@ -86,23 +88,26 @@ export default function HostingerPDFUpload({
     formData.append('timestamp', String(timestamp))
     formData.append('api_key', apiKey)
     formData.append('folder', folder)
+    formData.append('resource_type', resourceType)
 
-    const uploadRes = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
-      { method: 'POST', body: formData }
-    )
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`
+    console.log('🌐 [PDF Upload] Target URL:', uploadUrl)
+
+    const uploadRes = await fetch(uploadUrl, { method: 'POST', body: formData })
 
     setProgress(90)
 
     if (!uploadRes.ok) {
       const errData = await uploadRes.json().catch(() => ({}))
-      throw new Error(errData?.error?.message || `Cloudinary upload failed (${uploadRes.status})`)
+      console.error('❌ [PDF Upload] Cloudinary rejected upload:', uploadRes.status, errData)
+      throw new Error(errData?.error?.message || `Cloudinary rejected upload (${uploadRes.status})`)
     }
 
     const data = await uploadRes.json()
+    console.log('✅ [PDF Upload] 100% - Success!', { public_id: data.public_id, url: data.secure_url })
+
     if (!data.secure_url) throw new Error('No URL returned from Cloudinary')
 
-    console.log('✅ PDF uploaded to Cloudinary:', data.secure_url)
     setProgress(100)
     onUpload(data.secure_url)
     toast.success(t('upload_success', 'PDF uploaded successfully!', 'PDF வெற்றிகரமாக பதிவேற்றப்பட்டது!'))
