@@ -373,47 +373,79 @@ export default function AdminMagazinesPage() {
                     </select>
                   </div>
 
-                  {/* Title - Bilingual */}
-                  <BilingualField
-                    label="Title"
-                    labelTamil="தலைப்பு"
-                    englishValue={formData.title}
-                    tamilValue={formData.title_ta}
-                    onEnglishChange={(value) => setFormData({ ...formData, title: value })}
-                    onTamilChange={(value) => setFormData({ ...formData, title_ta: value })}
-                    required={true}
-                    placeholder={{
-                      english: "Enter magazine title in English",
-                      tamil: "பத்திரிகை தலைப்பை தமிழில் உள்ளிடவும்"
-                    }}
-                  />
+		          {/* Title - Bilingual */}
+		          <BilingualField
+		            label="Title"
+		            labelTamil="தலைப்பு"
+		            englishValue={formData.title}
+		            tamilValue={formData.title_ta}
+		            onEnglishChange={(value) => setFormData({ ...formData, title: value })}
+		            onTamilChange={(value) => setFormData({ ...formData, title_ta: value })}
+		            required={true}
+		            placeholder={{
+		              english: "Enter magazine title in English",
+		              tamil: "பத்திரிகை தலைப்பை தமிழில் உள்ளிடவும்"
+		            }}
+		          />
+		  
+		          {/* PDF URL - Google Drive (primary) */}
+		          <div className="mb-6 space-y-3">
+		            <div>
+		              <label className="block text-sm font-medium text-gray-700 mb-2">
+		                <TranslatedText tamil="பத்திரிகை PDF இணைப்பு (Google Drive URL)">
+		                  Magazine PDF URL (Google Drive)
+		                </TranslatedText>
+		                <span className="text-red-500 ml-1">*</span>
+		              </label>
+		              <input
+		                type="url"
+		                value={formData.pdfUrl}
+		                onChange={(e) => setFormData({ ...formData, pdfUrl: e.target.value })}
+		                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+		                placeholder={t(
+		                  'admin.pdfUrlPlaceholder',
+		                  'Paste PDF URL (e.g. Google Drive link with Anyone with the link - Viewer)',
+		                  'PDF இணைப்பை ஒட்டவும் (எ.கா., Google Drive இணைப்பு - Anyone with the link - Viewer)'
+		                )}
+		              />
+		              <p className="mt-1 text-xs text-gray-500">
+		                <TranslatedText tamil="Google Drive இல் PDF ஐ பதிவேற்றி, பகிர்வு அமைப்பை Anyone with the link - Viewer என அமைத்து இங்கே இணைப்பை ஒட்டவும்">
+		                  Upload the PDF to Google Drive, set sharing to Anyone with the link - Viewer and paste the link here.
+		                </TranslatedText>
+		              </p>
+		            </div>
+		  
+		            {/* Legacy: Cloudinary upload (kept for advanced use, de-emphasized) */}
+		            <details className="text-xs text-gray-500">
+		              <summary className="cursor-pointer select-none">
+		                <TranslatedText tamil="மேம்பட்ட அமைப்பு: Cloudinary மூலம் PDF பதிவேற்றம் (பரிந்துரைக்கப்படவில்லை)">
+		                  Advanced: Upload PDF via Cloudinary (not recommended)
+		                </TranslatedText>
+		              </summary>
+		              <div className="mt-2 space-y-2">
+		                <p className="text-[11px] text-red-500">
+		                  <TranslatedText tamil="இப்போது Cloudinary இலவச திட்டத்தில் PDF கோப்புகளை நேரடியாக வழங்க முடியாமல் இருக்கலாம். பொதுவாக Google Drive URL மட்டும் பயன்படுத்த பரிந்துரைக்கப்படுகிறது">
+		                    Cloudinary free plans may block direct PDF delivery. Prefer using the Google Drive URL above.
+		                  </TranslatedText>
+		                </p>
+		                <HostingerPDFUpload
+		                  label=""
+		                  currentUrl={formData.pdfUrl}
+		                  onUpload={(url) => setFormData({ ...formData, pdfUrl: url })}
+		                />
+		              </div>
+		            </details>
+		          </div>
 
-                  {/* PDF Upload - Cloudinary Only */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <TranslatedText tamil="பத்திரிகை PDF (பதிவேற்றவும் - 10MB வரை)">
-                        Magazine PDF (Upload - Up to 10MB)
-                      </TranslatedText>
-                      <span className="text-red-500 ml-1">*</span>
-                    </label>
-                    <HostingerPDFUpload
-                      label=""
-                      currentUrl={formData.pdfUrl}
-                      onUpload={(url) => setFormData({ ...formData, pdfUrl: url })}
-                    />
-                  </div>
-
-                  {/* Cover Image Upload */}
-                  <FileUpload
-                    label={t('admin.coverImage', 'Cover Image', 'அட்டைப் படம்')}
-                    fileType="image"
-                    currentFile={formData.coverImage}
-                    onFileUpload={(url) => setFormData({ ...formData, coverImage: url })}
-                    onUrlChange={(url) => setFormData({ ...formData, coverImage: url })}
-                    className="mb-6"
-                    useCloudinary={true}
-                    cloudinaryFolder="hello-madurai/magazines"
-                  />
+	                  {/* Cover Image Upload - use Hostinger storage (default FileUpload path) */}
+	                  <FileUpload
+	                    label={t('admin.coverImage', 'Cover Image', 'அட்டைப் படம்')}
+	                    fileType="image"
+	                    currentFile={formData.coverImage}
+	                    onFileUpload={(url) => setFormData({ ...formData, coverImage: url })}
+	                    onUrlChange={(url) => setFormData({ ...formData, coverImage: url })}
+	                    className="mb-6"
+	                  />
 
                   <div className="grid gap-6 md:grid-cols-2">
                     <div>

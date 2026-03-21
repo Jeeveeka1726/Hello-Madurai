@@ -4,10 +4,10 @@ import prisma from '@/lib/prisma'
 // Serve images from Hostinger database
 export async function GET(
   request: NextRequest,
-  { params }: { params: { filename: string } }
+  { params }: { params: Promise<{ filename: string }> }
 ) {
   try {
-    const { filename } = params
+    const { filename } = await params
     
     // Retrieve image from Hostinger MySQL database
     const image = await prisma.image.findUnique({

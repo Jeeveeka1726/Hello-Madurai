@@ -45,6 +45,7 @@ function EpaperPageContent() {
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [likedMagazines, setLikedMagazines] = useState<Set<string>>(new Set())
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set())
 
   // Load liked magazines from localStorage on mount
   useEffect(() => {
@@ -123,6 +124,35 @@ function EpaperPageContent() {
     ? magazines.filter(mag => mag.collection?.id === selectedCollection)
     : magazines
 
+  // Normalize different kinds of PDF URLs (especially Google Drive)
+	  const normalizePdfUrl = (url: string): string => {
+	    const finalUrl = url?.trim()
+
+    if (!finalUrl) return url
+
+    try {
+      if (finalUrl.includes('drive.google.com')) {
+        // Try to extract file id from /file/d/ or from query params (id=)
+        const fileIdFromPath = finalUrl.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)?.[1]
+        let fileId = fileIdFromPath
+
+        if (!fileId) {
+          const urlObj = new URL(finalUrl)
+          fileId = urlObj.searchParams.get('id') || undefined
+        }
+
+        if (fileId) {
+          // Use Google Drive's preview viewer so the magazine opens instead of just downloading
+          return `https://drive.google.com/file/d/${fileId}/preview`
+        }
+      }
+    } catch (e) {
+      console.error('Error normalizing PDF URL:', e)
+    }
+
+    return finalUrl
+  }
+
   const handleView = async (magazine: Magazine) => {
     console.log('🎯 handleView called for:', magazine.title)
 
@@ -132,34 +162,27 @@ function EpaperPageContent() {
       return
     }
 
-    // Open window IMMEDIATELY to avoid popup blockers
-    const pdfUrl = magazine.pdfUrl
-    const newWindow = window.open('about:blank', '_blank', 'noopener,noreferrer')
-
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-      console.log('❌ Popup blocked or failed to open')
-      toast.error(t('popup_blocked', 'Popup blocked. Attempting to open in current tab...', 'பாப்-அப் தடுக்கப்பட்டது. தற்போதைய டேபில் திறக்கப்படுகிறது...'), { icon: '⚠️' })
-    } else {
-      toast.success(t('view_started', 'Opening PDF...', 'PDF திறக்கப்படுகிறது...'))
-    }
-
     try {
-      // Process URL if needed
-      let finalUrl = pdfUrl
-      if (finalUrl.includes('drive.google.com/file/d/')) {
-        const fileId = finalUrl.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)?.[1]
-        if (fileId) {
-          finalUrl = `https://drive.google.com/file/d/${fileId}/view`
-        }
-      }
-
+      // Process URL if needed (Google Drive, etc.)
+      const finalUrl = normalizePdfUrl(magazine.pdfUrl)
       console.log(`🌐 Final PDF URL: ${finalUrl}`)
 
-      // Update the opened window or navigate if blocked
-      if (newWindow) {
-        newWindow.location.href = finalUrl
+      // Always try to open in a NEW TAB only
+      const newWindow = window.open(finalUrl, '_blank', 'noopener,noreferrer')
+
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        console.log('❌ Popup blocked or failed to open')
+        // Do NOT navigate the current tab anymore – just inform the user
+        toast.error(
+          t(
+            'popup_blocked',
+            'Popup was blocked. Please allow popups for this site or open the link in a new tab.',
+            'பாப்-அப் தடுக்கப்பட்டது. தயவுசெய்து இந்த தளத்திற்கு பாப்-அப் அனுமதிக்கவும் அல்லது இணைப்பை புதிய டேபில் திறக்கவும்.'
+          ),
+          { icon: '⚠️' }
+        )
       } else {
-        window.location.href = finalUrl
+        toast.success(t('view_started', 'Opening PDF in new tab...', 'PDF புதிய டேபில் திறக்கப்படுகிறது...'))
       }
 
       // Track view as download in database
@@ -181,7 +204,7 @@ function EpaperPageContent() {
         console.error('View tracking API failed:', apiError)
       }
 
-      console.log(`👁️ Viewing: ${magazine.title} - URL: ${pdfUrl}`)
+      console.log(`👁️ Viewing: ${magazine.title} - URL: ${finalUrl}`)
     } catch (error) {
       console.error('PDF view error:', error)
       toast.error(t('view_failed', 'Failed to open PDF', 'PDF திறக்க முடியவில்லை'))
@@ -242,47 +265,58 @@ function EpaperPageContent() {
     }
   }
 
-  const handleLike = async (magazine: Magazine) => {
-    const isLiked = likedMagazines.has(magazine.id)
-
-    try {
-      if (isLiked) {
-        // Unlike
-        const newSet = new Set(likedMagazines)
-        newSet.delete(magazine.id)
-        updateLikedMagazines(newSet)
-        toast.success(t('unliked', 'Removed from favorites', 'பிடித்தவைகளிலிருந்து நீக்கப்பட்டது'))
-      } else {
-        // Like
-        const newSet = new Set(likedMagazines).add(magazine.id)
-        updateLikedMagazines(newSet)
-        toast.success(t('liked', 'Added to favorites', 'பிடித்தவைகளில் சேர்க்கப்பட்டது'))
-
-        // Call API to increment likes in database
-        try {
-          const response = await fetch(`/api/magazines/${magazine.id}/like`, {
-            method: 'POST'
-          })
-
-          if (response.ok) {
-            const data = await response.json()
-            console.log(`✅ Like saved to DB. New count: ${data.likes}`)
-
-            // Update the magazine data with new likes count
-            setMagazines(prev => prev.map(m =>
-              m.id === magazine.id ? { ...m, likes: data.likes } : m
-            ))
-          }
-        } catch (apiError) {
-          console.error('API call failed:', apiError)
-        }
-      }
-
-      console.log(`❤️ ${isLiked ? 'Unliked' : 'Liked'}: ${magazine.title}`)
-    } catch (error) {
-      toast.error(t('like_failed', 'Action failed', 'செயல் தோல்வியடைந்தது'))
-    }
+  const handleImageError = (magazineId: string) => {
+    console.error('❌ Image failed to load for magazine:', magazineId)
+    setImageErrors(prev => new Set(prev).add(magazineId))
   }
+
+	  const handleLike = async (magazine: Magazine) => {
+	    const isLiked = likedMagazines.has(magazine.id)
+
+	    try {
+	      const newSet = new Set(likedMagazines)
+	      const action = isLiked ? 'unlike' : 'like'
+
+	      if (isLiked) {
+	        // Unlike
+	        newSet.delete(magazine.id)
+	        updateLikedMagazines(newSet)
+	        toast.success(t('unliked', 'Removed from favorites', 'பிடித்தவைகளிலிருந்து நீக்கப்பட்டது'))
+	      } else {
+	        // Like
+	        newSet.add(magazine.id)
+	        updateLikedMagazines(newSet)
+	        toast.success(t('liked', 'Added to favorites', 'பிடித்தவைகளில் சேர்க்கப்பட்டது'))
+	      }
+
+	      // Call API to update likes count in database
+	      try {
+	        const response = await fetch(`/api/magazines/${magazine.id}/like`, {
+	          method: 'POST',
+	          headers: {
+	            'Content-Type': 'application/json'
+	          },
+	          body: JSON.stringify({ action })
+	        })
+
+	        if (response.ok) {
+	          const data = await response.json()
+	          console.log(`✅ Like updated in DB. New count: ${data.likes}`)
+
+	          // Update the magazine data with new likes count
+	          setMagazines(prev => prev.map(m =>
+	            m.id === magazine.id ? { ...m, likes: data.likes } : m
+	          ))
+	        }
+	      } catch (apiError) {
+	        console.error('API call failed:', apiError)
+	      }
+
+	      console.log(`❤️ ${isLiked ? 'Unliked' : 'Liked'}: ${magazine.title}`)
+	    } catch (error) {
+	      toast.error(t('like_failed', 'Action failed', 'செயல் தோல்வியடைந்தது'))
+	    }
+	  }
 
   const handleShare = async (magazine: Magazine) => {
     const shareData = {
@@ -382,95 +416,83 @@ function EpaperPageContent() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
           {filteredMagazines.map((magazine) => (
             <Card
               key={magazine.id}
               hover
-              className="transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white rounded-lg overflow-hidden"
+              padding="sm"
+              className="transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white rounded-lg overflow-hidden !p-0"
             >
               {/* Cover Image - Clickable to Open PDF */}
               <div
-                className="relative w-full h-64 sm:h-72 md:h-80 overflow-hidden group cursor-pointer bg-gradient-to-br from-blue-100 to-blue-200"
-                onClick={(e) => {
-                  console.log('🎯 Cover clicked for:', magazine.title)
-                  console.log('🔗 PDF URL:', magazine.pdfUrl)
-                  handleView(magazine)
-                }}
+                className="relative w-full overflow-hidden group cursor-pointer"
+                onClick={() => handleView(magazine)}
               >
-                {/* Cover Image */}
-                {(magazine.coverImage || magazine.featuredImage) ? (
-                  <img
-                    src={magazine.coverImage || magazine.featuredImage}
-                    alt={`${magazine.title} cover`}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                    onLoad={() => console.log('✅ Image loaded successfully:', magazine.coverImage || magazine.featuredImage)}
-                    onError={(e) => {
-                      console.log('❌ Image failed to load:', magazine.coverImage || magazine.featuredImage)
-                      const target = e.currentTarget as HTMLImageElement
-                      target.style.display = 'none'
-                      // Show fallback
-                      const fallback = target.parentElement?.querySelector('.fallback-placeholder') as HTMLElement
-                      if (fallback) {
-                        fallback.style.display = 'flex'
-                      }
-                    }}
-                  />
-                ) : null}
+                {/* Show cover image if available and not errored */}
+                {(magazine.coverImage || magazine.featuredImage) && !imageErrors.has(magazine.id) ? (
+                  <>
+                    {/* Actual Cover Image */}
+                    <img
+                      src={magazine.coverImage || magazine.featuredImage}
+                      alt={`${magazine.title} cover`}
+                      className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+                      onLoad={() => console.log('✅ Cover loaded:', magazine.title)}
+                      onError={() => {
+                        console.error('❌ Cover failed:', magazine.title, magazine.coverImage || magazine.featuredImage)
+                        handleImageError(magazine.id)
+                      }}
+                    />
 
-                {/* Fallback placeholder */}
-                <div
-                  className={`fallback-placeholder absolute inset-0 w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center transition-transform group-hover:scale-105 ${(magazine.coverImage || magazine.featuredImage) ? 'hidden' : 'flex'}`}
-                >
-                  <div className="text-center">
-                    <FileText className="w-12 h-12 text-blue-400 mx-auto mb-2" />
-                    <p className="text-sm text-blue-600 font-medium">
-                      <TranslatedText tamil="PDF இதழ்">PDF Magazine</TranslatedText>
-                    </p>
-                    <p className="text-xs text-blue-500 mt-1">
-                      <TranslatedText tamil="திறக்க கிளிக் செய்யவும்">Click to open</TranslatedText>
-                    </p>
-                  </div>
-                </div>
-
-                {/* PDF Open Indicator - only show on hover when image exists */}
-                {(magazine.coverImage || magazine.featuredImage) && (
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 rounded-full p-3">
-                      <Eye className="w-6 h-6 text-blue-600" />
+                    {/* Hover overlay with eye icon - only visible on hover */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center pointer-events-none">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white rounded-full p-4 shadow-lg">
+                        <Eye className="w-8 h-8 text-blue-600" />
+                      </div>
                     </div>
-                  </div>
-                )}
 
-                {/* Click to Open PDF Label - only show when image exists */}
-                {(magazine.coverImage || magazine.featuredImage) && (
-                  <div className="absolute bottom-2 left-2 right-2">
-                    <div className="bg-blue-600 bg-opacity-90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-center">
-                      <TranslatedText tamil="PDF திறக்க கிளிக் செய்யவும்">Click to open PDF</TranslatedText>
+                    {/* "Click to open PDF" label on hover */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                      <p className="text-white text-sm font-medium text-center">
+                        <TranslatedText tamil="PDF திறக்க கிளிக் செய்யவும்">Click to open PDF</TranslatedText>
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  /* Fallback placeholder when no image or image failed */
+                  <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center transition-transform group-hover:scale-105">
+                    <div className="text-center p-6">
+                      <FileText className="w-16 h-16 text-blue-400 mx-auto mb-3" />
+                      <p className="text-base text-blue-600 font-semibold mb-1">
+                        <TranslatedText tamil="PDF இதழ்">PDF Magazine</TranslatedText>
+                      </p>
+                      <p className="text-sm text-blue-500">
+                        <TranslatedText tamil="திறக்க கிளிக் செய்யவும்">Click to open</TranslatedText>
+                      </p>
                     </div>
                   </div>
                 )}
               </div>
 
               {/* Magazine Details */}
-              <div className="p-4">
+              <div className="p-3">
                 {/* Title */}
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                <h3 className="text-sm font-semibold text-gray-900 mb-2 line-clamp-2">
                   <TranslatedText tamil={magazine.title_ta || magazine.title}>
                     {magazine.title}
                   </TranslatedText>
                 </h3>
 
                 {/* Magazine Info */}
-                <div className="space-y-2 mb-4">
+                <div className="space-y-1.5 mb-3">
                   {magazine.issueNumber && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <FileText className="w-4 h-4 mr-2" />
+                    <div className="flex items-center text-xs text-gray-600">
+                      <FileText className="w-3.5 h-3.5 mr-1.5" />
                       <TranslatedText tamil="இதழ்">Issue</TranslatedText>: {magazine.issueNumber}
                     </div>
                   )}
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="w-4 h-4 mr-2" />
+                  <div className="flex items-center text-xs text-gray-600">
+                    <Calendar className="w-3.5 h-3.5 mr-1.5" />
                     {new Date(magazine.publishedAt).toLocaleDateString(
                       language === 'ta' ? 'ta-IN' : 'en-IN'
                     )}
@@ -478,7 +500,7 @@ function EpaperPageContent() {
                 </div>
 
                 {/* Stats */}
-                <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
+                <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
                   <span className="flex items-center gap-1">
                     <Eye className="w-3 h-3" />
                     {magazine.downloads || 0} <TranslatedText tamil="பார்வைகள்">views</TranslatedText>
@@ -490,7 +512,8 @@ function EpaperPageContent() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-2">
+                <div className="space-y-1.5">
+                  {/* Download Button - Full Width */}
                   <Button
                     onClick={(e) => {
                       e.stopPropagation()
@@ -499,37 +522,40 @@ function EpaperPageContent() {
                     variant="primary"
                     size="sm"
                     disabled={!magazine.pdfUrl}
-                    className="flex-1"
+                    className="w-full text-xs py-1.5"
                   >
-                    <Download className="w-4 h-4 mr-1" />
+                    <Download className="w-3.5 h-3.5 mr-1" />
                     <TranslatedText tamil="பதிவிறக்கம்">Download</TranslatedText>
                   </Button>
 
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleLike(magazine)
-                    }}
-                    variant={likedMagazines.has(magazine.id) ? "primary" : "outline"}
-                    size="sm"
-                    className="px-3"
-                  >
-                    <Heart
-                      className={`w-4 h-4 ${likedMagazines.has(magazine.id) ? 'fill-current' : ''}`}
-                    />
-                  </Button>
+                  {/* Like and Share Buttons - Side by Side */}
+                  <div className="flex gap-1.5">
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleLike(magazine)
+                      }}
+                      variant={likedMagazines.has(magazine.id) ? "primary" : "outline"}
+                      size="sm"
+                      className="flex-1 py-1.5"
+                    >
+                      <Heart
+                        className={`w-3.5 h-3.5 ${likedMagazines.has(magazine.id) ? 'fill-current' : ''}`}
+                      />
+                    </Button>
 
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleShare(magazine)
-                    }}
-                    variant="outline"
-                    size="sm"
-                    className="px-3"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </Button>
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleShare(magazine)
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 py-1.5"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </Card>
