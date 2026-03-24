@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { prisma } from '@/lib/prisma'
+import BusinessVideoHeader from '@/components/BusinessVideoHeader'
 
 interface Business {
   id: string
@@ -14,6 +15,7 @@ interface Business {
   website?: string
   mainImage?: string
   mainVideoUrl?: string
+  videoType?: string
   youtubeUrl?: string
   instagramUrl?: string
   facebookUrl?: string
@@ -41,10 +43,47 @@ async function getBusiness(id: string): Promise<Business | null> {
   }
 }
 
-// Helper function to get YouTube ID from URL
+// Helper function to get YouTube ID from URL (including Shorts)
 function getYouTubeId(url: string): string | null {
-  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
+  // Handle different YouTube URL formats
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,           // Standard watch URL
+    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,                       // Shortened URL
+    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,             // Embed URL
+    /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,            // Shorts URL
+  ]
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern)
+    if (match && match[1]) {
+      return match[1]
+    }
+  }
+
+  return null
+}
+
+// Helper function to get Instagram Reel ID from URL
+function getInstagramReelId(url: string): string | null {
+  const match = url.match(/instagram\.com\/reel\/([^/?#]+)/)
   return match ? match[1] : null
+}
+
+// Helper function to determine video type
+function getVideoType(url: string, videoType?: string): 'YOUTUBE_VIDEO' | 'YOUTUBE_SHORTS' | 'INSTAGRAM_REEL' | null {
+  if (videoType) {
+    return videoType as 'YOUTUBE_VIDEO' | 'YOUTUBE_SHORTS' | 'INSTAGRAM_REEL'
+  }
+
+  if (url.includes('youtube.com/shorts') || url.includes('shorts/')) {
+    return 'YOUTUBE_SHORTS'
+  } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    return 'YOUTUBE_VIDEO'
+  } else if (url.includes('instagram.com/reel')) {
+    return 'INSTAGRAM_REEL'
+  }
+
+  return null
 }
 
 // Helper function to get YouTube thumbnail
@@ -183,22 +222,8 @@ export default async function BusinessPage({ params }: PageProps) {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Business Header */}
-          <div className="relative h-64 bg-gradient-to-r from-blue-500 to-purple-600">
-            {business.mainImage && (
-              <img
-                src={`/api/image/${business.mainImage}`}
-                alt={business.name}
-                className="w-full h-full object-cover"
-              />
-            )}
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end">
-              <div className="p-6 text-white">
-                <h1 className="text-3xl font-bold mb-2">{business.name}</h1>
-                <p className="text-lg opacity-90">{business.address}</p>
-              </div>
-            </div>
-          </div>
+          {/* Business Header with Video/Image */}
+          <BusinessVideoHeader business={business} />
 
           {/* Business Details */}
           <div className="p-6">

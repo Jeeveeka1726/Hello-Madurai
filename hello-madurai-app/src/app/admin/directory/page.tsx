@@ -55,6 +55,7 @@ interface Business {
   website?: string
   mainImage?: string
   mainVideoUrl?: string
+  videoType?: string
   youtubeUrl?: string
   instagramUrl?: string
   facebookUrl?: string
@@ -94,6 +95,7 @@ export default function AdminDirectoryPage() {
     website: '',
     mainImage: '',
     mainVideoUrl: '',
+    videoType: '',
     youtubeUrl: '',
     instagramUrl: '',
     facebookUrl: '',
@@ -118,9 +120,9 @@ export default function AdminDirectoryPage() {
     }
   }, [isAdmin])
 
-  // YouTube helper functions
+  // YouTube helper functions (including Shorts)
   const getYouTubeId = (url: string): string | null => {
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
     return match ? match[1] : null
   }
 
@@ -209,12 +211,34 @@ export default function AdminDirectoryPage() {
 
       const method = editingBusiness ? 'PUT' : 'POST'
 
-      // Ensure exclusive media selection before submission
+      // Ensure exclusive media selection based on selectedMediaType
       const submissionData = { ...formData }
-      if (submissionData.mainImage && submissionData.mainVideoUrl) {
-        // If both exist, prioritize image and clear video
+
+      console.log('📤 Submitting with selectedMediaType:', selectedMediaType)
+      console.log('📤 Before cleanup - mainImage:', submissionData.mainImage ? 'exists' : 'empty')
+      console.log('📤 Before cleanup - mainVideoUrl:', submissionData.mainVideoUrl ? 'exists' : 'empty')
+
+      if (selectedMediaType === 'image') {
+        // User selected image - clear video
         submissionData.mainVideoUrl = ''
+        submissionData.videoType = ''
+        console.log('✅ Cleared video, keeping image')
+      } else if (selectedMediaType === 'video') {
+        // User selected video - clear image
+        submissionData.mainImage = ''
+        console.log('✅ Cleared image, keeping video')
+      } else {
+        // No media type selected - clear both if switching from one to none
+        if (!submissionData.mainImage && !submissionData.mainVideoUrl) {
+          submissionData.mainImage = ''
+          submissionData.mainVideoUrl = ''
+          submissionData.videoType = ''
+          console.log('✅ No media selected, cleared both')
+        }
       }
+
+      console.log('📤 After cleanup - mainImage:', submissionData.mainImage ? 'exists' : 'empty')
+      console.log('📤 After cleanup - mainVideoUrl:', submissionData.mainVideoUrl ? 'exists' : 'empty')
 
       const response = await fetch(url, {
         method,
@@ -243,6 +267,7 @@ export default function AdminDirectoryPage() {
           website: '',
           mainImage: '',
           mainVideoUrl: '',
+        videoType: '',
           youtubeUrl: '',
           instagramUrl: '',
           facebookUrl: '',
@@ -268,19 +293,23 @@ export default function AdminDirectoryPage() {
   const handleEdit = (business: Business) => {
     setEditingBusiness(business)
 
-    // Handle exclusive media selection - prioritize image over video if both exist
+    // Determine which media type to show based on what exists
+    // Don't modify the data - just set the radio button state
     let mainImage = business.mainImage || ''
     let mainVideoUrl = business.mainVideoUrl || ''
     let mediaType: 'image' | 'video' | '' = ''
 
-    // If both exist, prioritize image and clear video
-    if (mainImage && mainVideoUrl) {
-      mainVideoUrl = ''
-      mediaType = 'image'
+    console.log('🔧 handleEdit - mainImage:', mainImage ? 'exists' : 'empty')
+    console.log('🔧 handleEdit - mainVideoUrl:', mainVideoUrl ? 'exists' : 'empty')
+
+    // Determine which media type to select in the radio buttons
+    // If both exist, we need to pick one to show - let's prioritize video since it's newer
+    if (mainVideoUrl) {
+      mediaType = 'video'
+      console.log('🔧 Setting mediaType to: video')
     } else if (mainImage) {
       mediaType = 'image'
-    } else if (mainVideoUrl) {
-      mediaType = 'video'
+      console.log('🔧 Setting mediaType to: image')
     }
 
     setSelectedMediaType(mediaType)
@@ -298,6 +327,7 @@ export default function AdminDirectoryPage() {
       website: business.website || '',
       mainImage: mainImage,
       mainVideoUrl: mainVideoUrl,
+      videoType: business.videoType || '',
       youtubeUrl: business.youtubeUrl || '',
       instagramUrl: business.instagramUrl || '',
       facebookUrl: business.facebookUrl || '',
@@ -377,6 +407,7 @@ export default function AdminDirectoryPage() {
                 website: '',
                 mainImage: '',
                 mainVideoUrl: '',
+                videoType: '',
                 videoUrl: '',
                 youtubeUrl: '',
                 instagramUrl: '',
@@ -438,6 +469,7 @@ export default function AdminDirectoryPage() {
                           value="video"
                           checked={selectedMediaType === 'video'}
                           onChange={() => {
+                            console.log('📻 Video radio button selected - clearing mainImage')
                             setSelectedMediaType('video')
                             setFormData({ ...formData, mainImage: '' })
                           }}
@@ -481,15 +513,29 @@ export default function AdminDirectoryPage() {
                     {selectedMediaType === 'video' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <TranslatedText>Video Type</TranslatedText>
+                        </label>
+                        <select
+                          value={formData.videoType || ''}
+                          onChange={(e) => setFormData({ ...formData, videoType: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 mb-3"
+                        >
+                          <option value="">Select Video Type</option>
+                          <option value="YOUTUBE_VIDEO">YouTube Video</option>
+                          <option value="YOUTUBE_SHORTS">YouTube Shorts</option>
+                          <option value="INSTAGRAM_REEL">Instagram Reel</option>
+                        </select>
+
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                           <TranslatedText>Main Business Video URL</TranslatedText>
-                          <span className="text-xs text-gray-500 ml-2">(YouTube recommended for best sharing)</span>
+                          <span className="text-xs text-gray-500 ml-2">(YouTube or Instagram URL)</span>
                         </label>
                         <input
                           type="url"
                           value={formData.mainVideoUrl}
                           onChange={(e) => setFormData({ ...formData, mainVideoUrl: e.target.value, mainImage: '' })}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                          placeholder="https://www.youtube.com/watch?v=..."
+                          placeholder="https://www.youtube.com/watch?v=... or https://www.instagram.com/reel/..."
                         />
 
                         {/* YouTube Thumbnail Preview */}

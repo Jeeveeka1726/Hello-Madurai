@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { X, ExternalLink, Phone, Mail, Globe, MapPin, Instagram, Facebook, Youtube } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import TranslatedText from '@/components/TranslatedText'
+import VideoPlayerModal from '@/components/VideoPlayerModal'
+import { PlayIcon } from '@heroicons/react/24/solid'
 
 interface Business {
   id: string
@@ -16,6 +18,7 @@ interface Business {
   website?: string
   mainImage?: string
   mainVideoUrl?: string
+  videoType?: string  // Added to support video type detection
   youtubeUrl?: string
   instagramUrl?: string
   facebookUrl?: string
@@ -35,6 +38,7 @@ interface BusinessProfilePopupProps {
 
 export default function BusinessProfilePopup({ business, isOpen, onClose }: BusinessProfilePopupProps) {
   const { language } = useLanguage()
+  const [isVideoPlayerOpen, setIsVideoPlayerOpen] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
@@ -50,93 +54,179 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
 
   if (!isOpen) return null
 
-  const getYouTubeEmbedUrl = (url: string) => {
-    // Match YouTube regular videos, shorts, and youtu.be links
-    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&\n?#]+)/)
-    return videoId ? `https://www.youtube.com/embed/${videoId[1]}` : null
-  }
+  // Helper function to get YouTube ID from URL (including Shorts)
+  const getYouTubeId = (url: string): string | null => {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+      /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+    ]
 
-  const getInstagramEmbedUrl = (url: string) => {
-    // Match Instagram posts and reels
-    const match = url.match(/instagram\.com\/(p|reel|reels)\/([^/?#]+)/)
-    if (match) {
-      return `https://www.instagram.com/${match[1]}/${match[2]}/embed`
+    for (const pattern of patterns) {
+      const match = url.match(pattern)
+      if (match && match[1]) {
+        console.log('🎬 BusinessProfilePopup - Extracted YouTube ID:', match[1])
+        return match[1]
+      }
     }
+    console.log('❌ BusinessProfilePopup - Failed to extract YouTube ID from:', url)
     return null
   }
 
-  const isVerticalVideo = (url: string) => {
-    // Check if it's a YouTube Short or Instagram video (vertical format)
-    return url.includes('/shorts/') || url.includes('instagram.com')
+  // Helper function to get Instagram Reel ID from URL
+  const getInstagramReelId = (url: string): string | null => {
+    const match = url.match(/instagram\.com\/reel\/([^/?#]+)/)
+    return match ? match[1] : null
+  }
+
+  // Helper function to determine video type
+  const getVideoType = (url: string, videoType?: string): 'YOUTUBE_VIDEO' | 'YOUTUBE_SHORTS' | 'INSTAGRAM_REEL' | null => {
+    if (videoType) {
+      return videoType as 'YOUTUBE_VIDEO' | 'YOUTUBE_SHORTS' | 'INSTAGRAM_REEL'
+    }
+
+    if (url.includes('youtube.com/shorts') || url.includes('shorts/')) {
+      return 'YOUTUBE_SHORTS'
+    } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      return 'YOUTUBE_VIDEO'
+    } else if (url.includes('instagram.com/reel')) {
+      return 'INSTAGRAM_REEL'
+    }
+
+    return null
   }
 
   const renderVideoContent = () => {
     // Check profileVideo first, then fall back to mainVideoUrl
     const videoUrl = business.profileVideo || business.mainVideoUrl
 
-    if (videoUrl) {
-      const isVertical = isVerticalVideo(videoUrl)
+    if (!videoUrl) return null
 
-      // Try YouTube first
-      const youtubeEmbedUrl = getYouTubeEmbedUrl(videoUrl)
-      if (youtubeEmbedUrl) {
-        if (isVertical) {
-          // Vertical video (YouTube Shorts) - use fixed height approach
-          return (
-            <div className="w-full mb-4 sm:mb-6 -mx-3 sm:mx-0 flex justify-center bg-black">
-              <div className="w-full sm:w-auto sm:max-w-md">
-                <div className="relative w-full profile-vertical-video">
-                  <iframe
-                    src={youtubeEmbedUrl}
-                    className="absolute inset-0 w-full h-full sm:rounded-lg"
-                    allowFullScreen
-                    title="Business Video"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  />
+    const vType = getVideoType(videoUrl, business.videoType)
+    const videoId = getYouTubeId(videoUrl)
+    const reelId = getInstagramReelId(videoUrl)
+
+    console.log('🎬 Profile Video:', { vType, videoId, reelId, videoUrl })
+
+    // Determine the modal video type
+    let modalVideoType: 'youtube' | 'instagram' | 'upload' = 'youtube'
+    if (vType === 'INSTAGRAM_REEL') {
+      modalVideoType = 'instagram'
+    }
+
+    // Get thumbnail URL
+    let thumbnailUrl = ''
+    let showThumbnail = false
+
+    if (videoId) {
+      thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+      showThumbnail = true
+      console.log('🖼️ BusinessProfilePopup - YouTube thumbnail URL:', thumbnailUrl)
+      console.log('🖼️ BusinessProfilePopup - showThumbnail:', showThumbnail)
+      console.log('🖼️ BusinessProfilePopup - videoId:', videoId)
+    } else if (vType === 'INSTAGRAM_REEL') {
+      // Instagram Reels don't have direct thumbnails, use gradient background
+      thumbnailUrl = ''
+      showThumbnail = false
+      console.log('📸 BusinessProfilePopup - Instagram Reel, using gradient')
+    } else {
+      console.log('⚠️ BusinessProfilePopup - No videoId found, vType:', vType)
+    }
+
+    console.log('🎨 Rendering video content - showThumbnail:', showThumbnail, 'thumbnailUrl:', thumbnailUrl)
+
+    return (
+      <>
+        <div className="w-full mb-4 sm:mb-6">
+          <div
+            className="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden cursor-pointer group"
+            onClick={() => setIsVideoPlayerOpen(true)}
+          >
+            {/* Background Layer - Thumbnail or Gradient */}
+            {showThumbnail && thumbnailUrl ? (
+              <img
+                src={thumbnailUrl}
+                alt="Video thumbnail"
+                className="absolute top-0 left-0 w-full h-full object-cover"
+                style={{ zIndex: 1 }}
+                loading="eager"
+                onLoad={() => {
+                  console.log('✅ Thumbnail loaded successfully:', thumbnailUrl)
+                }}
+                onError={(e) => {
+                  console.error('❌ Thumbnail failed to load, trying fallback:', thumbnailUrl)
+                  if (videoId) {
+                    const fallbackUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+                    console.log('🔄 Trying fallback URL:', fallbackUrl)
+                    e.currentTarget.src = fallbackUrl
+                  }
+                }}
+              />
+            ) : vType === 'INSTAGRAM_REEL' ? (
+              // Instagram Reel - gradient background with Instagram icon
+              <div
+                className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 flex items-center justify-center"
+                style={{ zIndex: 1 }}
+              >
+                <div className="text-center text-white">
+                  <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                  <p className="text-sm font-medium">Instagram Reel</p>
                 </div>
               </div>
-            </div>
-          )
-        } else {
-          // Horizontal video - standard 16:9
-          return (
-            <div className="w-full mb-4 sm:mb-6 -mx-3 sm:mx-0">
-              <div className="relative w-full profile-horizontal-video">
-                <iframe
-                  src={youtubeEmbedUrl}
-                  className="absolute inset-0 w-full h-full sm:rounded-lg"
-                  allowFullScreen
-                  title="Business Video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                />
+            ) : (
+              // Fallback gradient for other video types
+              <div
+                className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+                style={{ zIndex: 1 }}
+              >
+                <div className="text-center text-white">
+                  <div className="bg-white bg-opacity-20 p-4 rounded-full mb-3 mx-auto w-fit">
+                    <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium">Video</p>
+                </div>
               </div>
-            </div>
-          )
-        }
-      }
+            )}
 
-      // Try Instagram
-      const instagramEmbedUrl = getInstagramEmbedUrl(videoUrl)
-      if (instagramEmbedUrl) {
-        return (
-          <div className="w-full mb-4 sm:mb-6 -mx-3 sm:mx-0 flex justify-center bg-black">
-            <div className="w-full sm:w-auto sm:max-w-md">
-              <div className="relative w-full profile-vertical-video">
-                <iframe
-                  src={instagramEmbedUrl}
-                  className="absolute inset-0 w-full h-full sm:rounded-lg"
-                  allowFullScreen
-                  title="Business Video"
-                  scrolling="no"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                />
+            {/* Play Button Overlay - Above thumbnail */}
+            <div
+              className="absolute inset-0 flex items-center justify-center group-hover:bg-black group-hover:bg-opacity-30 transition-all duration-300 pointer-events-none"
+              style={{ zIndex: 10 }}
+            >
+              <div className="bg-red-600 text-white p-4 rounded-full shadow-lg transform group-hover:scale-110 transition-transform duration-300 pointer-events-auto">
+                <PlayIcon className="w-8 h-8" />
               </div>
             </div>
+
+            {/* Video Type Badge - Above everything */}
+            {vType && (
+              <div
+                className="absolute top-3 left-3 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm font-medium"
+                style={{ zIndex: 20 }}
+              >
+                {vType === 'YOUTUBE_SHORTS' && 'YouTube Shorts'}
+                {vType === 'YOUTUBE_VIDEO' && 'YouTube Video'}
+                {vType === 'INSTAGRAM_REEL' && 'Instagram Reel'}
+              </div>
+            )}
           </div>
-        )
-      }
-    }
-    return null
+        </div>
+
+        {/* Video Player Modal */}
+        <VideoPlayerModal
+          isOpen={isVideoPlayerOpen}
+          onClose={() => setIsVideoPlayerOpen(false)}
+          videoUrl={videoUrl}
+          videoType={modalVideoType}
+          title={business.name}
+        />
+      </>
+    )
   }
 
   return (
@@ -177,8 +267,12 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
             </div>
           )}
 
-          {/* Main Video */}
-          {renderVideoContent()}
+          {/* Profile Video - Centered */}
+          <div className="mb-4 sm:mb-6">
+            <div className="w-full max-w-3xl mx-auto px-0">
+              {renderVideoContent()}
+            </div>
+          </div>
 
           {/* Contact Information */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">

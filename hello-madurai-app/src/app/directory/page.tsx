@@ -278,6 +278,8 @@ function DirectoryPageContent() {
     fetchData()
   }, [language])
 
+
+
   // Handle business parameter from URL (for social media sharing)
   useEffect(() => {
     const businessId = searchParams.get('business')
@@ -313,18 +315,61 @@ function DirectoryPageContent() {
   }, [searchParams, categories])
 
   const getYouTubeEmbedUrl = (url: string) => {
-    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
-    return videoId ? `https://www.youtube.com/embed/${videoId[1]}` : null
+    // Updated regex to support YouTube Shorts and extract exactly 11 characters
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,           // Standard watch URL
+      /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,                       // Shortened URL
+      /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,             // Embed URL
+      /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,            // Shorts URL
+    ]
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern)
+      if (match && match[1]) {
+        return `https://www.youtube.com/embed/${match[1]}`
+      }
+    }
+    return null
+  }
+
+  const getInstagramEmbedUrl = (url: string) => {
+    // Extract Instagram Reel/Post ID - support both /reel/ and /reels/ (plural)
+    const postId = url.match(/\/(?:reels?|p)\/([^\/\?]+)/)
+    if (postId) {
+      // Add captioned=0 to remove caption overlay for cleaner look
+      return `https://www.instagram.com/p/${postId[1]}/embed/captioned/?cr=1&v=14`
+    }
+    return null
   }
 
   const getYouTubeId = (url: string): string | null => {
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
-    return match ? match[1] : null
+    // Updated regex to support YouTube Shorts and extract exactly 11 characters
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,           // Standard watch URL
+      /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,                       // Shortened URL
+      /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,             // Embed URL
+      /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,            // Shorts URL
+    ]
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern)
+      if (match && match[1]) {
+        console.log('✅ Extracted YouTube ID:', match[1], 'from URL:', url)
+        return match[1]
+      }
+    }
+    console.log('❌ Failed to extract YouTube ID from URL:', url)
+    return null
   }
 
   const getYouTubeThumbnail = (url: string) => {
-    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)
-    return videoId ? `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg` : ''
+    const videoId = getYouTubeId(url)
+    if (videoId) {
+      const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+      console.log('🖼️ Generated thumbnail URL:', thumbnailUrl)
+      return thumbnailUrl
+    }
+    return ''
   }
 
   const handleVideoPlay = (businessId: string) => {
@@ -888,13 +933,15 @@ function DirectoryPageContent() {
                               // Show video player when playing - Responsive 16:9 aspect ratio
                               <div className="relative w-full aspect-video bg-black sm:rounded-lg overflow-hidden">
                                 {(() => {
-                                  const embedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
-                                  if (embedUrl) {
+                                  const youtubeEmbedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
+                                  const instagramEmbedUrl = getInstagramEmbedUrl(business.mainVideoUrl)
+
+                                  if (youtubeEmbedUrl) {
                                     return (
                                       <>
                                         <iframe
                                           key={`${business.id}-${videoKey}`}
-                                          src={`${embedUrl}?autoplay=1&rel=0&modestbranding=1`}
+                                          src={`${youtubeEmbedUrl}?autoplay=1&rel=0&modestbranding=1`}
                                           className="absolute inset-0 w-full h-full border-0"
                                           allowFullScreen
                                           title={`${business.name} video`}
@@ -908,8 +955,46 @@ function DirectoryPageContent() {
                                         </button>
                                       </>
                                     )
+                                  } else if (instagramEmbedUrl) {
+                                    // Instagram Reel player - use iframe for better inline playback
+                                    return (
+                                      <>
+                                        {/* Instagram gradient background */}
+                                        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 flex items-center justify-center">
+                                          <div className="text-center text-white">
+                                            <svg className="w-20 h-20 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
+                                              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                            </svg>
+                                            <p className="text-base font-medium">Instagram Reel</p>
+                                          </div>
+                                        </div>
+                                        {/* Instagram iframe - centered vertical format for better inline playback */}
+                                        <div className="absolute inset-0 flex items-center justify-center z-10">
+                                          <iframe
+                                            key={`${business.id}-${videoKey}`}
+                                            src={instagramEmbedUrl}
+                                            className="border-0"
+                                            style={{
+                                              width: '328px',
+                                              height: '100%',
+                                              maxHeight: '580px',
+                                              backgroundColor: 'transparent'
+                                            }}
+                                            allowFullScreen
+                                            title={`${business.name} Instagram Reel`}
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                          />
+                                        </div>
+                                        <button
+                                          onClick={handleVideoClose}
+                                          className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity z-20"
+                                        >
+                                          <XMarkIcon className="w-4 h-4" />
+                                        </button>
+                                      </>
+                                    )
                                   } else {
-                                    // Fallback for non-YouTube videos
+                                    // Fallback for non-YouTube/Instagram videos
                                     return (
                                       <>
                                         <video
@@ -945,10 +1030,13 @@ function DirectoryPageContent() {
                                     />
                                   </div>
                                 ) : business.mainVideoUrl ? (
-                                  // Show YouTube video thumbnail if no image but video exists
+                                  // Show video thumbnail if no image but video exists
                                   (() => {
                                     const youtubeId = getYouTubeId(business.mainVideoUrl)
+                                    const isInstagramReel = business.mainVideoUrl.includes('instagram.com/reel')
+
                                     if (youtubeId) {
+                                      // YouTube video - show thumbnail
                                       return (
                                         <div className="aspect-video w-full">
                                           <div
@@ -979,19 +1067,48 @@ function DirectoryPageContent() {
                                           </div>
                                         </div>
                                       )
-                                    } else {
-                                      // Non-YouTube video or invalid URL - show placeholder
+                                    } else if (isInstagramReel) {
+                                      // Instagram Reel - show gradient thumbnail
                                       return (
                                         <div className="aspect-video w-full">
                                           <div
-                                            className="w-full h-full bg-gray-900 rounded-lg flex items-center justify-center cursor-pointer"
+                                            className="relative w-full h-full bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 sm:rounded-lg overflow-hidden cursor-pointer group"
+                                            onClick={() => handleVideoPlay(business.id)}
+                                          >
+                                            {/* Instagram Icon and Text */}
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                                              <svg className="w-16 h-16 mb-3" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                              </svg>
+                                              <p className="text-sm font-medium">Instagram Reel</p>
+                                            </div>
+
+                                            {/* Play Button Overlay - Always Visible */}
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                              <div className="bg-black bg-opacity-60 text-white p-3 rounded-full shadow-lg">
+                                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                                  <path d="M8 5v14l11-7z" />
+                                                </svg>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )
+                                    } else {
+                                      // Other video types - show generic placeholder
+                                      return (
+                                        <div className="aspect-video w-full">
+                                          <div
+                                            className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center cursor-pointer group"
                                             onClick={() => handleVideoPlay(business.id)}
                                           >
                                           <div className="text-center text-white">
-                                            <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
-                                              <path d="M8 5v14l11-7z"/>
-                                            </svg>
-                                            <p className="text-sm">Play Video</p>
+                                            <div className="bg-white bg-opacity-20 p-4 rounded-full mb-3 mx-auto w-fit group-hover:bg-opacity-30 transition-all">
+                                              <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z"/>
+                                              </svg>
+                                            </div>
+                                            <p className="text-sm font-medium">Play Video</p>
                                           </div>
                                           </div>
                                         </div>
@@ -1517,13 +1634,15 @@ function DirectoryPageContent() {
                             // Show video player when playing - Responsive 16:9 aspect ratio
                             <div className="relative w-full aspect-video bg-black sm:rounded-lg overflow-hidden">
                               {(() => {
-                                const embedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
-                                if (embedUrl) {
+                                const youtubeEmbedUrl = getYouTubeEmbedUrl(business.mainVideoUrl)
+                                const instagramEmbedUrl = getInstagramEmbedUrl(business.mainVideoUrl)
+
+                                if (youtubeEmbedUrl) {
                                   return (
                                     <>
                                       <iframe
                                         key={`${business.id}-${videoKey}`}
-                                        src={`${embedUrl}?autoplay=1&rel=0&modestbranding=1`}
+                                        src={`${youtubeEmbedUrl}?autoplay=1&rel=0&modestbranding=1`}
                                         className="absolute inset-0 w-full h-full border-0"
                                         allowFullScreen
                                         title={`${business.name} video`}
@@ -1539,8 +1658,48 @@ function DirectoryPageContent() {
                                       </button>
                                     </>
                                   )
+                                } else if (instagramEmbedUrl) {
+                                  // Instagram Reel player - vertical format like Shorts
+                                  return (
+                                    <>
+                                      {/* Instagram gradient background */}
+                                      <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 flex items-center justify-center">
+                                        <div className="text-center text-white">
+                                          <svg className="w-20 h-20 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                          </svg>
+                                          <p className="text-base font-medium">Instagram Reel</p>
+                                        </div>
+                                      </div>
+                                      {/* Instagram iframe - centered vertical format */}
+                                      <div className="absolute inset-0 flex items-center justify-center z-10">
+                                        <iframe
+                                          key={`${business.id}-${videoKey}`}
+                                          src={instagramEmbedUrl}
+                                          className="border-0"
+                                          style={{
+                                            width: '328px',
+                                            height: '100%',
+                                            maxHeight: '580px',
+                                            backgroundColor: 'transparent'
+                                          }}
+                                          allowFullScreen
+                                          title={`${business.name} Instagram Reel`}
+                                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        />
+                                      </div>
+                                      <button
+                                        onClick={handleVideoClose}
+                                        className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity z-20"
+                                      >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                      </button>
+                                    </>
+                                  )
                                 } else {
-                                  // Fallback for non-YouTube videos
+                                  // Fallback for non-YouTube/Instagram videos
                                   return (
                                     <>
                                       <video
@@ -1578,9 +1737,11 @@ function DirectoryPageContent() {
                                   />
                                 </div>
                               ) : business.mainVideoUrl ? (
-                                // Show YouTube video thumbnail if no image but video exists
+                                // Show video thumbnail if no image but video exists
                                 (() => {
                                   const youtubeId = getYouTubeId(business.mainVideoUrl)
+                                  const isInstagramReel = business.mainVideoUrl.includes('instagram.com/reel')
+
                                   if (youtubeId) {
                                     return (
                                       <div className="aspect-video w-full">
@@ -1612,8 +1773,35 @@ function DirectoryPageContent() {
                                         </div>
                                       </div>
                                     )
+                                  } else if (isInstagramReel) {
+                                    // Instagram Reel - show gradient thumbnail
+                                    return (
+                                      <div className="aspect-video w-full">
+                                        <div
+                                          className="relative w-full h-full bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 sm:rounded-lg overflow-hidden cursor-pointer group"
+                                          onClick={() => handleVideoPlay(business.id)}
+                                        >
+                                          {/* Instagram Icon and Text */}
+                                          <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                                            <svg className="w-16 h-16 mb-3" fill="currentColor" viewBox="0 0 24 24">
+                                              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                            </svg>
+                                            <p className="text-sm font-medium">Instagram Reel</p>
+                                          </div>
+
+                                          {/* Play Button Overlay - Always Visible */}
+                                          <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="bg-black bg-opacity-60 text-white p-3 rounded-full shadow-lg">
+                                              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z" />
+                                              </svg>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )
                                   } else {
-                                    // Non-YouTube video or invalid URL - show placeholder
+                                    // Non-YouTube/Instagram video or invalid URL - show placeholder
                                     return (
                                       <div className="aspect-video w-full">
                                         <div

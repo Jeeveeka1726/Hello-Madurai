@@ -9,6 +9,11 @@ export async function PUT(
     const { id } = await params
     const data = await request.json()
 
+    console.log('🔧 API PUT - Received data for business:', id)
+    console.log('🔧 mainImage:', data.mainImage === '' ? 'EMPTY STRING (will be set to null)' : data.mainImage ? 'exists' : 'undefined')
+    console.log('🔧 mainVideoUrl:', data.mainVideoUrl === '' ? 'EMPTY STRING (will be set to null)' : data.mainVideoUrl ? 'exists' : 'undefined')
+    console.log('🔧 videoType:', data.videoType || 'not set')
+
     const business = await prisma.business.update({
       where: { id: id },
       data: {
@@ -22,8 +27,12 @@ export async function PUT(
         phone: data.phone,
         email: data.email || undefined,
         website: data.website || undefined,
-        mainImage: data.mainImage || undefined,
-        mainVideoUrl: data.mainVideoUrl || undefined,
+        // Handle mainImage: empty string should set to null, not undefined
+        mainImage: data.mainImage === '' ? null : (data.mainImage || undefined),
+        // Handle mainVideoUrl: empty string should set to null, not undefined
+        mainVideoUrl: data.mainVideoUrl === '' ? null : (data.mainVideoUrl || undefined),
+        // Handle videoType: empty string should set to null, not undefined
+        videoType: data.videoType === '' ? null : (data.videoType || undefined),
         youtubeUrl: data.youtubeUrl || undefined,
         instagramUrl: data.instagramUrl || undefined,
         facebookUrl: data.facebookUrl || undefined,
@@ -45,6 +54,10 @@ export async function PUT(
         subcategory: true
       }
     })
+
+    console.log('✅ API PUT - Business updated successfully')
+    console.log('✅ Updated mainImage:', business.mainImage ? 'exists' : 'null')
+    console.log('✅ Updated mainVideoUrl:', business.mainVideoUrl ? 'exists' : 'null')
 
     return NextResponse.json(business)
   } catch (error) {

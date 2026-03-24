@@ -1489,6 +1489,28 @@ button.bg-red-600 * {
   visibility: visible !important;
 }
 
+/* Instagram Embed Styles */
+.instagram-embed-container {
+  background: transparent !important;
+}
+
+.instagram-embed-container iframe {
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+.instagram-embed-container blockquote {
+  background: white !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 1px 0 rgba(0,0,0,0.5), 0 1px 10px 0 rgba(0,0,0,0.15) !important;
+  margin: 1px !important;
+  max-width: 400px !important;
+  min-width: 326px !important;
+  padding: 0 !important;
+  width: calc(100% - 2px) !important;
+}
+
 /* ========================================
    END OF STYLES
    ======================================== */

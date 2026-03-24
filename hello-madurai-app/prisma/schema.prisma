@@ -152,6 +152,7 @@ model Business {
   profileVideo      String?
   mainImage         String?
   mainVideoUrl      String?
+  videoType         String?               // 'YOUTUBE_VIDEO', 'YOUTUBE_SHORTS', 'INSTAGRAM_REEL'
   directionsUrl     String?
   latitude          Float?
   longitude         Float?
