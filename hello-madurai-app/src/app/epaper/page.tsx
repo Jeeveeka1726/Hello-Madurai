@@ -413,9 +413,6 @@ function EpaperPageContent() {
               suppressHydrationWarning
             >
               {language === 'ta' ? (collection.name_ta || collection.name) : collection.name}
-              <span className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">
-                {collection._count?.magazines || 0}
-              </span>
             </Button>
           ))}
         </div>
