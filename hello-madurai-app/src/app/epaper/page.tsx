@@ -386,8 +386,8 @@ function EpaperPageContent() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
+      {/* Header - Centered */}
+      <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           <TranslatedText tamil="மின்னிதழ்">E-Paper</TranslatedText>
         </h1>
@@ -404,14 +404,6 @@ function EpaperPageContent() {
           {t('epaper.categories', 'Categories', 'வகைகள்')}
         </h2>
         <div className="flex flex-wrap gap-1.5 sm:gap-2">
-          <Button
-            variant={selectedCollection === null ? "primary" : "outline"}
-            size="sm"
-            onClick={() => setSelectedCollection(null)}
-            suppressHydrationWarning
-          >
-            {t('epaper.all_magazines', 'All Magazines', 'அனைத்து பத்திரிகைகள்')}
-          </Button>
           {collections.map((collection) => (
             <Button
               key={collection.id}

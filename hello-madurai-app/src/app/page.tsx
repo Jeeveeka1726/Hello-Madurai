@@ -72,7 +72,7 @@ export default function RootPage() {
       nameTa: 'பத்திரிகை',
       descEn: 'Read digital newspapers',
       descTa: 'டிஜிட்டல் பத்திரிகைகளைப் படியுங்கள்',
-      href: '/magazine',
+      href: '/epaper',
       icon: DocumentIcon,
       color: 'bg-blue-500'
     },

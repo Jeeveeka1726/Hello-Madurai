@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   try {
     const collections = await prisma.magazineCollection.findMany({
       orderBy: {
-        createdAt: 'desc'
+        createdAt: 'asc'
       },
       include: {
         _count: {
