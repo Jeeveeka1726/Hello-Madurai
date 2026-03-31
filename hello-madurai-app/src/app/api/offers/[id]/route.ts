@@ -38,7 +38,7 @@ export async function PUT(
   try {
     const { id } = params
     const body = await request.json()
-    const { title, title_ta, imageUrl, bookNowUrl, active, orderNumber } = body
+    const { title, title_ta, imageUrl, bookNowUrl, bookNowPhone, category, active, orderNumber } = body
 
     const offer = await prisma.offer.update({
       where: { id },
@@ -47,6 +47,8 @@ export async function PUT(
         ...(title_ta !== undefined && { title_ta }),
         ...(imageUrl !== undefined && { imageUrl }),
         ...(bookNowUrl !== undefined && { bookNowUrl }),
+        ...(bookNowPhone !== undefined && { bookNowPhone }),
+        ...(category !== undefined && { category }),
         ...(active !== undefined && { active }),
         ...(orderNumber !== undefined && { orderNumber })
       }

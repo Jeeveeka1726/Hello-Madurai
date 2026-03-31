@@ -26,11 +26,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { title, title_ta, imageUrl, bookNowUrl, active, orderNumber } = body
+    const { title, title_ta, imageUrl, bookNowUrl, bookNowPhone, category, active, orderNumber } = body
 
-    if (!title || !imageUrl || !bookNowUrl) {
+    if (!title || !imageUrl) {
       return NextResponse.json(
-        { error: 'Title, image URL, and book now URL are required' },
+        { error: 'Title and image URL are required' },
         { status: 400 }
       )
     }
@@ -40,7 +40,9 @@ export async function POST(request: NextRequest) {
         title,
         title_ta: title_ta || null,
         imageUrl,
-        bookNowUrl,
+        bookNowUrl: bookNowUrl || null,
+        bookNowPhone: bookNowPhone || null,
+        category: category || null,
         active: active !== undefined ? active : true,
         orderNumber: orderNumber || 0
       }
