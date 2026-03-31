@@ -16,7 +16,8 @@ import {
   MegaphoneIcon,
   VideoCameraIcon,
   GiftIcon,
-  TagIcon
+  TagIcon,
+  PhoneIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAdmin } from '@/contexts/AdminContext'
@@ -101,6 +102,18 @@ const navigation = [
     href: '/admin/offer-categories',
     icon: TagIcon,
     badge: 'new'
+  },
+  {
+    name: 'Helplines',
+    name_ta: 'உதவி எண்கள்',
+    href: '/admin/helplines',
+    icon: PhoneIcon
+  },
+  {
+    name: 'Helpline Categories',
+    name_ta: 'உதவி எண் வகைகள்',
+    href: '/admin/helpline-categories',
+    icon: TagIcon
   }
 ]
 

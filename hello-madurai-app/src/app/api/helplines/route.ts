@@ -5,9 +5,11 @@ export async function GET() {
   try {
     // Fetch helplines from Hostinger MySQL
     const helplines = await prisma.helpline.findMany({
+      include: {
+        category: true
+      },
       orderBy: [
         { featured: 'desc' },
-        { category: 'asc' },
         { name: 'asc' }
       ]
     })
@@ -25,18 +27,30 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, name_ta, phone, category, description, description_ta, featured } = body
+    const { name, name_ta, phone, categoryId, address, address_ta, description, description_ta, featured } = body
+
+    if (!name || !phone || !categoryId) {
+      return NextResponse.json(
+        { error: 'Name, phone, and category are required' },
+        { status: 400 }
+      )
+    }
 
     // Create helpline in Hostinger MySQL
     const helpline = await prisma.helpline.create({
       data: {
         name,
-        name_ta,
+        name_ta: name_ta || null,
         phone,
-        category,
-        description,
-        description_ta,
+        categoryId,
+        address: address || null,
+        address_ta: address_ta || null,
+        description: description || null,
+        description_ta: description_ta || null,
         featured: featured || false
+      },
+      include: {
+        category: true
       }
     })
 

@@ -287,18 +287,37 @@ model BusinessShare {
   @@map("business_shares")
 }
 
+model HelplineCategory {
+  id          String     @id @default(cuid())
+  name        String
+  name_ta     String?
+  orderNumber Int        @default(0)
+  active      Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  helplines   Helpline[]
+
+  @@index([active])
+  @@index([orderNumber])
+  @@map("helpline_categories")
+}
+
 model Helpline {
-  id             String   @id @default(cuid())
+  id             String            @id @default(cuid())
   name           String
   name_ta        String?
   phone          String
-  category       String
+  categoryId     String
+  address        String?
+  address_ta     String?
   description    String?
   description_ta String?
-  featured       Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  featured       Boolean           @default(false)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  category       HelplineCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
+  @@index([categoryId])
   @@map("helplines")
 }
 
