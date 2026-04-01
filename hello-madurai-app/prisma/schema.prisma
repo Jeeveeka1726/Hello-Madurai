@@ -308,10 +308,10 @@ model Helpline {
   name_ta        String?
   phone          String
   categoryId     String
-  address        String?
-  address_ta     String?
-  description    String?
-  description_ta String?
+  address        String?           @db.Text
+  address_ta     String?           @db.Text
+  description    String?           @db.Text
+  description_ta String?           @db.Text
   featured       Boolean           @default(false)
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt

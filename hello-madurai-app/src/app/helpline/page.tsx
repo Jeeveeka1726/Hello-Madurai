@@ -212,7 +212,7 @@ export default function HelplinePage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-gray-500 mb-0.5">{t('address', 'Address', 'முகவரி')}</p>
-                        <p className="text-sm sm:text-base text-gray-900 line-clamp-2">
+                        <p className="text-sm sm:text-base text-gray-900 leading-relaxed break-words">
                           {language === 'ta' && helpline.address_ta ? helpline.address_ta : helpline.address}
                         </p>
                       </div>
@@ -223,7 +223,7 @@ export default function HelplinePage() {
                 {/* Description with enhanced styling */}
                 {(helpline.description || helpline.description_ta) && (
                   <div className="p-3 sm:p-4 bg-gray-50 rounded-xl mb-5 border-l-4 border-blue-500">
-                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
                       {language === 'ta' && helpline.description_ta ? helpline.description_ta : helpline.description}
                     </p>
                   </div>

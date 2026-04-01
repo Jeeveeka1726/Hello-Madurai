@@ -385,98 +385,92 @@ function EpaperPageContent() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header - Centered */}
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          <TranslatedText tamil="மின்னிதழ்">E-Paper</TranslatedText>
-        </h1>
-        <p className="text-gray-600">
-          <TranslatedText tamil="எங்கள் டிஜிட்டல் பத்திரிகைகளைப் படித்து பதிவிறக்கம் செய்யுங்கள்">
-            Read and download our digital magazines
-          </TranslatedText>
-        </p>
-      </div>
+    <div className="min-h-screen bg-white">
+      {/* Header Section - No padding on mobile */}
+      <div className="py-4 bg-white">
+        <div className="text-center px-4 md:px-0">
+          <div className="flex items-center justify-center mb-1">
+            <FileText className="h-6 w-6 text-blue-600 mr-2" />
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+              <TranslatedText tamil="மின்னிதழ்">E-Paper</TranslatedText>
+            </h1>
+          </div>
+          <p className="text-sm text-gray-600 font-medium mb-3">
+            <TranslatedText tamil="எங்கள் டிஜிட்டல் பத்திரிகைகளைப் படித்து பதிவிறக்கம் செய்யுங்கள்">
+              Read and download our digital magazines
+            </TranslatedText>
+          </p>
 
-      {/* Category Filters - Matching Videos Section Style */}
-      <div className="mb-4 sm:mb-6 md:mb-8">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4" suppressHydrationWarning>
-          {t('epaper.categories', 'Categories', 'வகைகள்')}
-        </h2>
-        <div className="flex flex-wrap gap-1.5 sm:gap-2">
-          {collections.map((collection) => (
-            <Button
-              key={collection.id}
-              variant={selectedCollection === collection.id ? "primary" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCollection(collection.id)}
-              suppressHydrationWarning
-            >
-              {language === 'ta' ? (collection.name_ta || collection.name) : collection.name}
-            </Button>
-          ))}
+          {/* Category Filter */}
+          {collections.length > 0 && (
+            <div className="mb-2">
+              <p className="text-gray-700 font-semibold mb-2 text-center text-sm">
+                <TranslatedText tamil="வகையைத் தேர்ந்தெடுக்கவும்">Select Category</TranslatedText>
+              </p>
+              <div className="overflow-x-auto scrollbar-hide">
+                <div className="flex gap-2 min-w-max justify-center px-4 md:px-0">
+                  {collections.map((collection) => (
+                    <button
+                      key={collection.id}
+                      onClick={() => setSelectedCollection(collection.id)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap flex-shrink-0 text-sm ${
+                        selectedCollection === collection.id
+                          ? 'bg-blue-600 text-white shadow-md'
+                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {language === 'ta' ? (collection.name_ta || collection.name) : collection.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Magazines Grid */}
+      {/* Magazines Grid - Vertical Cards like Offers */}
       {filteredMagazines.length === 0 ? (
-        <div className="text-center py-12">
-          <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            <TranslatedText tamil="பத்திரிகைகள் எதுவும் கிடைக்கவில்லை">No magazines found</TranslatedText>
-          </h3>
-          <p className="text-gray-600">
-            <TranslatedText tamil="புதிய வெளியீடுகளுக்கு பின்னர் சரிபார்க்கவும்">
-              Check back later for new publications
-            </TranslatedText>
+        <div className="text-center py-12 px-4">
+          <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500 text-lg">
+            <TranslatedText tamil="தற்போது பத்திரிகைகள் இல்லை">No magazines available at the moment</TranslatedText>
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+        <div className="md:grid md:grid-cols-2 md:gap-6 md:px-4">
           {filteredMagazines.map((magazine) => (
-            <Card
-              key={magazine.id}
-              hover
-              padding="sm"
-              className="transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white rounded-lg overflow-hidden !p-0"
-            >
-              {/* Cover Image - Clickable to Open PDF */}
+            <div key={magazine.id} className="mb-8 md:mb-0">
+              {/* Magazine Cover Image - Full width on mobile, normal on desktop */}
               <div
-                className="relative w-full overflow-hidden group cursor-pointer"
+                className="relative cursor-pointer group"
                 onClick={() => handleView(magazine)}
               >
                 {/* Show cover image if available and not errored */}
                 {(magazine.coverImage || magazine.featuredImage) && !imageErrors.has(magazine.id) ? (
                   <>
-                    {/* Actual Cover Image */}
                     <img
                       src={magazine.coverImage || magazine.featuredImage}
-                      alt={`${magazine.title} cover`}
-                      className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+                      alt={language === 'ta' && magazine.title_ta ? magazine.title_ta : magazine.title}
+                      className="offer-image-mobile md:w-full md:h-auto md:object-contain md:rounded-lg"
                       onLoad={() => console.log('✅ Cover loaded:', magazine.title)}
                       onError={() => {
                         console.error('❌ Cover failed:', magazine.title, magazine.coverImage || magazine.featuredImage)
                         handleImageError(magazine.id)
                       }}
                     />
-
-                    {/* Hover overlay with eye icon - only visible on hover */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center pointer-events-none">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white rounded-full p-4 shadow-lg">
-                        <Eye className="w-8 h-8 text-blue-600" />
+                    {/* Hover overlay with eye icon */}
+                    <div className="hidden md:block absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 rounded-lg">
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <div className="bg-white rounded-full p-3 shadow-lg">
+                          <Eye className="w-6 h-6 text-blue-600" />
+                        </div>
                       </div>
-                    </div>
-
-                    {/* "Click to open PDF" label on hover */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                      <p className="text-white text-sm font-medium text-center">
-                        <TranslatedText tamil="PDF திறக்க கிளிக் செய்யவும்">Click to open PDF</TranslatedText>
-                      </p>
                     </div>
                   </>
                 ) : (
                   /* Fallback placeholder when no image or image failed */
-                  <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center transition-transform group-hover:scale-105">
+                  <div className="offer-image-mobile md:w-full md:aspect-[3/4] md:rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
                     <div className="text-center p-6">
                       <FileText className="w-16 h-16 text-blue-400 mx-auto mb-3" />
                       <p className="text-base text-blue-600 font-semibold mb-1">
@@ -490,153 +484,116 @@ function EpaperPageContent() {
                 )}
               </div>
 
-              {/* Magazine Details */}
-              <div className="p-3">
-                {/* Title */}
-                <h3 className="text-sm font-semibold text-gray-900 mb-2 line-clamp-2">
-                  <TranslatedText tamil={magazine.title_ta || magazine.title}>
-                    {magazine.title}
-                  </TranslatedText>
-                </h3>
+              {/* Action Buttons - Positioned Below Image */}
+              <div className="flex gap-2 items-center justify-center py-4 px-4 bg-white">
+                {/* Download Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleDownload(magazine)
+                  }}
+                  disabled={!magazine.pdfUrl}
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-8 rounded-lg text-center transition-all shadow-md hover:shadow-lg text-base md:text-sm transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  <TranslatedText tamil="பதிவிறக்கம்">Download</TranslatedText>
+                </button>
 
-                {/* Magazine Info */}
-                <div className="space-y-1.5 mb-3">
-                  {magazine.issueNumber && (
-                    <div className="flex items-center text-xs text-gray-600">
-                      <FileText className="w-3.5 h-3.5 mr-1.5" />
-                      <TranslatedText tamil="இதழ்">Issue</TranslatedText>: {magazine.issueNumber}
-                    </div>
-                  )}
-                  <div className="flex items-center text-xs text-gray-600">
-                    <Calendar className="w-3.5 h-3.5 mr-1.5" />
-                    {new Date(magazine.publishedAt).toLocaleDateString(
-                      language === 'ta' ? 'ta-IN' : 'en-IN'
-                    )}
-                  </div>
-                </div>
+                {/* Like Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleLike(magazine)
+                  }}
+                  className={`p-3 rounded-lg transition-all shadow-sm hover:shadow-md border ${
+                    likedMagazines.has(magazine.id)
+                      ? 'bg-red-50 border-red-300 hover:bg-red-100'
+                      : 'bg-gray-100 hover:bg-gray-200 border-gray-300'
+                  }`}
+                  aria-label="Like"
+                  title={language === 'ta' ? 'விருப்பம்' : 'Like'}
+                >
+                  <Heart
+                    className={`h-6 w-6 md:h-5 md:w-5 transition-colors ${
+                      likedMagazines.has(magazine.id) ? 'text-red-500 fill-red-500' : 'text-gray-700'
+                    }`}
+                  />
+                </button>
 
-                {/* Stats */}
-                <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
-                  <span className="flex items-center gap-1">
-                    <Eye className="w-3 h-3" />
-                    {magazine.downloads || 0} <TranslatedText tamil="பார்வைகள்">views</TranslatedText>
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Heart className="w-3 h-3" />
-                    {magazine.likes || 0} <TranslatedText tamil="விருப்பங்கள்">likes</TranslatedText>
-                  </span>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="space-y-1.5">
-                  {/* Download Button - Full Width */}
-                  <Button
+                {/* Share Button */}
+                <div className="relative">
+                  <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDownload(magazine)
+                      handleShareToggle(magazine.id)
                     }}
-                    variant="primary"
-                    size="sm"
-                    disabled={!magazine.pdfUrl}
-                    className="w-full text-xs py-1.5"
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-all shadow-sm hover:shadow-md border border-gray-300"
+                    aria-label="Share"
+                    title={language === 'ta' ? 'பகிர்' : 'Share'}
                   >
-                    <Download className="w-3.5 h-3.5 mr-1" />
-                    <TranslatedText tamil="பதிவிறக்கம்">Download</TranslatedText>
-                  </Button>
+                    <Share2 className="h-6 w-6 md:h-5 md:w-5" />
+                  </button>
 
-                  {/* Like and Share Buttons - Side by Side */}
-                  <div className="flex gap-1.5">
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleLike(magazine)
-                      }}
-                      variant={likedMagazines.has(magazine.id) ? "primary" : "outline"}
-                      size="sm"
-                      className="flex-1 py-1.5"
-                    >
-                      <Heart
-                        className={`w-3.5 h-3.5 ${likedMagazines.has(magazine.id) ? 'fill-current' : ''}`}
+                  {/* Share Dropdown */}
+                  {shareDropdownOpen === magazine.id && (
+                    <>
+                      {/* Backdrop to close dropdown */}
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setShareDropdownOpen(null)}
                       />
-                    </Button>
 
-                    {/* Share Button with Dropdown */}
-                    <div className="flex-1 relative">
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleShareToggle(magazine.id)
-                        }}
-                        variant="outline"
-                        size="sm"
-                        className="w-full py-1.5"
-                      >
-                        <Share2 className="w-3.5 h-3.5" />
-                      </Button>
+                      {/* Dropdown Menu */}
+                      <div className="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20 overflow-hidden">
+                        {/* WhatsApp */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleWhatsAppShare(magazine)
+                            setShareDropdownOpen(null)
+                          }}
+                          className="w-full px-4 py-2.5 text-left hover:bg-green-50 flex items-center gap-2 text-sm transition-colors"
+                        >
+                          <svg className="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                          </svg>
+                          <span className="text-gray-700">WhatsApp</span>
+                        </button>
 
-                      {/* Share Dropdown */}
-                      {shareDropdownOpen === magazine.id && (
-                        <>
-                          {/* Backdrop to close dropdown */}
-                          <div
-                            className="fixed inset-0 z-10"
-                            onClick={() => setShareDropdownOpen(null)}
-                          />
+                        {/* Facebook */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleFacebookShare(magazine)
+                            setShareDropdownOpen(null)
+                          }}
+                          className="w-full px-4 py-2.5 text-left hover:bg-blue-50 flex items-center gap-2 text-sm transition-colors"
+                        >
+                          <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                          </svg>
+                          <span className="text-gray-700">Facebook</span>
+                        </button>
 
-                          {/* Dropdown Menu */}
-                          <div className="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20 overflow-hidden">
-                            {/* WhatsApp */}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleWhatsAppShare(magazine)
-                                setShareDropdownOpen(null)
-                              }}
-                              className="w-full px-4 py-2.5 text-left hover:bg-green-50 flex items-center gap-2 text-sm transition-colors"
-                            >
-                              <svg className="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                              </svg>
-                              <span className="text-gray-700">WhatsApp</span>
-                            </button>
-
-                            {/* Facebook */}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleFacebookShare(magazine)
-                                setShareDropdownOpen(null)
-                              }}
-                              className="w-full px-4 py-2.5 text-left hover:bg-blue-50 flex items-center gap-2 text-sm transition-colors"
-                            >
-                              <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                              </svg>
-                              <span className="text-gray-700">Facebook</span>
-                            </button>
-
-                            {/* Copy Link */}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleCopyLink(magazine)
-                                setShareDropdownOpen(null)
-                              }}
-                              className="w-full px-4 py-2.5 text-left hover:bg-gray-50 flex items-center gap-2 text-sm transition-colors"
-                            >
-                              <svg className="h-4 w-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                              </svg>
-                              <span className="text-gray-700"><TranslatedText tamil="இணைப்பை நகலெடு">Copy Link</TranslatedText></span>
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
+                        {/* Copy Link */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleCopyLink(magazine)
+                            setShareDropdownOpen(null)
+                          }}
+                          className="w-full px-4 py-2.5 text-left hover:bg-gray-50 flex items-center gap-2 text-sm transition-colors"
+                        >
+                          <svg className="h-4 w-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          <span className="text-gray-700"><TranslatedText tamil="இணைப்பை நகலெடு">Copy Link</TranslatedText></span>
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}

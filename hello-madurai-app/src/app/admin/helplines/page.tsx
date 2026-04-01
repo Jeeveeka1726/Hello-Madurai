@@ -86,6 +86,8 @@ export default function AdminHelplinesPage() {
         ? `/api/helplines/${editingHelpline.id}`
         : '/api/helplines'
 
+      console.log('Submitting helpline data:', formData)
+
       const response = await fetch(url, {
         method: editingHelpline ? 'PUT' : 'POST',
         headers: {
@@ -95,6 +97,8 @@ export default function AdminHelplinesPage() {
       })
 
       if (response.ok) {
+        const result = await response.json()
+        console.log('Helpline saved successfully:', result)
         await fetchHelplines()
         setShowForm(false)
         setEditingHelpline(null)
@@ -102,6 +106,7 @@ export default function AdminHelplinesPage() {
         toast.success(editingHelpline ? 'Helpline updated!' : 'Helpline created!')
       } else {
         const error = await response.json()
+        console.error('Error response:', error)
         toast.error(error.error || 'Error saving helpline')
       }
     } catch (error) {
