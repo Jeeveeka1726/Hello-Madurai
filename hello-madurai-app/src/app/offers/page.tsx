@@ -7,6 +7,16 @@ import NewspaperHeader from '@/components/NewspaperHeader'
 import CategoryNavigation from '@/components/CategoryNavigation'
 import { GiftIcon, ShareIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
+import {
+  WhatsappShareButton,
+  FacebookShareButton,
+  TelegramShareButton,
+  TwitterShareButton,
+  WhatsappIcon,
+  FacebookIcon,
+  TelegramIcon,
+  TwitterIcon
+} from 'react-share'
 
 interface Offer {
   id: string
@@ -36,6 +46,7 @@ export default function OffersPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [shareMenuOpen, setShareMenuOpen] = useState<string | null>(null)
 
   useEffect(() => {
     fetchOffers()
@@ -72,23 +83,22 @@ export default function OffersPage() {
     }
   }
 
-  const handleShare = async (offer: Offer) => {
-    const shareData = {
-      title: language === 'ta' && offer.title_ta ? offer.title_ta : offer.title,
-      text: `Check out this offer: ${language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}`,
-      url: offer.bookNowUrl
-    }
+  const handleShare = (offerId: string) => {
+    setShareMenuOpen(shareMenuOpen === offerId ? null : offerId)
+  }
 
+  const getShareUrl = (offer: Offer) => {
+    return `${window.location.origin}/offers/share/${offer.id}`
+  }
+
+  const handleCopyLink = async (offer: Offer) => {
     try {
-      if (navigator.share) {
-        await navigator.share(shareData)
-      } else {
-        // Fallback: Copy to clipboard
-        await navigator.clipboard.writeText(offer.bookNowUrl)
-        toast.success(language === 'ta' ? 'இணைப்பு நகலெடுக்கப்பட்டது!' : 'Link copied to clipboard!')
-      }
+      const shareUrl = getShareUrl(offer)
+      await navigator.clipboard.writeText(shareUrl)
+      toast.success(language === 'ta' ? 'இணைப்பு நகலெடுக்கப்பட்டது!' : 'Link copied!')
+      setShareMenuOpen(null)
     } catch (error) {
-      console.error('Error sharing:', error)
+      console.error('Error copying link:', error)
     }
   }
 
@@ -207,14 +217,97 @@ export default function OffersPage() {
                     >
                       {language === 'ta' ? 'முன்பதிவு' : 'Book Now'}
                     </a>
-                    <button
-                      onClick={() => handleShare(offer)}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-all shadow-sm hover:shadow-md border border-gray-300"
-                      aria-label="Share"
-                      title={language === 'ta' ? 'பகிர்' : 'Share'}
-                    >
-                      <ShareIcon className="h-6 w-6 md:h-5 md:w-5" />
-                    </button>
+
+                    {/* Share Button with Dropdown */}
+                    <div className="relative">
+                      <button
+                        onClick={() => handleShare(offer.id)}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-all shadow-sm hover:shadow-md border border-gray-300"
+                        aria-label="Share"
+                        title={language === 'ta' ? 'பகிர்' : 'Share'}
+                      >
+                        <ShareIcon className="h-6 w-6 md:h-5 md:w-5" />
+                      </button>
+
+                      {/* Share Menu */}
+                      {shareMenuOpen === offer.id && (
+                        <>
+                          {/* Backdrop to close menu */}
+                          <div
+                            className="fixed inset-0 z-10"
+                            onClick={() => setShareMenuOpen(null)}
+                          />
+
+                          {/* Share Dropdown */}
+                          <div className="absolute bottom-full mb-2 right-0 bg-white rounded-lg shadow-2xl border border-gray-200 p-4 z-20 min-w-[280px]">
+                            <p className="text-sm font-semibold text-gray-700 mb-3">
+                              {language === 'ta' ? 'இதில் பகிரவும்:' : 'Share to:'}
+                            </p>
+                            <div className="flex gap-3 justify-center mb-4">
+                              {/* WhatsApp */}
+                              <WhatsappShareButton
+                                url={getShareUrl(offer)}
+                                title={`${language === 'ta' && offer.title_ta ? offer.title_ta : offer.title} - Hello Madurai`}
+                                onClick={() => setShareMenuOpen(null)}
+                              >
+                                <div className="flex flex-col items-center gap-1 transform hover:scale-110 transition-transform">
+                                  <WhatsappIcon size={48} round />
+                                  <span className="text-xs text-gray-600">WhatsApp</span>
+                                </div>
+                              </WhatsappShareButton>
+
+                              {/* Facebook - Use direct URL for better Open Graph support */}
+                              <button
+                                onClick={() => {
+                                  const shareUrl = getShareUrl(offer)
+                                  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
+                                  window.open(facebookUrl, '_blank', 'width=600,height=400')
+                                  setShareMenuOpen(null)
+                                }}
+                                className="transform hover:scale-110 transition-transform cursor-pointer"
+                              >
+                                <div className="flex flex-col items-center gap-1">
+                                  <FacebookIcon size={48} round />
+                                  <span className="text-xs text-gray-600">Facebook</span>
+                                </div>
+                              </button>
+                            </div>
+
+                            <p className="text-xs text-gray-500 mb-2 px-1">
+                              {language === 'ta' ? 'மேலும் விருப்பங்கள்:' : 'More options:'}
+                            </p>
+                            <div className="flex gap-2 justify-center mb-3">
+                              <TwitterShareButton
+                                url={getShareUrl(offer)}
+                                title={`${language === 'ta' && offer.title_ta ? offer.title_ta : offer.title} - Hello Madurai`}
+                                onClick={() => setShareMenuOpen(null)}
+                              >
+                                <TwitterIcon size={32} round />
+                              </TwitterShareButton>
+
+                              <TelegramShareButton
+                                url={getShareUrl(offer)}
+                                title={`${language === 'ta' && offer.title_ta ? offer.title_ta : offer.title} - Hello Madurai`}
+                                onClick={() => setShareMenuOpen(null)}
+                              >
+                                <TelegramIcon size={32} round />
+                              </TelegramShareButton>
+                            </div>
+
+                            {/* Copy Link Button */}
+                            <button
+                              onClick={() => handleCopyLink(offer)}
+                              className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-700 flex items-center justify-center gap-2 transition-colors"
+                            >
+                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                              {language === 'ta' ? 'இணைப்பை நகலெடு' : 'Copy Link'}
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               )
