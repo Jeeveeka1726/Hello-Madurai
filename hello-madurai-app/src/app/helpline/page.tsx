@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
 import CategoryNavigation from '@/components/CategoryNavigation'
-import { PhoneIcon, MapPinIcon, ShareIcon } from '@heroicons/react/24/outline'
+import { PhoneIcon, MapPinIcon, ShareIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
 interface HelplineCategory {
@@ -32,7 +32,8 @@ export default function HelplinePage() {
   const [helplines, setHelplines] = useState<Helpline[]>([])
   const [categories, setCategories] = useState<HelplineCategory[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [searchQuery, setSearchQuery] = useState<string>('')
 
   useEffect(() => {
     fetchHelplines()
@@ -59,15 +60,37 @@ export default function HelplinePage() {
       if (response.ok) {
         const data = await response.json()
         setCategories(data)
+        // Set first category as default if available
+        if (data.length > 0) {
+          setSelectedCategory(data[0].id)
+        }
       }
     } catch (error) {
       console.error('Error fetching categories:', error)
     }
   }
 
-  const filteredHelplines = selectedCategory === 'all'
-    ? helplines
-    : helplines.filter(h => h.categoryId === selectedCategory)
+  // Filter logic: If search is active, search ALL helplines. Otherwise, filter by category.
+  const filteredHelplines = helplines.filter(helpline => {
+    // If there's a search query, search across ALL helplines (ignore category)
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      return (
+        (helpline.name?.toLowerCase().includes(query)) ||
+        (helpline.name_ta?.toLowerCase().includes(query)) ||
+        (helpline.phone?.includes(searchQuery)) ||
+        (helpline.address?.toLowerCase().includes(query)) ||
+        (helpline.address_ta?.toLowerCase().includes(query)) ||
+        (helpline.description?.toLowerCase().includes(query)) ||
+        (helpline.description_ta?.toLowerCase().includes(query)) ||
+        (helpline.category?.name?.toLowerCase().includes(query)) ||
+        (helpline.category?.name_ta?.toLowerCase().includes(query))
+      )
+    }
+
+    // If no search query, filter by selected category only
+    return !selectedCategory || helpline.categoryId === selectedCategory
+  })
 
   const handleCall = (phone: string) => {
     window.location.href = `tel:${phone}`
@@ -128,19 +151,42 @@ export default function HelplinePage() {
           </p>
         </div>
 
-        {/* Enhanced Category Filter */}
+        {/* Search Bar */}
+        <div className="mb-6 sm:mb-8 max-w-2xl mx-auto">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <MagnifyingGlassIcon className="h-5 w-5 text-white/60" />
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={language === 'ta' ? 'தேடுக... (பெயர், தொலைபேசி, முகவரி)' : 'Search... (name, phone, address)'}
+              className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/40 transition-all text-sm sm:text-base"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/60 hover:text-white transition-colors"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Category Filter */}
         <div className="mb-8 sm:mb-10">
-          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base transition-all duration-200 transform hover:scale-105 shadow-md ${
-                selectedCategory === 'all'
-                  ? 'bg-white text-blue-800 shadow-lg ring-2 ring-white/50'
-                  : 'bg-white/10 backdrop-blur-sm text-white hover:bg-white/20'
-              }`}
-            >
-              {t('helpline.category.all', 'All', 'அனைத்தும்')}
-            </button>
+          {searchQuery && (
+            <p className="text-center text-white/80 text-sm mb-3">
+              {language === 'ta'
+                ? `அனைத்து வகைகளிலிருந்தும் "${searchQuery}" தேடப்படுகிறது...`
+                : `Searching "${searchQuery}" across all categories...`}
+            </p>
+          )}
+          <div className={`flex flex-wrap gap-2 sm:gap-3 justify-center ${searchQuery ? 'opacity-50 pointer-events-none' : ''}`}>
             {categories.map((category) => (
               <button
                 key={category.id}

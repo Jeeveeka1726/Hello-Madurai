@@ -413,7 +413,7 @@ function EpaperPageContent() {
         </div>
       </div>
 
-      {/* Magazines Grid - Vertical Cards like Offers */}
+      {/* Magazines Grid - 3x3 Grid Layout */}
       {filteredMagazines.length === 0 ? (
         <div className="text-center py-12 px-4">
           <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -422,12 +422,12 @@ function EpaperPageContent() {
           </p>
         </div>
       ) : (
-        <div className="md:grid md:grid-cols-2 md:gap-6 md:px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4">
           {filteredMagazines.map((magazine) => (
-            <div key={magazine.id} className="mb-8 md:mb-0">
-              {/* Magazine Cover Image - Full width on mobile, normal on desktop */}
+            <div key={magazine.id} className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+              {/* Magazine Cover Image - Clickable */}
               <div
-                className="relative cursor-pointer group"
+                className="relative cursor-pointer group overflow-hidden"
                 onClick={() => handleView(magazine)}
               >
                 {/* Show cover image if available and not errored */}
@@ -436,7 +436,7 @@ function EpaperPageContent() {
                     <img
                       src={magazine.coverImage || magazine.featuredImage}
                       alt={language === 'ta' && magazine.title_ta ? magazine.title_ta : magazine.title}
-                      className="offer-image-mobile md:w-full md:h-auto md:object-contain md:rounded-lg"
+                      className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
                       onLoad={() => console.log('✅ Cover loaded:', magazine.title)}
                       onError={() => {
                         console.error('❌ Cover failed:', magazine.title, magazine.coverImage || magazine.featuredImage)
@@ -444,7 +444,7 @@ function EpaperPageContent() {
                       }}
                     />
                     {/* Hover overlay with eye icon */}
-                    <div className="hidden md:block absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 rounded-lg">
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200">
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <div className="bg-white rounded-full p-3 shadow-lg">
                           <Eye className="w-6 h-6 text-blue-600" />
@@ -454,13 +454,13 @@ function EpaperPageContent() {
                   </>
                 ) : (
                   /* Fallback placeholder when no image or image failed */
-                  <div className="offer-image-mobile md:w-full md:aspect-[3/4] md:rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+                  <div className="w-full aspect-[3/4] bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
                     <div className="text-center p-6">
-                      <FileText className="w-16 h-16 text-blue-400 mx-auto mb-3" />
-                      <p className="text-base text-blue-600 font-semibold mb-1">
+                      <FileText className="w-12 h-12 text-blue-400 mx-auto mb-2" />
+                      <p className="text-sm text-blue-600 font-semibold mb-1">
                         <TranslatedText tamil="PDF இதழ்">PDF Magazine</TranslatedText>
                       </p>
-                      <p className="text-sm text-blue-500">
+                      <p className="text-xs text-blue-500">
                         <TranslatedText tamil="திறக்க கிளிக் செய்யவும்">Click to open</TranslatedText>
                       </p>
                     </div>
@@ -468,54 +468,73 @@ function EpaperPageContent() {
                 )}
               </div>
 
-              {/* Action Buttons - Positioned Below Image */}
-              <div className="flex gap-2 items-center justify-center py-4 px-4 bg-white">
-                {/* Download Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleDownload(magazine)
-                  }}
-                  disabled={!magazine.pdfUrl}
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-8 rounded-lg text-center transition-all shadow-md hover:shadow-lg text-base md:text-sm transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  <TranslatedText tamil="பதிவிறக்கம்">Download</TranslatedText>
-                </button>
+              {/* Magazine Info & Actions */}
+              <div className="p-4">
+                {/* Title and Date */}
+                <div className="mb-3">
+                  <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2">
+                    <TranslatedText tamil={magazine.title_ta || magazine.title}>
+                      {magazine.title}
+                    </TranslatedText>
+                  </h3>
+                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {new Date(magazine.publishedAt).toLocaleDateString(
+                      language === 'ta' ? 'ta-IN' : 'en-IN',
+                      { year: 'numeric', month: 'short', day: 'numeric' }
+                    )}
+                  </p>
+                </div>
 
-                {/* Like Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleLike(magazine)
-                  }}
-                  className={`p-3 rounded-lg transition-all shadow-sm hover:shadow-md border ${
-                    likedMagazines.has(magazine.id)
-                      ? 'bg-red-50 border-red-300 hover:bg-red-100'
-                      : 'bg-gray-100 hover:bg-gray-200 border-gray-300'
-                  }`}
-                  aria-label="Like"
-                  title={language === 'ta' ? 'விருப்பம்' : 'Like'}
-                >
-                  <Heart
-                    className={`h-6 w-6 md:h-5 md:w-5 transition-colors ${
-                      likedMagazines.has(magazine.id) ? 'text-red-500 fill-red-500' : 'text-gray-700'
-                    }`}
-                  />
-                </button>
-
-                {/* Share Button */}
-                <div className="relative">
+                {/* Action Buttons */}
+                <div className="flex gap-2 items-center">
+                  {/* Download Button */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleShareToggle(magazine.id)
+                      handleDownload(magazine)
                     }}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-all shadow-sm hover:shadow-md border border-gray-300"
-                    aria-label="Share"
-                    title={language === 'ta' ? 'பகிர்' : 'Share'}
+                    disabled={!magazine.pdfUrl}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-2 px-4 rounded-lg text-center transition-all shadow-md hover:shadow-lg text-xs transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-1"
                   >
-                    <Share2 className="h-6 w-6 md:h-5 md:w-5" />
+                    <Download className="w-3.5 h-3.5" />
+                    <TranslatedText tamil="பதிவிறக்கம்">Download</TranslatedText>
                   </button>
+
+                  {/* Like Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleLike(magazine)
+                    }}
+                    className={`p-2 rounded-lg transition-all shadow-sm hover:shadow-md border ${
+                      likedMagazines.has(magazine.id)
+                        ? 'bg-red-50 border-red-300 hover:bg-red-100'
+                        : 'bg-gray-100 hover:bg-gray-200 border-gray-300'
+                    }`}
+                    aria-label="Like"
+                    title={language === 'ta' ? 'விருப்பம்' : 'Like'}
+                  >
+                    <Heart
+                      className={`h-4 w-4 transition-colors ${
+                        likedMagazines.has(magazine.id) ? 'text-red-500 fill-red-500' : 'text-gray-700'
+                      }`}
+                    />
+                  </button>
+
+                  {/* Share Button */}
+                  <div className="relative">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleShareToggle(magazine.id)
+                      }}
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded-lg transition-all shadow-sm hover:shadow-md border border-gray-300"
+                      aria-label="Share"
+                      title={language === 'ta' ? 'பகிர்' : 'Share'}
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </button>
 
                   {/* Share Dropdown */}
                   {shareDropdownOpen === magazine.id && (
@@ -598,6 +617,7 @@ function EpaperPageContent() {
                       </div>
                     </>
                   )}
+                  </div>
                 </div>
               </div>
             </div>
