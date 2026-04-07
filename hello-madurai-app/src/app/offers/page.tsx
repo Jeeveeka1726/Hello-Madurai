@@ -176,7 +176,7 @@ export default function OffersPage() {
           </div>
         </div>
 
-        {/* Offers Grid - Images break out to full width on mobile */}
+        {/* Offers Grid - 3x3 Portrait Grid on Desktop, Full width on Mobile */}
         {filteredOffers.length === 0 ? (
           <div className="text-center py-12 px-4">
             <GiftIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -185,7 +185,7 @@ export default function OffersPage() {
             </p>
           </div>
         ) : (
-          <div className="md:grid md:grid-cols-2 md:gap-6 md:px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-4 lg:gap-6 sm:px-4">
             {filteredOffers.map((offer) => {
               // Determine the booking link - prefer phone number if available, otherwise use URL
               const bookingContact = offer.bookNowPhone || offer.bookNowUrl
@@ -197,116 +197,130 @@ export default function OffersPage() {
                 : bookingContact
 
               return (
-                <div key={offer.id} className="mb-8 md:mb-0">
-                  {/* Offer Image - Full width on mobile, normal on desktop */}
-                  <div className="relative">
+                <div key={offer.id} className="mb-6 sm:mb-0 bg-white sm:rounded-lg sm:shadow-md sm:hover:shadow-xl sm:transition-all sm:duration-300 overflow-hidden flex flex-col">
+                  {/* Offer Image - Portrait on all devices */}
+                  <div className="relative overflow-hidden cursor-pointer group">
                     <img
                       src={offer.imageUrl}
                       alt={language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}
-                      className="offer-image-mobile md:w-full md:h-auto md:object-contain"
+                      className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105 aspect-[3/4]"
                     />
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-200" />
                   </div>
 
-                  {/* Action Buttons - Positioned Below Image */}
-                  <div className="flex gap-2 items-center justify-center py-4 px-4 bg-white">
-                    <a
-                      href={bookNowHref}
-                      target={isPhoneNumber ? '_self' : '_blank'}
-                      rel={isPhoneNumber ? undefined : 'noopener noreferrer'}
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-8 rounded-lg text-center transition-all shadow-md hover:shadow-lg text-base md:text-sm transform hover:scale-105"
-                    >
-                      {language === 'ta' ? 'முன்பதிவு' : 'Book Now'}
-                    </a>
+                  {/* Action Buttons - Compact and close to image */}
+                  <div className="flex flex-col gap-2 py-3 px-2 bg-white sm:px-3">
+                    {/* Title (if available) */}
+                    {(offer.title || offer.title_ta) && (
+                      <div className="mb-1">
+                        <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-tight">
+                          {language === 'ta' && offer.title_ta ? offer.title_ta : offer.title}
+                        </h3>
+                      </div>
+                    )}
 
-                    {/* Share Button with Dropdown */}
-                    <div className="relative">
-                      <button
-                        onClick={() => handleShare(offer.id)}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-all shadow-sm hover:shadow-md border border-gray-300"
-                        aria-label="Share"
-                        title={language === 'ta' ? 'பகிர்' : 'Share'}
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 items-center">
+                      <a
+                        href={bookNowHref}
+                        target={isPhoneNumber ? '_self' : '_blank'}
+                        rel={isPhoneNumber ? undefined : 'noopener noreferrer'}
+                        className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-2 px-3 rounded-lg text-center transition-all shadow-md hover:shadow-lg text-xs transform hover:scale-105 flex items-center justify-center gap-1"
                       >
-                        <ShareIcon className="h-6 w-6 md:h-5 md:w-5" />
-                      </button>
+                        {language === 'ta' ? 'முன்பதிவு' : 'Book Now'}
+                      </a>
 
-                      {/* Share Menu */}
-                      {shareMenuOpen === offer.id && (
-                        <>
-                          {/* Backdrop to close menu */}
-                          <div
-                            className="fixed inset-0 z-10"
-                            onClick={() => setShareMenuOpen(null)}
-                          />
+                      {/* Share Button with Dropdown */}
+                      <div className="relative">
+                        <button
+                          onClick={() => handleShare(offer.id)}
+                          className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded-lg transition-all shadow-sm hover:shadow-md border border-gray-300"
+                          aria-label="Share"
+                          title={language === 'ta' ? 'பகிர்' : 'Share'}
+                        >
+                          <ShareIcon className="h-4 w-4" />
+                        </button>
 
-                          {/* Share Dropdown */}
-                          <div className="absolute bottom-full mb-2 right-0 bg-white rounded-lg shadow-2xl border border-gray-200 p-4 z-20 min-w-[280px]">
-                            <p className="text-sm font-semibold text-gray-700 mb-3">
-                              {language === 'ta' ? 'இதில் பகிரவும்:' : 'Share to:'}
-                            </p>
-                            <div className="flex gap-3 justify-center mb-4">
-                              {/* WhatsApp */}
-                              <WhatsappShareButton
-                                url={getShareUrl(offer)}
-                                title={`${language === 'ta' && offer.title_ta ? offer.title_ta : offer.title} - Hello Madurai`}
-                                onClick={() => setShareMenuOpen(null)}
-                              >
-                                <div className="flex flex-col items-center gap-1 transform hover:scale-110 transition-transform">
-                                  <WhatsappIcon size={48} round />
-                                  <span className="text-xs text-gray-600">WhatsApp</span>
-                                </div>
-                              </WhatsappShareButton>
+                        {/* Share Menu */}
+                        {shareMenuOpen === offer.id && (
+                          <>
+                            {/* Backdrop to close menu */}
+                            <div
+                              className="fixed inset-0 z-10"
+                              onClick={() => setShareMenuOpen(null)}
+                            />
 
-                              {/* Facebook - Use direct URL for better Open Graph support */}
+                            {/* Share Dropdown */}
+                            <div className="absolute bottom-full mb-2 right-0 bg-white rounded-lg shadow-2xl border border-gray-200 p-4 z-20 min-w-[280px]">
+                              <p className="text-sm font-semibold text-gray-700 mb-3">
+                                {language === 'ta' ? 'இதில் பகிரவும்:' : 'Share to:'}
+                              </p>
+                              <div className="flex gap-3 justify-center mb-4">
+                                {/* WhatsApp */}
+                                <WhatsappShareButton
+                                  url={getShareUrl(offer)}
+                                  title={`${language === 'ta' && offer.title_ta ? offer.title_ta : offer.title} - Hello Madurai`}
+                                  onClick={() => setShareMenuOpen(null)}
+                                >
+                                  <div className="flex flex-col items-center gap-1 transform hover:scale-110 transition-transform">
+                                    <WhatsappIcon size={48} round />
+                                    <span className="text-xs text-gray-600">WhatsApp</span>
+                                  </div>
+                                </WhatsappShareButton>
+
+                                {/* Facebook - Use direct URL for better Open Graph support */}
+                                <button
+                                  onClick={() => {
+                                    const shareUrl = getShareUrl(offer)
+                                    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
+                                    window.open(facebookUrl, '_blank', 'width=600,height=400')
+                                    setShareMenuOpen(null)
+                                  }}
+                                  className="transform hover:scale-110 transition-transform cursor-pointer"
+                                >
+                                  <div className="flex flex-col items-center gap-1">
+                                    <FacebookIcon size={48} round />
+                                    <span className="text-xs text-gray-600">Facebook</span>
+                                  </div>
+                                </button>
+                              </div>
+
+                              <p className="text-xs text-gray-500 mb-2 px-1">
+                                {language === 'ta' ? 'மேலும் விருப்பங்கள்:' : 'More options:'}
+                              </p>
+                              <div className="flex gap-2 justify-center mb-3">
+                                <TwitterShareButton
+                                  url={getShareUrl(offer)}
+                                  title={`${language === 'ta' && offer.title_ta ? offer.title_ta : offer.title} - Hello Madurai`}
+                                  onClick={() => setShareMenuOpen(null)}
+                                >
+                                  <TwitterIcon size={32} round />
+                                </TwitterShareButton>
+
+                                <TelegramShareButton
+                                  url={getShareUrl(offer)}
+                                  title={`${language === 'ta' && offer.title_ta ? offer.title_ta : offer.title} - Hello Madurai`}
+                                  onClick={() => setShareMenuOpen(null)}
+                                >
+                                  <TelegramIcon size={32} round />
+                                </TelegramShareButton>
+                              </div>
+
+                              {/* Copy Link Button */}
                               <button
-                                onClick={() => {
-                                  const shareUrl = getShareUrl(offer)
-                                  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
-                                  window.open(facebookUrl, '_blank', 'width=600,height=400')
-                                  setShareMenuOpen(null)
-                                }}
-                                className="transform hover:scale-110 transition-transform cursor-pointer"
+                                onClick={() => handleCopyLink(offer)}
+                                className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-700 flex items-center justify-center gap-2 transition-colors"
                               >
-                                <div className="flex flex-col items-center gap-1">
-                                  <FacebookIcon size={48} round />
-                                  <span className="text-xs text-gray-600">Facebook</span>
-                                </div>
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                {language === 'ta' ? 'இணைப்பை நகலெடு' : 'Copy Link'}
                               </button>
                             </div>
-
-                            <p className="text-xs text-gray-500 mb-2 px-1">
-                              {language === 'ta' ? 'மேலும் விருப்பங்கள்:' : 'More options:'}
-                            </p>
-                            <div className="flex gap-2 justify-center mb-3">
-                              <TwitterShareButton
-                                url={getShareUrl(offer)}
-                                title={`${language === 'ta' && offer.title_ta ? offer.title_ta : offer.title} - Hello Madurai`}
-                                onClick={() => setShareMenuOpen(null)}
-                              >
-                                <TwitterIcon size={32} round />
-                              </TwitterShareButton>
-
-                              <TelegramShareButton
-                                url={getShareUrl(offer)}
-                                title={`${language === 'ta' && offer.title_ta ? offer.title_ta : offer.title} - Hello Madurai`}
-                                onClick={() => setShareMenuOpen(null)}
-                              >
-                                <TelegramIcon size={32} round />
-                              </TelegramShareButton>
-                            </div>
-
-                            {/* Copy Link Button */}
-                            <button
-                              onClick={() => handleCopyLink(offer)}
-                              className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-700 flex items-center justify-center gap-2 transition-colors"
-                            >
-                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                              </svg>
-                              {language === 'ta' ? 'இணைப்பை நகலெடு' : 'Copy Link'}
-                            </button>
-                          </div>
-                        </>
-                      )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
