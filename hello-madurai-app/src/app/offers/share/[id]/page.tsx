@@ -23,16 +23,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const title = offer.title
     const description = offer.title_ta || offer.title || 'Special offer from Hello Madurai'
 
-    // Ensure absolute URL for image
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:4000'
+
+    // Use image proxy for Google Drive and other URLs to ensure they work with Open Graph
     let imageUrl = offer.imageUrl
-    if (!imageUrl.startsWith('http')) {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:4000'
-      imageUrl = imageUrl.startsWith('/') ? `${baseUrl}${imageUrl}` : `${baseUrl}/${imageUrl}`
+    if (imageUrl) {
+      if (!imageUrl.startsWith('http')) {
+        // Local images - make absolute
+        imageUrl = imageUrl.startsWith('/') ? `${baseUrl}${imageUrl}` : `${baseUrl}/${imageUrl}`
+      } else {
+        // External images (Google Drive, etc) - use proxy
+        imageUrl = `${baseUrl}/api/og-image-proxy?url=${encodeURIComponent(offer.imageUrl)}`
+      }
     }
 
-    console.log('🖼️ Offer Share Metadata:', { id, title, imageUrl })
+    console.log('🖼️ Offer Share Metadata:', { id, title, originalImage: offer.imageUrl, proxiedImage: imageUrl })
 
-    const shareUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:4000'}/offers/share/${id}`
+    const shareUrl = `${baseUrl}/offers/share/${id}`
 
     return {
       title: `${title} - Hello Madurai`,
@@ -91,10 +98,20 @@ export default async function OfferSharePage({ params }: Props) {
     const title = offer.title
     const description = offer.title_ta || offer.title || 'Special offer from Hello Madurai'
 
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:4000'
+
+    // Display image - for Google Drive, use thumbnail format
     let imageUrl = offer.imageUrl
-    if (!imageUrl.startsWith('http')) {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:4000'
-      imageUrl = imageUrl.startsWith('/') ? `${baseUrl}${imageUrl}` : `${baseUrl}/${imageUrl}`
+    if (imageUrl) {
+      if (!imageUrl.startsWith('http')) {
+        imageUrl = imageUrl.startsWith('/') ? `${baseUrl}${imageUrl}` : `${baseUrl}/${imageUrl}`
+      } else if (imageUrl.includes('drive.google.com')) {
+        // For Google Drive, use thumbnail format for display
+        const fileId = imageUrl.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)?.[1] || imageUrl.match(/id=([a-zA-Z0-9-_]+)/)?.[1]
+        if (fileId) {
+          imageUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`
+        }
+      }
     }
 
     // Render a simple page that redirects but allows crawlers to see metadata

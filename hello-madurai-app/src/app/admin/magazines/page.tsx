@@ -20,9 +20,11 @@ interface Magazine {
   coverImage?: string
   issueNumber: string
   publishedAt: string
+  month?: string
   downloads: number
   likes: number
   featured: boolean
+  orderNumber: number
   createdAt: string
   updatedAt: string
   collectionId: string
@@ -56,8 +58,10 @@ export default function AdminMagazinesPage() {
     pdfUrl: '',
     coverImage: '',
     issueNumber: '',
+    month: '',
     collectionId: '',
-    featured: false
+    featured: false,
+    orderNumber: 0
   })
   const [collectionFormData, setCollectionFormData] = useState({
     name: '',
@@ -75,10 +79,13 @@ export default function AdminMagazinesPage() {
       const response = await fetch('/api/admin/magazines')
       if (response.ok) {
         const data = await response.json()
-        // Sort by publishedAt date (newest first)
-        const sortedData = data.sort((a: Magazine, b: Magazine) =>
-          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-        )
+        // Sort by orderNumber (ascending), then by publishedAt (newest first)
+        const sortedData = data.sort((a: Magazine, b: Magazine) => {
+          if (a.orderNumber !== b.orderNumber) {
+            return a.orderNumber - b.orderNumber
+          }
+          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+        })
         setMagazines(sortedData)
         setFilteredMagazines(sortedData)
       } else {
@@ -151,8 +158,10 @@ export default function AdminMagazinesPage() {
           pdfUrl: '',
           coverImage: '',
           issueNumber: '',
+          month: '',
           collectionId: '',
-          featured: false
+          featured: false,
+          orderNumber: 0
         })
         toast.success(editingMagazine
           ? t('admin.magazineUpdated', 'Magazine updated successfully!', 'பத்திரிகை வெற்றிகரமாக புதுப்பிக்கப்பட்டது!')
@@ -217,8 +226,10 @@ export default function AdminMagazinesPage() {
       pdfUrl: magazine.pdfUrl,
       coverImage: magazine.coverImage || '',
       issueNumber: magazine.issueNumber,
+      month: magazine.month || '',
       collectionId: magazine.collectionId,
-      featured: magazine.featured
+      featured: magazine.featured,
+      orderNumber: magazine.orderNumber || 0
     })
     setShowForm(true)
   }
@@ -326,8 +337,10 @@ export default function AdminMagazinesPage() {
                   pdfUrl: '',
                   coverImage: '',
                   issueNumber: '',
+                  month: '',
                   collectionId: '',
-                  featured: false
+                  featured: false,
+                  orderNumber: 0
                 })
               }}
               className="bg-green-600 text-white hover:bg-green-700"
@@ -460,6 +473,38 @@ export default function AdminMagazinesPage() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder={t('admin.issueNumberPlaceholder', 'e.g., Issue 1, Volume 2', 'எ.கா., இதழ் 1, தொகுதி 2')}
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <TranslatedText tamil="மாதம்">Month</TranslatedText>
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.month}
+                        onChange={(e) => setFormData({ ...formData, month: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder={t('admin.monthPlaceholder', 'e.g., January 2024', 'எ.கா., ஜனவரி 2024')}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-6 md:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <TranslatedText tamil="வரிசை எண்">Order Number</TranslatedText>
+                      </label>
+                      <input
+                        type="number"
+                        value={formData.orderNumber}
+                        onChange={(e) => setFormData({ ...formData, orderNumber: parseInt(e.target.value) || 0 })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="0"
+                        min="0"
+                      />
+                      <p className="mt-1 text-xs text-gray-500">
+                        <TranslatedText tamil="குறைந்த எண் முதலில் காட்டப்படும்">Lower numbers appear first</TranslatedText>
+                      </p>
                     </div>
 
                     <div className="flex items-center">

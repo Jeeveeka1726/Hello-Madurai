@@ -36,6 +36,7 @@ interface Magazine {
   title_ta?: string
   issueNumber?: string
   publishedAt: string
+  month?: string
   pdfUrl?: string
   coverImage?: string
   featuredImage?: string
@@ -105,6 +106,7 @@ function EpaperPageContent() {
         console.log('📄 First magazine details:', data[0] ? {
           id: data[0].id,
           title: data[0].title,
+          month: data[0].month,
           pdfUrl: data[0].pdfUrl,
           coverImage: data[0].coverImage,
           featuredImage: data[0].featuredImage,
@@ -115,6 +117,7 @@ function EpaperPageContent() {
         data.forEach((mag: Magazine, index: number) => {
           console.log(`📖 Magazine ${index + 1}:`, {
             title: mag.title,
+            month: mag.month || '❌ NO MONTH SET',
             hasImage: !!(mag.coverImage || mag.featuredImage),
             imageUrl: mag.coverImage || mag.featuredImage,
             hasPdf: !!mag.pdfUrl,
@@ -470,24 +473,17 @@ function EpaperPageContent() {
 
               {/* Magazine Info & Actions - Compact and close to image */}
               <div className="flex flex-col gap-2 py-3 px-2 bg-white sm:px-3">
-                {/* Title and Date - Compact */}
-                <div className="mb-1">
-                  <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2 leading-tight">
+                {/* Title - Centered */}
+                <div className="w-full text-center mb-2">
+                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight">
                     <TranslatedText tamil={magazine.title_ta || magazine.title}>
                       {magazine.title}
                     </TranslatedText>
                   </h3>
-                  <p className="text-xs text-gray-500 flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    {new Date(magazine.publishedAt).toLocaleDateString(
-                      language === 'ta' ? 'ta-IN' : 'en-IN',
-                      { year: 'numeric', month: 'short', day: 'numeric' }
-                    )}
-                  </p>
                 </div>
 
-                {/* Action Buttons - Compact */}
-                <div className="flex gap-2 items-center">
+                {/* Action Buttons - Centered */}
+                <div className="flex gap-2 items-center justify-center">
                   {/* Download Button */}
                   <button
                     onClick={(e) => {

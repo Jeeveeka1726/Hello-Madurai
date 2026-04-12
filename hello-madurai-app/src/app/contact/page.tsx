@@ -80,16 +80,16 @@ export default function ContactPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-blue-800">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
       <NewHeader />
-      <div className="min-h-screen bg-blue-800 py-12">
+      <div className="min-h-screen py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-white mb-4">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
               {t('contact.title', 'Contact Hello Madurai', 'ஹலோ மதுரையை தொடர்பு கொள்ளுங்கள்')}
             </h1>
-            <p className="text-xl text-blue-200 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-700 max-w-2xl mx-auto">
               {t('contact.subtitle', 'Get in touch with us for any queries or feedback', 'எந்தவொரு கேள்விகள் அல்லது கருத்துகளுக்கும் எங்களுடன் தொடர்பு கொள்ளுங்கள்')}
             </p>
           </div>
@@ -99,20 +99,20 @@ export default function ContactPage() {
             {contactInfo.map((info, index) => {
               const Icon = info.icon
               return (
-                <Card key={index} className="bg-blue-600 border-blue-500 hover:bg-blue-500 transition-colors h-full">
+                <Card key={index} className="bg-white border-gray-200 hover:shadow-xl transition-all duration-300 h-full">
                   <CardContent className="p-6 text-center h-full flex flex-col">
                     <div className="flex justify-center mb-4">
-                      <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-500 rounded-lg">
+                      <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md">
                         <Icon className="h-6 w-6 text-white" />
                       </div>
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       {info.title}
                     </h3>
-                    <p className="text-blue-200 font-medium mb-2 break-words">
+                    <p className="text-blue-600 font-medium mb-2 break-words">
                       {info.value}
                     </p>
-                    <p className="text-blue-300 text-sm flex-grow">
+                    <p className="text-gray-600 text-sm flex-grow">
                       {info.description}
                     </p>
                   </CardContent>
@@ -122,8 +122,8 @@ export default function ContactPage() {
           </div>
 
           {/* Social Media Links */}
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-white mb-8">
+          <div className="text-center bg-white rounded-2xl shadow-lg p-8 md:p-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">
               {t('contact.followUs', 'Follow Us', 'எங்களைப் பின்தொடருங்கள்')}
             </h2>
             <div className="flex justify-center items-center space-x-6">
@@ -133,7 +133,7 @@ export default function ContactPage() {
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-14 h-14 bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors group"
+                  className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 group"
                   title={`Follow us on ${social.name}`}
                 >
                   <div className="text-white group-hover:scale-110 transition-transform">
@@ -142,7 +142,7 @@ export default function ContactPage() {
                 </a>
               ))}
             </div>
-            <p className="text-blue-300 mt-4">
+            <p className="text-gray-600 mt-6">
               {t('contact.socialDesc', 'Stay updated with our latest content and news', 'எங்கள் சமீபத்திய உள்ளடக்கம் மற்றும் செய்திகளுடன் புதுப்பித்த நிலையில் இருங்கள்')}
             </p>
           </div>

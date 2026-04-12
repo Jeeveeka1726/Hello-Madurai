@@ -194,8 +194,10 @@ model Magazine {
   featuredImage  String?
   issueNumber    String
   publishedAt    DateTime           @default(now())
+  month          String?            // Display month (e.g., "January 2024", "ஜனவரி 2024")
   downloads      Int                @default(0)
   featured       Boolean            @default(false)
+  orderNumber    Int                @default(0)
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   collectionId   String
@@ -203,6 +205,7 @@ model Magazine {
   collection     MagazineCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   pdfs           MagazinePdf[]
 
+  @@index([orderNumber])
   @@map("magazines")
 }
 

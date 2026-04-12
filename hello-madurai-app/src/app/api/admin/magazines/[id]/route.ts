@@ -65,7 +65,9 @@ export async function PUT(
         pdfUrl: body.pdfUrl || undefined,
         coverImage: body.coverImage || undefined,
         issueNumber: body.issueNumber || undefined,
+        month: body.month || undefined,
         featured: body.featured,
+        orderNumber: body.orderNumber !== undefined ? body.orderNumber : undefined,
         collectionId: body.collectionId || undefined,
         publishedAt: body.publishedAt ? new Date(body.publishedAt) : undefined
       },

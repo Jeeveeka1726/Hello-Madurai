@@ -9,9 +9,10 @@ export async function GET() {
       include: {
         collection: true
       },
-      orderBy: {
-        publishedAt: 'desc'
-      }
+      orderBy: [
+        { orderNumber: 'asc' },   // First by manual order
+        { publishedAt: 'desc' }   // Then by newest
+      ]
     })
 
     return NextResponse.json(magazines || [])
@@ -48,8 +49,10 @@ export async function POST(request: NextRequest) {
         coverImage: body.coverImage,
         featuredImage: body.featuredImage,
         issueNumber: body.issueNumber || '',
+        month: body.month,
         collectionId: body.collectionId,
         featured: body.featured || false,
+        orderNumber: body.orderNumber || 0,
         publishedAt: body.publishedAt ? new Date(body.publishedAt) : new Date()
       },
       include: {

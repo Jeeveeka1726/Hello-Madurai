@@ -14,9 +14,10 @@ export async function GET() {
           }
         }
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: [
+        { orderNumber: 'asc' },  // First by manual order
+        { createdAt: 'desc' }    // Then by newest
+      ]
     })
 
     console.log('📄 API: Fetched magazines with collections:', magazines.map(m => ({

@@ -73,10 +73,8 @@ export default function OffersPage() {
       if (response.ok) {
         const data = await response.json()
         setCategories(data)
-        // Set first category as default
-        if (data.length > 0) {
-          setSelectedCategory(data[0].id)
-        }
+        // Default to "All" (empty string means show all)
+        setSelectedCategory('')
       }
     } catch (error) {
       console.error('Error fetching categories:', error)
@@ -156,6 +154,19 @@ export default function OffersPage() {
                 </p>
                 <div className="overflow-x-auto scrollbar-hide">
                   <div className="flex gap-2 min-w-max justify-center px-4 md:px-0">
+                    {/* All Category Button */}
+                    <button
+                      onClick={() => setSelectedCategory('')}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap flex-shrink-0 text-sm ${
+                        selectedCategory === ''
+                          ? 'bg-blue-600 text-white shadow-md'
+                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {language === 'ta' ? 'அனைத்தும்' : 'All'}
+                    </button>
+
+                    {/* Category Buttons */}
                     {categories.map((category) => (
                       <button
                         key={category.id}
