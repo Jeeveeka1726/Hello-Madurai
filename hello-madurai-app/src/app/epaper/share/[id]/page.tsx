@@ -26,8 +26,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:4000'
 
+    // Default fallback image if no cover image
+    const fallbackImage = `${baseUrl}/hellomadurai_logo.png`
+
     // Use image proxy for Google Drive and other URLs to ensure they work with Open Graph
-    let absoluteImageUrl = imageUrl
+    let absoluteImageUrl = fallbackImage
     if (imageUrl) {
       if (!imageUrl.startsWith('http')) {
         // Local images - make absolute
@@ -38,7 +41,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       }
     }
 
-    console.log('🖼️ E-Paper Share Metadata:', { id, title, originalImage: imageUrl, proxiedImage: absoluteImageUrl })
+    console.log('🖼️ E-Paper Share Metadata:', {
+      id,
+      title,
+      originalImage: imageUrl || 'NO IMAGE',
+      proxiedImage: absoluteImageUrl,
+      hasImage: !!imageUrl
+    })
 
     const shareUrl = `${baseUrl}/epaper/share/${id}`
 
@@ -101,9 +110,10 @@ export default async function MagazineSharePage({ params }: Props) {
     const imageUrl = magazine.coverImage || magazine.featuredImage || ''
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:4000'
+    const fallbackImage = `${baseUrl}/hellomadurai_logo.png`
 
     // Display image - use original URL for display, proxy handles Open Graph
-    let absoluteImageUrl = imageUrl
+    let absoluteImageUrl = fallbackImage
     if (imageUrl) {
       if (!imageUrl.startsWith('http')) {
         absoluteImageUrl = imageUrl.startsWith('/') ? `${baseUrl}${imageUrl}` : `${baseUrl}/${imageUrl}`
@@ -113,6 +123,9 @@ export default async function MagazineSharePage({ params }: Props) {
         if (fileId) {
           absoluteImageUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`
         }
+      } else {
+        // Use proxy for external images
+        absoluteImageUrl = `${baseUrl}/api/og-image-proxy?url=${encodeURIComponent(imageUrl)}`
       }
     }
 
@@ -120,13 +133,23 @@ export default async function MagazineSharePage({ params }: Props) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center p-8 bg-white rounded-lg shadow-md max-w-md">
-          <div className="mb-4">
-            <img
-              src={absoluteImageUrl}
-              alt={title}
-              className="w-full h-48 object-cover rounded-lg mb-4"
-            />
-          </div>
+          {imageUrl ? (
+            <div className="mb-4">
+              <img
+                src={absoluteImageUrl}
+                alt={title}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+                onError={(e) => {
+                  console.error('Image failed to load:', absoluteImageUrl)
+                  e.currentTarget.src = fallbackImage
+                }}
+              />
+            </div>
+          ) : (
+            <div className="mb-4 h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+              <p className="text-gray-500">No preview available</p>
+            </div>
+          )}
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{title}</h1>
           <p className="text-gray-600 mb-4">{description}</p>
           <p className="text-sm text-gray-500">Redirecting to e-paper...</p>

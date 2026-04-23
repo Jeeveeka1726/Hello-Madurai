@@ -473,12 +473,14 @@ function EpaperPageContent() {
 
               {/* Magazine Info & Actions - Compact and close to image */}
               <div className="flex flex-col gap-2 py-3 px-2 bg-white sm:px-3">
-                {/* Title - Centered */}
+                {/* Month - Centered (show month if available, otherwise show title) */}
                 <div className="w-full text-center mb-2">
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight">
-                    <TranslatedText tamil={magazine.title_ta || magazine.title}>
-                      {magazine.title}
-                    </TranslatedText>
+                  <h3 className="text-sm sm:text-base font-bold text-gray-900">
+                    {magazine.month || (
+                      <TranslatedText tamil={magazine.title_ta || magazine.title}>
+                        {magazine.title}
+                      </TranslatedText>
+                    )}
                   </h3>
                 </div>
 
