@@ -24,10 +24,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const description = magazine.title_ta || magazine.title || 'E-Paper from Hello Madurai'
     const imageUrl = magazine.coverImage || magazine.featuredImage || ''
 
-    // Get base URL - prioritize env variables, fallback to production URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
+    // Get base URL - match news article pattern
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
+                    process.env.NEXT_PUBLIC_BASE_URL ||
                     process.env.NEXT_PUBLIC_APP_URL ||
-                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
                     'https://hellomadurai.com'
 
     // Default fallback image if no cover image
