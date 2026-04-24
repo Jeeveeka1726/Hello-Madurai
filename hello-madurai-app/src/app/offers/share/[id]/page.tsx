@@ -23,7 +23,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const title = offer.title
     const description = offer.title_ta || offer.title || 'Special offer from Hello Madurai'
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:4000'
+    // Get base URL - prioritize env variables, fallback to production URL
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
+                    process.env.NEXT_PUBLIC_APP_URL ||
+                    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
+                    'https://hellomadurai.com'
 
     // Use image proxy for Google Drive and other URLs to ensure they work with Open Graph
     let imageUrl = offer.imageUrl
