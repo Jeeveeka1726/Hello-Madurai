@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
       title: `${title} - Hello Madurai`,
       description: description,
-      metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:4000'),
+      metadataBase: new URL(baseUrl),
       openGraph: {
         title: title,
         description: description,
@@ -66,6 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             width: 1200,
             height: 630,
             alt: title,
+            type: 'image/webp',
           }
         ],
         type: 'website',
@@ -80,9 +81,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
       other: {
         'og:image': absoluteImageUrl,
+        'og:image:type': 'image/webp',
         'og:image:width': '1200',
         'og:image:height': '630',
         'og:image:alt': title,
+        'og:image:secure_url': absoluteImageUrl,
       }
     }
   } catch (error) {

@@ -24,6 +24,9 @@ export async function GET(
         'Content-Type': image.mimeType,
         'Cache-Control': 'public, max-age=31536000, immutable', // Cache for 1 year
         'Content-Length': image.size.toString(),
+        'Access-Control-Allow-Origin': '*', // Allow all origins for Open Graph crawlers
+        'Access-Control-Allow-Methods': 'GET',
+        'X-Content-Type-Options': 'nosniff',
       },
     })
     
