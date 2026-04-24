@@ -27,21 +27,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // Get base URL - prioritize env variables, fallback to production URL
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
                     process.env.NEXT_PUBLIC_APP_URL ||
-                    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
+                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
                     'https://hellomadurai.com'
 
     // Default fallback image if no cover image
     const fallbackImage = `${baseUrl}/hellomadurai_logo.png`
 
-    // Use image proxy for Google Drive and other URLs to ensure they work with Open Graph
+    // Build absolute image URL for Open Graph
     let absoluteImageUrl = fallbackImage
     if (imageUrl) {
-      if (!imageUrl.startsWith('http')) {
-        // Local images - make absolute
-        absoluteImageUrl = imageUrl.startsWith('/') ? `${baseUrl}${imageUrl}` : `${baseUrl}/${imageUrl}`
-      } else {
+      if (imageUrl.startsWith('http')) {
         // External images (Google Drive, etc) - use proxy
         absoluteImageUrl = `${baseUrl}/api/og-image-proxy?url=${encodeURIComponent(imageUrl)}`
+      } else {
+        // Local images (including /api/image/) - make absolute with base URL
+        absoluteImageUrl = imageUrl.startsWith('/') ? `${baseUrl}${imageUrl}` : `${baseUrl}/${imageUrl}`
       }
     }
 
