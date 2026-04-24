@@ -139,10 +139,6 @@ export default async function MagazineSharePage({ params }: Props) {
                 src={absoluteImageUrl}
                 alt={title}
                 className="w-full h-48 object-cover rounded-lg mb-4"
-                onError={(e) => {
-                  console.error('Image failed to load:', absoluteImageUrl)
-                  e.currentTarget.src = fallbackImage
-                }}
               />
             </div>
           ) : (
