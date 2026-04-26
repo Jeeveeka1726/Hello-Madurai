@@ -598,21 +598,23 @@ model Singer {
 }
 
 model RadioSong {
-  id        String     @id @default(cuid())
-  title     String
-  title_ta  String?
-  audioUrl  String
-  duration  String?
-  plays     Int        @default(0)
-  singerId  String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  shares    Int        @default(0)
-  audioType String     @default("direct")
-  singer    Singer     @relation(fields: [singerId], references: [id], onDelete: Cascade)
-  likes     SongLike[]
+  id          String     @id @default(cuid())
+  title       String
+  title_ta    String?
+  audioUrl    String
+  duration    String?
+  plays       Int        @default(0)
+  singerId    String
+  orderNumber Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  shares      Int        @default(0)
+  audioType   String     @default("direct")
+  singer      Singer     @relation(fields: [singerId], references: [id], onDelete: Cascade)
+  likes       SongLike[]
 
   @@index([singerId])
+  @@index([orderNumber])
   @@map("radio_songs")
 }
 

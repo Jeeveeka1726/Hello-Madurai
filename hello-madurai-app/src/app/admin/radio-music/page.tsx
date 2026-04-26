@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import FileUpload from '@/components/admin/FileUpload'
@@ -14,7 +15,8 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon,
   PhotoIcon,
-  ChatBubbleLeftRightIcon
+  ChatBubbleLeftRightIcon,
+  Bars3Icon
 } from '@heroicons/react/24/outline'
 
 interface RadioCategory {
@@ -186,6 +188,46 @@ export default function RadioMusicAdminPage() {
     } catch (error) {
       console.error('Error fetching songs:', error)
       setSongs([]) // Set empty array on error
+    }
+  }
+
+  const handleSongDragEnd = async (result: any) => {
+    if (!result.destination || !selectedSinger) return
+
+    // Get songs for current singer only
+    const singerSongs = songs.filter(s => s.singerId === selectedSinger.id)
+    const otherSongs = songs.filter(s => s.singerId !== selectedSinger.id)
+
+    const items = Array.from(singerSongs)
+    const [reorderedItem] = items.splice(result.source.index, 1)
+    items.splice(result.destination.index, 0, reorderedItem)
+
+    // Update order numbers
+    const updatedSongs = items.map((song, index) => ({
+      ...song,
+      orderNumber: index
+    }))
+
+    // Update local state immediately
+    setSongs([...otherSongs, ...updatedSongs])
+
+    try {
+      const response = await fetch('/api/admin/radio-songs/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ songs: updatedSongs })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update order')
+      }
+
+      toast.success('Audio order updated successfully')
+    } catch (error) {
+      console.error('Error updating order:', error)
+      toast.error('Failed to update audio order')
+      // Revert on error
+      fetchSongs()
     }
   }
 
@@ -982,48 +1024,74 @@ export default function RadioMusicAdminPage() {
               <p className="text-gray-500">No audios yet. Add your first audio!</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {songs
-                .filter(s => s.singerId === selectedSinger.id)
-                .map((song, index) => (
-                  <div key={song.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
-                    <div className="flex items-center gap-4">
-                      {/* Track Number */}
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <span className="text-blue-600 font-semibold">{index + 1}</span>
-                      </div>
+            <DragDropContext onDragEnd={handleSongDragEnd}>
+              <Droppable droppableId="songs">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
+                    {songs
+                      .filter(s => s.singerId === selectedSinger.id)
+                      .sort((a, b) => (a.orderNumber || 0) - (b.orderNumber || 0))
+                      .map((song, index) => (
+                        <Draggable key={song.id} draggableId={song.id} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              className={`border border-gray-200 rounded-lg p-4 transition-shadow ${
+                                snapshot.isDragging ? 'shadow-lg bg-blue-50' : 'hover:shadow-md bg-white'
+                              }`}
+                            >
+                              <div className="flex items-center gap-4">
+                                {/* Drag Handle */}
+                                <div
+                                  {...provided.dragHandleProps}
+                                  className="cursor-move text-gray-400 hover:text-gray-600 flex-shrink-0"
+                                >
+                                  <Bars3Icon className="h-5 w-5" />
+                                </div>
 
-                      {/* Song Info */}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-gray-900">{song.title}</h4>
-                        {song.title_ta && <p className="text-sm text-gray-600">{song.title_ta}</p>}
-                        <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
-                          <span>⏱️ {song.duration || 'N/A'}</span>
-                          <span>▶️ {song.plays} plays</span>
-                        </div>
-                      </div>
+                                {/* Track Number */}
+                                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                  <span className="text-blue-600 font-semibold">{index + 1}</span>
+                                </div>
 
-                      {/* Actions */}
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => handleEditSong(song)}
-                          className="bg-blue-50 text-blue-600 hover:bg-blue-100 text-sm py-2 px-3"
-                        >
-                          <PencilIcon className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
-                        <Button
-                          onClick={() => handleDeleteSong(song.id)}
-                          className="bg-red-50 text-red-600 hover:bg-red-100 text-sm py-2 px-3"
-                        >
-                          <TrashIcon className="h-4 w-4 mr-1" />
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
+                                {/* Song Info */}
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-semibold text-gray-900">{song.title}</h4>
+                                  {song.title_ta && <p className="text-sm text-gray-600">{song.title_ta}</p>}
+                                  <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+                                    <span>⏱️ {song.duration || 'N/A'}</span>
+                                    <span>▶️ {song.plays} plays</span>
+                                  </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex gap-2">
+                                  <Button
+                                    onClick={() => handleEditSong(song)}
+                                    className="bg-blue-50 text-blue-600 hover:bg-blue-100 text-sm py-2 px-3"
+                                  >
+                                    <PencilIcon className="h-4 w-4 mr-1" />
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    onClick={() => handleDeleteSong(song.id)}
+                                    className="bg-red-50 text-red-600 hover:bg-red-100 text-sm py-2 px-3"
+                                  >
+                                    <TrashIcon className="h-4 w-4 mr-1" />
+                                    Delete
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                    {provided.placeholder}
                   </div>
-                ))}
-            </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           )}
 
           {/* Comments Section */}
