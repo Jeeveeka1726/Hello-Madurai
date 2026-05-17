@@ -127,7 +127,7 @@ function NewsPageContent() {
             {t('news.title', 'News', 'செய்திகள்')}
           </h1>
           <p className="mt-2 text-lg text-gray-600" suppressHydrationWarning>
-            {t('news.subtitle', 'Stay updated with the latest news and happenings in Madurai', 'மதுரையின் சமீபத்திய செய்திகள் மற்றும் நிகழ்வுகளுடன் புதுப்பித்த நிலையில் இருங்கள்')}
+            {t('news.subtitle', 'Stay Updated With The Latest News and Happenings In Madurai', 'மதுரையின் சமீபத்திய செய்திகள் மற்றும் நிகழ்வுகளுடன் புதுப்பித்த நிலையில் இருங்கள்')}
           </p>
         </div>
 

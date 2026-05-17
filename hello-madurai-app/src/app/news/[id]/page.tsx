@@ -383,7 +383,7 @@ export default function NewsDetailPage() {
   return (
     <div>
       <NewspaperHeader showTagline={true} />
-    <AppWrapper>
+    <AppWrapper showFooter={false}>
       <NewsDetailPageContent />
     </AppWrapper>
     </div>
