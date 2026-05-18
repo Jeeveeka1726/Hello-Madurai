@@ -152,11 +152,11 @@ model Business {
   profileVideo      String?
   mainImage         String?
   mainVideoUrl      String?
-  videoType         String?               // 'YOUTUBE_VIDEO', 'YOUTUBE_SHORTS', 'INSTAGRAM_REEL'
   directionsUrl     String?
   latitude          Float?
   longitude         Float?
   description_ta    String?
+  videoType         String?
   mainCategory      DirectoryCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   subcategory       DirectorySubcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
   comments          BusinessComment[]
@@ -194,14 +194,14 @@ model Magazine {
   featuredImage  String?
   issueNumber    String
   publishedAt    DateTime           @default(now())
-  month          String?            // Display month (e.g., "January 2024", "ஜனவரி 2024")
   downloads      Int                @default(0)
   featured       Boolean            @default(false)
-  orderNumber    Int                @default(0)
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   collectionId   String
   likes          Int                @default(0)
+  month          String?
+  orderNumber    Int                @default(0)
   collection     MagazineCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   pdfs           MagazinePdf[]
 
@@ -306,19 +306,19 @@ model HelplineCategory {
 }
 
 model Helpline {
-  id             String            @id @default(cuid())
+  id             String           @id @default(cuid())
   name           String
   name_ta        String?
   phone          String
+  description    String?          @db.Text
+  description_ta String?          @db.Text
+  featured       Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  address        String?          @db.Text
+  address_ta     String?          @db.Text
   categoryId     String
-  address        String?           @db.Text
-  address_ta     String?           @db.Text
-  description    String?           @db.Text
-  description_ta String?           @db.Text
-  featured       Boolean           @default(false)
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  category       HelplineCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category       HelplineCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@index([categoryId])
   @@map("helplines")
@@ -446,17 +446,17 @@ model OfferCategory {
 }
 
 model Offer {
-  id             String   @id @default(cuid())
-  title          String
-  title_ta       String?
-  imageUrl       String
-  bookNowUrl     String?
-  bookNowPhone   String?
-  category       String?
-  active         Boolean  @default(true)
-  orderNumber    Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id           String   @id @default(cuid())
+  title        String
+  title_ta     String?
+  imageUrl     String
+  bookNowUrl   String?
+  active       Boolean  @default(true)
+  orderNumber  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  category     String?
+  bookNowPhone String?
 
   @@index([active])
   @@index([orderNumber])
@@ -547,7 +547,7 @@ model Reel {
   title_ta     String?
   videoUrl     String
   thumbnailUrl String?
-  reelType     String   @default("youtube") // "youtube", "instagram", "upload"
+  reelType     String   @default("youtube")
   duration     String?
   views        Int      @default(0)
   likes        Int      @default(0)
@@ -605,11 +605,11 @@ model RadioSong {
   duration    String?
   plays       Int        @default(0)
   singerId    String
-  orderNumber Int        @default(0)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   shares      Int        @default(0)
   audioType   String     @default("direct")
+  orderNumber Int        @default(0)
   singer      Singer     @relation(fields: [singerId], references: [id], onDelete: Cascade)
   likes       SongLike[]
 

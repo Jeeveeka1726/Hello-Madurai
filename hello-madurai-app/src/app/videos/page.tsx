@@ -74,6 +74,8 @@ function VideosPageContent() {
   const [ads, setAds] = useState<Ad[]>([])
   const [loading, setLoading] = useState(true)
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null)
+  const [driveFallbackVideos, setDriveFallbackVideos] = useState<string[]>([])
+  const [thumbnailErrors, setThumbnailErrors] = useState<string[]>([])
 
   // Fetch videos from database
   useEffect(() => {
@@ -148,6 +150,73 @@ function VideosPageContent() {
     }
     
     return null
+  }
+
+  // Helper to extract Google Drive file ID
+  const getDriveFileId = (url: string): string | null => {
+    if (!url) return null
+    try {
+      const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//)
+      if (match) return match[1]
+    } catch (e) {
+      console.error('Error extracting Drive ID:', e)
+    }
+    return null
+  }
+
+  // Extract Google Drive file ID and return embed URL
+  const getDriveEmbedUrl = (url: string): string | null => {
+    const fileId = getDriveFileId(url)
+    if (fileId) {
+      return `https://drive.google.com/file/d/${fileId}/preview`
+    }
+    return null
+  }
+
+  // Get a publicly accessible thumbnail from a Drive share link
+  const getDriveThumbnailUrl = (url: string): string | null => {
+    const fileId = getDriveFileId(url)
+    if (fileId) {
+      // use thumbnail endpoint for drive files
+      return `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`
+    }
+    return null
+  }
+
+  // Convert any URL (including Drive share links) to a usable direct image URL
+  const resolveThumbnailUrl = (url: string): string => {
+    if (!url) return ''
+
+    // Check for standard Google Drive share links
+    if (url.includes('drive.google.com/file/d/')) {
+      const fileId = getDriveFileId(url)
+      if (fileId) {
+        // Use our proxy API to handle Google Drive images (solves CORS and permission issues)
+        const driveUrl = `https://drive.google.com/uc?export=view&id=${fileId}`
+        return `/api/proxy-image?url=${encodeURIComponent(driveUrl)}`
+      }
+    }
+
+    // Check for drive thumbnail links - convert to uc?export=view and proxy
+    if (url.includes('drive.google.com/thumbnail')) {
+      const match = url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+      if (match && match[1]) {
+        const driveUrl = `https://drive.google.com/uc?export=view&id=${match[1]}`
+        return `/api/proxy-image?url=${encodeURIComponent(driveUrl)}`
+      }
+    }
+
+    // Check for drive uc?id= links - proxy them
+    if (url.includes('drive.google.com/uc?')) {
+      const match = url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+      if (match && match[1]) {
+        const driveUrl = `https://drive.google.com/uc?export=view&id=${match[1]}`
+        return `/api/proxy-image?url=${encodeURIComponent(driveUrl)}`
+      }
+    }
+
+    // Return regular URLs as-is (non-Drive URLs)
+    return url
   }
 
   // Increment view count
@@ -413,7 +482,10 @@ function VideosPageContent() {
             {filteredVideos.map((video, index) => {
               const videoTitle = language === 'ta' && video.title_ta ? video.title_ta : video.title
               const isYouTube = video.videoType === 'youtube'
+              const isGoogleDrive = video.videoType === 'drive'
               const youtubeId = isYouTube ? getYouTubeId(video.videoUrl) : null
+              const driveEmbedUrl = isGoogleDrive ? getDriveEmbedUrl(video.videoUrl) : null
+              const driveThumbnailUrl = isGoogleDrive ? getDriveThumbnailUrl(video.videoUrl) : null
 
               // Insert ad after every 4 videos (2 rows of 2)
               const shouldShowAd = (index + 1) % 4 === 0 && ads.length > 0
@@ -444,7 +516,7 @@ function VideosPageContent() {
                             style={{ WebkitTapHighlightColor: 'transparent' }}
                           >
                             <img
-                              src={video.thumbnailUrl || getYouTubeThumbnail(youtubeId)}
+                              src={resolveThumbnailUrl(video.thumbnailUrl || '') || getYouTubeThumbnail(youtubeId)}
                               alt={videoTitle}
                               className="absolute top-0 left-0 w-full h-full"
                               style={{
@@ -481,6 +553,76 @@ function VideosPageContent() {
                                 </svg>
                               </div>
                             </div>
+                          </div>
+                        )
+                      ) : isGoogleDrive && driveEmbedUrl ? (
+                        playingVideoId === video.id ? (
+                          // Show Google Drive iframe embed
+                          <iframe
+                            src={driveEmbedUrl}
+                            title={videoTitle}
+                            className="absolute top-0 left-0 w-full h-full border-0"
+                            style={{ width: '100%', height: '100%', minWidth: '100%', minHeight: '100%', maxWidth: '100%', maxHeight: '100%' }}
+                            allow="autoplay; encrypted-media"
+                            allowFullScreen
+                            onLoad={() => handleVideoView(video.id)}
+                          />
+                        ) : (
+                          // Show Drive thumbnail with play button on hover
+                          <div
+                            className="absolute top-0 left-0 w-full h-full cursor-pointer group"
+                            onClick={(e) => handlePlayClick(video.id, e)}
+                            onTouchEnd={(e) => handlePlayClick(video.id, e)}
+                            style={{ WebkitTapHighlightColor: 'transparent' }}
+                          >
+                            {(video.thumbnailUrl || driveThumbnailUrl) && !thumbnailErrors.includes(video.id) ? (
+                              <>
+                                <img
+                                  src={resolveThumbnailUrl(video.thumbnailUrl || '') || driveThumbnailUrl!}
+                                  alt={videoTitle}
+                                  onError={() => {
+                                    console.log("Thumbnail failed to load for video:", video.id);
+                                    setThumbnailErrors((prev) => [...prev, video.id]);
+                                  }}
+                                  className="absolute top-0 left-0 w-full h-full"
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    minWidth: '100%',
+                                    minHeight: '100%',
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    objectFit: 'cover',
+                                    display: 'block'
+                                  }}
+                                  loading="lazy"
+                                />
+                                {/* Semi-transparent play button overlay - always visible for Drive videos */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-black bg-opacity-50 rounded-full flex items-center justify-center backdrop-blur-sm border-3 border-white border-opacity-70 shadow-2xl hover:bg-opacity-70 hover:scale-110 transition-all duration-300">
+                                    <svg
+                                      className="w-10 h-10 sm:w-12 sm:h-12 text-white ml-1"
+                                      fill="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              // Fallback when no thumbnail or thumbnail failed - show dark background with centered play icon
+                              <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                                <div className="flex flex-col items-center gap-4">
+                                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white bg-opacity-10 rounded-full flex items-center justify-center backdrop-blur-sm border-2 border-white border-opacity-20">
+                                    <svg className="w-10 h-10 sm:w-12 sm:h-12 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                  </div>
+                                  <p className="text-white text-sm opacity-60">Click to play</p>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )
                       ) : video.videoType === 'upload' && video.videoUrl ? (

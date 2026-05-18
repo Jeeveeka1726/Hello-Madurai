@@ -38,6 +38,7 @@ export default function VideoDetailClient({ video }: VideoDetailClientProps) {
 
   const videoTitle = language === 'ta' && video.title_ta ? video.title_ta : video.title
   const isYouTube = video.videoType === 'youtube'
+  const isGoogleDrive = video.videoType === 'drive'
 
   // Get YouTube ID
   const getYouTubeId = (url: string): string | null => {
@@ -46,7 +47,22 @@ export default function VideoDetailClient({ video }: VideoDetailClientProps) {
     return match && match[2].length === 11 ? match[2] : null
   }
 
+  // Convert Google Drive share URL to embed URL
+  const getDriveEmbedUrl = (url: string): string | null => {
+    if (!url) return null
+    try {
+      const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)\//)
+      if (match) {
+        return `https://drive.google.com/file/d/${match[1]}/preview`
+      }
+    } catch (e) {
+      console.error('Drive URL parse error', e)
+    }
+    return null
+  }
+
   const youtubeId = isYouTube ? getYouTubeId(video.videoUrl) : null
+  const driveEmbedUrl = isGoogleDrive ? getDriveEmbedUrl(video.videoUrl) : null
 
   // Get YouTube thumbnail
   const getYouTubeThumbnail = (youtubeId: string): string => {
@@ -147,6 +163,22 @@ export default function VideoDetailClient({ video }: VideoDetailClientProps) {
                     border: 'none'
                   }}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : isGoogleDrive && driveEmbedUrl ? (
+                <iframe
+                  src={driveEmbedUrl}
+                  title={videoTitle}
+                  className="absolute top-0 left-0 w-full h-full border-0"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    border: 'none'
+                  }}
+                  allow="autoplay; encrypted-media"
                   allowFullScreen
                 />
               ) : (

@@ -4,9 +4,10 @@ import prisma from '@/lib/prisma'
 export async function GET() {
   try {
     const videos = await prisma.video.findMany({
-      orderBy: {
-        updatedAt: 'desc' // Latest updated videos first
-      }
+      orderBy: [
+        { orderNumber: 'asc' },  // Manual order first (if set)
+        { publishedAt: 'desc' }, // Then by publish date (newest first)
+      ]
     })
 
     return NextResponse.json(videos || [], {
