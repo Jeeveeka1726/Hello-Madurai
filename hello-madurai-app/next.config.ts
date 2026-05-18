@@ -35,6 +35,14 @@ const nextConfig: NextConfig = {
         hostname: 'hello-madurai-c5xr.vercel.app',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'archive.org',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.archive.org',
+      },
     ],
   },
   experimental: {
@@ -79,7 +87,7 @@ const nextConfig: NextConfig = {
           // Content Security Policy - Prevents XSS attacks
           {
             key: 'Content-Security-Policy',
-            value: "frame-src 'self' https://drive.google.com https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://www.instagram.com https://instagram.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.google.com https://ep2.adtrafficquality.google https://tpc.googlesyndication.com https://www.tamilradios.com https://tamilradios.com https://*.tamilradios.com;",
+            value: "frame-src 'self' https://drive.google.com https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://www.instagram.com https://instagram.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.google.com https://ep2.adtrafficquality.google https://tpc.googlesyndication.com https://www.tamilradios.com https://tamilradios.com https://*.tamilradios.com https://archive.org https://*.archive.org;",
           },
           // Strict Transport Security - Forces HTTPS (prevents SSL downgrade attacks)
           {

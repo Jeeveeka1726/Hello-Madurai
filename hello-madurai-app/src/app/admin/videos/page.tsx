@@ -53,12 +53,11 @@ export default function AdminVideosPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingVideo, setEditingVideo] = useState<Video | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [thumbnailType, setThumbnailType] = useState<'url' | 'drive'>('url')
   const [formData, setFormData] = useState({
     title: '',
     title_ta: '',
     videoUrl: '',
-    videoType: 'youtube', // 'youtube' or 'drive'
+    videoType: 'youtube', // 'youtube' or 'archive'
     thumbnailUrl: '',
     category: 'agri',
     duration: '',
@@ -127,7 +126,6 @@ export default function AdminVideosPage() {
         alert(editingVideo ? 'Video updated successfully!' : 'Video created successfully!')
         setShowForm(false)
         setEditingVideo(null)
-        setThumbnailType('url')
         setFormData({
           title: '',
           title_ta: '',
@@ -150,16 +148,12 @@ export default function AdminVideosPage() {
 
   const handleEdit = (video: Video) => {
     setEditingVideo(video)
-    // Detect thumbnail type
-    const thumbUrl = video.thumbnailUrl || ''
-    const isThumbDrive = thumbUrl.includes('drive.google.com')
-    setThumbnailType(isThumbDrive ? 'drive' : 'url')
     setFormData({
       title: video.title,
       title_ta: video.title_ta || '',
-      videoUrl: video.videoUrl,
+      videoUrl: video.videoUrl || '',
       videoType: video.videoType || 'youtube',
-      thumbnailUrl: thumbUrl,
+      thumbnailUrl: video.thumbnailUrl || '',
       category: video.category,
       duration: video.duration || '',
       featured: video.featured
@@ -196,7 +190,6 @@ export default function AdminVideosPage() {
             onClick={() => {
               setShowForm(!showForm)
               setEditingVideo(null)
-              setThumbnailType('url')
               setFormData({
                 title: '',
                 title_ta: '',
@@ -231,7 +224,7 @@ export default function AdminVideosPage() {
                     <input
                       type="text"
                       required
-                      value={formData.title}
+                      value={formData.title || ''}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -243,7 +236,7 @@ export default function AdminVideosPage() {
                     </label>
                     <input
                       type="text"
-                      value={formData.title_ta}
+                      value={formData.title_ta || ''}
                       onChange={(e) => setFormData({ ...formData, title_ta: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -269,12 +262,12 @@ export default function AdminVideosPage() {
                     <label className="flex items-center">
                       <input
                         type="radio"
-                        value="drive"
-                        checked={formData.videoType === 'drive'}
+                        value="archive"
+                        checked={formData.videoType === 'archive'}
                         onChange={(e) => setFormData({ ...formData, videoType: e.target.value, videoUrl: '' })}
                         className="mr-2"
                       />
-                      Google Drive URL
+                      Internet Archive URL
                     </label>
                   </div>
                 </div>
@@ -288,7 +281,7 @@ export default function AdminVideosPage() {
                     <input
                       type="url"
                       required
-                      value={formData.videoUrl}
+                      value={formData.videoUrl || ''}
                       onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
                       placeholder="https://www.youtube.com/watch?v=..."
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -298,18 +291,18 @@ export default function AdminVideosPage() {
                 ) : (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Google Drive Share URL *
+                      Internet Archive URL *
                     </label>
                     <input
                       type="url"
                       required
-                      value={formData.videoUrl}
+                      value={formData.videoUrl || ''}
                       onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-                      placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing"
+                      placeholder="https://archive.org/details/your-video-id"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Open the file in Google Drive → Share → Copy link. Make sure sharing is set to <strong>Anyone with the link</strong>.
+                      Upload your video to <a href="https://archive.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Archive.org</a>, then paste the video page URL here (e.g., https://archive.org/details/ayya-01)
                     </p>
                   </div>
                 )}
@@ -317,51 +310,19 @@ export default function AdminVideosPage() {
                 {/* Thumbnail (Optional) */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Thumbnail Image (Optional)
+                    Thumbnail Image URL (Optional)
                   </label>
-                  <div className="flex gap-4 mb-2">
-                    <label className="flex items-center text-sm">
-                      <input
-                        type="radio"
-                        value="url"
-                        checked={thumbnailType === 'url'}
-                        onChange={() => { setThumbnailType('url'); setFormData({ ...formData, thumbnailUrl: '' }) }}
-                        className="mr-2"
-                      />
-                      Image URL
-                    </label>
-                    <label className="flex items-center text-sm">
-                      <input
-                        type="radio"
-                        value="drive"
-                        checked={thumbnailType === 'drive'}
-                        onChange={() => { setThumbnailType('drive'); setFormData({ ...formData, thumbnailUrl: '' }) }}
-                        className="mr-2"
-                      />
-                      Google Drive Image URL
-                    </label>
-                  </div>
-                  {thumbnailType === 'url' ? (
-                    <input
-                      type="url"
-                      value={formData.thumbnailUrl}
-                      onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
-                      placeholder="https://example.com/thumbnail.jpg"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  ) : (
-                    <input
-                      type="url"
-                      value={formData.thumbnailUrl}
-                      onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
-                      placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  )}
+                  <input
+                    type="url"
+                    value={formData.thumbnailUrl || ''}
+                    onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
+                    placeholder="https://example.com/thumbnail.jpg or https://i.imgur.com/image.jpg"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  />
                   <p className="text-xs text-gray-500 mt-1">
                     {formData.videoType === 'youtube'
-                      ? "Leave empty to use YouTube's auto-generated thumbnail"
-                      : 'Provide a thumbnail image URL or a Google Drive image link'}
+                      ? "Leave empty to use YouTube's auto-generated thumbnail. For custom: Use direct image URL (JPG, PNG, WebP) from Imgur, Cloudinary, etc."
+                      : 'Recommended: Upload thumbnail to Imgur or Cloudinary and paste the direct image URL here.'}
                   </p>
                 </div>
 
@@ -372,7 +333,7 @@ export default function AdminVideosPage() {
                     </label>
                     <select
                       required
-                      value={formData.category}
+                      value={formData.category || 'agri'}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     >
@@ -390,7 +351,7 @@ export default function AdminVideosPage() {
                     </label>
                     <input
                       type="text"
-                      value={formData.duration}
+                      value={formData.duration || ''}
                       onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                       placeholder="e.g., 5:30"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
