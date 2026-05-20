@@ -246,7 +246,12 @@ function VideosPageContent() {
     }
   }
 
-  // Handle play button click for YouTube videos
+  // Handle video click - navigate to detail page
+  const handleVideoClick = (videoId: string) => {
+    router.push(`/videos/${videoId}`)
+  }
+
+  // Handle play button click for inline playing
   const handlePlayClick = (videoId: string, event?: React.MouseEvent | React.TouchEvent) => {
     // Prevent default behavior and stop propagation
     if (event) {
@@ -576,7 +581,7 @@ function VideosPageContent() {
                           </div>
                         )
                       ) : isGoogleDrive && driveEmbedUrl ? (
-                        // Show Google Drive iframe as-is (Drive UI included, no cropping)
+                        // Show Google Drive iframe directly - no play button overlay
                         <iframe
                           src={driveEmbedUrl}
                           title={videoTitle}
@@ -594,7 +599,7 @@ function VideosPageContent() {
                           }}
                         />
                       ) : isArchive && archiveEmbedUrl ? (
-                        // Show Internet Archive iframe - clean embed, 1-click playback
+                        // Show Internet Archive iframe directly - no play button overlay
                         <iframe
                           src={archiveEmbedUrl}
                           title={videoTitle}
@@ -635,10 +640,11 @@ function VideosPageContent() {
                     </div>
 
                     <CardContent className="p-3 sm:p-4 flex flex-col flex-grow">
-                      {/* Title */}
+                      {/* Title - Click to open detail page */}
                       <h3
-                        className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 mb-2 sm:mb-3 line-clamp-2"
+                        className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 mb-2 sm:mb-3 line-clamp-2 cursor-pointer hover:text-blue-600 transition-colors"
                         suppressHydrationWarning
+                        onClick={() => handleVideoClick(video.id)}
                       >
                         {videoTitle}
                       </h3>
