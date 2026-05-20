@@ -300,8 +300,7 @@ function VideoDetailPageContent() {
           </CardContent>
         </Card>
       </div>
-      </AppWrapper>
-    </>
+    </AppWrapper>
   )
 }
 
