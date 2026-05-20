@@ -78,7 +78,6 @@ function VideoDetailPageContent() {
   const videoId = params.id as string
   const [video, setVideo] = useState<Video | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -164,18 +163,22 @@ function VideoDetailPageContent() {
   const archiveEmbedUrl = isArchive ? getArchiveEmbedUrl(video.videoUrl) : null
   const driveEmbedUrl = isDrive ? getDriveEmbedUrl(video.videoUrl) : null
 
-  // Get thumbnail URL
-  const getThumbnailUrl = (): string => {
-    if (video.thumbnailUrl) return video.thumbnailUrl
-    if (isYouTube && youtubeId) {
-      return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
+  // Get Archive.org thumbnail from URL
+  const getArchiveThumbnail = (url: string): string | null => {
+    if (!url) return null
+    try {
+      const match = url.match(/archive\.org\/details\/([^\/\?]+)/)
+      if (match && match[1]) {
+        return `https://archive.org/services/img/${match[1]}`
+      }
+    } catch (error) {
+      console.error('Error extracting Archive.org thumbnail:', error)
     }
-    return ''
+    return null
   }
 
-  const handlePlayClick = () => {
-    setIsPlaying(true)
-  }
+  // Get thumbnail URL with Archive.org URL conversion
+
 
   return (
     <AppWrapper>
@@ -192,76 +195,35 @@ function VideoDetailPageContent() {
         {/* Video Player Card */}
         <Card className="mb-6">
           <CardContent className="p-0">
-            {/* Video Player */}
+            {/* Video Player - Show directly, no thumbnail */}
             <div className="relative w-full aspect-video bg-black">
-              {isPlaying ? (
-                // Show video player after clicking play
-                <>
-                  {isYouTube && youtubeId ? (
-                    <iframe
-                      src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
-                      title={videoTitle}
-                      className="absolute inset-0 w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    />
-                  ) : isArchive && archiveEmbedUrl ? (
-                    <iframe
-                      src={archiveEmbedUrl}
-                      title={videoTitle}
-                      className="absolute inset-0 w-full h-full border-0"
-                      allow="fullscreen"
-                      allowFullScreen
-                    />
-                  ) : isDrive && driveEmbedUrl ? (
-                    <iframe
-                      src={driveEmbedUrl}
-                      title={videoTitle}
-                      className="absolute inset-0 w-full h-full border-0"
-                      allow="encrypted-media"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-white">
-                      {language === 'ta' ? 'வீடியோ கிடைக்கவில்லை' : 'Video not available'}
-                    </div>
-                  )}
-                </>
+              {isYouTube && youtubeId ? (
+                <iframe
+                  src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+                  title={videoTitle}
+                  className="absolute inset-0 w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              ) : isArchive && archiveEmbedUrl ? (
+                <iframe
+                  src={archiveEmbedUrl}
+                  title={videoTitle}
+                  className="absolute inset-0 w-full h-full border-0"
+                  allow="fullscreen"
+                  allowFullScreen
+                />
+              ) : isDrive && driveEmbedUrl ? (
+                <iframe
+                  src={driveEmbedUrl}
+                  title={videoTitle}
+                  className="absolute inset-0 w-full h-full border-0"
+                  allow="encrypted-media"
+                  allowFullScreen
+                />
               ) : (
-                // Show thumbnail with YouTube-style play button
-                <div
-                  className="absolute inset-0 cursor-pointer group"
-                  onClick={handlePlayClick}
-                >
-                  {/* Thumbnail Image */}
-                  <img
-                    src={getThumbnailUrl()}
-                    alt={videoTitle}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-
-                  {/* YouTube-style Play Button - Hidden by default, shows on hover */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    {/* Dark transparent overlay */}
-                    <div className="absolute inset-0 bg-black opacity-30"></div>
-                    {/* Play button */}
-                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-black bg-opacity-60 rounded-full flex items-center justify-center backdrop-blur-sm border-3 sm:border-4 border-white border-opacity-80 shadow-2xl">
-                      <svg
-                        className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white ml-1"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  {/* Duration Badge (if available) */}
-                  {video.duration && (
-                    <div className="absolute bottom-3 right-3 bg-black bg-opacity-80 text-white px-2 py-1 rounded text-xs sm:text-sm font-semibold">
-                      {video.duration}
-                    </div>
-                  )}
+                <div className="absolute inset-0 flex items-center justify-center text-white">
+                  {language === 'ta' ? 'வீடியோ கிடைக்கவில்லை' : 'Video not available'}
                 </div>
               )}
             </div>

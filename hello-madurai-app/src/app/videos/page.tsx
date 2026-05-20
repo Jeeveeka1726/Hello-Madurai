@@ -201,9 +201,30 @@ function VideosPageContent() {
     return null
   }
 
-  // Convert any URL (including Drive share links) to a usable direct image URL
+  // Get Archive.org thumbnail URL from video URL or details URL
+  const getArchiveThumbnail = (url: string): string | null => {
+    if (!url) return null
+    try {
+      // Extract ID from URLs like:
+      // https://archive.org/details/video-id
+      const match = url.match(/archive\.org\/details\/([^\/\?]+)/)
+      if (match && match[1]) {
+        return `https://archive.org/services/img/${match[1]}`
+      }
+    } catch (error) {
+      console.error('Error extracting Archive.org thumbnail:', error)
+    }
+    return null
+  }
+
+  // Resolve thumbnail URL - convert Archive.org details URL and Google Drive URLs to thumbnails
   const resolveThumbnailUrl = (url: string): string => {
     if (!url) return ''
+
+    // If thumbnail URL is an Archive.org details page, convert to thumbnail
+    if (url.includes('archive.org/details/')) {
+      return getArchiveThumbnail(url) || url
+    }
 
     // Check for standard Google Drive share links
     if (url.includes('drive.google.com/file/d/')) {
@@ -618,7 +639,7 @@ function VideosPageContent() {
                         />
                       ) : video.thumbnailUrl ? (
                         <img
-                          src={video.thumbnailUrl}
+                          src={resolveThumbnailUrl(video.thumbnailUrl)}
                           alt={videoTitle}
                           className="absolute top-0 left-0 w-full h-full"
                           style={{
