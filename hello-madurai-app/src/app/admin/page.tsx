@@ -49,17 +49,25 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       // Fetch real stats from APIs
-      const [newsRes, eventsRes] = await Promise.all([
+      const [newsRes, eventsRes, businessesRes, analyticsRes] = await Promise.all([
         fetch('/api/admin/news').then(r => r.json()).catch(() => []),
-        fetch('/api/admin/events').then(r => r.json()).catch(() => [])
+        fetch('/api/admin/events').then(r => r.json()).catch(() => []),
+        fetch('/api/directory').then(r => r.json()).catch(() => []),
+        fetch('/api/admin/analytics?range=30d').then(r => r.json()).catch(() => ({}))
       ])
+
+      // Calculate monthly views from analytics
+      const monthlyViews = analyticsRes.totalViews || 0
+
+      // Total users = newsletter subscribers + anonymous users
+      const totalUsers = (analyticsRes.totalSubscriptions || 0)
 
       setStats({
         totalNews: Array.isArray(newsRes) ? newsRes.length : 0,
         totalEvents: Array.isArray(eventsRes) ? eventsRes.length : 0,
-        totalBusinesses: 0, // Will be fetched from database when businesses feature is implemented
-        totalUsers: 0, // Will be fetched from database when user management is implemented
-        monthlyViews: 0 // Will be fetched from analytics when implemented
+        totalBusinesses: Array.isArray(businessesRes) ? businessesRes.length : 0,
+        totalUsers: totalUsers,
+        monthlyViews: monthlyViews
       })
 
       setRecentContent({
@@ -99,12 +107,12 @@ export default function AdminDashboard() {
       href: '/admin/directory'
     },
     {
-      name: t('admin.stats.totalUsers', 'Total Users', 'மொத்த பயனர்கள்'),
+      name: t('admin.stats.totalUsers', 'Subscribers', 'சந்தாதாரர்கள்'),
       value: stats.totalUsers.toLocaleString(),
       icon: UserGroupIcon,
       change: '',
       changeType: 'neutral',
-      href: '/admin/users'
+      href: '/admin'
     },
     {
       name: t('admin.stats.monthlyViews', 'Monthly Views', 'மாதாந்திர பார்வைகள்'),
