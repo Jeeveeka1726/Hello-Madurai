@@ -28,6 +28,7 @@ interface ContentStats {
   news: number
   videos: number
   radio: number
+  radioSongs?: number
   businesses: number
   events?: number
   magazines?: number
@@ -68,6 +69,14 @@ interface AnalyticsData {
   totalSubscriptions: number
   totalDiscountCards: number
   totalShares: number
+  periodMetrics?: {
+    views: number
+    likes: number
+    comments: number
+    subscriptions: number
+    shares: number
+    range: string
+  }
   contentStats: ContentStats
   recentActivity: ActivityItem[]
   topContent: ContentItem[]
@@ -175,6 +184,8 @@ interface MetricCardProps {
   iconColor: string
   trendUp?: boolean
   trendPct?: string
+  periodCount?: number // NEW: period-specific count
+  periodLabel?: string // NEW: e.g., "Last 7 Days"
 }
 
 function MetricCard({
@@ -185,6 +196,8 @@ function MetricCard({
   iconColor,
   trendUp,
   trendPct,
+  periodCount,
+  periodLabel,
 }: MetricCardProps) {
   const formatted =
     value >= 1_000_000
@@ -202,6 +215,24 @@ function MetricCard({
         </div>
       </div>
       <p className="text-3xl font-bold text-gray-900">{formatted}</p>
+      {periodCount !== undefined && periodLabel && (
+        <div className="mt-2 pt-2 border-t border-gray-100">
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-500">{periodLabel}:</span>
+              <span className="font-semibold text-blue-600">+{periodCount.toLocaleString()}</span>
+            </div>
+            <span className="text-[10px] text-gray-400 italic">
+              new {
+                label.toLowerCase().includes('view') ? 'views' :
+                label.toLowerCase().includes('like') ? 'likes' :
+                label.toLowerCase().includes('comment') ? 'comments' :
+                'subscribers'
+              }
+            </span>
+          </div>
+        </div>
+      )}
       {trendPct !== undefined && (
         <div className="flex items-center mt-2 gap-1">
           {trendUp ? (
@@ -398,32 +429,64 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
       {/* ── Key Metric Cards ───────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <MetricCard
-          label={t('admin.analytics.totalViews', 'Total Views', 'மொத்த பார்வைகள்')}
+          label={t('admin.analytics.totalViews', 'Total Views (All Time)', 'மொத்த பார்வைகள் (அனைத்தும்)')}
           value={analytics.totalViews}
           icon={EyeIcon}
           iconBg="bg-blue-50"
           iconColor="text-blue-600"
+          periodCount={analytics.periodMetrics?.views}
+          periodLabel={
+            timeRange === '7d'
+              ? 'Last 7 Days'
+              : timeRange === '30d'
+              ? 'Last 30 Days'
+              : 'Last 90 Days'
+          }
         />
         <MetricCard
-          label={t('admin.analytics.totalLikes', 'Total Likes', 'மொத்த விருப்பங்கள்')}
+          label={t('admin.analytics.totalLikes', 'Total Likes (All Time)', 'மொத்த விருப்பங்கள் (அனைத்தும்)')}
           value={analytics.totalLikes}
           icon={HeartIcon}
           iconBg="bg-red-50"
           iconColor="text-red-500"
+          periodCount={analytics.periodMetrics?.likes}
+          periodLabel={
+            timeRange === '7d'
+              ? 'Last 7 Days'
+              : timeRange === '30d'
+              ? 'Last 30 Days'
+              : 'Last 90 Days'
+          }
         />
         <MetricCard
-          label={t('admin.analytics.totalComments', 'Total Comments', 'மொத்த கருத்துகள்')}
+          label={t('admin.analytics.totalComments', 'Total Comments (All Time)', 'மொத்த கருத்துகள் (அனைத்தும்)')}
           value={analytics.totalComments}
           icon={ChatBubbleLeftIcon}
           iconBg="bg-green-50"
           iconColor="text-green-600"
+          periodCount={analytics.periodMetrics?.comments}
+          periodLabel={
+            timeRange === '7d'
+              ? 'Last 7 Days'
+              : timeRange === '30d'
+              ? 'Last 30 Days'
+              : 'Last 90 Days'
+          }
         />
         <MetricCard
-          label={t('admin.analytics.subscriptions', 'Newsletter Subscribers', 'செய்திமடல் சந்தாதாரர்கள்')}
+          label={t('admin.analytics.subscriptions', 'Newsletter Subscribers (All Time)', 'செய்திமடல் சந்தாதாரர்கள் (அனைத்தும்)')}
           value={analytics.totalSubscriptions}
           icon={UserGroupIcon}
           iconBg="bg-yellow-50"
           iconColor="text-yellow-600"
+          periodCount={analytics.periodMetrics?.subscriptions}
+          periodLabel={
+            timeRange === '7d'
+              ? 'Last 7 Days'
+              : timeRange === '30d'
+              ? 'Last 30 Days'
+              : 'Last 90 Days'
+          }
         />
       </div>
 
@@ -475,14 +538,18 @@ export default function AdminAnalyticsDashboard({ className = '' }: AdminAnalyti
             {[
               { label: t('admin.analytics.news', 'News Articles', 'செய்தி கட்டுரைகள்'), count: analytics.contentStats?.news || 0, icon: NewspaperIcon, bg: 'bg-red-50', color: 'text-red-600', bar: '#ef4444' },
               { label: t('admin.analytics.videos', 'Videos', 'வீடியோக்கள்'), count: analytics.contentStats?.videos || 0, icon: VideoCameraIcon, bg: 'bg-blue-50', color: 'text-blue-600', bar: '#3b82f6' },
-              { label: t('admin.analytics.radio', 'Radio Shows', 'வானொலி நிகழ்ச்சிகள்'), count: analytics.contentStats?.radio || 0, icon: MicrophoneIcon, bg: 'bg-green-50', color: 'text-green-600', bar: '#22c55e' },
+              { label: t('admin.analytics.radioSongs', 'Radio Songs', 'வானொலி பாடல்கள்'), count: analytics.contentStats?.radioSongs || 0, icon: MicrophoneIcon, bg: 'bg-green-50', color: 'text-green-600', bar: '#22c55e' },
+              { label: t('admin.analytics.magazines', 'Magazines (ePaper)', 'பத்திரிகைகள்'), count: analytics.contentStats?.magazines || 0, icon: NewspaperIcon, bg: 'bg-purple-50', color: 'text-purple-600', bar: '#a855f7' },
+              { label: t('admin.analytics.reels', 'Reels', 'ரீல்ஸ்'), count: analytics.contentStats?.reels || 0, icon: VideoCameraIcon, bg: 'bg-pink-50', color: 'text-pink-600', bar: '#ec4899' },
               { label: t('admin.analytics.businesses', 'Businesses', 'வணிகங்கள்'), count: analytics.contentStats?.businesses || 0, icon: BuildingOfficeIcon, bg: 'bg-indigo-50', color: 'text-indigo-600', bar: '#6366f1' },
               { label: t('admin.analytics.events', 'Events', 'நிகழ்வுகள்'), count: analytics.contentStats?.events || 0, icon: CalendarIcon, bg: 'bg-orange-50', color: 'text-orange-600', bar: '#f97316' },
             ].map(({ label, count, icon: Icon, bg, color, bar }) => {
               const total = Math.max(
                 analytics.contentStats?.news || 0,
                 analytics.contentStats?.videos || 0,
-                analytics.contentStats?.radio || 0,
+                analytics.contentStats?.radioSongs || 0,
+                analytics.contentStats?.magazines || 0,
+                analytics.contentStats?.reels || 0,
                 analytics.contentStats?.businesses || 0,
                 analytics.contentStats?.events || 0,
                 1

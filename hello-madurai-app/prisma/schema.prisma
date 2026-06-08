@@ -29,6 +29,8 @@ model News {
   updatedAt     DateTime      @updatedAt
   comments      NewsComment[]
   shares        NewsShare[]
+  viewRecords   NewsView[]    @relation("NewsViews")
+  likeRecords   NewsLike[]    @relation("NewsLikes")
 
   @@map("news")
 }
@@ -239,6 +241,58 @@ model NewsShare {
   news      News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
 
   @@map("news_shares")
+}
+
+model NewsView {
+  id        String   @id @default(cuid())
+  newsId    String
+  userAgent String?
+  ipHash    String?
+  createdAt DateTime @default(now())
+  news      News     @relation("NewsViews", fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@index([newsId])
+  @@index([createdAt])
+  @@map("news_views")
+}
+
+model NewsLike {
+  id        String   @id @default(cuid())
+  newsId    String
+  userAgent String?
+  ipHash    String?
+  createdAt DateTime @default(now())
+  news      News     @relation("NewsLikes", fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@index([newsId])
+  @@index([createdAt])
+  @@map("news_likes")
+}
+
+model VideoView {
+  id        String   @id @default(cuid())
+  videoId   String
+  userAgent String?
+  ipHash    String?
+  createdAt DateTime @default(now())
+  video     Video    @relation("VideoViews", fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@index([videoId])
+  @@index([createdAt])
+  @@map("video_views")
+}
+
+model VideoLike {
+  id        String   @id @default(cuid())
+  videoId   String
+  userAgent String?
+  ipHash    String?
+  createdAt DateTime @default(now())
+  video     Video    @relation("VideoLikes", fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@index([videoId])
+  @@index([createdAt])
+  @@map("video_likes")
 }
 
 model RadioComment {
@@ -513,6 +567,8 @@ model Video {
   videoType    String         @default("upload")
   comments     VideoComment[]
   shares       VideoShare[]
+  viewRecords  VideoView[]    @relation("VideoViews")
+  likeRecords  VideoLike[]    @relation("VideoLikes")
 
   @@map("videos")
 }

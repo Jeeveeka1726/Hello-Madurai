@@ -9,6 +9,7 @@ export async function POST(
     const { id: newsId } = await params
     const body = await request.json()
     const { action } = body // 'like' or 'unlike'
+    const userAgent = request.headers.get('user-agent') || undefined
 
     // Get current news item first
     const currentNews = await prisma.news.findUnique({
@@ -26,11 +27,30 @@ export async function POST(
     // Calculate new like count with bounds checking
     const currentLikes = currentNews.likes || 0
     let newLikes = currentLikes
-    
+
     if (action === 'like') {
       newLikes = currentLikes + 1
+
+      // Create timestamped like record
+      await prisma.newsLike.create({
+        data: {
+          newsId,
+          userAgent,
+        }
+      })
     } else if (action === 'unlike') {
       newLikes = Math.max(0, currentLikes - 1) // Never go below 0
+
+      // Remove one like record (most recent)
+      const likeToDelete = await prisma.newsLike.findFirst({
+        where: { newsId },
+        orderBy: { createdAt: 'desc' }
+      })
+      if (likeToDelete) {
+        await prisma.newsLike.delete({
+          where: { id: likeToDelete.id }
+        })
+      }
     }
 
     // Update likes count in Hostinger MySQL

@@ -15,6 +15,7 @@ export async function GET(request: Request) {
     const [
       newsCount,
       radioCount,
+      radioSongsCount,
       businessCount,
       eventCount,
       magazineCount,
@@ -23,6 +24,7 @@ export async function GET(request: Request) {
     ] = await Promise.all([
       prisma.news.count(),
       prisma.radioShow.count(),
+      prisma.radioSong.count(),
       prisma.business.count(),
       prisma.event.count(),
       prisma.magazine.count(),
@@ -30,42 +32,113 @@ export async function GET(request: Request) {
       prisma.reel.count(),
     ])
 
-    // ── Engagement Totals (within date range) ───────────────────────────────────
-    const [newsItems, radioItems, videoItems] = await Promise.all([
+    // ── Engagement Totals (ALL TIME - not filtered by date) ────────────────────
+    // Get ALL content to count total views/likes across all time
+    const [allNewsItems, allRadioItems, allVideoItems, allMagazines, allReels, allRadioSongs] = await Promise.all([
       prisma.news.findMany({
-        where: { createdAt: { gte: startDate } },
         select: { id: true, title: true, views: true, likes: true, dislikes: true, createdAt: true, category: true },
         orderBy: { views: 'desc' },
       }),
       prisma.radioShow.findMany({
-        where: { createdAt: { gte: startDate } },
         select: { id: true, title: true, plays: true, createdAt: true },
       }),
       prisma.video.findMany({
-        where: { createdAt: { gte: startDate } },
         select: { id: true, title: true, views: true, likes: true, createdAt: true },
         orderBy: { views: 'desc' },
       }),
+      prisma.magazine.findMany({
+        select: { id: true, title: true, downloads: true, likes: true, createdAt: true },
+        orderBy: { downloads: 'desc' },
+      }),
+      prisma.reel.findMany({
+        select: { id: true, title: true, views: true, likes: true, createdAt: true },
+        orderBy: { views: 'desc' },
+      }),
+      prisma.radioSong.findMany({
+        select: { id: true, title: true, plays: true, createdAt: true },
+      }),
     ])
 
+    // Count all song likes and comments
+    const [songLikesCount, videoCommentsCount, radioCommentsCount, businessCommentsCount] = await Promise.all([
+      prisma.songLike.count(),
+      prisma.videoComment.count(),
+      prisma.radioComment.count(),
+      prisma.businessComment.count(),
+    ])
+
+    // Calculate TOTAL views/likes from ALL content (not just new content)
     const totalViews =
-      newsItems.reduce((s, i) => s + (i.views || 0), 0) +
-      radioItems.reduce((s, i) => s + (i.plays || 0), 0) +
-      videoItems.reduce((s, i) => s + (i.views || 0), 0)
+      allNewsItems.reduce((s, i) => s + (i.views || 0), 0) +
+      allRadioItems.reduce((s, i) => s + (i.plays || 0), 0) +
+      allVideoItems.reduce((s, i) => s + (i.views || 0), 0) +
+      allMagazines.reduce((s, i) => s + (i.downloads || 0), 0) +
+      allReels.reduce((s, i) => s + (i.views || 0), 0) +
+      allRadioSongs.reduce((s, i) => s + (i.plays || 0), 0)
 
     const totalLikes =
-      newsItems.reduce((s, i) => s + (i.likes || 0), 0) +
-      videoItems.reduce((s, i) => s + (i.likes || 0), 0)
+      allNewsItems.reduce((s, i) => s + (i.likes || 0), 0) +
+      allVideoItems.reduce((s, i) => s + (i.likes || 0), 0) +
+      allMagazines.reduce((s, i) => s + (i.likes || 0), 0) +
+      allReels.reduce((s, i) => s + (i.likes || 0), 0) +
+      songLikesCount // Add radio song likes!
 
-    const totalDislikes = newsItems.reduce((s, i) => s + (i.dislikes || 0), 0)
+    const totalDislikes = allNewsItems.reduce((s, i) => s + (i.dislikes || 0), 0)
 
-    const [commentsCount, subscriptionsCount, discountCardsCount, newsSharesCount] =
-      await Promise.all([
-        prisma.newsComment.count({ where: { createdAt: { gte: startDate } } }),
-        prisma.subscription.count({ where: { createdAt: { gte: startDate } } }),
-        prisma.discountCard.count(),
-        prisma.newsShare.count({ where: { createdAt: { gte: startDate } } }),
+    // Count ALL comments, subscriptions, shares (TOTAL - not filtered by date)
+    // Add all comment types together
+    const totalCommentsCount = (await prisma.newsComment.count()) +
+                                videoCommentsCount +
+                                radioCommentsCount +
+                                businessCommentsCount
+
+    const [
+      totalSubscriptionsCount,
+      totalDiscountCardsCount,
+      totalNewsSharesCount,
+      // Period-based counts (NEW activity in the selected period)
+      periodNewsCommentsCount,
+      periodSubscriptionsCount,
+      periodSharesCount,
+    ] = await Promise.all([
+      prisma.subscription.count(), // ALL subscriptions (total)
+      prisma.discountCard.count(), // ALL discount cards
+      prisma.newsShare.count(), // ALL shares (total)
+      // NEW activity within the date range
+      prisma.newsComment.count({ where: { createdAt: { gte: startDate } } }),
+      prisma.subscription.count({ where: { createdAt: { gte: startDate } } }),
+      prisma.newsShare.count({ where: { createdAt: { gte: startDate } } }),
+    ])
+
+    // Period comments from all sources
+    const periodCommentsCount = periodNewsCommentsCount +
+      (await prisma.videoComment.count({ where: { createdAt: { gte: startDate } } })) +
+      (await prisma.radioComment.count({ where: { createdAt: { gte: startDate } } })) +
+      (await prisma.businessComment.count({ where: { createdAt: { gte: startDate } } }))
+
+    // NEW views and likes tracking (with fallback for old Prisma client)
+    let periodViewsCount = 0
+    let periodLikesCount = 0
+
+    try {
+      const [periodNewsViews, periodVideoViews, periodNewsLikes, periodVideoLikes] = await Promise.all([
+        (prisma as any).newsView?.count({ where: { createdAt: { gte: startDate } } }) ?? Promise.resolve(0),
+        (prisma as any).videoView?.count({ where: { createdAt: { gte: startDate } } }) ?? Promise.resolve(0),
+        (prisma as any).newsLike?.count({ where: { createdAt: { gte: startDate } } }) ?? Promise.resolve(0),
+        (prisma as any).videoLike?.count({ where: { createdAt: { gte: startDate } } }) ?? Promise.resolve(0),
       ])
+      periodViewsCount = periodNewsViews + periodVideoViews
+      periodLikesCount = periodNewsLikes + periodVideoLikes
+    } catch (e) {
+      console.log('Note: View/Like tracking not available yet. Please restart dev server.')
+      periodViewsCount = 0
+      periodLikesCount = 0
+    }
+
+    // For top content and charts, filter by date range
+    const newsItems = allNewsItems.filter(n => n.createdAt >= startDate)
+    const radioItems = allRadioItems.filter(r => r.createdAt >= startDate)
+    const videoItems = allVideoItems.filter(v => v.createdAt >= startDate)
 
     // ── Top Performing Content ──────────────────────────────────────────────────
     // Merge news + videos and sort by views descending
@@ -173,17 +246,28 @@ export async function GET(request: Request) {
 
     // ── Response ─────────────────────────────────────────────────────────────────
     return NextResponse.json({
+      // TOTAL metrics (all time)
       totalViews,
       totalLikes,
       totalDislikes,
-      totalComments: commentsCount,
-      totalSubscriptions: subscriptionsCount,
-      totalDiscountCards: discountCardsCount,
-      totalShares: newsSharesCount,
+      totalComments: totalCommentsCount,
+      totalSubscriptions: totalSubscriptionsCount,
+      totalDiscountCards: totalDiscountCardsCount,
+      totalShares: totalNewsSharesCount,
+      // PERIOD metrics (NEW activity in selected time range)
+      periodMetrics: {
+        views: periodViewsCount,
+        likes: periodLikesCount,
+        comments: periodCommentsCount,
+        subscriptions: periodSubscriptionsCount,
+        shares: periodSharesCount,
+        range: range, // '7d', '30d', or '90d'
+      },
       contentStats: {
         news: newsCount,
         videos: videoCount,
         radio: radioCount,
+        radioSongs: radioSongsCount,
         businesses: businessCount,
         events: eventCount,
         magazines: magazineCount,
@@ -195,12 +279,17 @@ export async function GET(request: Request) {
       summary: {
         totalContent:
           newsCount + radioCount + businessCount + eventCount + magazineCount + videoCount,
-        totalEngagement: totalViews + totalLikes + commentsCount,
+        totalEngagement: totalViews + totalLikes + totalCommentsCount,
         averageViewsPerContent: totalViews / Math.max(1, newsCount + radioCount + videoCount),
       },
     })
   } catch (error) {
     console.error('Analytics error:', error)
-    return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 })
+    console.error('Error details:', error instanceof Error ? error.message : String(error))
+    console.error('Error stack:', error instanceof Error ? error.stack : '')
+    return NextResponse.json({
+      error: 'Failed to fetch analytics',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 })
   }
 }

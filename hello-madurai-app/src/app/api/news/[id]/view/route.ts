@@ -7,16 +7,27 @@ export async function POST(
 ) {
   try {
     const { id } = await params
+    const userAgent = request.headers.get('user-agent') || undefined
 
-    // Increment view count
-    await prisma.news.update({
-      where: { id },
-      data: {
-        views: {
-          increment: 1
+    // Create a view record with timestamp AND increment the counter
+    await Promise.all([
+      // Create timestamped view record for analytics
+      prisma.newsView.create({
+        data: {
+          newsId: id,
+          userAgent,
         }
-      }
-    })
+      }),
+      // Also increment the counter for backward compatibility
+      prisma.news.update({
+        where: { id },
+        data: {
+          views: {
+            increment: 1
+          }
+        }
+      })
+    ])
 
     return NextResponse.json({ success: true })
   } catch (error) {
