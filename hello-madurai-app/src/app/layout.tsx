@@ -56,6 +56,8 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
         {/* Disable browser auto-translate */}
         <meta name="google" content="notranslate" />
+        {/* Google AdSense Verification */}
+        <meta name="google-adsense-account" content="ca-pub-6813067212539087" />
         {/* Favicon links - Hello Madurai Logo */}
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
@@ -72,7 +74,7 @@ export default function RootLayout({
         />
         <script
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXXX"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6813067212539087"
           crossOrigin="anonymous"
         ></script>
       </head>

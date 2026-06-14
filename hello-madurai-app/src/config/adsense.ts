@@ -2,8 +2,8 @@
 // Replace these with your real AdSense codes after approval
 
 export const ADSENSE_CONFIG = {
-  // Your AdSense Publisher ID (replace after approval)
-  publisherId: 'ca-pub-XXXXXXXXXXXXXXXXX',
+  // Your AdSense Publisher ID
+  publisherId: 'ca-pub-6813067212539087',
   
   // Ad Slot IDs (get these from AdSense dashboard after approval)
   adSlots: {
