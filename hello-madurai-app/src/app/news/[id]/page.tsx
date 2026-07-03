@@ -8,6 +8,7 @@ import { CalendarIcon, EyeIcon, UserIcon, ArrowLeftIcon } from '@heroicons/react
 import { ArrowDownTrayIcon as DownloadIcon } from '@heroicons/react/24/outline'
 import AppWrapper from '@/components/AppWrapper'
 import NewspaperHeader from '@/components/NewspaperHeader'
+import CategoryNavigation from '@/components/CategoryNavigation'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -383,6 +384,7 @@ export default function NewsDetailPage() {
   return (
     <div>
       <NewspaperHeader showTagline={true} />
+      <CategoryNavigation />
     <AppWrapper showFooter={false}>
       <NewsDetailPageContent />
     </AppWrapper>

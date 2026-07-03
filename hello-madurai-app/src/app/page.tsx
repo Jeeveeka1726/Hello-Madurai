@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/contexts/LanguageContext'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
 import {
   NewspaperIcon,
   VideoCameraIcon,
@@ -14,14 +15,33 @@ import {
   ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
 import NewHeader from '@/components/layout/NewHeader'
+import CategoryNavigation from '@/components/CategoryNavigation'
 import SubscriptionButton from '@/components/SubscriptionButton'
 import TranslatedText from '@/components/TranslatedText'
 import ReelsSection from '@/components/ReelsSection'
 
-export default function RootPage() {
-  const { t } = useLanguage()
+interface HomeFeature {
+  id: string
+  nameEn: string
+  nameTa?: string
+  descEn: string
+  descTa?: string
+  href: string
+  iconColor: string
+  backgroundImage?: string
+  orderNumber: number
+  active: boolean
+}
 
-  const features = [
+export default function RootPage() {
+  const { t, language } = useLanguage()
+  const [features, setFeatures] = useState<HomeFeature[]>([])
+  const [loading, setLoading] = useState(true)
+  const [latestNews, setLatestNews] = useState<any[]>([])
+  const [stats, setStats] = useState({ news: 0, videos: 0, businesses: 0 })
+
+  // Default fallback features
+  const defaultFeatures = [
     {
       nameEn: 'News',
       nameTa: 'செய்திகள்',
@@ -105,9 +125,66 @@ export default function RootPage() {
     }
   ]
 
+  // Icon mapping based on href
+  const getIconForHref = (href: string) => {
+    const iconMap: { [key: string]: any } = {
+      '/news': NewspaperIcon,
+      '/radio': MicrophoneIcon,
+      '/videos': VideoCameraIcon,
+      '/directory': BuildingOfficeIcon,
+      '/events': CalendarIcon,
+      '/epaper': DocumentIcon,
+      '/offers': GiftIcon,
+      '/helpline': PhoneIcon,
+      '/contact': ChatBubbleLeftRightIcon
+    }
+    return iconMap[href] || NewspaperIcon
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch features
+        const featuresResponse = await fetch('/api/home-features')
+        if (featuresResponse.ok) {
+          const featuresData = await featuresResponse.json()
+          setFeatures(featuresData)
+        }
+
+        // Fetch latest news for homepage
+        const newsResponse = await fetch('/api/news')
+        if (newsResponse.ok) {
+          const newsData = await newsResponse.json()
+          setLatestNews(newsData.slice(0, 6)) // Get first 6 news items
+        }
+
+        // Fetch stats
+        const analyticsResponse = await fetch('/api/admin/analytics?range=30d')
+        if (analyticsResponse.ok) {
+          const analyticsData = await analyticsResponse.json()
+          setStats({
+            news: analyticsData.contentStats?.news || 49,
+            videos: analyticsData.contentStats?.videos || 141,
+            businesses: analyticsData.contentStats?.businesses || 12
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Use fetched features or default ones
+  const displayFeatures = features.length > 0 ? features : defaultFeatures
+
   return (
     <div className="min-h-screen bg-white">
       <NewHeader />
+      <CategoryNavigation />
       <div className="min-h-screen bg-white">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-blue-500 to-blue-600">
@@ -129,8 +206,75 @@ export default function RootPage() {
           </div>
         </div>
 
+        {/* About Section - Rich Content for SEO */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+              <TranslatedText tamil="ஹலோ மதுரை பற்றி">About Hello Madurai</TranslatedText>
+            </h2>
+            <div className="prose prose-lg mx-auto text-gray-700 space-y-4">
+              <p>
+                <TranslatedText tamil="ஹலோ மதுரை என்பது மதுரை மற்றும் சுற்றியுள்ள பகுதிகளுக்கான முழுமையான டிஜிட்டல் தகவல் தளமாகும். நாங்கள் உள்ளூர் செய்திகள், நிகழ்வுகள், வணிக தகவல் மற்றும் பலவற்றை வழங்குகிறோம்.">
+                  Hello Madurai is a comprehensive digital information platform for Madurai and surrounding areas. We provide local news, events, business information, and more, serving as your complete gateway to everything happening in and around the temple city of Madurai.
+                </TranslatedText>
+              </p>
+              <p>
+                <TranslatedText tamil="எங்கள் இயங்குதளம் செய்திகள், வீடியோக்கள், டிஜிட்டல் எஃப்எம், பத்திரிகை, வணிக முகவரி, நிகழ்வுகள் மற்றும் உதவி எண்களை உள்ளடக்கியது. மதுரையின் பல்வேறு தகவல்களை ஒரே இடத்தில் பெறுங்கள்.">
+                  Our platform includes news articles, videos, digital FM radio, e-paper magazines, business directory, local events, and helpline services. We are committed to keeping Madurai connected with timely, accurate, and relevant local information that matters to our community.
+                </TranslatedText>
+              </p>
+              <p className="font-semibold text-gray-900">
+                <TranslatedText tamil="தற்போது எங்களிடம் {stats.news}+ செய்தி கட்டுரைகள், {stats.videos}+ வீடியோக்கள், மற்றும் {stats.businesses}+ வணிக பட்டியல்கள் உள்ளன.">
+                  Currently featuring over {stats.news} news articles, {stats.videos} videos, and {stats.businesses} business listings, we continue to grow as Madurai's most trusted local information source.
+                </TranslatedText>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Latest News Section - Content for SEO */}
+        {latestNews.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900">
+                <TranslatedText tamil="சமீபத்திய செய்திகள்">Latest News</TranslatedText>
+              </h2>
+              <Link href="/news" className="text-blue-600 hover:text-blue-700 font-medium">
+                <TranslatedText tamil="அனைத்தும் காண்க →">View All →</TranslatedText>
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {latestNews.map((news: any) => (
+                <Link key={news.id} href={`/news/${news.id}`} className="group">
+                  <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow overflow-hidden">
+                    {news.featuredImage && (
+                      <img
+                        src={news.featuredImage}
+                        alt={language === 'ta' && news.title_ta ? news.title_ta : news.title}
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    )}
+                    <div className="p-4">
+                      <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600">
+                        {language === 'ta' && news.title_ta ? news.title_ta : news.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm line-clamp-3">
+                        {language === 'ta' && news.excerpt_ta ? news.excerpt_ta : news.excerpt}
+                      </p>
+                      <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+                        <span>{news.category}</span>
+                        <span>{news.views || 0} views</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Features Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
           <div className="text-center mb-12">
             <TranslatedText as="h2" className="text-3xl font-bold text-gray-900 mb-4" tamil="மதுரையை கண்டறியுங்கள்">
               Discover Madurai
@@ -141,24 +285,42 @@ export default function RootPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature) => {
-              const Icon = feature.icon
-              return (
-                <Link key={feature.nameEn} href={feature.href} className="no-underline">
-                  <div className="bg-blue-600 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 p-6 cursor-pointer group h-full flex flex-col border-2 border-blue-700 hover:border-blue-800">
-                    <div className={`inline-flex items-center justify-center w-12 h-12 ${feature.color} rounded-lg mb-4 group-hover:scale-110 transition-transform duration-200`}>
-                      <Icon className="h-6 w-6" />
+            {loading ? (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-gray-500">Loading...</p>
+              </div>
+            ) : (
+              displayFeatures.map((feature: any) => {
+                const Icon = feature.icon || getIconForHref(feature.href)
+                const backgroundStyle = feature.backgroundImage
+                  ? {
+                      backgroundImage: `linear-gradient(rgba(37, 99, 235, 0.85), rgba(29, 78, 216, 0.9)), url(${feature.backgroundImage})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat'
+                    }
+                  : {}
+
+                return (
+                  <Link key={feature.id || feature.nameEn} href={feature.href} className="no-underline">
+                    <div
+                      className="bg-blue-600 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 p-6 cursor-pointer group h-full flex flex-col border-2 border-blue-700 hover:border-blue-800 relative overflow-hidden"
+                      style={backgroundStyle}
+                    >
+                      <div className={`inline-flex items-center justify-center w-12 h-12 ${feature.iconColor || feature.color} rounded-lg mb-4 group-hover:scale-110 transition-transform duration-200 relative z-10`}>
+                        <Icon className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2 text-white relative z-10">
+                        {language === 'ta' && feature.nameTa ? feature.nameTa : feature.nameEn}
+                      </h3>
+                      <p className="flex-grow text-white relative z-10">
+                        {language === 'ta' && feature.descTa ? feature.descTa : feature.descEn}
+                      </p>
                     </div>
-                    <h3 className="text-xl font-semibold mb-2">
-                      <TranslatedText tamil={feature.nameTa}>{feature.nameEn}</TranslatedText>
-                    </h3>
-                    <p className="flex-grow">
-                      <TranslatedText tamil={feature.descTa}>{feature.descEn}</TranslatedText>
-                    </p>
-                  </div>
-                </Link>
-              )
-            })}
+                  </Link>
+                )
+              })
+            )}
           </div>
         </div>
 

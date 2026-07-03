@@ -200,18 +200,19 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
       const textLength = paragraph.textContent ? paragraph.textContent.trim().length : 0
       console.log(`📢 Paragraph ${index + 1} length: ${textLength} chars`)
 
-      // Insert ad after every 2 paragraphs - minimum 30 chars for valid paragraph
+      // Insert ad after every 3 paragraphs - minimum 30 chars for valid paragraph
       if (paragraph.textContent && textLength > 30) {
         paragraphCount++
         console.log(`📢 Valid paragraph ${paragraphCount} found (${textLength} chars)`)
 
-        // Insert ad after 2nd, 4th, 6th paragraph, etc. (every 2 paragraphs)
-        if (paragraphCount % 2 === 0) {
+        // Insert ad after 3rd, 6th, 9th paragraph, etc. (every 3 paragraphs)
+        // Only insert if we still have ads available (no repeating)
+        if (paragraphCount % 3 === 0 && adIndex < ads.length) {
           const ad = ads[adIndex]
           console.log(`📢 Inserting ad ${adIndex + 1} after paragraph ${paragraphCount}`)
           const adElement = createAdElement(ad)
           paragraph.insertAdjacentHTML('afterend', adElement)
-          adIndex = (adIndex + 1) % ads.length // Cycle through ads
+          adIndex++ // Move to next ad (don't cycle, just increment)
           adsInjected++
         }
       } else {

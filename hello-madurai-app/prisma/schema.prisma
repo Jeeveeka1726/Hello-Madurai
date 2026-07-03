@@ -734,3 +734,22 @@ model pdf_chunks {
 
   @@index([uploadId])
 }
+
+model HomeFeature {
+  id              String   @id @default(cuid())
+  nameEn          String
+  nameTa          String?
+  descEn          String   @db.Text
+  descTa          String?  @db.Text
+  href            String
+  iconColor       String   @default("bg-blue-500")
+  backgroundImage String?  @db.Text
+  orderNumber     Int      @default(0)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([active])
+  @@index([orderNumber])
+  @@map("home_features")
+}

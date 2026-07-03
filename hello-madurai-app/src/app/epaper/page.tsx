@@ -7,6 +7,7 @@ import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import NewspaperHeader from '@/components/NewspaperHeader'
 import NewHeader from '@/components/layout/NewHeader'
+import CategoryNavigation from '@/components/CategoryNavigation'
 import { Download, Calendar, FileText, Folder, Heart, Share2, Eye } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import {
@@ -629,6 +630,7 @@ export default function EpaperPage() {
     <div>
       <NewspaperHeader showTagline={true} />
       <NewHeader />
+      <CategoryNavigation />
       <EpaperPageContent />
     </div>
   )
