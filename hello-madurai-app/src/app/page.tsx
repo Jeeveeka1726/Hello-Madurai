@@ -37,8 +37,6 @@ export default function RootPage() {
   const { t, language } = useLanguage()
   const [features, setFeatures] = useState<HomeFeature[]>([])
   const [loading, setLoading] = useState(true)
-  const [latestNews, setLatestNews] = useState<any[]>([])
-  const [stats, setStats] = useState({ news: 0, videos: 0, businesses: 0 })
 
   // Default fallback features
   const defaultFeatures = [
@@ -150,24 +148,6 @@ export default function RootPage() {
           const featuresData = await featuresResponse.json()
           setFeatures(featuresData)
         }
-
-        // Fetch latest news for homepage
-        const newsResponse = await fetch('/api/news')
-        if (newsResponse.ok) {
-          const newsData = await newsResponse.json()
-          setLatestNews(newsData.slice(0, 6)) // Get first 6 news items
-        }
-
-        // Fetch stats
-        const analyticsResponse = await fetch('/api/admin/analytics?range=30d')
-        if (analyticsResponse.ok) {
-          const analyticsData = await analyticsResponse.json()
-          setStats({
-            news: analyticsData.contentStats?.news || 49,
-            videos: analyticsData.contentStats?.videos || 141,
-            businesses: analyticsData.contentStats?.businesses || 12
-          })
-        }
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
@@ -205,73 +185,6 @@ export default function RootPage() {
             </div>
           </div>
         </div>
-
-        {/* About Section - Rich Content for SEO */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-              <TranslatedText tamil="ஹலோ மதுரை பற்றி">About Hello Madurai</TranslatedText>
-            </h2>
-            <div className="prose prose-lg mx-auto text-gray-700 space-y-4">
-              <p>
-                <TranslatedText tamil="ஹலோ மதுரை என்பது மதுரை மற்றும் சுற்றியுள்ள பகுதிகளுக்கான முழுமையான டிஜிட்டல் தகவல் தளமாகும். நாங்கள் உள்ளூர் செய்திகள், நிகழ்வுகள், வணிக தகவல் மற்றும் பலவற்றை வழங்குகிறோம்.">
-                  Hello Madurai is a comprehensive digital information platform for Madurai and surrounding areas. We provide local news, events, business information, and more, serving as your complete gateway to everything happening in and around the temple city of Madurai.
-                </TranslatedText>
-              </p>
-              <p>
-                <TranslatedText tamil="எங்கள் இயங்குதளம் செய்திகள், வீடியோக்கள், டிஜிட்டல் எஃப்எம், பத்திரிகை, வணிக முகவரி, நிகழ்வுகள் மற்றும் உதவி எண்களை உள்ளடக்கியது. மதுரையின் பல்வேறு தகவல்களை ஒரே இடத்தில் பெறுங்கள்.">
-                  Our platform includes news articles, videos, digital FM radio, e-paper magazines, business directory, local events, and helpline services. We are committed to keeping Madurai connected with timely, accurate, and relevant local information that matters to our community.
-                </TranslatedText>
-              </p>
-              <p className="font-semibold text-gray-900">
-                <TranslatedText tamil="தற்போது எங்களிடம் {stats.news}+ செய்தி கட்டுரைகள், {stats.videos}+ வீடியோக்கள், மற்றும் {stats.businesses}+ வணிக பட்டியல்கள் உள்ளன.">
-                  Currently featuring over {stats.news} news articles, {stats.videos} videos, and {stats.businesses} business listings, we continue to grow as Madurai's most trusted local information source.
-                </TranslatedText>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Latest News Section - Content for SEO */}
-        {latestNews.length > 0 && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900">
-                <TranslatedText tamil="சமீபத்திய செய்திகள்">Latest News</TranslatedText>
-              </h2>
-              <Link href="/news" className="text-blue-600 hover:text-blue-700 font-medium">
-                <TranslatedText tamil="அனைத்தும் காண்க →">View All →</TranslatedText>
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {latestNews.map((news: any) => (
-                <Link key={news.id} href={`/news/${news.id}`} className="group">
-                  <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow overflow-hidden">
-                    {news.featuredImage && (
-                      <img
-                        src={news.featuredImage}
-                        alt={language === 'ta' && news.title_ta ? news.title_ta : news.title}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    )}
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600">
-                        {language === 'ta' && news.title_ta ? news.title_ta : news.title}
-                      </h3>
-                      <p className="text-gray-600 text-sm line-clamp-3">
-                        {language === 'ta' && news.excerpt_ta ? news.excerpt_ta : news.excerpt}
-                      </p>
-                      <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
-                        <span>{news.category}</span>
-                        <span>{news.views || 0} views</span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Features Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
