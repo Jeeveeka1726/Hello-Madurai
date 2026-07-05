@@ -11,6 +11,20 @@ import TodaysNewsCarousel from '@/components/TodaysNewsCarousel'
 import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
+// News categories - hardcoded like videos section for instant loading
+const newsCategories = [
+  { id: 'all', name: 'All News', name_ta: 'அனைத்து செய்திகள்', slug: 'all' },
+  { id: 'madurai', name: 'Madurai', name_ta: 'மதுரை', slug: 'madurai' },
+  { id: 'religious', name: 'Devotion', name_ta: 'ஆன்மிகம்', slug: 'religious' },
+  { id: 'agri', name: 'Agriculture', name_ta: 'விவசாயம்', slug: 'agri' },
+  { id: 'education', name: 'Education', name_ta: 'கல்வி', slug: 'education' },
+  { id: 'medical', name: 'Medical', name_ta: 'மருத்துவம்', slug: 'medical' },
+  { id: 'cinema', name: 'Cinema', name_ta: 'சினிமா', slug: 'cinema' },
+  { id: 'games', name: 'Games', name_ta: 'விளையாட்டு', slug: 'games' },
+  { id: 'jobs', name: 'Jobs', name_ta: 'வேலைவாய்ப்பு', slug: 'jobs' },
+  { id: 'article', name: 'Article', name_ta: 'கட்டுரை', slug: 'article' }
+]
+
 interface NewsArticle {
   id: string
   title: string
@@ -40,27 +54,9 @@ function NewsPageContent() {
   const { t, language } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([])
-  const [categories, setCategories] = useState<NewsCategory[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Fetch categories from database
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch('/api/news-categories')
-        if (response.ok) {
-          const data = await response.json()
-          setCategories(data)
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error)
-      }
-    }
-
-    fetchCategories()
-  }, [])
-
-  // Fetch news from database
+  // Fetch news from database - categories are hardcoded for instant display
   useEffect(() => {
     const fetchNews = async () => {
       try {
@@ -84,9 +80,9 @@ function NewsPageContent() {
     ? newsArticles
     : newsArticles.filter(article => article.category === selectedCategory)
 
-  // Helper function to get category display name from slug
+  // Helper function to get category display name from slug - uses hardcoded categories
   const getCategoryName = (categorySlug: string) => {
-    const category = categories.find(c => c.slug === categorySlug)
+    const category = newsCategories.find(c => c.slug === categorySlug)
     if (category) {
       return language === 'ta' && category.name_ta ? category.name_ta : category.name
     }
@@ -127,20 +123,8 @@ function NewsPageContent() {
 
           {/* Flex wrap of category buttons */}
           <div className="flex flex-wrap gap-2 sm:gap-3">
-            {/* All News button */}
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold transition-all duration-200 text-xs sm:text-sm shadow-md hover:shadow-lg transform hover:scale-105 whitespace-nowrap ${
-                selectedCategory === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400'
-              }`}
-            >
-              {t('news.allNews', 'All News', 'அனைத்து செய்திகள்')}
-            </button>
-
-            {/* Dynamic categories */}
-            {categories.map((category) => (
+            {/* Category buttons - hardcoded like videos section for instant display */}
+            {newsCategories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.slug)}
@@ -165,13 +149,10 @@ function NewsPageContent() {
 
         {/* Section Title */}
         <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 text-center sm:text-left">
-          {selectedCategory === 'all'
-            ? t('news.allNews', 'All News', 'அனைத்து செய்திகள்')
-            : (() => {
-                const cat = categories.find(c => c.slug === selectedCategory)
-                return cat ? (language === 'ta' && cat.name_ta ? cat.name_ta : cat.name) : ''
-              })()
-          }
+          {(() => {
+            const cat = newsCategories.find(c => c.slug === selectedCategory)
+            return cat ? (language === 'ta' && cat.name_ta ? cat.name_ta : cat.name) : ''
+          })()}
         </h2>
 
         {/* Loading State */}
