@@ -37,6 +37,7 @@ export default function AdminNewsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingNews, setEditingNews] = useState<NewsItem | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [categories, setCategories] = useState<any[]>([])
   const [formData, setFormData] = useState({
     title: '',
     title_ta: '',
@@ -44,32 +45,33 @@ export default function AdminNewsPage() {
     content_ta: '',
     excerpt: '',
     excerpt_ta: '',
-    category: 'general',
+    category: '',
     author: 'Hello Madurai',
     featured: false,
     featuredImage: '',
     tags: ''
   })
 
-  const categories = [
-    { id: 'general', name: language === 'ta' ? 'பொதுவானது' : 'General' },
-    { id: 'collector', name: language === 'ta' ? 'கலெக்டர்' : 'Collector' },
-    { id: 'corporation', name: language === 'ta' ? 'மாநகராட்சி' : 'Corporation' },
-    { id: 'education', name: language === 'ta' ? 'கல்வி' : 'Education' },
-    { id: 'religious', name: language === 'ta' ? 'ஆன்மிகம்' : 'Devotion' },
-    { id: 'cinema', name: language === 'ta' ? 'சினிமா' : 'Cinema' },
-    { id: 'games', name: language === 'ta' ? 'விளையாட்டு' : 'Games' },
-    { id: 'political', name: language === 'ta' ? 'அமைச்சர்' : 'Minister' },
-    { id: 'police', name: language === 'ta' ? 'போலீஸ்' : 'Police' },
-    { id: 'agri', name: language === 'ta' ? 'விவசாயம்' : 'Agriculture' },
-    { id: 'jobs', name: language === 'ta' ? 'வேலைவாய்ப்பு' : 'Jobs' },
-    { id: 'article', name: language === 'ta' ? 'கட்டுரை' : 'Article' },
-    { id: 'others', name: language === 'ta' ? 'மற்றவை' : 'Others' }
-  ]
-
   useEffect(() => {
     fetchNews()
+    fetchCategories()
   }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/admin/news-categories')
+      if (response.ok) {
+        const data = await response.json()
+        setCategories(data)
+        // Set first category as default if available
+        if (data.length > 0 && !formData.category) {
+          setFormData(prev => ({ ...prev, category: data[0].slug }))
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
 
   const fetchNews = async () => {
     try {
@@ -138,7 +140,7 @@ export default function AdminNewsPage() {
           content_ta: '',
           excerpt: '',
           excerpt_ta: '',
-          category: 'general',
+          category: categories.length > 0 ? categories[0].slug : '',
           author: 'Hello Madurai',
           featured: false,
           featuredImage: '',
@@ -259,7 +261,7 @@ export default function AdminNewsPage() {
                   content_ta: '',
                   excerpt: '',
                   excerpt_ta: '',
-                  category: 'general',
+                  category: categories.length > 0 ? categories[0].slug : '',
                   author: 'Hello Madurai',
                   featured: false,
                   featuredImage: '',
@@ -403,9 +405,14 @@ export default function AdminNewsPage() {
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
+                        {categories.length === 0 && (
+                          <option value="">
+                            {language === 'ta' ? 'வகைகள் ஏற்றுகிறது...' : 'Loading categories...'}
+                          </option>
+                        )}
                         {categories.map((category) => (
-                          <option key={category.id} value={category.id}>
-                            {category.name}
+                          <option key={category.id} value={category.slug}>
+                            {language === 'ta' && category.name_ta ? category.name_ta : category.name}
                           </option>
                         ))}
                       </select>

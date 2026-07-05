@@ -75,7 +75,7 @@ export default function NewHeader() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <img
-                src="/logo.jpg"
+                src="/hello-madurai-logo.jpeg"
                 alt="Hello Madurai Logo"
                 className="h-10 w-10 rounded-full object-cover"
               />

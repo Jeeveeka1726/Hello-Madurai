@@ -33,9 +33,9 @@ export default function NewspaperHeader({ className = '', showTagline = true }: 
         <div className="text-center py-4 sm:py-6">
           {/* Logo and Title */}
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3">
-            <img 
-              src="/logo.jpg" 
-              alt="Hello Madurai Logo" 
+            <img
+              src="/hello-madurai-logo.jpeg"
+              alt="Hello Madurai Logo"
               className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shadow-md flex-shrink-0"
             />
             <div className="text-center">

@@ -22,9 +22,9 @@ export const metadata: Metadata = {
     siteName: "Hello Madurai",
     images: [
       {
-        url: "/favicon-32x32.png",
-        width: 32,
-        height: 32,
+        url: "/hello-madurai-logo.jpeg",
+        width: 512,
+        height: 512,
         alt: "Hello Madurai Logo",
       },
     ],

@@ -165,9 +165,14 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
         <div className="flex flex-col h-full">
           {/* Logo/Header */}
           <div className="flex items-center justify-between h-16 px-4 bg-blue-600" style={{ backgroundColor: '#2563eb' }}>
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
+              <img
+                src="/hello-madurai-logo.jpeg"
+                alt="Hello Madurai Logo"
+                className="h-8 w-8 rounded-full object-cover"
+              />
               <h1 className="text-lg font-bold" style={{ color: '#ffffff' }}>Hello Madurai</h1>
-              <span className="ml-2 text-xs bg-blue-700 px-2 py-1 rounded" style={{ backgroundColor: '#1d4ed8', color: '#ffffff' }}>CMS</span>
+              <span className="ml-1 text-xs bg-blue-700 px-2 py-1 rounded" style={{ backgroundColor: '#1d4ed8', color: '#ffffff' }}>CMS</span>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
