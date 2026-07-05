@@ -23,7 +23,7 @@ export default function ContactPage() {
     {
       icon: EnvelopeIcon,
       title: t('contact.email', 'Email', 'மின்னஞ்சல்'),
-      value: 'hellomadurai777@gmail.com',
+      value: 'hellomaduraiapp@gmail.com',
       description: t('contact.emailDesc', 'Send us your queries and feedback', 'உங்கள் கேள்விகள் மற்றும் கருத்துகளை எங்களுக்கு அனுப்பவும்')
     },
     {

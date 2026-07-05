@@ -84,6 +84,16 @@ function NewsPageContent() {
     ? newsArticles
     : newsArticles.filter(article => article.category === selectedCategory)
 
+  // Helper function to get category display name from slug
+  const getCategoryName = (categorySlug: string) => {
+    const category = categories.find(c => c.slug === categorySlug)
+    if (category) {
+      return language === 'ta' && category.name_ta ? category.name_ta : category.name
+    }
+    // Fallback: capitalize the slug if category not found
+    return categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)
+  }
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-IN', {
@@ -194,7 +204,7 @@ function NewsPageContent() {
                       {/* Category badge */}
                       <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
                         <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-bold shadow-lg">
-                          {article.category}
+                          {getCategoryName(article.category)}
                         </span>
                       </div>
 

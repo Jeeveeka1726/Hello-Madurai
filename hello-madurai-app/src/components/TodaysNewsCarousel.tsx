@@ -19,14 +19,41 @@ interface NewsArticle {
   views: number
 }
 
+interface NewsCategory {
+  id: string
+  name: string
+  name_ta?: string
+  slug: string
+  orderNumber: number
+  active: boolean
+}
+
 export default function TodaysNewsCarousel() {
   const { language } = useLanguage()
   const [todaysNews, setTodaysNews] = useState<NewsArticle[]>([])
+  const [categories, setCategories] = useState<NewsCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number>(0)
   const touchEndX = useRef<number>(0)
+
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/news-categories')
+        if (response.ok) {
+          const data = await response.json()
+          setCategories(data)
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
+    }
+
+    fetchCategories()
+  }, [])
 
   useEffect(() => {
     const fetchTodaysNews = async () => {
@@ -34,17 +61,17 @@ export default function TodaysNewsCarousel() {
         const response = await fetch('/api/news')
         if (response.ok) {
           const data = await response.json()
-          
+
           // Filter news from today
           const today = new Date()
           today.setHours(0, 0, 0, 0)
-          
+
           const filtered = data.filter((news: NewsArticle) => {
             const newsDate = new Date(news.publishedAt)
             newsDate.setHours(0, 0, 0, 0)
             return newsDate.getTime() === today.getTime()
           })
-          
+
           setTodaysNews(filtered)
         }
       } catch (error) {
@@ -115,6 +142,16 @@ export default function TodaysNewsCarousel() {
       // Swipe right
       handlePrevious()
     }
+  }
+
+  // Helper function to get category display name from slug
+  const getCategoryName = (categorySlug: string) => {
+    const category = categories.find(c => c.slug === categorySlug)
+    if (category) {
+      return language === 'ta' && category.name_ta ? category.name_ta : category.name
+    }
+    // Fallback: capitalize the slug if category not found
+    return categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)
   }
 
   if (loading) {
@@ -188,7 +225,7 @@ export default function TodaysNewsCarousel() {
                               {/* Category badge */}
                               <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
                                 <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-bold shadow-lg">
-                                  {news.category}
+                                  {getCategoryName(news.category)}
                                 </span>
                               </div>
 

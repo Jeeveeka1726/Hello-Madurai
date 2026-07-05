@@ -88,6 +88,16 @@ export default function AdminNewsPage() {
     }
   }
 
+  // Helper function to get category display name from slug
+  const getCategoryName = (categorySlug: string) => {
+    const category = categories.find(c => c.slug === categorySlug)
+    if (category) {
+      return language === 'ta' && category.name_ta ? category.name_ta : category.name
+    }
+    // Fallback: capitalize the slug if category not found
+    return categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)
+  }
+
   const handleSearch = (query: string) => {
     setSearchQuery(query)
     if (!query.trim()) {
@@ -492,7 +502,7 @@ export default function AdminNewsPage() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {newsItem.category}
+                        {getCategoryName(newsItem.category)}
                       </span>
                       {newsItem.featuredImage && (
                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">

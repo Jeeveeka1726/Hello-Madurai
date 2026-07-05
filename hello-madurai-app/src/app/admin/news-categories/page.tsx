@@ -97,7 +97,7 @@ export default function AdminNewsCategoriesPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this category?')) return
+    if (!confirm('Are you sure you want to delete this category? Any news articles using this category will be automatically moved to another category.')) return
 
     try {
       const response = await fetch(`/api/admin/news-categories/${id}`, {
@@ -105,10 +105,17 @@ export default function AdminNewsCategoriesPage() {
       })
 
       if (response.ok) {
+        const result = await response.json()
         await fetchCategories()
-        toast.success('Category deleted!')
+
+        if (result.movedArticles > 0) {
+          toast.success(`Category deleted! ${result.movedArticles} news article(s) were moved to "${result.movedTo || 'another category'}".`)
+        } else {
+          toast.success('Category deleted!')
+        }
       } else {
-        toast.error('Error deleting category')
+        const error = await response.json()
+        toast.error(error.error || 'Error deleting category')
       }
     } catch (error) {
       console.error('Error deleting category:', error)

@@ -54,14 +54,41 @@ interface Share {
   createdAt: string
 }
 
+interface NewsCategory {
+  id: string
+  name: string
+  name_ta?: string
+  slug: string
+  orderNumber: number
+  active: boolean
+}
+
 function NewsDetailPageContent() {
   const params = useParams()
   const { t, language } = useLanguage()
   const newsId = params.id as string
   const [article, setArticle] = useState<NewsArticle | null>(null)
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([])
+  const [categories, setCategories] = useState<NewsCategory[]>([])
   const [loading, setLoading] = useState(true)
   // Using featured images only
+
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/news-categories')
+        if (response.ok) {
+          const data = await response.json()
+          setCategories(data)
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
+    }
+
+    fetchCategories()
+  }, [])
 
   // Fetch article and related articles from database
   useEffect(() => {
@@ -106,7 +133,7 @@ function NewsDetailPageContent() {
 
   const handleDownload = async () => {
     if (!article) return
-    
+
     try {
       const response = await fetch(`/api/news/${article.id}/download`)
       if (response.ok) {
@@ -125,7 +152,15 @@ function NewsDetailPageContent() {
     }
   }
 
-
+  // Helper function to get category display name from slug
+  const getCategoryName = (categorySlug: string) => {
+    const category = categories.find(c => c.slug === categorySlug)
+    if (category) {
+      return language === 'ta' && category.name_ta ? category.name_ta : category.name
+    }
+    // Fallback: capitalize the slug if category not found
+    return categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)
+  }
 
   // Show loading state
   if (loading) {
@@ -227,7 +262,7 @@ function NewsDetailPageContent() {
                 <div className="mb-4 sm:mb-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800 w-fit">
-                      {article.category}
+                      {getCategoryName(article.category)}
                     </span>
                     {article.allowDownload && (
                       <Button variant="outline" onClick={handleDownload} className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 touch-target w-full sm:w-auto">
