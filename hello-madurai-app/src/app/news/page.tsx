@@ -11,18 +11,19 @@ import TodaysNewsCarousel from '@/components/TodaysNewsCarousel'
 import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
-// News categories - hardcoded like videos section for instant loading
-const newsCategories = [
-  { id: 'all', name: 'All News', name_ta: 'அனைத்து செய்திகள்', slug: 'all' },
-  { id: 'madurai', name: 'Madurai', name_ta: 'மதுரை', slug: 'madurai' },
-  { id: 'religious', name: 'Devotion', name_ta: 'ஆன்மிகம்', slug: 'religious' },
-  { id: 'agri', name: 'Agriculture', name_ta: 'விவசாயம்', slug: 'agri' },
-  { id: 'education', name: 'Education', name_ta: 'கல்வி', slug: 'education' },
-  { id: 'medical', name: 'Medical', name_ta: 'மருத்துவம்', slug: 'medical' },
-  { id: 'cinema', name: 'Cinema', name_ta: 'சினிமா', slug: 'cinema' },
-  { id: 'games', name: 'Games', name_ta: 'விளையாட்டு', slug: 'games' },
-  { id: 'jobs', name: 'Jobs', name_ta: 'வேலைவாய்ப்பு', slug: 'jobs' },
-  { id: 'article', name: 'Article', name_ta: 'கட்டுரை', slug: 'article' }
+// Fallback categories for instant display (like videos section)
+// These show immediately while API loads
+const fallbackCategories = [
+  { id: 'all', name: 'All News', name_ta: 'அனைத்து செய்திகள்', slug: 'all', orderNumber: 0, active: true },
+  { id: 'madurai', name: 'Madurai', name_ta: 'மதுரை', slug: 'madurai', orderNumber: 1, active: true },
+  { id: 'religious', name: 'Devotion', name_ta: 'ஆன்மிகம்', slug: 'religious', orderNumber: 2, active: true },
+  { id: 'agri', name: 'Agriculture', name_ta: 'விவசாயம்', slug: 'agri', orderNumber: 3, active: true },
+  { id: 'education', name: 'Education', name_ta: 'கல்வி', slug: 'education', orderNumber: 4, active: true },
+  { id: 'medical', name: 'Medical', name_ta: 'மருத்துவம்', slug: 'medical', orderNumber: 5, active: true },
+  { id: 'cinema', name: 'Cinema', name_ta: 'சினிமா', slug: 'cinema', orderNumber: 6, active: true },
+  { id: 'games', name: 'Games', name_ta: 'விளையாட்டு', slug: 'games', orderNumber: 7, active: true },
+  { id: 'jobs', name: 'Jobs', name_ta: 'வேலைவாய்ப்பு', slug: 'jobs', orderNumber: 11, active: true },
+  { id: 'article', name: 'Article', name_ta: 'கட்டுரை', slug: 'article', orderNumber: 12, active: true }
 ]
 
 interface NewsArticle {
@@ -54,25 +55,40 @@ function NewsPageContent() {
   const { t, language } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([])
+  // Start with fallback categories for instant display, then update with API data
+  const [categories, setCategories] = useState<NewsCategory[]>(fallbackCategories)
   const [loading, setLoading] = useState(true)
 
-  // Fetch news from database - categories are hardcoded for instant display
+  // Fetch categories and news in parallel
   useEffect(() => {
-    const fetchNews = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/news')
-        if (response.ok) {
-          const data = await response.json()
-          setNewsArticles(data)
+        const [categoriesRes, newsRes] = await Promise.all([
+          fetch('/api/news-categories', { cache: 'no-store' }),
+          fetch('/api/news', { cache: 'no-store' })
+        ])
+
+        if (categoriesRes.ok) {
+          const apiCategories = await categoriesRes.json()
+          // Add "All News" to the beginning of API categories
+          setCategories([
+            { id: 'all', name: 'All News', name_ta: 'அனைத்து செய்திகள்', slug: 'all', orderNumber: 0, active: true },
+            ...apiCategories
+          ])
+        }
+
+        if (newsRes.ok) {
+          const newsData = await newsRes.json()
+          setNewsArticles(newsData)
         }
       } catch (error) {
-        console.error('Error fetching news:', error)
+        console.error('Error fetching data:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchNews()
+    fetchData()
   }, [])
 
   // Filter articles based on selected category
@@ -80,9 +96,9 @@ function NewsPageContent() {
     ? newsArticles
     : newsArticles.filter(article => article.category === selectedCategory)
 
-  // Helper function to get category display name from slug - uses hardcoded categories
+  // Helper function to get category display name from slug
   const getCategoryName = (categorySlug: string) => {
-    const category = newsCategories.find(c => c.slug === categorySlug)
+    const category = categories.find(c => c.slug === categorySlug)
     if (category) {
       return language === 'ta' && category.name_ta ? category.name_ta : category.name
     }
@@ -123,8 +139,8 @@ function NewsPageContent() {
 
           {/* Flex wrap of category buttons */}
           <div className="flex flex-wrap gap-2 sm:gap-3">
-            {/* Category buttons - hardcoded like videos section for instant display */}
-            {newsCategories.map((category) => (
+            {/* Category buttons - starts with fallback, updates with API data */}
+            {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.slug)}
@@ -150,7 +166,7 @@ function NewsPageContent() {
         {/* Section Title */}
         <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 text-center sm:text-left">
           {(() => {
-            const cat = newsCategories.find(c => c.slug === selectedCategory)
+            const cat = categories.find(c => c.slug === selectedCategory)
             return cat ? (language === 'ta' && cat.name_ta ? cat.name_ta : cat.name) : ''
           })()}
         </h2>

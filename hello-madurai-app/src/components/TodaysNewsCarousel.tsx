@@ -28,10 +28,24 @@ interface NewsCategory {
   active: boolean
 }
 
+// Fallback categories for instant display
+const fallbackCategories: NewsCategory[] = [
+  { id: 'madurai', name: 'Madurai', name_ta: 'மதுரை', slug: 'madurai', orderNumber: 1, active: true },
+  { id: 'religious', name: 'Devotion', name_ta: 'ஆன்மிகம்', slug: 'religious', orderNumber: 2, active: true },
+  { id: 'agri', name: 'Agriculture', name_ta: 'விவசாயம்', slug: 'agri', orderNumber: 3, active: true },
+  { id: 'education', name: 'Education', name_ta: 'கல்வி', slug: 'education', orderNumber: 4, active: true },
+  { id: 'medical', name: 'Medical', name_ta: 'மருத்துவம்', slug: 'medical', orderNumber: 5, active: true },
+  { id: 'cinema', name: 'Cinema', name_ta: 'சினிமா', slug: 'cinema', orderNumber: 6, active: true },
+  { id: 'games', name: 'Games', name_ta: 'விளையாட்டு', slug: 'games', orderNumber: 7, active: true },
+  { id: 'jobs', name: 'Jobs', name_ta: 'வேலைவாய்ப்பு', slug: 'jobs', orderNumber: 11, active: true },
+  { id: 'article', name: 'Article', name_ta: 'கட்டுரை', slug: 'article', orderNumber: 12, active: true }
+]
+
 export default function TodaysNewsCarousel() {
   const { language } = useLanguage()
   const [todaysNews, setTodaysNews] = useState<NewsArticle[]>([])
-  const [categories, setCategories] = useState<NewsCategory[]>([])
+  // Start with fallback for instant display
+  const [categories, setCategories] = useState<NewsCategory[]>(fallbackCategories)
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
