@@ -39,6 +39,12 @@ const navigation = [
     badge: 'new'
   },
   {
+    name: 'News Categories',
+    name_ta: 'செய்தி வகைகள்',
+    href: '/admin/news-categories',
+    icon: TagIcon
+  },
+  {
     name: 'Events',
     name_ta: 'நிகழ்வுகள்',
     href: '/admin/events',

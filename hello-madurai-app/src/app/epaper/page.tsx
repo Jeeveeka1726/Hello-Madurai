@@ -92,6 +92,11 @@ function EpaperPageContent() {
         console.log('📂 Collections count:', data.length)
         console.log('📂 First collection:', data[0])
         setCollections(data)
+
+        // Auto-select first collection by default
+        if (data.length > 0 && selectedCollection === null) {
+          setSelectedCollection(data[0].id)
+        }
       }
     } catch (error) {
       console.error('Error fetching collections:', error)

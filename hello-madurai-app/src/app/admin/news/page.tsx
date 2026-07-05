@@ -207,6 +207,15 @@ export default function AdminNewsPage() {
     })
   }
 
+  // Check if a news item is from today
+  const isToday = (dateString: string) => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const newsDate = new Date(dateString)
+    newsDate.setHours(0, 0, 0, 0)
+    return newsDate.getTime() === today.getTime()
+  }
+
   if (loading && !showForm) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -261,6 +270,28 @@ export default function AdminNewsPage() {
               <PlusIcon className="h-4 w-4 mr-2" />
               {language === 'ta' ? 'செய்தி சேர்க்க' : 'Add News'}
             </Button>
+          </div>
+        </div>
+
+        {/* Info Banner for Today's News */}
+        <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-blue-800">
+                {language === 'ta' ? 'இன்றைய செய்தி பிரிவு' : "Today's News Section"}
+              </h3>
+              <p className="mt-1 text-sm text-blue-700">
+                {language === 'ta'
+                  ? 'இன்று வெளியிடப்பட்ட செய்திகள் தானாகவே முகப்பு பக்கத்தில் "இன்றைய செய்திகள்" பிரிவில் காட்டப்படும். இந்த செய்திகள் ⭐ குறியீட்டுடன் குறிக்கப்பட்டுள்ளன.'
+                  : 'News published today will automatically appear in the "Today\'s News" carousel on the homepage. These news items are marked with a ⭐ badge.'
+                }
+              </p>
+            </div>
           </div>
         </div>
 
@@ -460,6 +491,11 @@ export default function AdminNewsPage() {
                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           <PhotoIcon className="h-3 w-3 inline mr-1" />
                           {language === 'ta' ? 'படம்' : 'Image'}
+                        </span>
+                      )}
+                      {isToday(newsItem.publishedAt) && (
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 animate-pulse">
+                          ⭐ {language === 'ta' ? 'இன்றைய செய்தி' : "Today's News"}
                         </span>
                       )}
                     </div>

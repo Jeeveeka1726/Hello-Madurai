@@ -8,6 +8,21 @@ datasource db {
   relationMode = "prisma"
 }
 
+model NewsCategory {
+  id          String   @id @default(cuid())
+  name        String
+  name_ta     String?
+  slug        String   @unique
+  orderNumber Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active])
+  @@index([orderNumber])
+  @@map("news_categories")
+}
+
 model News {
   id            String        @id @default(cuid())
   title         String        @db.VarChar(500)

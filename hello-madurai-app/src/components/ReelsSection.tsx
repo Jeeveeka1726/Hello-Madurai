@@ -145,7 +145,7 @@ export default function ReelsSection() {
   if (loading) {
     return (
       <div className="bg-gray-50 border-t-2 border-blue-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-300 rounded w-48 mx-auto mb-4"></div>
             <div className="h-4 bg-gray-300 rounded w-96 mx-auto mb-8"></div>
@@ -163,12 +163,12 @@ export default function ReelsSection() {
   return (
     <>
       <div className="bg-gray-50 border-t-2 border-blue-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-8">
-            <TranslatedText as="h2" className="text-3xl font-bold text-gray-900 mb-4" tamil="சமீபத்திய வீடியோக்கள்">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+          <div className="text-center mb-6 sm:mb-8">
+            <TranslatedText as="h2" className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4" tamil="சமீபத்திய வீடியோக்கள்">
               Latest Reels
             </TranslatedText>
-            <TranslatedText as="p" className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto" tamil="மதுரையின் சமீபத்திய வீடியோக்கள் மற்றும் ரீல்ஸ்களைப் பார்க்கவும்">
+            <TranslatedText as="p" className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto" tamil="மதுரையின் சமீபத்திய வீடியோக்கள் மற்றும் ரீல்ஸ்களைப் பார்க்கவும்">
               Watch the latest videos and reels from Madurai
             </TranslatedText>
           </div>
