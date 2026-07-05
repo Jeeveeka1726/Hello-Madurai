@@ -17,7 +17,8 @@ import {
   VideoCameraIcon,
   GiftIcon,
   TagIcon,
-  PhoneIcon
+  PhoneIcon,
+  UserCircleIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAdmin } from '@/contexts/AdminContext'
@@ -43,6 +44,13 @@ const navigation = [
     name_ta: 'செய்தி வகைகள்',
     href: '/admin/news-categories',
     icon: TagIcon
+  },
+  {
+    name: 'Reporters',
+    name_ta: 'செய்தியாளர்கள்',
+    href: '/admin/authors',
+    icon: UserCircleIcon,
+    badge: 'new'
   },
   {
     name: 'Events',

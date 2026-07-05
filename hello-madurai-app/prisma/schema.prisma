@@ -23,6 +23,27 @@ model NewsCategory {
   @@map("news_categories")
 }
 
+model Author {
+  id          String   @id @default(cuid())
+  name        String
+  name_ta     String?
+  slug        String   @unique
+  imageUrl    String?
+  description String?  @db.Text
+  description_ta String? @db.Text
+  active      Boolean  @default(true)
+  featured    Boolean  @default(false)
+  orderNumber Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active])
+  @@index([featured])
+  @@index([slug])
+  @@index([orderNumber])
+  @@map("authors")
+}
+
 model News {
   id            String        @id @default(cuid())
   title         String        @db.VarChar(500)

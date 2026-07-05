@@ -99,16 +99,22 @@ export default function TodaysNewsCarousel() {
   }, [])
 
   const handlePrevious = () => {
+    const isMobile = window.innerWidth < 768
+    const step = isMobile ? 1 : 2 // Move by 2 cards on desktop, 1 on mobile
+
     if (currentIndex > 0) {
-      const newIndex = currentIndex - 1
+      const newIndex = Math.max(0, currentIndex - step)
       setCurrentIndex(newIndex)
       scrollToIndex(newIndex)
     }
   }
 
   const handleNext = () => {
+    const isMobile = window.innerWidth < 768
+    const step = isMobile ? 1 : 2 // Move by 2 cards on desktop, 1 on mobile
+
     if (currentIndex < todaysNews.length - 1) {
-      const newIndex = currentIndex + 1
+      const newIndex = Math.min(todaysNews.length - 1, currentIndex + step)
       setCurrentIndex(newIndex)
       scrollToIndex(newIndex)
     }
@@ -127,8 +133,8 @@ export default function TodaysNewsCarousel() {
           behavior: 'smooth'
         })
       } else {
-        // Desktop: scroll half width (showing 2 cards, scroll by 1)
-        const cards = container.querySelectorAll('[data-carousel-card]')
+        // Desktop: scroll to show 2 cards at a time
+        const cards = container.querySelectorAll('[data-card]')
         if (cards[index]) {
           cards[index].scrollIntoView({
             behavior: 'smooth',

@@ -38,6 +38,7 @@ export default function AdminNewsPage() {
   const [editingNews, setEditingNews] = useState<NewsItem | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [categories, setCategories] = useState<any[]>([])
+  const [authors, setAuthors] = useState<any[]>([])
   const [formData, setFormData] = useState({
     title: '',
     title_ta: '',
@@ -46,7 +47,7 @@ export default function AdminNewsPage() {
     excerpt: '',
     excerpt_ta: '',
     category: '',
-    author: 'Hello Madurai',
+    author: '',
     featured: false,
     featuredImage: '',
     tags: ''
@@ -55,6 +56,7 @@ export default function AdminNewsPage() {
   useEffect(() => {
     fetchNews()
     fetchCategories()
+    fetchAuthors()
   }, [])
 
   const fetchCategories = async () => {
@@ -73,6 +75,33 @@ export default function AdminNewsPage() {
     }
   }
 
+  const fetchAuthors = async () => {
+    try {
+      console.log('📥 Fetching authors from /api/admin/authors...')
+      const response = await fetch('/api/admin/authors')
+      console.log('📊 Authors response status:', response.status)
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('✅ Authors loaded:', data.length, 'authors')
+        console.log('📋 Authors data:', data)
+        setAuthors(data)
+
+        // Set first author as default if available
+        if (data.length > 0 && !formData.author) {
+          console.log('🎯 Setting default author:', data[0].name)
+          setFormData(prev => ({ ...prev, author: data[0].name }))
+        }
+      } else {
+        console.error('❌ Failed to fetch authors, status:', response.status)
+        const errorText = await response.text()
+        console.error('Error details:', errorText)
+      }
+    } catch (error) {
+      console.error('❌ Error fetching authors:', error)
+    }
+  }
+
   const fetchNews = async () => {
     try {
       const response = await fetch('/api/admin/news')
@@ -86,16 +115,6 @@ export default function AdminNewsPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  // Helper function to get category display name from slug
-  const getCategoryName = (categorySlug: string) => {
-    const category = categories.find(c => c.slug === categorySlug)
-    if (category) {
-      return language === 'ta' && category.name_ta ? category.name_ta : category.name
-    }
-    // Fallback: capitalize the slug if category not found
-    return categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1)
   }
 
   const handleSearch = (query: string) => {
@@ -151,7 +170,7 @@ export default function AdminNewsPage() {
           excerpt: '',
           excerpt_ta: '',
           category: categories.length > 0 ? categories[0].slug : '',
-          author: 'Hello Madurai',
+          author: authors.length > 0 ? authors[0].name : '',
           featured: false,
           featuredImage: '',
           tags: ''
@@ -272,7 +291,7 @@ export default function AdminNewsPage() {
                   excerpt: '',
                   excerpt_ta: '',
                   category: categories.length > 0 ? categories[0].slug : '',
-                  author: 'Hello Madurai',
+                  author: authors.length > 0 ? authors[0].name : '',
                   featured: false,
                   featuredImage: '',
                   tags: ''
@@ -431,14 +450,34 @@ export default function AdminNewsPage() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         {language === 'ta' ? 'ஆசிரியர்' : 'Author'} *
                       </label>
-                      <input
-                        type="text"
+                      <select
                         required
                         value={formData.author}
                         onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                        placeholder={language === 'ta' ? 'ஆசிரியர் பெயர்' : 'Author name'}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      />
+                      >
+                        {authors.length === 0 && (
+                          <option value="">
+                            {language === 'ta' ? 'ஆசிரியர்கள் ஏற்றுகிறது...' : 'Loading authors...'}
+                          </option>
+                        )}
+                        {authors.map((author) => (
+                          <option key={author.id} value={author.name}>
+                            {language === 'ta' && author.name_ta ? author.name_ta : author.name}
+                          </option>
+                        ))}
+                      </select>
+                      {authors.length === 0 && (
+                        <p className="mt-1 text-xs text-gray-500">
+                          {language === 'ta'
+                            ? 'ஆசிரியர்களை '
+                            : 'No authors found. '
+                          }
+                          <Link href="/admin/authors" className="text-blue-600 hover:underline">
+                            {language === 'ta' ? 'இங்கே சேர்க்கவும்' : 'Add reporters here'}
+                          </Link>
+                        </p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -502,7 +541,7 @@ export default function AdminNewsPage() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {getCategoryName(newsItem.category)}
+                        {newsItem.category}
                       </span>
                       {newsItem.featuredImage && (
                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
