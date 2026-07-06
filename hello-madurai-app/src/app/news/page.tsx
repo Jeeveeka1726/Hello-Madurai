@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { CalendarIcon, EyeIcon, UserIcon, ClockIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
@@ -53,6 +54,8 @@ interface NewsCategory {
 
 function NewsPageContent() {
   const { t, language } = useLanguage()
+  const searchParams = useSearchParams()
+  const searchQuery = searchParams.get('search') || ''
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([])
   // Start with fallback categories for instant display, then update with API data
@@ -91,10 +94,25 @@ function NewsPageContent() {
     fetchData()
   }, [])
 
-  // Filter articles based on selected category
-  const filteredArticles = selectedCategory === 'all'
+  // Filter articles based on selected category and search query
+  let filteredArticles = selectedCategory === 'all'
     ? newsArticles
     : newsArticles.filter(article => article.category === selectedCategory)
+
+  // Apply search filter if search query exists
+  if (searchQuery) {
+    const queryLower = searchQuery.toLowerCase()
+    filteredArticles = filteredArticles.filter(article => {
+      const titleMatch = article.title?.toLowerCase().includes(queryLower)
+      const titleTaMatch = article.title_ta?.toLowerCase().includes(queryLower)
+      const excerptMatch = article.excerpt?.toLowerCase().includes(queryLower)
+      const excerptTaMatch = article.excerpt_ta?.toLowerCase().includes(queryLower)
+      const contentMatch = article.content?.toLowerCase().includes(queryLower)
+      const contentTaMatch = article.content_ta?.toLowerCase().includes(queryLower)
+
+      return titleMatch || titleTaMatch || excerptMatch || excerptTaMatch || contentMatch || contentTaMatch
+    })
+  }
 
   // Helper function to get category display name from slug
   const getCategoryName = (categorySlug: string) => {
@@ -157,8 +175,26 @@ function NewsPageContent() {
         </div>
       </div>
 
-      {/* Today's News Carousel - Only show when All News is selected */}
-      {selectedCategory === 'all' && <TodaysNewsCarousel />}
+      {/* Search Results Header */}
+      {searchQuery && (
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mb-6">
+          <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-lg">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
+              {language === 'ta' ? (
+                <>தேடல் முடிவுகள்: "<span className="text-blue-600">{searchQuery}</span>"</>
+              ) : (
+                <>Search results for: "<span className="text-blue-600">{searchQuery}</span>"</>
+              )}
+            </h2>
+            <p className="text-sm text-gray-600">
+              {language === 'ta' ? `${filteredArticles.length} கட்டுரைகள் கண்டறியப்பட்டன` : `${filteredArticles.length} articles found`}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Today's News Carousel - Only show when All News is selected and not searching */}
+      {selectedCategory === 'all' && !searchQuery && <TodaysNewsCarousel />}
 
       {/* Other News Section */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
