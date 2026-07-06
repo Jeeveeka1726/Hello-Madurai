@@ -136,10 +136,10 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
 
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg transition-all duration-300">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-full px-6 sm:px-8 lg:px-12">
         <div className="flex items-center h-16">
           {/* Logo - Far Left */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 -ml-2">
             <Link href="/" className="flex items-center">
               <img
                 src="/hello-madurai-logo.jpeg"
@@ -150,7 +150,7 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
           </div>
 
           {/* Desktop Navigation - Centered */}
-          <nav className="hidden lg:flex items-center space-x-6 flex-1 justify-center">
+          <nav className="hidden lg:flex items-center space-x-6 flex-1 justify-center ml-8 lg:ml-12 xl:ml-16">
             {navigation.map((item) => (
               <Link
                 key={item.name}
