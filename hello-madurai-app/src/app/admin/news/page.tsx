@@ -21,6 +21,7 @@ interface NewsItem {
   excerpt_ta?: string
   category: string
   author: string
+  authorSlug?: string
   publishedAt: string
   views: number
   featured: boolean
@@ -48,6 +49,7 @@ export default function AdminNewsPage() {
     excerpt_ta: '',
     category: '',
     author: '',
+    authorSlug: '',
     featured: false,
     featuredImage: '',
     tags: ''
@@ -171,6 +173,7 @@ export default function AdminNewsPage() {
           excerpt_ta: '',
           category: categories.length > 0 ? categories[0].slug : '',
           author: authors.length > 0 ? authors[0].name : '',
+          authorSlug: authors.length > 0 ? authors[0].slug : '',
           featured: false,
           featuredImage: '',
           tags: ''
@@ -201,6 +204,7 @@ export default function AdminNewsPage() {
       excerpt_ta: newsItem.excerpt_ta || '',
       category: newsItem.category,
       author: newsItem.author,
+      authorSlug: newsItem.authorSlug || '',
       featured: newsItem.featured,
       featuredImage: newsItem.featuredImage || '',
       tags: ''
@@ -453,7 +457,14 @@ export default function AdminNewsPage() {
                       <select
                         required
                         value={formData.author}
-                        onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                        onChange={(e) => {
+                          const selectedAuthor = authors.find(a => a.name === e.target.value)
+                          setFormData({
+                            ...formData,
+                            author: e.target.value,
+                            authorSlug: selectedAuthor?.slug || ''
+                          })
+                        }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
                         {authors.length === 0 && (

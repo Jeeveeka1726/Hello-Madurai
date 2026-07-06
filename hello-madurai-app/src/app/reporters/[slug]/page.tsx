@@ -70,10 +70,10 @@ export default function ReporterDetailPage() {
           <div className="text-center">
             <UserIcon className="mx-auto h-12 w-12 text-gray-400" />
             <p className="mt-4 text-gray-600">
-              {language === 'ta' ? 'செய்தியாளர் கிடைக்கவில்லை' : 'Reporter not found'}
+              {language === 'ta' ? 'குழு உறுப்பினர் கிடைக்கவில்லை' : 'Team member not found'}
             </p>
             <Link href="/reporters" className="mt-4 inline-block text-blue-600 hover:text-blue-700">
-              {language === 'ta' ? 'செய்தியாளர்களுக்குத் திரும்பு' : 'Back to Reporters'}
+              {language === 'ta' ? 'எங்கள் குழுவிற்குத் திரும்பு' : 'Back to Our Team'}
             </Link>
           </div>
         </div>
@@ -87,12 +87,12 @@ export default function ReporterDetailPage() {
       <div className="min-h-screen py-12">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           {/* Back Button */}
-          <Link 
+          <Link
             href="/reporters"
             className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-6 transition-colors"
           >
             <ArrowLeftIcon className="h-4 w-4 mr-2" />
-            {language === 'ta' ? 'செய்தியாளர்களுக்குத் திரும்பு' : 'Back to Reporters'}
+            {language === 'ta' ? 'எங்கள் குழுவிற்குத் திரும்பு' : 'Back to Our Team'}
           </Link>
 
           <Card className="bg-white border-gray-200 shadow-xl">

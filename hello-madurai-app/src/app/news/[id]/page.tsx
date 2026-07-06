@@ -273,12 +273,16 @@ function NewsDetailPageContent() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-sm text-gray-500 mb-6">
                   <div className="flex items-center">
                     <UserIcon className="h-4 w-4 mr-2" />
-                    <Link
-                      href={`/reporters/${article.author.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`}
-                      className="truncate hover:text-blue-600 hover:underline transition-colors"
-                    >
-                      {article.author}
-                    </Link>
+                    {article.authorSlug ? (
+                      <Link
+                        href={`/reporters/${article.authorSlug}`}
+                        className="truncate hover:text-blue-600 hover:underline transition-colors"
+                      >
+                        {article.author}
+                      </Link>
+                    ) : (
+                      <span className="truncate">{article.author}</span>
+                    )}
                   </div>
                   <div className="flex items-center">
                     <CalendarIcon className="h-4 w-4 mr-2" />

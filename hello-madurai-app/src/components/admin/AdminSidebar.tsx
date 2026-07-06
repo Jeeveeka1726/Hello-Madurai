@@ -46,8 +46,8 @@ const navigation = [
     icon: TagIcon
   },
   {
-    name: 'Reporters',
-    name_ta: 'செய்தியாளர்கள்',
+    name: 'Our Team',
+    name_ta: 'எங்கள் குழு',
     href: '/admin/authors',
     icon: UserCircleIcon,
     badge: 'new'

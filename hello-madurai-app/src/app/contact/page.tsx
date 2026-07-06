@@ -86,8 +86,8 @@ export default function ContactPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              {t('contact.title', 'Contact Hello Madurai', 'ஹலோ மதுரையை தொடர்பு கொள்ளுங்கள்')}
+            <h1 className="text-4xl font-bold mb-4" style={{ color: '#1e3a8a' }}>
+              {t('contact.title', 'Contact Us', 'எங்களை தொடர்பு கொள்ளுங்கள்')}
             </h1>
             <p className="text-xl text-gray-700 max-w-2xl mx-auto">
               {t('contact.subtitle', 'Get in touch with us for any queries or feedback', 'எந்தவொரு கேள்விகள் அல்லது கருத்துகளுக்கும் எங்களுடன் தொடர்பு கொள்ளுங்கள்')}

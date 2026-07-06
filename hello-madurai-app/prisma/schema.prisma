@@ -54,6 +54,7 @@ model News {
   excerpt_ta    String?       @db.Text
   category      String
   author        String
+  authorSlug    String?
   featuredImage String?       @db.VarChar(500)
   publishedAt   DateTime      @default(now())
   views         Int           @default(0)
@@ -68,6 +69,7 @@ model News {
   viewRecords   NewsView[]    @relation("NewsViews")
   likeRecords   NewsLike[]    @relation("NewsLikes")
 
+  @@index([authorSlug])
   @@map("news")
 }
 

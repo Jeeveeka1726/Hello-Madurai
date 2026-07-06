@@ -48,13 +48,13 @@ export default function ReportersPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              {language === 'ta' ? 'எங்கள் செய்தியாளர்கள்' : 'Our Reporters'}
+            <h1 className="text-4xl font-bold mb-4" style={{ color: '#1e3a8a' }}>
+              {language === 'ta' ? 'எங்கள் குழு உறுப்பினர்கள்' : 'Our Team Members'}
             </h1>
-            <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-              {language === 'ta' 
-                ? 'மதுரையின் செய்திகளை உங்களுக்குக் கொண்டுவரும் எங்கள் அர்ப்பணிப்புள்ள செய்தியாளர்கள்' 
-                : 'Meet our dedicated reporters bringing you the latest news from Madurai'
+            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+              {language === 'ta'
+                ? 'நம்பகமான செய்திகள், வானொலி நிகழ்ச்சிகள் மற்றும் டிஜிட்டல் ஊடக உள்ளடக்கங்களை வழங்கும் ஹலோ மதுரை குழுவினரை அறிந்து கொள்ளுங்கள்.'
+                : 'Meet the Hello Madurai team delivering trusted news, radio, and digital media content.'
               }
             </p>
           </div>
@@ -71,7 +71,7 @@ export default function ReportersPage() {
             <div className="text-center py-12">
               <UserIcon className="mx-auto h-12 w-12 text-gray-400" />
               <p className="mt-4 text-gray-600">
-                {language === 'ta' ? 'செய்தியாளர்கள் இல்லை' : 'No reporters found'}
+                {language === 'ta' ? 'குழு உறுப்பினர்கள் இல்லை' : 'No team members found'}
               </p>
             </div>
           ) : (

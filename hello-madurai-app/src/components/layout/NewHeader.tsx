@@ -2,20 +2,30 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   Bars3Icon,
   XMarkIcon,
   LanguageIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 
-export default function NewHeader() {
+interface NewHeaderProps {
+  showSearch?: boolean
+}
+
+export default function NewHeader({ showSearch = false, onSearch }: NewHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isOthersOpen, setIsOthersOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
   const { language, setLanguage, t } = useLanguage()
   const pathname = usePathname()
+  const router = useRouter()
 
   const navigation = [
     {
@@ -50,16 +60,16 @@ export default function NewHeader() {
 
   const othersDropdown = [
     {
-      name: t('nav.reporters', 'Reporters', 'செய்தியாளர்கள்'),
-      href: '/reporters'
-    },
-    {
       name: t('nav.discount', 'Discount', 'தள்ளுபடி'),
       href: '/offers'
     },
     {
       name: t('nav.helpline', 'Help Line', 'உதவி எண்'),
       href: '/helpline'
+    },
+    {
+      name: t('nav.ourteam', 'Our Team', 'எங்கள் குழு'),
+      href: '/reporters'
     },
     {
       name: t('nav.contact', 'Contact', 'தொடர்பு'),
@@ -71,12 +81,65 @@ export default function NewHeader() {
     setLanguage(language === 'en' ? 'ta' : 'en')
   }
 
+  // Search as user types - for autocomplete dropdown
+  const handleSearchInput = async (value: string) => {
+    setSearchQuery(value)
+
+    if (!value.trim()) {
+      setSearchResults([])
+      setShowDropdown(false)
+      return
+    }
+
+    setIsSearching(true)
+    setShowDropdown(true)
+
+    try {
+      const response = await fetch('/api/news')
+      if (response.ok) {
+        const allNews = await response.json()
+        const queryLower = value.toLowerCase()
+
+        // Filter and limit to 5 results
+        const filtered = allNews.filter((article: any) => {
+          const titleMatch = article.title?.toLowerCase().includes(queryLower)
+          const titleTaMatch = article.title_ta?.toLowerCase().includes(queryLower)
+          const excerptMatch = article.excerpt?.toLowerCase().includes(queryLower)
+          const excerptTaMatch = article.excerpt_ta?.toLowerCase().includes(queryLower)
+
+          return titleMatch || titleTaMatch || excerptMatch || excerptTaMatch
+        }).slice(0, 5) // Limit to 5 results
+
+        setSearchResults(filtered)
+      }
+    } catch (error) {
+      console.error('Error searching:', error)
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/news?search=${encodeURIComponent(searchQuery.trim())}`)
+      setShowDropdown(false)
+    }
+  }
+
+  const handleResultClick = (articleId: string) => {
+    router.push(`/news/${articleId}`)
+    setSearchQuery('')
+    setSearchResults([])
+    setShowDropdown(false)
+  }
+
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg transition-all duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo - Only logo, no text */}
-          <div className="flex items-center">
+        <div className="flex items-center h-16">
+          {/* Logo - Far Left */}
+          <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
               <img
                 src="/hello-madurai-logo.jpeg"
@@ -86,8 +149,8 @@ export default function NewHeader() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-6">
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden lg:flex items-center space-x-6 flex-1 justify-center">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -126,9 +189,72 @@ export default function NewHeader() {
             </div>
           </nav>
 
-          {/* Controls */}
-          <div className="flex items-center space-x-4">
-            {/* Language Toggle */}
+          {/* Right Side - Search Bar and Controls */}
+          <div className="flex items-center space-x-4 flex-shrink-0">
+            {/* Search Bar - Only on home page */}
+            {showSearch && (
+              <div className="hidden md:flex relative">
+                <form onSubmit={handleSearch} className="w-full">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => handleSearchInput(e.target.value)}
+                      onFocus={() => searchQuery && setShowDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                      placeholder={language === 'ta' ? 'செய்திகளை தேடுங்கள்...' : 'Search news...'}
+                      className="w-64 lg:w-72 px-4 py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  </div>
+                </form>
+
+                {/* Search Results Dropdown */}
+                {showDropdown && searchQuery && (
+                  <div className="absolute top-full right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto">
+                    {isSearching ? (
+                      <div className="p-4 text-center text-gray-500">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      <div className="py-2">
+                        {searchResults.map((article: any) => (
+                          <button
+                            key={article.id}
+                            onClick={() => handleResultClick(article.id)}
+                            className="w-full px-4 py-3 hover:bg-gray-50 text-left transition-colors border-b border-gray-100 last:border-0"
+                          >
+                            <div className="flex gap-3">
+                              {article.featuredImage && (
+                                <img
+                                  src={article.featuredImage}
+                                  alt=""
+                                  className="w-16 h-16 object-cover rounded flex-shrink-0"
+                                />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-sm text-gray-900 line-clamp-2 mb-1">
+                                  {language === 'ta' && article.title_ta ? article.title_ta : article.title}
+                                </h4>
+                                <p className="text-xs text-gray-500">
+                                  {article.category} • {article.views || 0} {language === 'ta' ? 'பார்வைகள்' : 'views'}
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-4 text-center text-gray-500 text-sm">
+                        {language === 'ta' ? 'முடிவுகள் இல்லை' : 'No results found'}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Language Toggle - Right corner */}
             <button
               onClick={toggleLanguage}
               className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors duration-200"

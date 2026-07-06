@@ -493,7 +493,7 @@ p {
   font-weight: 700 !important;
   letter-spacing: 0.015em !important; /* Moderate spacing */
   line-height: 1.6 !important; /* Focus on vertical spacing */
-  color: #ffffff !important; /* Pure white */
+  /* Removed global white color - let components control their own text color */
 }
 
 /* Responsive typography for mobile */

@@ -37,6 +37,11 @@ export default function RootPage() {
   const { t, language } = useLanguage()
   const [features, setFeatures] = useState<HomeFeature[]>([])
   const [loading, setLoading] = useState(true)
+  const [latestNews, setLatestNews] = useState<any[]>([])
+  const [stats, setStats] = useState({ news: 0, videos: 0, businesses: 0 })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [isSearching, setIsSearching] = useState(false)
 
   // Default fallback features
   const defaultFeatures = [
@@ -148,6 +153,24 @@ export default function RootPage() {
           const featuresData = await featuresResponse.json()
           setFeatures(featuresData)
         }
+
+        // Fetch latest news for homepage
+        const newsResponse = await fetch('/api/news')
+        if (newsResponse.ok) {
+          const newsData = await newsResponse.json()
+          setLatestNews(newsData.slice(0, 6)) // Get first 6 news items
+        }
+
+        // Fetch stats
+        const analyticsResponse = await fetch('/api/admin/analytics?range=30d')
+        if (analyticsResponse.ok) {
+          const analyticsData = await analyticsResponse.json()
+          setStats({
+            news: analyticsData.contentStats?.news || 49,
+            videos: analyticsData.contentStats?.videos || 141,
+            businesses: analyticsData.contentStats?.businesses || 12
+          })
+        }
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
@@ -161,9 +184,41 @@ export default function RootPage() {
   // Use fetched features or default ones
   const displayFeatures = features.length > 0 ? features : defaultFeatures
 
+  // Handle search from navbar
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query)
+    setIsSearching(true)
+
+    try {
+      const response = await fetch('/api/news')
+      if (response.ok) {
+        const allNews = await response.json()
+        const queryLower = query.toLowerCase()
+
+        // Filter articles
+        const filtered = allNews.filter((article: any) => {
+          const titleMatch = article.title?.toLowerCase().includes(queryLower)
+          const titleTaMatch = article.title_ta?.toLowerCase().includes(queryLower)
+          const excerptMatch = article.excerpt?.toLowerCase().includes(queryLower)
+          const excerptTaMatch = article.excerpt_ta?.toLowerCase().includes(queryLower)
+          const contentMatch = article.content?.toLowerCase().includes(queryLower)
+          const contentTaMatch = article.content_ta?.toLowerCase().includes(queryLower)
+
+          return titleMatch || titleTaMatch || excerptMatch || excerptTaMatch || contentMatch || contentTaMatch
+        })
+
+        setSearchResults(filtered)
+      }
+    } catch (error) {
+      console.error('Error searching:', error)
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white">
-      <NewHeader />
+      <NewHeader showSearch={true} onSearch={handleSearch} />
       <CategoryNavigation />
       <div className="min-h-screen bg-white">
         {/* Hero Section */}
@@ -185,6 +240,8 @@ export default function RootPage() {
             </div>
           </div>
         </div>
+
+
 
         {/* Features Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
@@ -241,71 +298,64 @@ export default function RootPage() {
         <ReelsSection />
 
         {/* Social Media Follow Section */}
-        <div className="bg-gradient-to-b from-blue-50 to-blue-100 py-12">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  <TranslatedText tamil="எங்களைப் பின்தொடருங்கள்">Follow Us</TranslatedText>
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  <TranslatedText tamil="எங்கள் சமீபத்திய உள்ளடக்கம் மற்றும் செய்திகளுடன் புதுப்பித்த நிலையில் இருங்கள்">
-                    Stay updated with our latest content and news
-                  </TranslatedText>
-                </p>
-                <div className="flex justify-center items-center gap-4">
-                  {/* Facebook */}
-                  <a
-                    href="https://www.facebook.com/hellomadurai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center w-12 h-12 bg-blue-600 hover:bg-blue-700 rounded-lg transition-all duration-200 hover:scale-110 shadow-md"
-                    aria-label="Facebook"
-                  >
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                  </a>
+        <div className="bg-gray-50 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center bg-white rounded-2xl shadow-lg p-8 md:p-12">
+              <h2 className="text-2xl font-bold text-gray-900 mb-8">
+                <TranslatedText tamil="எங்களைப் பின்தொடருங்கள்">Follow Us</TranslatedText>
+              </h2>
+              <div className="flex justify-center items-center space-x-6">
+                {/* Facebook */}
+                <a
+                  href="https://www.facebook.com/hellomadurai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white hover:bg-blue-50 rounded-lg p-3 md:p-4 transition-all duration-200 hover:scale-110 shadow-lg"
+                  aria-label="Facebook"
+                >
+                  <svg className="w-6 h-6 md:w-8 md:h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                </a>
 
-                  {/* Instagram */}
-                  <a
-                    href="https://www.instagram.com/hello_madurai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-600 hover:from-purple-700 hover:via-pink-700 hover:to-orange-700 rounded-lg transition-all duration-200 hover:scale-110 shadow-md"
-                    aria-label="Instagram"
-                  >
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                    </svg>
-                  </a>
+                {/* Instagram */}
+                <a
+                  href="https://www.instagram.com/hello_madurai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white hover:bg-pink-50 rounded-lg p-3 md:p-4 transition-all duration-200 hover:scale-110 shadow-lg"
+                  aria-label="Instagram"
+                >
+                  <svg className="w-6 h-6 md:w-8 md:h-8 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                </a>
 
-                  {/* YouTube */}
-                  <a
-                    href="https://www.youtube.com/@hellomadurai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center w-12 h-12 bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 hover:scale-110 shadow-md"
-                    aria-label="YouTube"
-                  >
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                  </a>
+                {/* YouTube */}
+                <a
+                  href="https://www.youtube.com/@hellomadurai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white hover:bg-red-50 rounded-lg p-3 md:p-4 transition-all duration-200 hover:scale-110 shadow-lg"
+                  aria-label="YouTube"
+                >
+                  <svg className="w-6 h-6 md:w-8 md:h-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                </a>
 
-                  {/* X (Twitter) */}
-                  <a
-                    href="https://twitter.com/hellomadurai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center w-12 h-12 bg-gray-900 hover:bg-black rounded-lg transition-all duration-200 hover:scale-110 shadow-md"
-                    aria-label="X (Twitter)"
-                  >
-                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                  </a>
-                </div>
+                {/* X (Twitter) */}
+                <a
+                  href="https://twitter.com/hellomadurai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white hover:bg-gray-100 rounded-lg p-3 md:p-4 transition-all duration-200 hover:scale-110 shadow-lg"
+                  aria-label="X (Twitter)"
+                >
+                  <svg className="w-6 h-6 md:w-8 md:h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </a>
               </div>
             </div>
           </div>
@@ -315,16 +365,31 @@ export default function RootPage() {
         <div className="bg-gray-900 text-white py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-gray-400 text-sm">
-                Copyright © 2026 Hello Madurai |
-                <Link href="/contact" className="text-gray-400 hover:text-white mx-1 transition-colors duration-200">
+              <p className="text-gray-400 text-sm flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                <span>Copyright © 2026 Hello Madurai</span>
+                <span>|</span>
+                <Link href="/contact" className="text-gray-400 hover:text-white transition-colors duration-200">
                   Contact
-                </Link> |
-                <Link href="/privacy" className="text-gray-400 hover:text-white mx-1 transition-colors duration-200">
+                </Link>
+                <span>|</span>
+                <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors duration-200">
                   Privacy Policy
-                </Link> |
-                <Link href="/terms" className="text-gray-400 hover:text-white mx-1 transition-colors duration-200">
+                </Link>
+                <span>|</span>
+                <Link href="/terms" className="text-gray-400 hover:text-white transition-colors duration-200">
                   Terms of Conditions
+                </Link>
+                <span>|</span>
+                <Link href="/editorial-policy" className="text-gray-400 hover:text-white transition-colors duration-200">
+                  {language === 'ta' ? 'ஆசிரியர் கொள்கை' : 'Editorial Policy'}
+                </Link>
+                <span>|</span>
+                <Link href="/fact-check" className="text-gray-400 hover:text-white transition-colors duration-200">
+                  {language === 'ta' ? 'உண்மை சரிபார்ப்பு' : 'Fact Check'}
+                </Link>
+                <span>|</span>
+                <Link href="/corrections" className="text-gray-400 hover:text-white transition-colors duration-200">
+                  {language === 'ta' ? 'திருத்தக் கொள்கை' : 'Corrections'}
                 </Link>
               </p>
             </div>

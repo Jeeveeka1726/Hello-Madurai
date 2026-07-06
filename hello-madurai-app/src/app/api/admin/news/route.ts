@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     console.log('📝 Request body:', { ...body, content: body.content?.substring(0, 50) + '...' })
     
-    const { title, title_ta, content, content_ta, excerpt, excerpt_ta, category, author, featuredImage, featured } = body
+    const { title, title_ta, content, content_ta, excerpt, excerpt_ta, category, author, authorSlug, featuredImage, featured } = body
 
     if (!title || !content || !category || !author) {
       console.error('❌ Validation failed:', { title: !!title, content: !!content, category: !!category, author: !!author })
@@ -51,6 +51,7 @@ export async function POST(request: Request) {
         excerpt_ta: excerpt_ta || undefined,
         category,
         author,
+        authorSlug: authorSlug || undefined,
         featuredImage: featuredImage || undefined,
         featured: featured || false
       }

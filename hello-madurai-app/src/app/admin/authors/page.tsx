@@ -6,6 +6,7 @@ import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import FileUpload from '@/components/admin/FileUpload'
+import { slugify } from '@/utils/slugify'
 import { toast } from 'react-hot-toast'
 
 interface Author {
@@ -144,7 +145,7 @@ export default function AdminAuthorsPage() {
     <div className="p-6">
         <div className="mb-6 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">
-            {language === 'ta' ? 'ஆசிரியர்கள்' : 'Reporters / Authors'}
+            {language === 'ta' ? 'எங்கள் குழு' : 'Our Team'}
           </h1>
           <Button
             onClick={() => {
@@ -164,7 +165,7 @@ export default function AdminAuthorsPage() {
             }}
           >
             <PlusIcon className="h-4 w-4 mr-2" />
-            {language === 'ta' ? 'ஆசிரியர் சேர்க்க' : 'Add Author'}
+            {language === 'ta' ? 'குழு உறுப்பினர் சேர்க்க' : 'Add Team Member'}
           </Button>
         </div>
 
@@ -173,8 +174,8 @@ export default function AdminAuthorsPage() {
             <CardHeader>
               <CardTitle>
                 {editingAuthor
-                  ? (language === 'ta' ? 'ஆசிரியரை திருத்து' : 'Edit Author')
-                  : (language === 'ta' ? 'புதிய ஆசிரியர்' : 'New Author')
+                  ? (language === 'ta' ? 'குழு உறுப்பினரை திருத்து' : 'Edit Team Member')
+                  : (language === 'ta' ? 'புதிய குழு உறுப்பினர்' : 'New Team Member')
                 }
               </CardTitle>
             </CardHeader>
@@ -189,7 +190,15 @@ export default function AdminAuthorsPage() {
                       type="text"
                       required
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) => {
+                        const newName = e.target.value
+                        setFormData({
+                          ...formData,
+                          name: newName,
+                          // Auto-generate slug from name if not editing
+                          slug: editingAuthor ? formData.slug : slugify(newName)
+                        })
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     />
                   </div>
@@ -214,11 +223,13 @@ export default function AdminAuthorsPage() {
                     type="text"
                     required
                     value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
+                    onChange={(e) => setFormData({ ...formData, slug: slugify(e.target.value) })}
                     placeholder="hello-madurai"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
                   />
-                  <p className="text-xs text-gray-500 mt-1">URL-friendly identifier (e.g., hello-madurai)</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Auto-generated from name. URL: /reporters/{formData.slug || 'author-name'}
+                  </p>
                 </div>
 
                 {/* Profile Image Upload */}

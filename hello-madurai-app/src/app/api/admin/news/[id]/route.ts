@@ -45,6 +45,7 @@ export async function PUT(
       excerpt_ta,
       category,
       author,
+      authorSlug,
       featured,
       featuredImage
     } = body
@@ -72,6 +73,7 @@ export async function PUT(
         excerpt_ta: excerpt_ta || undefined,
         category,
         author,
+        authorSlug: authorSlug || undefined,
         featured: featured || false,
         featuredImage: featuredImage || undefined
       }
