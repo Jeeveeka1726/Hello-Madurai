@@ -72,7 +72,8 @@ export default function TodaysNewsCarousel() {
   useEffect(() => {
     const fetchTodaysNews = async () => {
       try {
-        const response = await fetch('/api/news?limit=20', { next: { revalidate: 60 } }) // Cache for 1 minute
+        // Fetch latest 10 news articles (optimized for speed)
+        const response = await fetch('/api/news/latest', { next: { revalidate: 60 } }) // Use optimized endpoint
         if (response.ok) {
           const data = await response.json()
 

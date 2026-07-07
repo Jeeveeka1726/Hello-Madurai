@@ -62,13 +62,14 @@ function NewsPageContent() {
   const [categories, setCategories] = useState<NewsCategory[]>(fallbackCategories)
   const [loading, setLoading] = useState(true)
 
-  // Fetch categories and news in parallel with caching
+  // Fetch categories and news in parallel with caching - OPTIMIZED for speed
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Fetch both in parallel for maximum speed
         const [categoriesRes, newsRes] = await Promise.all([
           fetch('/api/news-categories', { next: { revalidate: 300 } }), // Cache for 5 minutes
-          fetch('/api/news', { next: { revalidate: 60 } }) // Cache for 1 minute
+          fetch('/api/news?limit=30', { next: { revalidate: 60 } }) // Cache for 1 minute, limit to 30 articles for faster load
         ])
 
         if (categoriesRes.ok) {
@@ -193,31 +194,28 @@ function NewsPageContent() {
         {/* Section Title with Search Indicator */}
         <div className="mb-4 sm:mb-6">
           {searchQuery ? (
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-2">
-                    {language === 'ta' ? 'தேடல் முடிவுகள்' : 'Search Results'}
-                  </h2>
-                  <p className="text-sm sm:text-base text-gray-700">
-                    {language === 'ta' ? (
-                      <>
-                        <span className="font-semibold text-blue-700">"{searchQuery}"</span> க்கு <span className="font-bold text-blue-700">{filteredArticles.length}</span> செய்திகள் கண்டறியப்பட்டன
-                      </>
-                    ) : (
-                      <>
-                        Found <span className="font-bold text-blue-700">{filteredArticles.length}</span> news articles for <span className="font-semibold text-blue-700">"{searchQuery}"</span>
-                      </>
-                    )}
-                  </p>
-                </div>
-                <Link
-                  href="/news"
-                  className="inline-flex items-center justify-center px-4 py-2 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap"
-                >
-                  {language === 'ta' ? 'தேடலை அழி' : 'Clear Search'}
-                </Link>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div className="flex-1">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
+                  {language === 'ta' ? (
+                    <>தேடல் முடிவுகள்: <span className="text-blue-600">"{searchQuery}"</span></>
+                  ) : (
+                    <>Search Results: <span className="text-blue-600">"{searchQuery}"</span></>
+                  )}
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  {filteredArticles.length} {language === 'ta' ? 'செய்திகள் கண்டறியப்பட்டன' : 'articles found'}
+                </p>
               </div>
+              <Link
+                href="/news"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:border-blue-700 hover:text-blue-700 transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap text-sm self-start flex-shrink-0"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                {language === 'ta' ? 'அழி' : 'Clear'}
+              </Link>
             </div>
           ) : (
             <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 text-center sm:text-left">
