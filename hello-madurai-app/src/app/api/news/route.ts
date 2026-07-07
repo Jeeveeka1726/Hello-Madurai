@@ -1,14 +1,30 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
 // Cache for 60 seconds, revalidate in background
 export const revalidate = 60
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Fetch all news articles from Hostinger MySQL
+    const { searchParams } = new URL(request.url)
+    const limitParam = searchParams.get('limit')
+    const searchQuery = searchParams.get('search')
+    const limit = limitParam ? parseInt(limitParam, 10) : 100
+
+    // Build where clause for search
+    const where = searchQuery ? {
+      OR: [
+        { title: { contains: searchQuery, mode: 'insensitive' as const } },
+        { title_ta: { contains: searchQuery, mode: 'insensitive' as const } },
+        { excerpt: { contains: searchQuery, mode: 'insensitive' as const } },
+        { excerpt_ta: { contains: searchQuery, mode: 'insensitive' as const } }
+      ]
+    } : undefined
+
+    // Fetch news articles from Hostinger MySQL
     // Only select necessary fields for list view (not full content)
     const news = await prisma.news.findMany({
+      where,
       select: {
         id: true,
         title: true,
@@ -26,7 +42,7 @@ export async function GET() {
       orderBy: {
         createdAt: 'desc'
       },
-      take: 100 // Limit to 100 most recent articles
+      take: Math.min(limit, 100) // Maximum 100 articles
     })
 
     return NextResponse.json(news || [], {

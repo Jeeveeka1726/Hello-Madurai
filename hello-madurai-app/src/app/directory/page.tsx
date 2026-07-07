@@ -243,13 +243,13 @@ function DirectoryPageContent() {
     return businessesWithDistances.sort((a, b) => a.distance - b.distance)
   }
 
-  // Fetch categories and businesses from database
+  // Fetch categories and businesses from database with caching
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [categoriesRes, businessesRes] = await Promise.all([
-          fetch('/api/directory-categories', { cache: 'no-store' }),
-          fetch('/api/directory', { cache: 'no-store' })
+          fetch('/api/directory-categories', { next: { revalidate: 180 } }), // Cache for 3 minutes
+          fetch('/api/directory', { next: { revalidate: 180 } }) // Cache for 3 minutes
         ])
 
         if (categoriesRes.ok) {

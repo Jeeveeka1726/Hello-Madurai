@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// Cache for 3 minutes
+export const revalidate = 180
 
 /**
  * GET /api/radio-songs/singer/[singerId]
@@ -20,14 +20,31 @@ export async function GET(
       orderBy: { createdAt: 'desc' },
       include: {
         singer: {
-          include: {
-            category: true
+          select: {
+            id: true,
+            name: true,
+            name_ta: true,
+            slug: true,
+            imageUrl: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+                name_ta: true,
+                slug: true
+              }
+            }
           }
         }
-      }
+      },
+      take: 100 // Limit to 100 songs per singer
     })
 
-    return NextResponse.json(songs)
+    return NextResponse.json(songs, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=180, stale-while-revalidate=360'
+      }
+    })
   } catch (error) {
     console.error('Error fetching songs for singer:', error)
     return NextResponse.json(

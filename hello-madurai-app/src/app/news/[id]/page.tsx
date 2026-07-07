@@ -257,6 +257,9 @@ function NewsDetailPageContent() {
                       src={article.featuredImage}
                       alt={t(`news.${article.id}.title`, article.title, article.title_ta)}
                       className="w-full h-auto object-cover rounded-lg news-featured-image"
+                      loading="eager"
+                      decoding="async"
+                      fetchpriority="high"
                     />
                   </div>
                 ) : (
@@ -355,6 +358,8 @@ function NewsDetailPageContent() {
                             src={relatedArticle.featuredImage}
                             alt={t(`news.${relatedArticle.id}.title`, relatedArticle.title, relatedArticle.title_ta)}
                             className="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
                           />
                         </div>
                       ) : (

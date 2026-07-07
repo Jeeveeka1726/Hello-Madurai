@@ -393,8 +393,8 @@ function DigitalFMPageContent() {
       try {
         // Only fetch categories and ads - skip all songs for faster initial load
         const [categoriesRes, adsRes] = await Promise.all([
-          fetch('/api/radio-categories', { cache: 'no-store' }),
-          fetch('/api/ads/active?category=radio', { cache: 'no-store' })
+          fetch('/api/radio-categories', { next: { revalidate: 300 } }), // Cache for 5 minutes
+          fetch('/api/ads/active?category=radio', { next: { revalidate: 180 } }) // Cache for 3 minutes
         ])
 
         // Check for errors
@@ -415,13 +415,9 @@ function DigitalFMPageContent() {
         setCategories(safeCategories)
         setAds(safeAds)
 
-        console.log('📂 Categories loaded:', safeCategories.length, 'categories')
-        console.log('📢 Ads loaded:', safeAds.length, 'ads')
-
         // Only set selected category if state was NOT restored
         if (safeCategories.length > 0 && !stateRestored) {
           setSelectedCategory(safeCategories[0].id)
-          console.log('📌 Selected first category:', safeCategories[0].name)
         }
 
         // Track ad impressions asynchronously without blocking
@@ -517,8 +513,8 @@ function DigitalFMPageContent() {
     }
 
     try {
-      // Fetch songs first
-      const songsRes = await fetch(`/api/radio-songs/singer/${singer.id}`, { cache: 'no-store' })
+      // Fetch songs with caching
+      const songsRes = await fetch(`/api/radio-songs/singer/${singer.id}`, { next: { revalidate: 180 } }) // Cache for 3 minutes
       const data = await songsRes.json()
 
       if (data && data.length > 0) {

@@ -62,13 +62,13 @@ function NewsPageContent() {
   const [categories, setCategories] = useState<NewsCategory[]>(fallbackCategories)
   const [loading, setLoading] = useState(true)
 
-  // Fetch categories and news in parallel
+  // Fetch categories and news in parallel with caching
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [categoriesRes, newsRes] = await Promise.all([
-          fetch('/api/news-categories', { cache: 'no-store' }),
-          fetch('/api/news', { cache: 'no-store' })
+          fetch('/api/news-categories', { next: { revalidate: 300 } }), // Cache for 5 minutes
+          fetch('/api/news', { next: { revalidate: 60 } }) // Cache for 1 minute
         ])
 
         if (categoriesRes.ok) {
@@ -252,6 +252,8 @@ function NewsPageContent() {
                         src={article.featuredImage}
                         alt={language === 'ta' && article.title_ta ? article.title_ta : article.title}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                        decoding="async"
                       />
                       {/* Gradient overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>

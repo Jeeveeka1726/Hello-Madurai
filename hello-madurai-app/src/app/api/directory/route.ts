@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// Cache for 3 minutes
+export const revalidate = 180
+
 export async function GET() {
   try {
     // Fetch all businesses from Hostinger MySQL
@@ -9,17 +12,40 @@ export async function GET() {
         orderNumber: 'asc'
       },
       include: {
-        mainCategory: true,
-        subcategory: true,
-        comments: true
-      }
+        mainCategory: {
+          select: {
+            id: true,
+            name: true,
+            name_ta: true
+          }
+        },
+        subcategory: {
+          select: {
+            id: true,
+            name: true,
+            name_ta: true
+          }
+        },
+        comments: {
+          select: {
+            id: true,
+            content: true,
+            author: true,
+            rating: true,
+            createdAt: true
+          },
+          orderBy: {
+            createdAt: 'desc'
+          },
+          take: 5 // Only fetch latest 5 comments per business
+        }
+      },
+      take: 200 // Limit to 200 businesses for better performance
     })
 
     return NextResponse.json(businesses || [], {
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-        'Pragma': 'no-cache',
-        'Expires': '0'
+        'Cache-Control': 'public, s-maxage=180, stale-while-revalidate=360'
       }
     })
   } catch (error) {

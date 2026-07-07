@@ -1,21 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
 
-const prisma = new PrismaClient()
+// Cache for 5 minutes
+export const revalidate = 300
 
 // GET /api/reels - Get all reels
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const active = searchParams.get('active')
-    
+
     const reels = await prisma.reel.findMany({
       where: active === 'true' ? { active: true } : undefined,
       orderBy: { orderNumber: 'asc' },
       take: 10 // Limit to 10 reels for homepage
     })
 
-    return NextResponse.json(reels)
+    return NextResponse.json(reels, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+      }
+    })
   } catch (error) {
     console.error('Error fetching reels:', error)
     return NextResponse.json(

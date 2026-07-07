@@ -33,35 +33,15 @@ export default function ReelsSection() {
 
   useEffect(() => {
     fetchReels()
-
-    // Auto-refresh reels every 30 seconds to get latest updates
-    const interval = setInterval(() => {
-      fetchReels()
-    }, 30000)
-
-    return () => clearInterval(interval)
   }, [])
 
   const fetchReels = async () => {
     try {
       const response = await fetch('/api/reels?active=true', {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache'
-        }
+        next: { revalidate: 300 } // Cache for 5 minutes
       })
       if (response.ok) {
         const data = await response.json()
-        console.log('Fetched reels:', data)
-        data.forEach((reel: Reel) => {
-          console.log(`Reel ${reel.id}:`, {
-            title: reel.title,
-            reelType: reel.reelType,
-            videoUrl: reel.videoUrl,
-            thumbnailUrl: reel.thumbnailUrl,
-            generatedThumbnail: getThumbnailUrl(reel)
-          })
-        })
         setReels(data)
       }
     } catch (error) {

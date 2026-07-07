@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// Cache for 5 minutes
+export const revalidate = 300
+
 // GET: Fetch all directory categories for public use
 export async function GET(request: NextRequest) {
   try {
@@ -24,7 +27,11 @@ export async function GET(request: NextRequest) {
       orderBy: { orderNumber: 'asc' }
     })
 
-    return NextResponse.json({ categories })
+    return NextResponse.json({ categories }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+      }
+    })
   } catch (error) {
     console.error('Error fetching directory categories:', error)
     return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 })

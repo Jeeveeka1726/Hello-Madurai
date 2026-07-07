@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// Cache for 3 minutes
+export const revalidate = 180
+
 export async function GET(request: NextRequest) {
   try {
     const radioShows = await prisma.radioShow.findMany({
@@ -8,11 +11,22 @@ export async function GET(request: NextRequest) {
         createdAt: 'desc'
       },
       include: {
-        folder: true
-      }
+        folder: {
+          select: {
+            id: true,
+            name: true,
+            name_ta: true
+          }
+        }
+      },
+      take: 100 // Limit to 100 shows
     })
 
-    return NextResponse.json(radioShows)
+    return NextResponse.json(radioShows, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=180, stale-while-revalidate=360'
+      }
+    })
   } catch (error) {
     console.error('Error fetching radio shows:', error)
     return NextResponse.json(

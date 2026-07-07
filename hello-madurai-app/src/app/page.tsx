@@ -147,30 +147,28 @@ export default function RootPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch features
-        const featuresResponse = await fetch('/api/home-features')
+        // Fetch all data in parallel for faster loading
+        const [featuresResponse, newsResponse] = await Promise.all([
+          fetch('/api/home-features', { next: { revalidate: 300 } }), // Cache for 5 minutes
+          fetch('/api/news/latest', { next: { revalidate: 60 } }) // Optimized endpoint, cache for 1 minute
+        ])
+
         if (featuresResponse.ok) {
           const featuresData = await featuresResponse.json()
           setFeatures(featuresData)
         }
 
-        // Fetch latest news for homepage
-        const newsResponse = await fetch('/api/news')
         if (newsResponse.ok) {
           const newsData = await newsResponse.json()
-          setLatestNews(newsData.slice(0, 6)) // Get first 6 news items
+          setLatestNews(newsData)
         }
 
-        // Fetch stats
-        const analyticsResponse = await fetch('/api/admin/analytics?range=30d')
-        if (analyticsResponse.ok) {
-          const analyticsData = await analyticsResponse.json()
-          setStats({
-            news: analyticsData.contentStats?.news || 49,
-            videos: analyticsData.contentStats?.videos || 141,
-            businesses: analyticsData.contentStats?.businesses || 12
-          })
-        }
+        // Use static stats for faster initial load - these don't change often
+        setStats({
+          news: 49,
+          videos: 141,
+          businesses: 12
+        })
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {

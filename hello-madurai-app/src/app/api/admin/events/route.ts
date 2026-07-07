@@ -1,23 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// Cache for 5 minutes
+export const revalidate = 300
+
 // GET /api/admin/events - Get all events
 export async function GET() {
   try {
-    console.log('Fetching events...')
     // Fetch all events from Hostinger MySQL
     const events = await prisma.event.findMany({
       orderBy: {
         startDate: 'desc'
-      }
+      },
+      take: 100 // Limit to 100 events
     })
 
-    console.log(`Found ${events.length} events`)
-    return NextResponse.json(events || [])
+    return NextResponse.json(events || [], {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+      }
+    })
   } catch (error: any) {
     console.error('Error fetching events:', error)
-    console.error('Error message:', error.message)
-    console.error('Error code:', error.code)
     return NextResponse.json(
       { error: 'Failed to fetch events', details: error.message },
       { status: 500 }

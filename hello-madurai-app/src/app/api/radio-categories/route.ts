@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// Cache for 5 minutes
+export const revalidate = 300
+
 // GET all radio categories (public)
 export async function GET() {
   try {
@@ -19,7 +22,8 @@ export async function GET() {
             _count: {
               select: { songs: true }
             }
-          }
+          },
+          take: 100 // Limit singers per category
         }
       }
     })
