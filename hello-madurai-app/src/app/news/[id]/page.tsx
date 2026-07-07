@@ -63,36 +63,38 @@ function NewsDetailPageContent() {
   const [loading, setLoading] = useState(true)
   // Using featured images only
 
-  // Fetch article and related articles from database
+  // Fetch article and related articles from database - OPTIMIZED
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        // Fetch specific article
-        const articleResponse = await fetch(`/api/news/${newsId}`)
+        // Fetch article and increment view count in parallel
+        const [articleResponse] = await Promise.all([
+          fetch(`/api/news/${newsId}`, { next: { revalidate: 60 } }), // Cache for 1 minute
+          fetch(`/api/news/${newsId}/view`, { method: 'POST' }) // Don't wait for this
+        ])
+
         if (articleResponse.ok) {
           const articleData = await articleResponse.json()
           setArticle(articleData)
+          setLoading(false) // Show article immediately
 
-          // Increment view count
-          await fetch(`/api/news/${newsId}/view`, { method: 'POST' })
-
-          // Fetch all articles for related articles
-          const allResponse = await fetch('/api/news')
-          if (allResponse.ok) {
-            const allData = await allResponse.json()
-            // Filter articles by same category, exclude current article, and get 4 related ones (2x2 grid)
-            const related = allData
-              .filter((a: NewsArticle) =>
-                a.id !== newsId &&
-                a.category === articleData.category
-              )
-              .slice(0, 4)
-            setRelatedArticles(related)
-          }
+          // Fetch related articles in background (don't block UI)
+          fetch(`/api/news?limit=10`, { next: { revalidate: 60 } }) // Only fetch 10 for related
+            .then(res => res.ok ? res.json() : [])
+            .then(allData => {
+              // Filter articles by same category, exclude current article, and get 4 related ones
+              const related = allData
+                .filter((a: NewsArticle) =>
+                  a.id !== newsId &&
+                  a.category === articleData.category
+                )
+                .slice(0, 4)
+              setRelatedArticles(related)
+            })
+            .catch(err => console.error('Error fetching related articles:', err))
         }
       } catch (error) {
         console.error('Error fetching article:', error)
-      } finally {
         setLoading(false)
       }
     }

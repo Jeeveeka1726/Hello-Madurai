@@ -1,23 +1,30 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// Cache for 1 minute
+export const revalidate = 60
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const startTime = Date.now()
+
   try {
     const { id } = await params
 
-    // Fetch specific news article with comments and shares
+    // Fetch specific news article with limited comments and shares for performance
     const article = await prisma.news.findUnique({
       where: { id },
       include: {
         comments: {
           where: { approved: true },
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: 'desc' },
+          take: 20 // Limit to latest 20 comments for faster loading
         },
         shares: {
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: 'desc' },
+          take: 50 // Limit shares
         }
       }
     })
@@ -26,7 +33,15 @@ export async function GET(
       return NextResponse.json({ error: 'Article not found' }, { status: 404 })
     }
 
-    return NextResponse.json(article)
+    const duration = Date.now() - startTime
+    console.log(`✅ Article ${id} fetched in ${duration}ms`)
+
+    return NextResponse.json(article, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+        'X-Response-Time': `${duration}ms`
+      }
+    })
   } catch (error) {
     console.error('Error fetching article:', error)
     return NextResponse.json(
