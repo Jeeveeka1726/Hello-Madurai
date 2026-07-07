@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { CalendarIcon, EyeIcon, UserIcon, ClockIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
@@ -53,6 +54,8 @@ interface NewsCategory {
 
 function NewsPageContent() {
   const { t, language } = useLanguage()
+  const searchParams = useSearchParams()
+  const searchQuery = searchParams.get('search')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([])
   // Start with fallback categories for instant display, then update with API data
@@ -91,10 +94,32 @@ function NewsPageContent() {
     fetchData()
   }, [])
 
-  // Filter articles based on selected category
-  const filteredArticles = selectedCategory === 'all'
+  // When search query is present, set category to 'all'
+  useEffect(() => {
+    if (searchQuery) {
+      setSelectedCategory('all')
+    }
+  }, [searchQuery])
+
+  // Filter articles based on selected category and search query
+  let filteredArticles = selectedCategory === 'all'
     ? newsArticles
     : newsArticles.filter(article => article.category === selectedCategory)
+
+  // Apply search filter if search query exists
+  if (searchQuery) {
+    const queryLower = searchQuery.toLowerCase()
+    filteredArticles = filteredArticles.filter(article => {
+      const titleMatch = article.title?.toLowerCase().includes(queryLower)
+      const titleTaMatch = article.title_ta?.toLowerCase().includes(queryLower)
+      const excerptMatch = article.excerpt?.toLowerCase().includes(queryLower)
+      const excerptTaMatch = article.excerpt_ta?.toLowerCase().includes(queryLower)
+      const contentMatch = article.content?.toLowerCase().includes(queryLower)
+      const contentTaMatch = article.content_ta?.toLowerCase().includes(queryLower)
+
+      return titleMatch || titleTaMatch || excerptMatch || excerptTaMatch || contentMatch || contentTaMatch
+    })
+  }
 
   // Helper function to get category display name from slug
   const getCategoryName = (categorySlug: string) => {
@@ -131,45 +156,78 @@ function NewsPageContent() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Main Content Section */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-10">
-        {/* Category Filter - Grid layout */}
-        <div className="mb-6 sm:mb-8">
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 text-center">
-            {t('news.selectCategory', 'Select Category', 'வகையைத் தேர்ந்தெடுக்கவும்')}
-          </h2>
+        {/* Category Filter - Grid layout - Hidden when search is active */}
+        {!searchQuery && (
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 text-center">
+              {t('news.selectCategory', 'Select Category', 'வகையைத் தேர்ந்தெடுக்கவும்')}
+            </h2>
 
-          {/* Flex wrap of category buttons */}
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            {/* Category buttons - starts with fallback, updates with API data */}
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.slug)}
-                className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold transition-all duration-200 text-xs sm:text-sm shadow-md hover:shadow-lg transform hover:scale-105 whitespace-nowrap ${
-                  selectedCategory === category.slug
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400'
-                }`}
-              >
-                {language === 'ta' && category.name_ta ? category.name_ta : category.name}
-              </button>
-            ))}
+            {/* Flex wrap of category buttons */}
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {/* Category buttons - starts with fallback, updates with API data */}
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.slug)}
+                  className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold transition-all duration-200 text-xs sm:text-sm shadow-md hover:shadow-lg transform hover:scale-105 whitespace-nowrap ${
+                    selectedCategory === category.slug
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400'
+                  }`}
+                >
+                  {language === 'ta' && category.name_ta ? category.name_ta : category.name}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Today's News Carousel - Only show when All News is selected */}
-      {selectedCategory === 'all' && <TodaysNewsCarousel />}
+      {/* Today's News Carousel - Only show when All News is selected and no search active */}
+      {selectedCategory === 'all' && !searchQuery && <TodaysNewsCarousel />}
 
       {/* Other News Section */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
 
-        {/* Section Title */}
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 text-center sm:text-left">
-          {(() => {
-            const cat = categories.find(c => c.slug === selectedCategory)
-            return cat ? (language === 'ta' && cat.name_ta ? cat.name_ta : cat.name) : ''
-          })()}
-        </h2>
+        {/* Section Title with Search Indicator */}
+        <div className="mb-4 sm:mb-6">
+          {searchQuery ? (
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-2">
+                    {language === 'ta' ? 'தேடல் முடிவுகள்' : 'Search Results'}
+                  </h2>
+                  <p className="text-sm sm:text-base text-gray-700">
+                    {language === 'ta' ? (
+                      <>
+                        <span className="font-semibold text-blue-700">"{searchQuery}"</span> க்கு <span className="font-bold text-blue-700">{filteredArticles.length}</span> செய்திகள் கண்டறியப்பட்டன
+                      </>
+                    ) : (
+                      <>
+                        Found <span className="font-bold text-blue-700">{filteredArticles.length}</span> news articles for <span className="font-semibold text-blue-700">"{searchQuery}"</span>
+                      </>
+                    )}
+                  </p>
+                </div>
+                <Link
+                  href="/news"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap"
+                >
+                  {language === 'ta' ? 'தேடலை அழி' : 'Clear Search'}
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 text-center sm:text-left">
+              {(() => {
+                const cat = categories.find(c => c.slug === selectedCategory)
+                return cat ? (language === 'ta' && cat.name_ta ? cat.name_ta : cat.name) : ''
+              })()}
+            </h2>
+          )}
+        </div>
 
         {/* Loading State */}
         {loading && (
