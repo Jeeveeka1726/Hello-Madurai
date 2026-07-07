@@ -102,13 +102,15 @@ export default function ReporterDetailPage() {
                 {/* Author Image */}
                 <div className="flex-shrink-0">
                   {author.imageUrl ? (
-                    <img
-                      src={author.imageUrl}
-                      alt={language === 'ta' && author.name_ta ? author.name_ta : author.name}
-                      className="h-40 w-40 rounded-full object-cover border-4 border-blue-100 shadow-lg"
-                    />
+                    <div className="relative w-40 h-40">
+                      <img
+                        src={author.imageUrl}
+                        alt={language === 'ta' && author.name_ta ? author.name_ta : author.name}
+                        className="w-full h-full rounded-full object-cover border-4 border-white shadow-lg ring-2 ring-blue-200 aspect-square"
+                      />
+                    </div>
                   ) : (
-                    <div className="h-40 w-40 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                    <div className="w-40 h-40 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg ring-2 ring-blue-200 aspect-square">
                       <UserIcon className="h-20 w-20 text-white" />
                     </div>
                   )}
