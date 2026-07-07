@@ -66,9 +66,6 @@ function NewsPageContent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Show content immediately - fallback categories already loaded
-        setLoading(false)
-
         // Fetch both in parallel for maximum speed
         const [categoriesRes, newsRes] = await Promise.all([
           fetch('/api/news-categories', { next: { revalidate: 300 } }), // Cache for 5 minutes
@@ -90,6 +87,7 @@ function NewsPageContent() {
         }
       } catch (error) {
         console.error('Error fetching data:', error)
+      } finally {
         setLoading(false)
       }
     }
