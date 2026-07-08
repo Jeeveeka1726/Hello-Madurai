@@ -43,28 +43,31 @@ const getInitialLanguage = (): Language => {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('ta')
-  const [isClient, setIsClient] = useState(false)
-
-  // Load language from localStorage on mount - CLIENT SIDE ONLY
-  useEffect(() => {
-    setIsClient(true)
-
+  // Use lazy initialization to read from localStorage on first render (client-side only)
+  const [language, setLanguageState] = useState<Language>(() => {
     if (typeof window !== 'undefined') {
       try {
         const savedLang = localStorage.getItem('hello-madurai-language')
-        console.log('🌐 [MOUNT] Loading language from localStorage:', savedLang)
-
         if (savedLang === 'ta' || savedLang === 'en') {
-          console.log('🌐 [MOUNT] Setting language to:', savedLang)
-          setLanguageState(savedLang)
-        } else {
-          console.log('🌐 [MOUNT] No saved language, defaulting to: ta (Tamil)')
-          // Set default to Tamil
-          localStorage.setItem('hello-madurai-language', 'ta')
+          return savedLang
         }
       } catch (error) {
-        console.error('❌ Error loading language from localStorage:', error)
+        // Silent fail, use default
+      }
+    }
+    return 'ta' // Default fallback
+  })
+
+  // Sync with localStorage if not set
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedLang = localStorage.getItem('hello-madurai-language')
+        if (!savedLang) {
+          localStorage.setItem('hello-madurai-language', language)
+        }
+      } catch (error) {
+        console.error('❌ Error syncing language:', error)
       }
     }
   }, [])

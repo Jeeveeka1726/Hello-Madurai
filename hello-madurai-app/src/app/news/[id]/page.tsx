@@ -15,7 +15,6 @@ import Button from '@/components/ui/Button'
 import InteractionButtons from '@/components/InteractionButtons'
 import CommentsSection from '@/components/news/CommentsSection'
 import ContentWithAds from '@/components/news/ContentWithAds'
-import { BannerAd, ResponsiveAd } from '@/components/ads/GoogleAdsense'
 // Using featured images only
 
 // Video functionality removed - using featured images only
@@ -208,15 +207,8 @@ function NewsDetailPageContent() {
           </Link>
         </div>
 
-        {/* Article Layout with External Sidebar Ads */}
+        {/* Article Layout */}
         <div className="flex flex-col xl:flex-row gap-4 xl:gap-6">
-          {/* Left Sidebar Ad - Outside Article */}
-          <div className="hidden xl:block w-40 flex-shrink-0">
-            <div className="sticky top-4">
-              <ResponsiveAd />
-            </div>
-          </div>
-
           {/* Article Card */}
           <div className="flex-1 w-full max-w-4xl mx-auto">
             <Card className="bg-white border-gray-200">
@@ -262,7 +254,7 @@ function NewsDetailPageContent() {
                       className="w-full h-auto object-cover rounded-lg news-featured-image"
                       loading="eager"
                       decoding="async"
-                      fetchpriority="high"
+                      fetchPriority="high"
                     />
                   </div>
                 ) : (
@@ -329,18 +321,6 @@ function NewsDetailPageContent() {
             {/* Comments Section - Inline below article */}
             <div className="mt-6 sm:mt-8">
               <CommentsSection newsId={article.id} />
-            </div>
-
-            {/* Ad Space Below Comments */}
-            <div className="mt-6 sm:mt-8">
-              <BannerAd />
-            </div>
-          </div>
-
-          {/* Right Sidebar Ad - Outside Article */}
-          <div className="hidden xl:block w-40 flex-shrink-0">
-            <div className="sticky top-4">
-              <ResponsiveAd />
             </div>
           </div>
         </div>

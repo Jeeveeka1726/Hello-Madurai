@@ -8,6 +8,7 @@ import { RadioPlayerProvider } from '@/contexts/RadioPlayerContext'
 import PopupAds from '@/components/PopupAds'
 import GlobalRadioPlayer from '@/components/GlobalRadioPlayer'
 import ConditionalFooter from '@/components/layout/ConditionalFooter'
+import WeatherWidget from '@/components/WeatherWidget'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -91,6 +92,7 @@ export default function RootLayout({
                 </div>
                 <PopupAds />
                 <GlobalRadioPlayer />
+                <WeatherWidget />
               </RadioPlayerProvider>
             </AdminProvider>
           </LanguageProvider>
