@@ -219,135 +219,24 @@ export default function RootPage() {
       <NewHeader showSearch={true} onSearch={handleSearch} />
       <CategoryNavigation />
       <div className="min-h-screen bg-white">
-        {/* Hero Section - Premium Modern Design */}
-        <div className="relative bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 overflow-hidden">
-          {/* Animated Background Orbs */}
-          <div className="absolute inset-0">
-            <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-br from-blue-300 to-blue-400 rounded-full blur-3xl opacity-20 animate-pulse transform -translate-x-1/2 -translate-y-1/2"></div>
-            <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full blur-3xl opacity-20 animate-pulse transform translate-x-1/2 translate-y-1/2" style={{ animationDelay: '1s' }}></div>
-            <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-gradient-to-br from-sky-400 to-blue-500 rounded-full blur-3xl opacity-15 animate-pulse transform -translate-x-1/2 -translate-y-1/2" style={{ animationDelay: '2s' }}></div>
-          </div>
-
-          {/* Geometric Grid Pattern */}
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                             linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px'
-          }}></div>
-
-          {/* Floating Icons/Badges - More Visible */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-10 left-10 text-white/30 text-6xl animate-bounce" style={{ animationDuration: '3s' }}>📰</div>
-            <div className="absolute top-20 right-20 text-white/30 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '0.5s' }}>📻</div>
-            <div className="absolute bottom-20 left-20 text-white/30 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '1s' }}>🎥</div>
-            <div className="absolute bottom-10 right-10 text-white/30 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}>🎯</div>
-          </div>
-
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 relative z-10">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
             <div className="text-center">
-              {/* Main Heading with Gradient Text */}
-              <h1 className="text-4xl md:text-6xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-white drop-shadow-2xl animate-fade-in">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: '#ffffff' }}>
                 <TranslatedText tamil="ஹலோ மதுரை">Hello Madurai</TranslatedText>
               </h1>
-
-              {/* Subheading */}
-              <p className="text-base md:text-xl mb-8 max-w-2xl mx-auto text-white/90 font-light leading-relaxed">
+              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto" style={{ color: '#ffffff' }}>
                 <TranslatedText tamil="மதுரைக்கான உங்கள் நுழைவாயில் - செய்திகள், வானொலி மற்றும் பலவும்">Your gateway to Madurai - News, Radio & More</TranslatedText>
               </p>
-
-              {/* CTA Buttons with Enhanced Effects */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                {/* Primary Button - Explore News */}
-                <Link
-                  href="/news"
-                  className="group inline-flex items-center gap-3 px-8 py-3.5 border-2 rounded-full transition-all duration-300 hover:scale-110 font-bold text-base"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(10px)',
-                    borderColor: 'rgba(255, 255, 255, 0.8)',
-                    boxShadow: '0 0 40px rgba(96, 165, 250, 0.6), 0 0 80px rgba(59, 130, 246, 0.4), 0 0 120px rgba(37, 99, 235, 0.3)',
-                    outline: 'none',
-                    position: 'relative',
-                  }}
-                  onMouseEnter={(e) => {
-                    const link = e.currentTarget
-                    link.style.background = 'white'
-                    link.style.boxShadow = '0 0 60px rgba(96, 165, 250, 0.9), 0 0 120px rgba(59, 130, 246, 0.7), 0 0 180px rgba(37, 99, 235, 0.5)'
-                    // Change color of all child spans to BLUE
-                    const spans = link.querySelectorAll('span')
-                    spans.forEach(span => {
-                      const htmlSpan = span as HTMLElement
-                      htmlSpan.style.setProperty('color', '#3b82f6', 'important')
-                    })
-                  }}
-                  onMouseLeave={(e) => {
-                    const link = e.currentTarget
-                    link.style.background = 'rgba(255, 255, 255, 0.1)'
-                    link.style.boxShadow = '0 0 40px rgba(96, 165, 250, 0.6), 0 0 80px rgba(59, 130, 246, 0.4), 0 0 120px rgba(37, 99, 235, 0.3)'
-                    // Reset color of all child spans to WHITE
-                    const spans = link.querySelectorAll('span')
-                    spans.forEach(span => {
-                      const htmlSpan = span as HTMLElement
-                      htmlSpan.style.setProperty('color', 'white', 'important')
-                    })
-                  }}
-                >
-                  {/* Button content */}
-                  <span className="group-hover:scale-110 transition-transform duration-200" style={{ color: 'white' }}>📰</span>
-                  <span style={{ color: 'white' }}><TranslatedText tamil="செய்திகள் ஆராயுங்கள்">Explore News</TranslatedText></span>
-                  <span className="group-hover:translate-x-2 transition-transform duration-300" style={{ color: 'white' }}>→</span>
-                </Link>
-
-                {/* Secondary Button - Listen FM */}
-                <Link
-                  href="/radio"
-                  className="group inline-flex items-center gap-3 px-8 py-3.5 text-base font-semibold rounded-full transition-all duration-300 hover:scale-105"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    backdropFilter: 'blur(10px)',
-                    border: '2px solid rgba(255, 255, 255, 0.3)',
-                    boxShadow: '0 0 30px rgba(96, 165, 250, 0.5), 0 0 60px rgba(59, 130, 246, 0.3), 0 0 90px rgba(37, 99, 235, 0.2)',
-                    color: 'white',
-                    outline: 'none',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.8)'
-                    e.currentTarget.style.boxShadow = '0 0 40px rgba(96, 165, 250, 0.7), 0 0 80px rgba(59, 130, 246, 0.5), 0 0 120px rgba(37, 99, 235, 0.4)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)'
-                    e.currentTarget.style.boxShadow = '0 0 30px rgba(96, 165, 250, 0.5), 0 0 60px rgba(59, 130, 246, 0.3), 0 0 90px rgba(37, 99, 235, 0.2)'
-                  }}
-                >
-                  {/* Button content */}
-                  <span className="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">📻</span>
-                  <span className="font-semibold" style={{ color: 'white' }}><TranslatedText tamil="FM கேளுங்கள்">Listen FM</TranslatedText></span>
-                </Link>
-              </div>
-
-              {/* Stats Bar */}
-              <div className="mt-10 flex flex-wrap justify-center gap-8 text-white/80">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-white">1000+</div>
-                  <div className="text-sm"><TranslatedText tamil="செய்திகள்">News</TranslatedText></div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-white">24/7</div>
-                  <div className="text-sm"><TranslatedText tamil="வானொலி">Radio</TranslatedText></div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-white">500+</div>
-                  <div className="text-sm"><TranslatedText tamil="வீடியோக்கள்">Videos</TranslatedText></div>
-                </div>
-              </div>
+              <Link
+                href="/news"
+                className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-gray-50 transition-colors duration-200"
+              >
+                <TranslatedText tamil="சமீபத்திய செய்திகளை ஆராயுங்கள்">Explore Latest News</TranslatedText>
+              </Link>
             </div>
           </div>
-
-          {/* Bottom Wave Decoration */}
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
         </div>
 
 

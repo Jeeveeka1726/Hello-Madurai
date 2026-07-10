@@ -14,6 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 
 interface NewHeaderProps {
   showSearch?: boolean
+  onSearch?: (query: string) => void
 }
 
 export default function NewHeader({ showSearch = false, onSearch }: NewHeaderProps) {
