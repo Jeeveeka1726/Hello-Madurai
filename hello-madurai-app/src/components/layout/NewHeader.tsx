@@ -136,7 +136,7 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
   }
 
   return (
-    <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg transition-all duration-300">
+    <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg transition-all duration-300 sticky top-0 z-50">
       <div className="mx-auto max-w-full px-6 sm:px-8 lg:px-12">
         <div className="flex items-center h-16">
           {/* Logo - Far Left */}
@@ -163,7 +163,7 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
             ))}
 
             {/* Others Dropdown */}
-            <div className="relative">
+            <div className="relative z-[60]">
               <button
                 onClick={() => setIsOthersOpen(!isOthersOpen)}
                 onBlur={() => setTimeout(() => setIsOthersOpen(false), 200)}
@@ -174,7 +174,7 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
               </button>
 
               {isOthersOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl border border-gray-200 z-[100]">
                   {othersDropdown.map((item) => (
                     <Link
                       key={item.name}

@@ -2,9 +2,10 @@
 
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
-import { 
-  PhoneIcon, 
-  EnvelopeIcon, 
+import NewspaperHeader from '@/components/NewspaperHeader'
+import {
+  PhoneIcon,
+  EnvelopeIcon,
   MapPinIcon,
   ClockIcon
 } from '@heroicons/react/24/outline'
@@ -29,7 +30,7 @@ export default function ContactPage() {
     {
       icon: MapPinIcon,
       title: t('contact.address', 'Address', 'முகவரி'),
-      value: 'Madurai, Tamil Nadu, India',
+      value: '1/132 Maxworth Nagar 2nd Street, Melakuyilkudi Road, Nagamalai Puthukottai, Madurai 19',
       description: t('contact.addressDesc', 'Visit us at our office', 'எங்கள் அலுவலகத்தில் எங்களைப் பார்வையிடுங்கள்')
     },
     {
@@ -80,19 +81,12 @@ export default function ContactPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
+    <div className="min-h-screen bg-white">
+      <NewspaperHeader showTagline={true} />
       <NewHeader />
-      <div className="min-h-screen py-12">
+
+      <div className="bg-gradient-to-b from-blue-50 to-blue-100 py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4" style={{ color: '#1e3a8a' }}>
-              {t('contact.title', 'Contact Us', 'எங்களை தொடர்பு கொள்ளுங்கள்')}
-            </h1>
-            <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-              {t('contact.subtitle', 'Get in touch with us for any queries or feedback', 'எந்தவொரு கேள்விகள் அல்லது கருத்துகளுக்கும் எங்களுடன் தொடர்பு கொள்ளுங்கள்')}
-            </p>
-          </div>
 
           {/* Contact Information */}
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 mb-12">

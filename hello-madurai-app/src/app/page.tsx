@@ -227,7 +227,7 @@ export default function RootPage() {
                 <TranslatedText tamil="ஹலோ மதுரை">Hello Madurai</TranslatedText>
               </h1>
               <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto" style={{ color: '#ffffff' }}>
-                <TranslatedText tamil="மதுரைக்கான உங்கள் நுழைவாயில் - செய்திகள், வானொலி மற்றும் பலவும்">Your gateway to Madurai - News, Radio & More</TranslatedText>
+                <TranslatedText tamil="மதுரையுடன் இணைந்திருக்க தேவையான அனைத்தும்">Everything You Need, Connected to Madurai</TranslatedText>
               </p>
               <Link
                 href="/news"
@@ -391,18 +391,18 @@ export default function RootPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-gray-400 text-sm flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-                <span>Copyright © 2026 Hello Madurai</span>
+                <span>{language === 'ta' ? 'பதிப்புரிமை © 2026 ஹலோ மதுரை' : 'Copyright © 2026 Hello Madurai'}</span>
                 <span>|</span>
                 <Link href="/contact" className="text-gray-400 hover:text-white transition-colors duration-200">
-                  Contact
+                  {language === 'ta' ? 'தொடர்பு' : 'Contact'}
                 </Link>
                 <span>|</span>
                 <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors duration-200">
-                  Privacy Policy
+                  {language === 'ta' ? 'தனியுரிமைக் கொள்கை' : 'Privacy Policy'}
                 </Link>
                 <span>|</span>
                 <Link href="/terms" className="text-gray-400 hover:text-white transition-colors duration-200">
-                  Terms of Conditions
+                  {language === 'ta' ? 'விதிமுறைகள் மற்றும் நிபந்தனைகள்' : 'Terms of Conditions'}
                 </Link>
                 <span>|</span>
                 <Link href="/editorial-policy" className="text-gray-400 hover:text-white transition-colors duration-200">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
+import NewspaperHeader from '@/components/NewspaperHeader'
 import CategoryNavigation from '@/components/CategoryNavigation'
 import { PhoneIcon, MapPinIcon, ShareIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
@@ -119,6 +120,7 @@ export default function HelplinePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
+        <NewspaperHeader showTagline={true} />
         <NewHeader />
         <div className="flex flex-col items-center justify-center min-h-screen">
           <div className="relative">
@@ -135,6 +137,7 @@ export default function HelplinePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
+      <NewspaperHeader showTagline={true} />
       <NewHeader />
       <CategoryNavigation />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">

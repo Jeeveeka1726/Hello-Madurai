@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import NewHeader from '@/components/layout/NewHeader'
+import NewspaperHeader from '@/components/NewspaperHeader'
 import Link from 'next/link'
 import { UserIcon } from '@heroicons/react/24/outline'
 import Card, { CardContent } from '@/components/ui/Card'
@@ -42,22 +43,12 @@ export default function ReportersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
+    <div className="min-h-screen bg-white">
+      <NewspaperHeader showTagline={true} />
       <NewHeader />
-      <div className="min-h-screen py-12">
+
+      <div className="bg-gradient-to-b from-blue-50 to-blue-100 py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4" style={{ color: '#1e3a8a' }}>
-              {language === 'ta' ? 'எங்கள் குழு உறுப்பினர்கள்' : 'Our Team Members'}
-            </h1>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              {language === 'ta'
-                ? 'நம்பகமான செய்திகள், வானொலி நிகழ்ச்சிகள் மற்றும் டிஜிட்டல் ஊடக உள்ளடக்கங்களை வழங்கும் ஹலோ மதுரை குழுவினரை அறிந்து கொள்ளுங்கள்.'
-                : 'Meet the Hello Madurai team delivering trusted news, radio, and digital media content.'
-              }
-            </p>
-          </div>
 
           {/* Authors Grid */}
           {loading ? (
