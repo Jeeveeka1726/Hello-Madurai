@@ -219,24 +219,20 @@ export default function RootPage() {
       <NewHeader showSearch={true} onSearch={handleSearch} />
       <CategoryNavigation />
       <div className="min-h-screen bg-white">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-            <div className="text-center">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: '#ffffff' }}>
-                <TranslatedText tamil="ஹலோ மதுரை">Hello Madurai</TranslatedText>
-              </h1>
-              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto" style={{ color: '#ffffff' }}>
-                <TranslatedText tamil="மதுரையுடன் இணைந்திருக்க தேவையான அனைத்தும்">Everything You Need, Connected to Madurai</TranslatedText>
-              </p>
-              <Link
-                href="/news"
-                className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-gray-50 transition-colors duration-200"
-              >
-                <TranslatedText tamil="சமீபத்திய செய்திகளை ஆராயுங்கள்">Explore Latest News</TranslatedText>
-              </Link>
-            </div>
-          </div>
+        {/* Hero Section - Banner Image */}
+        <div className="w-full">
+          {/* Desktop Banner */}
+          <img
+            src="/feature-images/Banner.png"
+            alt="Hello Madurai Banner"
+            className="hidden md:block w-full h-auto object-cover"
+          />
+          {/* Mobile Banner */}
+          <img
+            src="/feature-images/mobile_banner.png"
+            alt="Hello Madurai Mobile Banner"
+            className="block md:hidden w-full h-auto object-cover"
+          />
         </div>
 
 
@@ -392,6 +388,10 @@ export default function RootPage() {
             <div className="text-center">
               <p className="text-gray-400 text-sm flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
                 <span>{language === 'ta' ? 'பதிப்புரிமை © 2026 ஹலோ மதுரை' : 'Copyright © 2026 Hello Madurai'}</span>
+                <span>|</span>
+                <Link href="/about" className="text-gray-400 hover:text-white transition-colors duration-200">
+                  {language === 'ta' ? 'எங்களை பற்றி' : 'About Us'}
+                </Link>
                 <span>|</span>
                 <Link href="/contact" className="text-gray-400 hover:text-white transition-colors duration-200">
                   {language === 'ta' ? 'தொடர்பு' : 'Contact'}

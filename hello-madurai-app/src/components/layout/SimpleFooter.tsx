@@ -15,6 +15,10 @@ export default function SimpleFooter() {
             <p className="text-gray-400 text-sm flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
               <span>{language === 'ta' ? 'பதிப்புரிமை © 2026 ஹலோ மதுரை' : 'Copyright © 2026 Hello Madurai'}</span>
               <span>|</span>
+              <Link href="/about" className="text-gray-400 hover:text-white transition-colors duration-200">
+                {language === 'ta' ? 'எங்களை பற்றி' : 'About Us'}
+              </Link>
+              <span>|</span>
               <Link href="/contact" className="text-gray-400 hover:text-white transition-colors duration-200">
                 {language === 'ta' ? 'தொடர்பு' : 'Contact'}
               </Link>
