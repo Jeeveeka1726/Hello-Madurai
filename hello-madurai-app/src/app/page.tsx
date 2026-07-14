@@ -220,18 +220,12 @@ export default function RootPage() {
       <CategoryNavigation />
       <div className="min-h-screen bg-white">
         {/* Hero Section - Banner Image */}
-        <div className="w-full">
-          {/* Desktop Banner */}
-          <img
-            src="/feature-images/Banner.png"
-            alt="Hello Madurai Banner"
-            className="hidden md:block w-full h-auto object-cover"
-          />
-          {/* Mobile Banner */}
+        <div className="w-full bg-gradient-to-b from-yellow-600 to-yellow-700" style={{ maxHeight: '450px' }}>
           <img
             src="/feature-images/mobile_banner.png"
-            alt="Hello Madurai Mobile Banner"
-            className="block md:hidden w-full h-auto object-cover"
+            alt="Hello Madurai Banner"
+            className="w-full h-auto object-contain"
+            style={{ maxHeight: '450px' }}
           />
         </div>
 
