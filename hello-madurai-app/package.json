@@ -8,7 +8,8 @@
     "postinstall": "prisma generate",
     "start": "node server.js",
     "lint": "eslint",
-    "update-favicon": "node force-favicon-update.js"
+    "update-favicon": "node force-favicon-update.js",
+    "seed:banners": "node scripts/add-sample-banners.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

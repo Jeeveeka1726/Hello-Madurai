@@ -19,6 +19,7 @@ import CategoryNavigation from '@/components/CategoryNavigation'
 import SubscriptionButton from '@/components/SubscriptionButton'
 import TranslatedText from '@/components/TranslatedText'
 import ReelsSection from '@/components/ReelsSection'
+import NoticeScroller from '@/components/NoticeScroller'
 
 interface HomeFeature {
   id: string
@@ -219,17 +220,8 @@ export default function RootPage() {
       <NewHeader showSearch={true} onSearch={handleSearch} />
       <CategoryNavigation />
       <div className="min-h-screen bg-white">
-        {/* Hero Section - Banner Image */}
-        <div className="w-full bg-gradient-to-b from-yellow-600 to-yellow-700" style={{ maxHeight: '450px' }}>
-          <img
-            src="/feature-images/mobile_banner.png"
-            alt="Hello Madurai Banner"
-            className="w-full h-auto object-contain"
-            style={{ maxHeight: '450px' }}
-          />
-        </div>
-
-
+        {/* Notice Scroller - Auto-scrolls every 5 seconds */}
+        <NoticeScroller />
 
         {/* Features Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">

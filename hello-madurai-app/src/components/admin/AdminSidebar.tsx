@@ -18,7 +18,8 @@ import {
   GiftIcon,
   TagIcon,
   PhoneIcon,
-  UserCircleIcon
+  UserCircleIcon,
+  BellIcon
 } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useAdmin } from '@/contexts/AdminContext'
@@ -31,6 +32,13 @@ const navigation = [
     href: '/admin',
     icon: HomeIcon,
     exact: true
+  },
+  {
+    name: 'Notice Banners',
+    name_ta: 'அறிவிப்பு பேனர்கள்',
+    href: '/admin/notice-banners',
+    icon: BellIcon,
+    badge: 'new'
   },
   {
     name: 'News',

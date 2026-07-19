@@ -791,3 +791,22 @@ model HomeFeature {
   @@index([orderNumber])
   @@map("home_features")
 }
+
+model NoticeBanner {
+  id             String   @id @default(cuid())
+  titleEn        String
+  titleTa        String?
+  descriptionEn  String   @db.Text
+  descriptionTa  String?  @db.Text
+  imageUrl       String?  @db.Text
+  mobileImageUrl String?  @db.Text
+  link           String?
+  active         Boolean  @default(true)
+  orderNumber    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([active])
+  @@index([orderNumber])
+  @@map("notice_banners")
+}
