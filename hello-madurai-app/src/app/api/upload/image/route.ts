@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
-import sharp from 'sharp'
+import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,31 +35,35 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Save as files (works for both development and Hostinger production)
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'image')
-    await mkdir(uploadDir, { recursive: true })
-
-    // Generate unique filename - preserve original extension
+    // Generate unique filename
     const timestamp = Date.now()
     const ext = file.name.split('.').pop() || 'jpg'
-    const filename = `${timestamp}.${ext}`
-    const filepath = path.join(uploadDir, filename)
+    const filename = `banner_${timestamp}.${ext}`
 
-    // Save original image without modification
-    await writeFile(filepath, buffer)
+    // Save to database (works on Hostinger production)
+    console.log('📤 Saving banner image to database...')
 
-    // Return public URL
-    const publicUrl = `/uploads/image/${filename}`
+    const imageRecord = await prisma.image.create({
+      data: {
+        filename: filename,
+        data: buffer,
+        mimeType: file.type,
+        size: buffer.length
+      }
+    })
+
+    const publicUrl = `/api/images/${imageRecord.id}`
+    console.log('✅ Banner image saved successfully:', publicUrl)
 
     return NextResponse.json({
       url: publicUrl,
-      message: 'Image uploaded successfully (original size preserved)',
+      message: 'Image uploaded successfully (saved to database)',
       originalSize: file.size
     })
   } catch (error) {
     console.error('Error uploading image:', error)
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to upload image',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
