@@ -124,19 +124,19 @@ export default function NoticeScroller() {
     return (
       <>
         {hasImages ? (
-          <div className="w-full h-full overflow-hidden rounded-2xl bg-black">
+          <div className="w-full overflow-hidden rounded-2xl">
             {/* Mobile Image - shown on screens < md (768px) */}
             <img
               src={mobileImage}
               alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-              className="block md:hidden w-full h-full object-cover"
+              className="block md:hidden w-full h-auto"
             />
 
             {/* Desktop Image - shown on screens >= md (768px) */}
             <img
               src={desktopImage}
               alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-              className="hidden md:block w-full h-full object-cover"
+              className="hidden md:block w-full h-auto"
             />
           </div>
         ) : (
@@ -154,7 +154,7 @@ export default function NoticeScroller() {
   }
 
   return (
-    <div className="w-full py-8">
+    <div className="w-full py-2">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`rounded-2xl shadow-xl relative overflow-hidden ${
           !(currentNotice.imageUrl || currentNotice.mobileImageUrl)
@@ -164,24 +164,24 @@ export default function NoticeScroller() {
           {(currentNotice.imageUrl || currentNotice.mobileImageUrl) ? (
             // Image Banner Layout - Full Width (No blue background)
             <>
-              <div className="relative w-full h-48 sm:h-56 md:h-64 lg:h-72">
+              <div className="relative w-full">
                 <NoticeContent />
 
                 {/* Navigation Buttons Overlaid on Image */}
                 <button
                   onClick={goToPrevious}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/30 hover:bg-black/50 transition-colors duration-200 backdrop-blur-sm z-10"
+                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/30 hover:bg-black/50 transition-colors duration-200 backdrop-blur-sm z-10"
                   aria-label="Previous notice"
                 >
-                  <ChevronLeftIcon className="w-7 h-7 text-white" />
+                  <ChevronLeftIcon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                 </button>
 
                 <button
                   onClick={goToNext}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/30 hover:bg-black/50 transition-colors duration-200 backdrop-blur-sm z-10"
+                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/30 hover:bg-black/50 transition-colors duration-200 backdrop-blur-sm z-10"
                   aria-label="Next notice"
                 >
-                  <ChevronRightIcon className="w-7 h-7 text-white" />
+                  <ChevronRightIcon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                 </button>
               </div>
 
