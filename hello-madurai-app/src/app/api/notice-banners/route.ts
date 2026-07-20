@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-// Cache for 5 minutes
-export const revalidate = 300
+// Cache for 30 seconds (reduce from 5 minutes)
+export const revalidate = 30
 
 export async function GET() {
   try {
@@ -15,7 +15,7 @@ export async function GET() {
 
     return NextResponse.json(banners || [], {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60'
       }
     })
   } catch (error) {

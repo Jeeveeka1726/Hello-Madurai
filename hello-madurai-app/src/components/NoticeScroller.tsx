@@ -59,7 +59,10 @@ export default function NoticeScroller() {
   useEffect(() => {
     const fetchNotices = async () => {
       try {
-        const response = await fetch('/api/notice-banners')
+        // Add cache busting to always get fresh data
+        const response = await fetch('/api/notice-banners?t=' + Date.now(), {
+          cache: 'no-store'
+        })
         if (response.ok) {
           const data = await response.json()
           // Use fetched data if available, otherwise use defaults
@@ -112,39 +115,29 @@ export default function NoticeScroller() {
     // Choose appropriate image based on screen size
     const hasImages = currentNotice.imageUrl || currentNotice.mobileImageUrl
 
+    // Determine which image to show
+    // Desktop (md and up): Use imageUrl if available, fallback to mobileImageUrl
+    // Mobile (below md): Use mobileImageUrl if available, fallback to imageUrl
+    const desktopImage = currentNotice.imageUrl || currentNotice.mobileImageUrl
+    const mobileImage = currentNotice.mobileImageUrl || currentNotice.imageUrl
+
     return (
       <>
         {hasImages ? (
           <div className="w-full h-full overflow-hidden rounded-2xl">
-            {/* Show mobile image on mobile if available, otherwise desktop image */}
-            {currentNotice.mobileImageUrl ? (
-              <img
-                src={currentNotice.mobileImageUrl}
-                alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-                className="block md:hidden w-full h-full object-cover"
-              />
-            ) : currentNotice.imageUrl ? (
-              <img
-                src={currentNotice.imageUrl}
-                alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-                className="block md:hidden w-full h-full object-cover"
-              />
-            ) : null}
+            {/* Mobile Image - shown on screens < md (768px) */}
+            <img
+              src={mobileImage}
+              alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
+              className="block md:hidden w-full h-full object-cover"
+            />
 
-            {/* Show desktop image on desktop if available, otherwise mobile image */}
-            {currentNotice.imageUrl ? (
-              <img
-                src={currentNotice.imageUrl}
-                alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-                className="hidden md:block w-full h-full object-cover"
-              />
-            ) : currentNotice.mobileImageUrl ? (
-              <img
-                src={currentNotice.mobileImageUrl}
-                alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-                className="hidden md:block w-full h-full object-cover"
-              />
-            ) : null}
+            {/* Desktop Image - shown on screens >= md (768px) */}
+            <img
+              src={desktopImage}
+              alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
+              className="hidden md:block w-full h-full object-cover"
+            />
           </div>
         ) : (
           <div className="transition-all duration-500 ease-in-out py-4 px-4">
