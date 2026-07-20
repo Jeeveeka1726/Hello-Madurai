@@ -124,7 +124,7 @@ export default function NoticeScroller() {
     return (
       <>
         {hasImages ? (
-          <div className="w-full h-full overflow-hidden rounded-2xl">
+          <div className="w-full h-full overflow-hidden rounded-2xl bg-black">
             {/* Mobile Image - shown on screens < md (768px) */}
             <img
               src={mobileImage}
@@ -164,7 +164,7 @@ export default function NoticeScroller() {
           {(currentNotice.imageUrl || currentNotice.mobileImageUrl) ? (
             // Image Banner Layout - Full Width (No blue background)
             <>
-              <div className="relative w-full h-60 sm:h-64 md:h-72">
+              <div className="relative w-full h-48 sm:h-56 md:h-64 lg:h-72">
                 <NoticeContent />
 
                 {/* Navigation Buttons Overlaid on Image */}
