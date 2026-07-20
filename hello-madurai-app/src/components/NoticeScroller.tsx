@@ -171,7 +171,7 @@ export default function NoticeScroller() {
           {(currentNotice.imageUrl || currentNotice.mobileImageUrl) ? (
             // Image Banner Layout - Full Width (No blue background)
             <>
-              <div className="relative w-full h-56 sm:h-64 md:h-72">
+              <div className="relative w-full h-60 sm:h-64 md:h-72">
                 <NoticeContent />
 
                 {/* Navigation Buttons Overlaid on Image */}
@@ -219,7 +219,7 @@ export default function NoticeScroller() {
                 <div className="absolute bottom-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
               </div>
 
-              <div className="relative w-full h-56 sm:h-64 md:h-72 flex items-center px-6 sm:px-8 lg:px-12">
+              <div className="relative w-full h-60 sm:h-64 md:h-72 flex items-center px-6 sm:px-8 lg:px-12">
                 {/* Previous Button */}
                 <button
                   onClick={goToPrevious}

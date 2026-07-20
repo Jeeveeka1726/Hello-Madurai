@@ -356,7 +356,7 @@ export default function AdminNoticeBannersPage() {
                 : 'Manage notice banners displayed on the homepage'}
             </p>
             <p className="text-xs text-blue-600 mt-1 font-medium">
-              📐 Desktop: 1400x288px | Mobile: 900x224px | Auto-fits all screens | Max: 5MB
+              📐 Desktop: 1400x350px | Mobile: 900x280px | Auto-fits all screens | Max: 5MB
             </p>
           </div>
           <Button onClick={() => {
@@ -437,7 +437,7 @@ export default function AdminNoticeBannersPage() {
                   {/* Desktop Image */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Desktop Image (1400 x 288 pixels)
+                      Desktop Image (1400 x 350 pixels)
                     </label>
                     <div className="flex items-center gap-4">
                       <input
@@ -476,7 +476,7 @@ export default function AdminNoticeBannersPage() {
                   {/* Mobile Image */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Mobile Image (900 x 224 pixels)
+                      Mobile Image (900 x 280 pixels)
                     </label>
                     <div className="flex items-center gap-4">
                       <input
