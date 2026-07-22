@@ -23,7 +23,6 @@ export default function NoticeScroller() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [notices, setNotices] = useState<Notice[]>([])
   const [loading, setLoading] = useState(true)
-  const [imageLoaded, setImageLoaded] = useState(false)
 
   // Default sample notices
   const defaultNotices: Notice[] = [
@@ -133,16 +132,10 @@ export default function NoticeScroller() {
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % notices.length)
-      setImageLoaded(false) // Reset image loaded state for smooth transition
     }, 5000)
 
     return () => clearInterval(interval)
   }, [notices.length])
-
-  // Reset image loaded state when currentIndex changes
-  useEffect(() => {
-    setImageLoaded(false)
-  }, [currentIndex])
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + notices.length) % notices.length)
@@ -166,52 +159,39 @@ export default function NoticeScroller() {
     // Choose appropriate image based on screen size
     const hasImages = currentNotice.imageUrl || currentNotice.mobileImageUrl
 
-    // Determine which image to show
-    // Desktop (md and up): Use imageUrl if available, fallback to mobileImageUrl
-    // Mobile (below md): Use mobileImageUrl if available, fallback to imageUrl
+    // Use picture element with srcset for proper responsive image handling
     const desktopImage = currentNotice.imageUrl || currentNotice.mobileImageUrl
     const mobileImage = currentNotice.mobileImageUrl || currentNotice.imageUrl
 
     return (
       <>
         {hasImages ? (
-          <div className="w-full overflow-hidden rounded-2xl bg-gray-100 relative min-h-[180px] md:min-h-[250px]">
-            {/* Loading skeleton */}
-            {!imageLoaded && (
-              <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse" />
-            )}
+          <div className="w-full overflow-hidden rounded-2xl">
+            <picture>
+              {/* Desktop Image - shown on screens >= 768px */}
+              {currentNotice.imageUrl && (
+                <source
+                  media="(min-width: 768px)"
+                  srcSet={currentNotice.imageUrl}
+                />
+              )}
 
-            {/* Mobile Image - shown on screens < md (768px) */}
-            <img
-              src={mobileImage}
-              alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-              className={`block md:hidden w-full h-auto transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-              loading="eager"
-              decoding="async"
-              onLoad={() => setImageLoaded(true)}
-              style={{
-                imageRendering: 'crisp-edges',
-                backfaceVisibility: 'hidden',
-                transform: 'translateZ(0)',
-                willChange: 'opacity'
-              }}
-            />
-
-            {/* Desktop Image - shown on screens >= md (768px) */}
-            <img
-              src={desktopImage}
-              alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-              className={`hidden md:block w-full h-auto transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-              loading="eager"
-              decoding="async"
-              onLoad={() => setImageLoaded(true)}
-              style={{
-                imageRendering: 'crisp-edges',
-                backfaceVisibility: 'hidden',
-                transform: 'translateZ(0)',
-                willChange: 'opacity'
-              }}
-            />
+              {/* Mobile Image - fallback and shown on screens < 768px */}
+              <img
+                key={currentNotice.id}
+                src={mobileImage}
+                alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
+                className="w-full h-auto"
+                loading="eager"
+                decoding="sync"
+                style={{
+                  imageRendering: '-webkit-optimize-contrast',
+                  backfaceVisibility: 'hidden',
+                  transform: 'translateZ(0)',
+                  WebkitTransform: 'translateZ(0)'
+                }}
+              />
+            </picture>
           </div>
         ) : (
           <div className="transition-all duration-500 ease-in-out py-4 px-4">

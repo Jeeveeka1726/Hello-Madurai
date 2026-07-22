@@ -1512,5 +1512,37 @@ button.bg-red-600 * {
 }
 
 /* ========================================
+   NOTICE BANNER IMAGE ANTI-BLINKING FIX
+   ======================================== */
+
+/* Prevent image blinking during banner transitions */
+img[src^="/api/images/"] {
+  -webkit-backface-visibility: hidden !important;
+  -moz-backface-visibility: hidden !important;
+  -ms-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+
+  -webkit-transform: translateZ(0) !important;
+  -moz-transform: translateZ(0) !important;
+  -ms-transform: translateZ(0) !important;
+  transform: translateZ(0) !important;
+
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+
+  /* Force GPU acceleration */
+  will-change: auto !important;
+
+  /* Prevent any opacity transitions that might cause blinking */
+  opacity: 1 !important;
+
+  /* Keep image visible during transitions */
+  visibility: visible !important;
+
+  /* Prevent layout shift */
+  display: block !important;
+}
+
+/* ========================================
    END OF STYLES
    ======================================== */
