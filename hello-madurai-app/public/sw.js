@@ -42,27 +42,26 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url)
 
-  // Aggressive caching for banner images
+  // Aggressive caching for banner images - cache-first, never expire
   if (url.pathname.startsWith('/api/images/')) {
     event.respondWith(
       caches.open(IMAGE_CACHE_NAME).then((cache) => {
         return cache.match(event.request).then((cachedResponse) => {
+          // Always return from cache if available (instant loading)
           if (cachedResponse) {
-            // Return from cache immediately, update in background
-            fetch(event.request).then((networkResponse) => {
-              if (networkResponse && networkResponse.status === 200) {
-                cache.put(event.request, networkResponse.clone())
-              }
-            }).catch(() => {}) // Ignore network errors
             return cachedResponse
           }
 
-          // Not in cache, fetch and cache
+          // Not in cache, fetch and cache permanently
           return fetch(event.request).then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
+              // Clone before caching
               cache.put(event.request, networkResponse.clone())
             }
             return networkResponse
+          }).catch(() => {
+            // Return a placeholder on error
+            return new Response('Image not available', { status: 404 })
           })
         })
       })

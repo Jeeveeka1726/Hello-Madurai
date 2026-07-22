@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import Image from 'next/image'
 
 interface Notice {
   id: string
@@ -56,51 +55,58 @@ export default function NoticeScroller() {
     }
   ]
 
-  // Fetch notices from API
+  // Fetch notices from API - only once on mount
   useEffect(() => {
+    let isMounted = true
+
     const fetchNotices = async () => {
       try {
-        // Use SWR-style caching for instant loading from cache
         const response = await fetch('/api/notice-banners', {
-          // Serve from cache first, revalidate in background
           cache: 'force-cache',
         })
+
+        if (!isMounted) return
+
         if (response.ok) {
           const data = await response.json()
-          // Use fetched data if available, otherwise use defaults
           const activeNotices = data.length > 0 ? data : defaultNotices
-          setNotices(activeNotices)
 
-          // Aggressively preload ALL banner images immediately
+          if (isMounted) {
+            setNotices(activeNotices)
+            setLoading(false)
+          }
+
+          // Preload images after setting state
           activeNotices.forEach((notice: Notice) => {
             if (notice.imageUrl) {
-              const link = document.createElement('link')
-              link.rel = 'preload'
-              link.as = 'image'
-              link.href = notice.imageUrl
-              document.head.appendChild(link)
+              const img = new Image()
+              img.src = notice.imageUrl
             }
             if (notice.mobileImageUrl) {
-              const link = document.createElement('link')
-              link.rel = 'preload'
-              link.as = 'image'
-              link.href = notice.mobileImageUrl
-              document.head.appendChild(link)
+              const img = new Image()
+              img.src = notice.mobileImageUrl
             }
           })
         } else {
-          setNotices(defaultNotices)
+          if (isMounted) {
+            setNotices(defaultNotices)
+            setLoading(false)
+          }
         }
       } catch (error) {
         console.error('Error fetching notice banners:', error)
-        // Use default notices on error
-        setNotices(defaultNotices)
-      } finally {
-        setLoading(false)
+        if (isMounted) {
+          setNotices(defaultNotices)
+          setLoading(false)
+        }
       }
     }
 
     fetchNotices()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   // Auto-scroll every 5 seconds
@@ -145,42 +151,34 @@ export default function NoticeScroller() {
     return (
       <>
         {hasImages ? (
-          <div className="w-full overflow-hidden rounded-2xl relative bg-gradient-to-br from-gray-100 to-gray-200">
+          <div className="w-full overflow-hidden rounded-2xl bg-gray-100">
             {/* Mobile Image - shown on screens < md (768px) */}
-            <div className="block md:hidden w-full relative min-h-[180px]">
-              <Image
-                src={mobileImage}
-                alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-                width={800}
-                height={450}
-                priority
-                placeholder="blur"
-                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgZmlsbD0iI2VmZjZmZiIvPjwvc3ZnPg=="
-                className="w-full h-auto"
-                sizes="(max-width: 768px) 100vw, 0vw"
-                quality={90}
-                loading="eager"
-                style={{ display: 'block' }}
-              />
-            </div>
+            <img
+              src={mobileImage}
+              alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
+              className="block md:hidden w-full h-auto transition-opacity duration-300"
+              loading="eager"
+              decoding="async"
+              style={{
+                imageRendering: 'crisp-edges',
+                backfaceVisibility: 'hidden',
+                transform: 'translateZ(0)'
+              }}
+            />
 
             {/* Desktop Image - shown on screens >= md (768px) */}
-            <div className="hidden md:block w-full relative min-h-[200px]">
-              <Image
-                src={desktopImage}
-                alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-                width={1400}
-                height={350}
-                priority
-                placeholder="blur"
-                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQwMCIgaGVpZ2h0PSIzNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE0MDAiIGhlaWdodD0iMzUwIiBmaWxsPSIjZWZmNmZmIi8+PC9zdmc+"
-                className="w-full h-auto"
-                sizes="(min-width: 768px) 100vw, 0vw"
-                quality={90}
-                loading="eager"
-                style={{ display: 'block' }}
-              />
-            </div>
+            <img
+              src={desktopImage}
+              alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
+              className="hidden md:block w-full h-auto transition-opacity duration-300"
+              loading="eager"
+              decoding="async"
+              style={{
+                imageRendering: 'crisp-edges',
+                backfaceVisibility: 'hidden',
+                transform: 'translateZ(0)'
+              }}
+            />
           </div>
         ) : (
           <div className="transition-all duration-500 ease-in-out py-4 px-4">
