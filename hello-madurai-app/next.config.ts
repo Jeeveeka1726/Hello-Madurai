@@ -8,11 +8,15 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ['localhost', 'supabase.co', 'hello-madurai-c5xr.vercel.app'],
+    domains: ['localhost', 'supabase.co', 'hello-madurai-c5xr.vercel.app', 'res.cloudinary.com'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '*.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
       },
       {
         protocol: 'https',
@@ -34,6 +38,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'hello-madurai-c5xr.vercel.app',
         pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'hello-madurai-c5xr.vercel.app',
+        pathname: '/api/images/**',
       },
       {
         protocol: 'https',

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface Notice {
   id: string
@@ -59,14 +60,34 @@ export default function NoticeScroller() {
   useEffect(() => {
     const fetchNotices = async () => {
       try {
-        // Add cache busting to always get fresh data
-        const response = await fetch('/api/notice-banners?t=' + Date.now(), {
-          cache: 'no-store'
+        // Use SWR-style caching for instant loading from cache
+        const response = await fetch('/api/notice-banners', {
+          // Serve from cache first, revalidate in background
+          cache: 'force-cache',
         })
         if (response.ok) {
           const data = await response.json()
           // Use fetched data if available, otherwise use defaults
-          setNotices(data.length > 0 ? data : defaultNotices)
+          const activeNotices = data.length > 0 ? data : defaultNotices
+          setNotices(activeNotices)
+
+          // Aggressively preload ALL banner images immediately
+          activeNotices.forEach((notice: Notice) => {
+            if (notice.imageUrl) {
+              const link = document.createElement('link')
+              link.rel = 'preload'
+              link.as = 'image'
+              link.href = notice.imageUrl
+              document.head.appendChild(link)
+            }
+            if (notice.mobileImageUrl) {
+              const link = document.createElement('link')
+              link.rel = 'preload'
+              link.as = 'image'
+              link.href = notice.mobileImageUrl
+              document.head.appendChild(link)
+            }
+          })
         } else {
           setNotices(defaultNotices)
         }
@@ -124,20 +145,42 @@ export default function NoticeScroller() {
     return (
       <>
         {hasImages ? (
-          <div className="w-full overflow-hidden rounded-2xl">
+          <div className="w-full overflow-hidden rounded-2xl relative bg-gradient-to-br from-gray-100 to-gray-200">
             {/* Mobile Image - shown on screens < md (768px) */}
-            <img
-              src={mobileImage}
-              alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-              className="block md:hidden w-full h-auto"
-            />
+            <div className="block md:hidden w-full relative min-h-[180px]">
+              <Image
+                src={mobileImage}
+                alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
+                width={800}
+                height={450}
+                priority
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgZmlsbD0iI2VmZjZmZiIvPjwvc3ZnPg=="
+                className="w-full h-auto"
+                sizes="(max-width: 768px) 100vw, 0vw"
+                quality={90}
+                loading="eager"
+                style={{ display: 'block' }}
+              />
+            </div>
 
             {/* Desktop Image - shown on screens >= md (768px) */}
-            <img
-              src={desktopImage}
-              alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-              className="hidden md:block w-full h-auto"
-            />
+            <div className="hidden md:block w-full relative min-h-[200px]">
+              <Image
+                src={desktopImage}
+                alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
+                width={1400}
+                height={350}
+                priority
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQwMCIgaGVpZ2h0PSIzNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE0MDAiIGhlaWdodD0iMzUwIiBmaWxsPSIjZWZmNmZmIi8+PC9zdmc+"
+                className="w-full h-auto"
+                sizes="(min-width: 768px) 100vw, 0vw"
+                quality={90}
+                loading="eager"
+                style={{ display: 'block' }}
+              />
+            </div>
           </div>
         ) : (
           <div className="transition-all duration-500 ease-in-out py-4 px-4">

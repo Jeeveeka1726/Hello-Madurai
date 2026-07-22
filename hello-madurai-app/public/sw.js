@@ -1,7 +1,8 @@
-// Service Worker for Background Audio Playback
+// Service Worker for Background Audio Playback + Image Caching
 // Hello Madurai Radio - Background Play Support
 
-const CACHE_NAME = 'hello-madurai-radio-v1'
+const CACHE_NAME = 'hello-madurai-v2'
+const IMAGE_CACHE_NAME = 'hello-madurai-images-v2'
 const urlsToCache = [
   '/',
   '/radio',
@@ -17,15 +18,94 @@ self.addEventListener('install', (event) => {
         return cache.addAll(urlsToCache)
       })
   )
+  // Force activation immediately
+  self.skipWaiting()
 })
 
-// Fetch event - serve from cache when offline
+// Activate event - clean old caches
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME && cacheName !== IMAGE_CACHE_NAME) {
+            return caches.delete(cacheName)
+          }
+        })
+      )
+    })
+  )
+  return self.clients.claim()
+})
+
+// Fetch event - aggressive image caching strategy
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url)
+
+  // Aggressive caching for banner images
+  if (url.pathname.startsWith('/api/images/')) {
+    event.respondWith(
+      caches.open(IMAGE_CACHE_NAME).then((cache) => {
+        return cache.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            // Return from cache immediately, update in background
+            fetch(event.request).then((networkResponse) => {
+              if (networkResponse && networkResponse.status === 200) {
+                cache.put(event.request, networkResponse.clone())
+              }
+            }).catch(() => {}) // Ignore network errors
+            return cachedResponse
+          }
+
+          // Not in cache, fetch and cache
+          return fetch(event.request).then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone())
+            }
+            return networkResponse
+          })
+        })
+      })
+    )
+    return
+  }
+
+  // Cache-first for notice banners API
+  if (url.pathname === '/api/notice-banners') {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.match(event.request).then((cachedResponse) => {
+          const fetchPromise = fetch(event.request).then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone())
+            }
+            return networkResponse
+          })
+
+          // Return cached response immediately if available
+          return cachedResponse || fetchPromise
+        })
+      })
+    )
+    return
+  }
+
+  // Default: network first, fallback to cache
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request)
+        // Cache successful responses
+        if (response && response.status === 200) {
+          const responseClone = response.clone()
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone)
+          })
+        }
+        return response
+      })
+      .catch(() => {
+        // Fallback to cache on network failure
+        return caches.match(event.request)
       })
   )
 })

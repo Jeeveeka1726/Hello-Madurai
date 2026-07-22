@@ -66,6 +66,12 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <meta name="theme-color" content="#2563eb" />
+
+        {/* Resource hints for faster loading */}
+        <link rel="prefetch" href="/api/notice-banners" as="fetch" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
+        <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
+
         {/* Pre-load language setting BEFORE React hydrates to prevent flash */}
         <script
           suppressHydrationWarning
