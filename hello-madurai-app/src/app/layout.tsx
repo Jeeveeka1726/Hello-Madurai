@@ -68,6 +68,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#2563eb" />
 
         {/* Resource hints for faster loading */}
+        <link rel="dns-prefetch" href={typeof window !== 'undefined' ? window.location.origin : 'https://hellomadurai.com'} />
         <link rel="prefetch" href="/api/notice-banners" as="fetch" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
         <link rel="preconnect" href="https://googleads.g.doubleclick.net" />

@@ -1,8 +1,8 @@
 // Service Worker for Background Audio Playback + Image Caching
 // Hello Madurai Radio - Background Play Support
 
-const CACHE_NAME = 'hello-madurai-v2'
-const IMAGE_CACHE_NAME = 'hello-madurai-images-v2'
+const CACHE_NAME = 'hello-madurai-v3'
+const IMAGE_CACHE_NAME = 'hello-madurai-images-v3'
 const urlsToCache = [
   '/',
   '/radio',

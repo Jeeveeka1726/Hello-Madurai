@@ -23,6 +23,7 @@ export default function NoticeScroller() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [notices, setNotices] = useState<Notice[]>([])
   const [loading, setLoading] = useState(true)
+  const [imageLoaded, setImageLoaded] = useState(false)
 
   // Default sample notices
   const defaultNotices: Notice[] = [
@@ -76,17 +77,34 @@ export default function NoticeScroller() {
             setLoading(false)
           }
 
-          // Preload images after setting state
-          activeNotices.forEach((notice: Notice) => {
-            if (notice.imageUrl) {
-              const img = new Image()
-              img.src = notice.imageUrl
-            }
-            if (notice.mobileImageUrl) {
-              const img = new Image()
-              img.src = notice.mobileImageUrl
-            }
-          })
+          // Aggressively preload images - create <link> tags for instant loading
+          if (typeof window !== 'undefined') {
+            activeNotices.forEach((notice: Notice) => {
+              // Preload mobile images first (priority for mobile)
+              if (notice.mobileImageUrl) {
+                const link = document.createElement('link')
+                link.rel = 'preload'
+                link.as = 'image'
+                link.href = notice.mobileImageUrl
+                link.fetchPriority = 'high'
+                document.head.appendChild(link)
+
+                // Also create img object for browser cache
+                const img = new Image()
+                img.src = notice.mobileImageUrl
+              }
+              if (notice.imageUrl) {
+                const link = document.createElement('link')
+                link.rel = 'preload'
+                link.as = 'image'
+                link.href = notice.imageUrl
+                document.head.appendChild(link)
+
+                const img = new Image()
+                img.src = notice.imageUrl
+              }
+            })
+          }
         } else {
           if (isMounted) {
             setNotices(defaultNotices)
@@ -115,10 +133,16 @@ export default function NoticeScroller() {
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % notices.length)
+      setImageLoaded(false) // Reset image loaded state for smooth transition
     }, 5000)
 
     return () => clearInterval(interval)
   }, [notices.length])
+
+  // Reset image loaded state when currentIndex changes
+  useEffect(() => {
+    setImageLoaded(false)
+  }, [currentIndex])
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + notices.length) % notices.length)
@@ -151,18 +175,25 @@ export default function NoticeScroller() {
     return (
       <>
         {hasImages ? (
-          <div className="w-full overflow-hidden rounded-2xl bg-gray-100">
+          <div className="w-full overflow-hidden rounded-2xl bg-gray-100 relative min-h-[180px] md:min-h-[250px]">
+            {/* Loading skeleton */}
+            {!imageLoaded && (
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse" />
+            )}
+
             {/* Mobile Image - shown on screens < md (768px) */}
             <img
               src={mobileImage}
               alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-              className="block md:hidden w-full h-auto transition-opacity duration-300"
+              className={`block md:hidden w-full h-auto transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
               loading="eager"
               decoding="async"
+              onLoad={() => setImageLoaded(true)}
               style={{
                 imageRendering: 'crisp-edges',
                 backfaceVisibility: 'hidden',
-                transform: 'translateZ(0)'
+                transform: 'translateZ(0)',
+                willChange: 'opacity'
               }}
             />
 
@@ -170,13 +201,15 @@ export default function NoticeScroller() {
             <img
               src={desktopImage}
               alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-              className="hidden md:block w-full h-auto transition-opacity duration-300"
+              className={`hidden md:block w-full h-auto transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
               loading="eager"
               decoding="async"
+              onLoad={() => setImageLoaded(true)}
               style={{
                 imageRendering: 'crisp-edges',
                 backfaceVisibility: 'hidden',
-                transform: 'translateZ(0)'
+                transform: 'translateZ(0)',
+                willChange: 'opacity'
               }}
             />
           </div>
