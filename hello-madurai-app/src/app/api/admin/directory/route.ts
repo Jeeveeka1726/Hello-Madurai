@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { generateBusinessSlug } from '@/lib/slugify'
 
 // GET /api/admin/directory - Get all businesses
 export async function GET() {
@@ -73,6 +74,13 @@ export async function POST(request: NextRequest) {
         mainCategory: true,
         subcategory: true
       }
+    })
+
+    // Auto-generate slug after creation (when we have the ID)
+    const slug = generateBusinessSlug(body.name, body.name_ta, business.id)
+    await prisma.business.update({
+      where: { id: business.id },
+      data: { slug }
     })
 
     return NextResponse.json(business, { status: 201 })

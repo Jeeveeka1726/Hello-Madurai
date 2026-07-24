@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { generateNewsSlug } from '@/lib/slugify'
 
 export async function GET() {
   try {
@@ -55,6 +56,13 @@ export async function POST(request: Request) {
         featuredImage: featuredImage || undefined,
         featured: featured || false
       }
+    })
+
+    // Auto-generate slug after creation (when we have the ID)
+    const slug = generateNewsSlug(title, title_ta, news.id)
+    await prisma.news.update({
+      where: { id: news.id },
+      data: { slug }
     })
 
     console.log('✅ News created successfully:', news.id)

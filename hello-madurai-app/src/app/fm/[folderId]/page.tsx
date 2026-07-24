@@ -170,12 +170,12 @@ function RadioFolderPageContent() {
         {/* Header */}
         <div className="mb-8">
           <Button
-            onClick={() => router.push('/radio')}
+            onClick={() => router.push('/fm')}
             variant="outline"
             className="mb-4 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
           >
             <ArrowLeftIcon className="h-4 w-4 mr-2" />
-            {t('radio.backToRadio', 'Back to Radio', 'வானொலிக்கு திரும்பு')}
+            {t('radio.backToRadio', 'Back to Digital FM', 'டிஜிட்டல் எஃப்.எம் திரும்பு')}
           </Button>
           
           <div className="text-center">

@@ -9,6 +9,7 @@ import Card, { CardContent } from '@/components/ui/Card'
 
 interface NewsArticle {
   id: string
+  slug?: string
   title: string
   title_ta?: string
   excerpt: string
@@ -230,7 +231,7 @@ export default function TodaysNewsCarousel() {
 
               return (
                 <div key={news.id} data-card className="w-full sm:w-[calc(50%-12px)] md:w-[calc(50%-12px)] flex-shrink-0 snap-start">
-                  <Link href={`/news/${news.id}`}>
+                  <Link href={`/news/${news.slug || news.id}`}>
                   <Card className="group hover:shadow-2xl transition-all duration-300 bg-white border-0 overflow-hidden h-full flex flex-col transform hover:-translate-y-1 sm:hover:-translate-y-2">
                                 {/* Image */}
                                 {news.featuredImage ? (

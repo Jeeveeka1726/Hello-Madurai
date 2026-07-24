@@ -15,12 +15,14 @@ import Button from '@/components/ui/Button'
 import InteractionButtons from '@/components/InteractionButtons'
 import CommentsSection from '@/components/news/CommentsSection'
 import ContentWithAds from '@/components/news/ContentWithAds'
+import NewsStructuredData from '@/components/seo/NewsStructuredData'
 // Using featured images only
 
 // Video functionality removed - using featured images only
 
 interface NewsArticle {
   id: string
+  slug?: string
   title: string
   title_ta?: string
   content: string
@@ -56,19 +58,24 @@ interface Share {
 function NewsDetailPageContent() {
   const params = useParams()
   const { t, language } = useLanguage()
-  const newsId = params.id as string
+  const idOrSlug = params.id as string
   const [article, setArticle] = useState<NewsArticle | null>(null)
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([])
   const [loading, setLoading] = useState(true)
   // Using featured images only
 
   // Fetch article and related articles from database - OPTIMIZED
+  // Now supports both ID and slug-based URLs for SEO
   useEffect(() => {
     const fetchArticle = async () => {
       try {
+        // Detect if the parameter is a slug (contains hyphen) or an ID (alphanumeric only)
+        const isSlug = idOrSlug.includes('-')
+        const apiUrl = isSlug ? `/api/news/slug/${idOrSlug}` : `/api/news/${idOrSlug}`
+
         // Fetch article and related articles in parallel (much faster!)
         const [articleResponse, relatedResponse] = await Promise.all([
-          fetch(`/api/news/${newsId}`, { next: { revalidate: 60 } }), // Cache for 1 minute
+          fetch(apiUrl, { next: { revalidate: 60 } }), // Cache for 1 minute
           fetch(`/api/news?limit=20`, { next: { revalidate: 60 } }) // Fetch limited news for related
         ])
 
@@ -76,7 +83,8 @@ function NewsDetailPageContent() {
           const articleData = await articleResponse.json()
           setArticle(articleData)
 
-          // Increment view count in background (don't wait)
+          // Increment view count in background (don't wait) - always use ID for this
+          const newsId = articleData.id
           fetch(`/api/news/${newsId}/view`, { method: 'POST' }).catch(() => {})
 
           // Get related articles from the parallel fetch
@@ -99,10 +107,10 @@ function NewsDetailPageContent() {
       }
     }
 
-    if (newsId) {
+    if (idOrSlug) {
       fetchArticle()
     }
-  }, [newsId])
+  }, [idOrSlug])
 
   // Using featured images only
 
@@ -196,6 +204,9 @@ function NewsDetailPageContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
+      {/* SEO: Structured Data for News Article */}
+      {article && <NewsStructuredData article={article} />}
+
       <div className="mx-auto max-w-6xl px-3 sm:px-4 lg:px-6 xl:px-8">
         {/* Back Button */}
         <div className="mb-4 sm:mb-6">
@@ -333,7 +344,7 @@ function NewsDetailPageContent() {
             </h2>
             <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
               {relatedArticles.map((relatedArticle) => (
-                  <Link key={relatedArticle.id} href={`/news/${relatedArticle.id}`}>
+                  <Link key={relatedArticle.id} href={`/news/${relatedArticle.slug || relatedArticle.id}`}>
                     <Card className="hover:shadow-lg transition-shadow bg-white border-gray-200 h-full">
                       {relatedArticle.featuredImage ? (
                         <div className="aspect-w-16 aspect-h-9 overflow-hidden">

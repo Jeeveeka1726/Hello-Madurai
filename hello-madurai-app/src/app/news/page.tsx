@@ -29,6 +29,7 @@ const fallbackCategories = [
 
 interface NewsArticle {
   id: string
+  slug?: string
   title: string
   title_ta?: string
   content: string
@@ -243,7 +244,7 @@ function NewsPageContent() {
         {!loading && filteredArticles.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {filteredArticles.map((article) => (
-              <Link key={article.id} href={`/news/${article.id}`}>
+              <Link key={article.id} href={`/news/${article.slug || article.id}`}>
                 <Card className="group hover:shadow-2xl transition-all duration-300 bg-white border-0 overflow-hidden h-full flex flex-col transform hover:-translate-y-1 sm:hover:-translate-y-2">
                   {/* Image */}
                   {article.featuredImage ? (

@@ -50,6 +50,7 @@ interface Category {
 
 interface Business {
   id: string
+  slug?: string
   name: string
   name_ta?: string
   category: string
@@ -621,7 +622,7 @@ function DirectoryPageContent() {
 
 
   const shareToWhatsApp = async (business: Business) => {
-    const url = `${window.location.origin}/directory/${business.id}`
+    const url = `${window.location.origin}/directory/${business.slug || business.id}`
     const businessName = language === 'ta' && business.name_ta ? business.name_ta : business.name
     const businessAddress = language === 'ta' && business.address_ta ? business.address_ta : business.address
     const text = `${businessName}\n📍 ${businessAddress}\n\n${url}`
@@ -659,7 +660,7 @@ function DirectoryPageContent() {
   }
 
   const shareToFacebook = async (business: Business) => {
-    const url = `${window.location.origin}/directory/${business.id}`
+    const url = `${window.location.origin}/directory/${business.slug || business.id}`
 
     // Track share
     try {
@@ -678,7 +679,7 @@ function DirectoryPageContent() {
   }
 
   const copyLink = async (business: Business) => {
-    const url = `${window.location.origin}/directory/${business.id}`
+    const url = `${window.location.origin}/directory/${business.slug || business.id}`
 
     // Track share
     try {
@@ -1242,15 +1243,12 @@ function DirectoryPageContent() {
 
                         {/* View Profile Button - Only if hasProfile is true */}
                         {business.hasProfile && (
-                          <button
-                            onClick={() => {
-                              setSelectedBusiness(business)
-                              setShowProfilePopup(true)
-                            }}
+                          <Link
+                            href={`/directory/${business.slug || business.id}`}
                             className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm font-medium mt-3"
                           >
                             View Profile
-                          </button>
+                          </Link>
                         )}
                       </CardContent>
                     </Card>
@@ -1554,15 +1552,12 @@ function DirectoryPageContent() {
 
                         {/* View Profile Button - Only if hasProfile is true */}
                         {business.hasProfile && (
-                          <button
-                            onClick={() => {
-                              setSelectedBusiness(business)
-                              setShowProfilePopup(true)
-                            }}
+                          <Link
+                            href={`/directory/${business.slug || business.id}`}
                             className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm font-medium mt-3"
                           >
                             View Profile
-                          </button>
+                          </Link>
                         )}
                       </CardContent>
                     </Card>
@@ -1948,15 +1943,12 @@ function DirectoryPageContent() {
 
                       {/* View Profile Button - Only if hasProfile is true */}
                       {business.hasProfile && (
-                        <button
-                          onClick={() => {
-                            setSelectedBusiness(business)
-                            setShowProfilePopup(true)
-                          }}
+                        <Link
+                          href={`/directory/${business.slug || business.id}`}
                           className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center text-sm font-medium"
                         >
                           View Profile
-                        </button>
+                        </Link>
                       )}
                     </CardContent>
                   </Card>
@@ -2064,7 +2056,7 @@ function DirectoryPageContent() {
                         await navigator.share({
                           title: businessName,
                           text: `${businessName}\n📍 ${businessAddress}`,
-                          url: `${window.location.origin}/directory/${shareBusinessData.id}`
+                          url: `${window.location.origin}/directory/${shareBusinessData.slug || shareBusinessData.id}`
                         })
                         setShowShareModal(false)
                       } catch (error) {

@@ -1,8 +1,7 @@
 import { Metadata } from 'next'
-import { notFound, redirect } from 'next/navigation'
-import { headers } from 'next/headers'
+import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import BusinessVideoHeader from '@/components/BusinessVideoHeader'
+import BusinessProfilePage from '@/components/BusinessProfilePage'
 
 interface Business {
   id: string
@@ -28,72 +27,114 @@ interface Business {
 }
 
 interface PageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
-async function getBusiness(id: string): Promise<Business | null> {
+async function getBusiness(idOrSlug: string): Promise<Business | null> {
   try {
-    const business = await prisma.business.findUnique({
-      where: { id }
+    // URL decode the parameter in case it contains encoded characters (like Tamil)
+    const decodedParam = decodeURIComponent(idOrSlug)
+
+    console.log('🔍 getBusiness called with:', {
+      original: idOrSlug,
+      decoded: decodedParam
     })
+
+    // Detect if the parameter is a slug (contains hyphen) or an ID
+    const isSlug = decodedParam.includes('-')
+
+    const business = isSlug
+      ? await prisma.business.findUnique({
+          where: { slug: decodedParam },
+          select: {
+            id: true,
+            name: true,
+            name_ta: true,
+            slug: true,
+            address: true,
+            address_ta: true,
+            phone: true,
+            email: true,
+            website: true,
+            mainImage: true,
+            mainVideoUrl: true,
+            videoType: true,
+            youtubeUrl: true,
+            instagramUrl: true,
+            facebookUrl: true,
+            bookingUrl: true,
+            profileContent: true,
+            profileContent_ta: true,
+            profileImage: true,
+            profileVideo: true,
+            verified: true,
+          }
+        })
+      : await prisma.business.findUnique({
+          where: { id: decodedParam },
+          select: {
+            id: true,
+            name: true,
+            name_ta: true,
+            slug: true,
+            address: true,
+            address_ta: true,
+            phone: true,
+            email: true,
+            website: true,
+            mainImage: true,
+            mainVideoUrl: true,
+            videoType: true,
+            youtubeUrl: true,
+            instagramUrl: true,
+            facebookUrl: true,
+            bookingUrl: true,
+            profileContent: true,
+            profileContent_ta: true,
+            profileImage: true,
+            profileVideo: true,
+            verified: true,
+          }
+        })
+
+    console.log('📊 Query result:', {
+      found: !!business,
+      businessId: business?.id,
+      businessSlug: business?.slug,
+      businessName: business?.name
+    })
+
     return business as Business | null
   } catch (error) {
-    console.error('Error fetching business:', error)
+    console.error('❌ Error fetching business:', error)
     return null
   }
 }
 
-// Helper function to get YouTube ID from URL (including Shorts)
+// Helper function to get YouTube ID from URL (for metadata only)
 function getYouTubeId(url: string): string | null {
-  // Handle different YouTube URL formats
   const patterns = [
-    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,           // Standard watch URL
-    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,                       // Shortened URL
-    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,             // Embed URL
-    /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,            // Shorts URL
+    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
   ]
-
   for (const pattern of patterns) {
     const match = url.match(pattern)
-    if (match && match[1]) {
-      return match[1]
-    }
+    if (match && match[1]) return match[1]
   }
-
   return null
 }
 
-// Helper function to get Instagram Reel ID from URL
-function getInstagramReelId(url: string): string | null {
-  const match = url.match(/instagram\.com\/reel\/([^/?#]+)/)
-  return match ? match[1] : null
-}
-
-// Helper function to determine video type
-function getVideoType(url: string, videoType?: string): 'YOUTUBE_VIDEO' | 'YOUTUBE_SHORTS' | 'INSTAGRAM_REEL' | null {
-  if (videoType) {
-    return videoType as 'YOUTUBE_VIDEO' | 'YOUTUBE_SHORTS' | 'INSTAGRAM_REEL'
-  }
-
-  if (url.includes('youtube.com/shorts') || url.includes('shorts/')) {
-    return 'YOUTUBE_SHORTS'
-  } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
-    return 'YOUTUBE_VIDEO'
-  } else if (url.includes('instagram.com/reel')) {
-    return 'INSTAGRAM_REEL'
-  }
-
-  return null
-}
-
-// Helper function to get YouTube thumbnail
 function getYouTubeThumbnail(youtubeId: string): string {
   return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
 }
 
+
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params
-  const business = await getBusiness(id)
+  const { id: idOrSlug } = await params
+  const business = await getBusiness(idOrSlug)
 
   if (!business) {
     return {
@@ -145,7 +186,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ? businessImage
     : `${baseUrl}${businessImage}`
 
-  const businessUrl = `${baseUrl}/directory/${business.id}`
+  // Use slug for SEO-friendly URL if available, otherwise use ID
+  const urlPath = (business as any).slug || idOrSlug
+  const businessUrl = `${baseUrl}/directory/${urlPath}`
   const description = `${businessName} located at ${businessAddress}. Find contact details, services, and more on Hello Madurai business directory.`
 
   console.log('🔍 Business Metadata Generation:')
@@ -185,140 +228,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function BusinessPage({ params }: PageProps) {
-  const { id } = await params
-  const business = await getBusiness(id)
+  const { id: idOrSlug } = await params
+  const business = await getBusiness(idOrSlug)
 
   if (!business) {
     notFound()
   }
 
-  // For social media crawlers and direct access, show business page
-  // For user navigation, redirect to directory with popup
-  const headersList = await headers()
-  const userAgent = headersList.get('user-agent') || ''
-  const isCrawler = /bot|crawler|spider|crawling/i.test(userAgent) ||
-                   /facebookexternalhit|twitterbot|linkedinbot|whatsapp/i.test(userAgent)
-
-  if (!isCrawler) {
-    // Redirect to directory and navigate to the specific subcategory where this business is located
-    const params = new URLSearchParams()
-
-    if (business.categoryId) {
-      params.set('category', business.categoryId)
-
-      // If business has a subcategory, navigate to that subcategory
-      if (business.subcategoryId) {
-        params.set('subcategory', business.subcategoryId)
-        params.set('viewSubcategory', 'true')
-      }
-    }
-
-    const redirectUrl = params.toString() ? `/directory?${params.toString()}` : '/directory'
-    redirect(redirectUrl)
-  }
-
-  // Show business page for crawlers and direct metadata access
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Business Header with Video/Image */}
-          <BusinessVideoHeader business={business} />
-
-          {/* Business Details */}
-          <div className="p-6">
-            {business.description && (
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold mb-3">About</h2>
-                <p className="text-gray-700 leading-relaxed">{business.description}</p>
-              </div>
-            )}
-
-            {/* Contact Information */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Contact Information</h3>
-                <div className="space-y-2">
-                  {business.phone && (
-                    <p className="flex items-center">
-                      <span className="font-medium mr-2">Phone:</span>
-                      <a href={`tel:${business.phone}`} className="text-blue-600 hover:underline">
-                        {business.phone}
-                      </a>
-                    </p>
-                  )}
-                  {business.email && (
-                    <p className="flex items-center">
-                      <span className="font-medium mr-2">Email:</span>
-                      <a href={`mailto:${business.email}`} className="text-blue-600 hover:underline">
-                        {business.email}
-                      </a>
-                    </p>
-                  )}
-                  {business.website && (
-                    <p className="flex items-center">
-                      <span className="font-medium mr-2">Website:</span>
-                      <a href={business.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                        Visit Website
-                      </a>
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Social Media</h3>
-                <div className="space-y-2">
-                  {business.facebookUrl && (
-                    <p>
-                      <a href={business.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                        Facebook
-                      </a>
-                    </p>
-                  )}
-                  {business.instagramUrl && (
-                    <p>
-                      <a href={business.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                        Instagram
-                      </a>
-                    </p>
-                  )}
-                  {business.youtubeUrl && (
-                    <p>
-                      <a href={business.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                        YouTube
-                      </a>
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="mt-8 flex flex-wrap gap-4">
-              <a
-                href={`/directory`}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Back to Directory
-              </a>
-              {business.bookingUrl && (
-                <a
-                  href={business.bookingUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  Book Now
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-
+  // Always show the business page for SEO optimization
+  // No more redirects - this is a dedicated business profile page
+  return <BusinessProfilePage business={business} />
 }
 
 

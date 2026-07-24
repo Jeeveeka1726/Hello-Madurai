@@ -48,6 +48,7 @@ model News {
   id            String        @id @default(cuid())
   title         String        @db.VarChar(500)
   title_ta      String?       @db.VarChar(500)
+  slug          String?       @unique @db.VarChar(600)
   content       String        @db.LongText
   content_ta    String?       @db.LongText
   excerpt       String        @db.Text
@@ -70,6 +71,7 @@ model News {
   likeRecords   NewsLike[]    @relation("NewsLikes")
 
   @@index([authorSlug])
+  @@index([slug])
   @@map("news")
 }
 
@@ -168,6 +170,7 @@ model Business {
   id                String                @id @default(cuid())
   name              String
   name_ta           String?
+  slug              String?               @unique @db.VarChar(600)
   description       String?
   category          String?
   phone             String?
@@ -204,6 +207,7 @@ model Business {
 
   @@index([categoryId])
   @@index([subcategoryId])
+  @@index([slug])
   @@map("businesses")
 }
 
@@ -227,6 +231,7 @@ model Magazine {
   id             String             @id @default(cuid())
   title          String
   title_ta       String?
+  slug           String?            @unique @db.VarChar(600)
   description    String
   description_ta String?
   pdfUrl         String
@@ -246,6 +251,7 @@ model Magazine {
   pdfs           MagazinePdf[]
 
   @@index([orderNumber])
+  @@index([slug])
   @@map("magazines")
 }
 
@@ -541,6 +547,7 @@ model Offer {
   id           String   @id @default(cuid())
   title        String
   title_ta     String?
+  slug         String?  @unique @db.VarChar(600)
   imageUrl     String
   bookNowUrl   String?
   active       Boolean  @default(true)
@@ -553,6 +560,7 @@ model Offer {
   @@index([active])
   @@index([orderNumber])
   @@index([category])
+  @@index([slug])
   @@map("offers")
 }
 

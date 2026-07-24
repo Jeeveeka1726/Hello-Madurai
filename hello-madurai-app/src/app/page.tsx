@@ -60,7 +60,7 @@ export default function RootPage() {
       nameTa: 'டிஜிட்டல் எஃப்.எம்',
       descEn: 'Listen to Digital FM',
       descTa: 'டிஜிட்டல் எஃப்.எம் கேளுங்கள்',
-      href: '/radio',
+      href: '/fm',
       icon: MicrophoneIcon,
       color: 'bg-green-500'
     },
@@ -133,7 +133,8 @@ export default function RootPage() {
   const getIconForHref = (href: string) => {
     const iconMap: { [key: string]: any } = {
       '/news': NewspaperIcon,
-      '/radio': MicrophoneIcon,
+      '/fm': MicrophoneIcon,
+      '/fm': MicrophoneIcon, // Keep old /radio for backward compatibility
       '/videos': VideoCameraIcon,
       '/directory': BuildingOfficeIcon,
       '/events': CalendarIcon,

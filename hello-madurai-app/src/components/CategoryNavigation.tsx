@@ -51,7 +51,7 @@ const categories: CategoryItem[] = [
   {
     nameEn: 'Radio',
     nameTa: 'வானொலி',
-    href: '/radio',
+    href: '/fm',
     icon: RadioIcon,
     color: 'bg-red-500'
   },

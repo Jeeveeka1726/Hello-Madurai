@@ -11,6 +11,7 @@ export async function GET() {
     const news = await prisma.news.findMany({
       select: {
         id: true,
+        slug: true,
         title: true,
         title_ta: true,
         excerpt: true,

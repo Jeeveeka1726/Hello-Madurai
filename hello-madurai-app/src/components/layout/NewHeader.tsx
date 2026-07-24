@@ -43,7 +43,7 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
     },
     {
       name: t('nav.radio', 'Digital FM', 'டிஜிட்டல் எஃப்.எம்'),
-      href: '/radio'
+      href: '/fm'
     },
     {
       name: t('nav.videos', 'Videos', 'வீடியோ'),
@@ -128,8 +128,8 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
     }
   }
 
-  const handleResultClick = (articleId: string) => {
-    router.push(`/news/${articleId}`)
+  const handleResultClick = (article: any) => {
+    router.push(`/news/${article.slug || article.id}`)
     setSearchQuery('')
     setSearchResults([])
     setShowDropdown(false)
@@ -222,7 +222,7 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
                         {searchResults.map((article: any) => (
                           <button
                             key={article.id}
-                            onClick={() => handleResultClick(article.id)}
+                            onClick={() => handleResultClick(article)}
                             className="w-full px-4 py-3 hover:bg-gray-50 text-left transition-colors border-b border-gray-100 last:border-0"
                           >
                             <div className="flex gap-3">

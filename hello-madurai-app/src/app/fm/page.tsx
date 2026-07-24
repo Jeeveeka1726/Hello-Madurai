@@ -509,7 +509,7 @@ function DigitalFMPageContent() {
     // Update URL immediately for better perceived performance
     // Use pushState to ADD to browser history (so back button works)
     if (singer.slug) {
-      window.history.pushState({}, '', `/radio?artist=${singer.slug}`)
+      window.history.pushState({}, '', `/fm?artist=${singer.slug}`)
     }
 
     try {
@@ -649,7 +649,7 @@ function DigitalFMPageContent() {
 
   const handleShare = async (song: RadioSong, platform: 'whatsapp' | 'facebook' | 'copy') => {
     // Use the share page URL which has proper Open Graph meta tags
-    const shareUrl = `${window.location.origin}/radio/share/${song.id}`
+    const shareUrl = `${window.location.origin}/fm/share/${song.id}`
     const title = language === 'ta' && song.title_ta ? song.title_ta : song.title
     const artistName = selectedSinger
       ? (language === 'ta' && selectedSinger.name_ta ? selectedSinger.name_ta : selectedSinger.name)

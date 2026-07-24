@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
       where,
       select: {
         id: true,
+        slug: true,
         title: true,
         title_ta: true,
         excerpt: true,
