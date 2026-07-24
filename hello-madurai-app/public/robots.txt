@@ -1,8 +1,18 @@
 User-agent: *
 Allow: /
 
-# Sitemap
+# Sitemaps
 Sitemap: https://hellomadurai.com/sitemap.xml
+Sitemap: https://hellomadurai.com/server-sitemap.xml
+
+# Allow crawling of all pages
+Allow: /news/
+Allow: /directory/
+Allow: /fm/
+Allow: /events/
+Allow: /videos/
+Allow: /offers/
+Allow: /epaper/
 
 # Favicon
 Allow: /favicon.ico
