@@ -60,6 +60,16 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '500mb', // Allow large PDF uploads to Hostinger
     },
   },
+  async redirects() {
+    return [
+      // Permanent redirect from old /radio route to new /fm route
+      {
+        source: '/radio',
+        destination: '/fm',
+        permanent: true, // 301 redirect (tells Google this is permanent)
+      },
+    ];
+  },
   async headers() {
     return [
       // Favicon cache control
