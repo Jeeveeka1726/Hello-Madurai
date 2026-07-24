@@ -247,7 +247,7 @@ export default function RootPage() {
                 // Premium gradient backgrounds matching the luxury design
                 const getBackgroundClass = (href: string) => {
                   if (href.includes('/news')) return 'from-red-900 via-red-800 to-red-900'
-                  if (href.includes('/radio')) return 'from-green-900 via-green-800 to-green-900'
+                  if (href.includes('/radio') || href.includes('/fm')) return 'from-green-900 via-green-800 to-green-900'
                   if (href.includes('/videos')) return 'from-purple-900 via-purple-800 to-purple-900'
                   if (href.includes('/tourism') || href.includes('/directory')) return 'from-gray-900 via-gray-800 to-gray-900'
                   if (href.includes('/events')) return 'from-orange-900 via-orange-800 to-orange-900'
@@ -261,7 +261,7 @@ export default function RootPage() {
                 // Get decorative image based on href - use uploaded images or fallback to feature.backgroundImage
                 const getDecorativeImage = (href: string) => {
                   if (href.includes('/news')) return '/feature-images/news.png'
-                  if (href.includes('/radio')) return '/feature-images/FM.png'
+                  if (href.includes('/radio') || href.includes('/fm')) return '/feature-images/FM.png'
                   if (href.includes('/videos')) return '/feature-images/Video.png'
                   if (href.includes('/tourism') || href.includes('/directory')) return '/feature-images/Directory.png'
                   if (href.includes('/events')) return '/feature-images/events.png'
