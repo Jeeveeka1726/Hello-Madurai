@@ -1,6 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// Helper function to generate slug from title
+function generateSlug(title: string, id: string): string {
+  // Remove all Tamil characters, special characters, and extra spaces
+  let slug = title
+    .replace(/[\u0B80-\u0BFF]/g, '') // Remove Tamil characters
+    .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+
+  // If slug is empty (e.g., title was all Tamil), use a generic name
+  if (!slug || slug.length < 3) {
+    slug = 'magazine'
+  }
+
+  // Append short ID to ensure uniqueness (last 8 characters)
+  const shortId = id.slice(-8)
+  slug = `${slug}-${shortId}`
+
+  // Limit total length to 200 characters
+  if (slug.length > 200) {
+    slug = slug.substring(0, 191) + '-' + shortId
+  }
+
+  return slug
+}
+
 // GET /api/admin/magazines/[id] - Get magazine by ID
 export async function GET(
   request: NextRequest,
@@ -41,7 +70,7 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    
+
     // Check if magazine exists
     const existingMagazine = await prisma.magazine.findUnique({
       where: { id }
@@ -54,12 +83,19 @@ export async function PUT(
       )
     }
 
+    // If title is being updated, regenerate slug
+    let slug = existingMagazine.slug
+    if (body.title && body.title !== existingMagazine.title) {
+      slug = generateSlug(body.title, id)
+    }
+
     // Update the magazine
     const magazine = await prisma.magazine.update({
       where: { id },
       data: {
         title: body.title,
         title_ta: body.title_ta || undefined,
+        slug,
         description: body.description || undefined,
         description_ta: body.description_ta || undefined,
         pdfUrl: body.pdfUrl || undefined,

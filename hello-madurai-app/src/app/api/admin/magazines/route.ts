@@ -1,6 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// Helper function to generate slug from title
+function generateSlug(title: string, id: string): string {
+  // Remove all Tamil characters, special characters, and extra spaces
+  let slug = title
+    .replace(/[\u0B80-\u0BFF]/g, '') // Remove Tamil characters
+    .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+
+  // If slug is empty (e.g., title was all Tamil), use a generic name
+  if (!slug || slug.length < 3) {
+    slug = 'magazine'
+  }
+
+  // Append short ID to ensure uniqueness (last 8 characters)
+  const shortId = id.slice(-8)
+  slug = `${slug}-${shortId}`
+
+  // Limit total length to 200 characters
+  if (slug.length > 200) {
+    slug = slug.substring(0, 191) + '-' + shortId
+  }
+
+  return slug
+}
+
 // GET /api/admin/magazines - Get all magazines
 export async function GET() {
   try {
@@ -38,7 +67,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create magazine in Hostinger MySQL
+    // Create magazine in Hostinger MySQL (first without slug)
     const magazine = await prisma.magazine.create({
       data: {
         title: body.title,
@@ -60,7 +89,17 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json(magazine, { status: 201 })
+    // Generate and update slug after creation (to use the generated ID)
+    const slug = generateSlug(magazine.title, magazine.id)
+    const updatedMagazine = await prisma.magazine.update({
+      where: { id: magazine.id },
+      data: { slug },
+      include: {
+        collection: true
+      }
+    })
+
+    return NextResponse.json(updatedMagazine, { status: 201 })
   } catch (error) {
     console.error('Error creating magazine:', error)
     return NextResponse.json(

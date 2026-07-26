@@ -8,7 +8,25 @@ export async function GET() {
   try {
     // Fetch all magazines from Hostinger MySQL with their collections
     const magazines = await prisma.magazine.findMany({
-      include: {
+      select: {
+        id: true,
+        title: true,
+        title_ta: true,
+        slug: true,
+        description: true,
+        description_ta: true,
+        pdfUrl: true,
+        coverImage: true,
+        featuredImage: true,
+        issueNumber: true,
+        publishedAt: true,
+        downloads: true,
+        likes: true,
+        featured: true,
+        month: true,
+        orderNumber: true,
+        createdAt: true,
+        updatedAt: true,
         collection: {
           select: {
             id: true,

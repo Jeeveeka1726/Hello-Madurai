@@ -35,6 +35,7 @@ interface Magazine {
   id: string
   title: string
   title_ta?: string
+  slug?: string
   issueNumber?: string
   publishedAt: string
   month?: string
@@ -337,9 +338,13 @@ function EpaperPageContent() {
 	    }
 	  }
 
-  // Get share URL for a specific magazine
+  // Get share URL for a specific magazine - use the actual PDF URL (Google Drive preview)
   const getShareUrl = (magazine: Magazine) => {
-    return `${window.location.origin}/epaper/share/${magazine.id}`
+    if (magazine.pdfUrl) {
+      return normalizePdfUrl(magazine.pdfUrl)
+    }
+    // Fallback to share page if no PDF URL
+    return `${window.location.origin}/epaper/share/${magazine.slug || magazine.id}`
   }
 
   // Handle copy link

@@ -10,9 +10,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
 
   try {
-    const magazine = await prisma.magazine.findUnique({
-      where: { id }
+    // Try to find by slug first, then fallback to ID
+    let magazine = await prisma.magazine.findUnique({
+      where: { slug: id }
     })
+
+    if (!magazine) {
+      magazine = await prisma.magazine.findUnique({
+        where: { id }
+      })
+    }
 
     if (!magazine) {
       return {
@@ -104,9 +111,16 @@ export default async function MagazineSharePage({ params }: Props) {
   const { id } = await params
 
   try {
-    const magazine = await prisma.magazine.findUnique({
-      where: { id }
+    // Try to find by slug first, then fallback to ID
+    let magazine = await prisma.magazine.findUnique({
+      where: { slug: id }
     })
+
+    if (!magazine) {
+      magazine = await prisma.magazine.findUnique({
+        where: { id }
+      })
+    }
 
     if (!magazine) {
       redirect('/epaper')

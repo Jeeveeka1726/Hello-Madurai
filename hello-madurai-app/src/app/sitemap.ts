@@ -34,6 +34,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       take: 1000
     })
 
+    // Fetch all magazines with slugs
+    const magazines = await prisma.magazine.findMany({
+      select: {
+        id: true,
+        slug: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        updatedAt: 'desc'
+      },
+      take: 1000
+    })
+
     // Main pages
     const mainPages: MetadataRoute.Sitemap = [
       {
@@ -108,8 +121,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }))
 
+    // Magazine pages
+    const magazinePages: MetadataRoute.Sitemap = magazines.map((magazine) => ({
+      url: `${baseUrl}/epaper/share/${magazine.slug || magazine.id}`,
+      lastModified: magazine.updatedAt,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    }))
+
     // Combine all pages
-    return [...mainPages, ...newsPages, ...businessPages]
+    return [...mainPages, ...newsPages, ...businessPages, ...magazinePages]
   } catch (error) {
     console.error('Error generating sitemap:', error)
     // Return at least main pages if database fails
