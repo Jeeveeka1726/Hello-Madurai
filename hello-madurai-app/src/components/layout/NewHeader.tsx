@@ -137,10 +137,10 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
 
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-lg transition-all duration-300 sticky top-0 z-50">
-      <div className="mx-auto max-w-full px-6 sm:px-8 lg:px-12">
-        <div className="flex items-center h-16">
-          {/* Logo - Far Left */}
-          <div className="flex-shrink-0 -ml-2">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo - Left */}
+          <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
               <img
                 src="/hello-madurai-logo.jpeg"
@@ -151,50 +151,52 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
           </div>
 
           {/* Desktop Navigation - Centered */}
-          <nav className="hidden lg:flex items-center space-x-6 flex-1 justify-center ml-8 lg:ml-12 xl:ml-16">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-blue-600 hover:text-blue-700 px-2 py-2 text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
-              >
-                <span suppressHydrationWarning>{item.name}</span>
-              </Link>
-            ))}
+          <nav className="hidden lg:flex items-center justify-center flex-1 mx-8">
+            <div className="flex items-center space-x-4 xl:space-x-6">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-blue-600 hover:text-blue-700 px-2 xl:px-3 py-2 text-sm xl:text-base font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
+                >
+                  <span suppressHydrationWarning>{item.name}</span>
+                </Link>
+              ))}
 
-            {/* Others Dropdown */}
-            <div className="relative z-[60]">
-              <button
-                onClick={() => setIsOthersOpen(!isOthersOpen)}
-                onBlur={() => setTimeout(() => setIsOthersOpen(false), 200)}
-                className="flex items-center gap-1 text-blue-600 hover:text-blue-700 px-2 py-2 text-sm font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
-              >
-                <span suppressHydrationWarning>{t('nav.others', 'Others', 'மேலும்')}</span>
-                <ChevronDownIcon className="h-4 w-4" />
-              </button>
+              {/* Others Dropdown */}
+              <div className="relative z-[60]">
+                <button
+                  onClick={() => setIsOthersOpen(!isOthersOpen)}
+                  onBlur={() => setTimeout(() => setIsOthersOpen(false), 200)}
+                  className="flex items-center gap-1 text-blue-600 hover:text-blue-700 px-2 xl:px-3 py-2 text-sm xl:text-base font-medium transition-colors duration-200 hover-lift whitespace-nowrap"
+                >
+                  <span suppressHydrationWarning>{t('nav.others', 'Others', 'மேலும்')}</span>
+                  <ChevronDownIcon className="h-4 w-4" />
+                </button>
 
-              {isOthersOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl border border-gray-200 z-[100]">
-                  {othersDropdown.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-700 first:rounded-t-md last:rounded-b-md transition-colors"
-                      onClick={() => setIsOthersOpen(false)}
-                    >
-                      <span suppressHydrationWarning>{item.name}</span>
-                    </Link>
-                  ))}
-                </div>
-              )}
+                {isOthersOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl border border-gray-200 z-[100]">
+                    {othersDropdown.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-700 first:rounded-t-md last:rounded-b-md transition-colors"
+                        onClick={() => setIsOthersOpen(false)}
+                      >
+                        <span suppressHydrationWarning>{item.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </nav>
 
           {/* Right Side - Search Bar and Controls */}
-          <div className="flex items-center space-x-4 flex-shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
             {/* Search Bar - Only on home page */}
             {showSearch && (
-              <div className="hidden md:flex relative">
+              <div className="hidden xl:flex relative">
                 <form onSubmit={handleSearch} className="w-full">
                   <div className="relative">
                     <input
@@ -204,7 +206,7 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
                       onFocus={() => searchQuery && setShowDropdown(true)}
                       onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
                       placeholder={language === 'ta' ? 'செய்திகளை தேடுங்கள்...' : 'Search news...'}
-                      className="w-64 lg:w-72 px-4 py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-56 xl:w-64 px-4 py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   </div>
@@ -258,12 +260,12 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
             {/* Language Toggle - Right corner */}
             <button
               onClick={toggleLanguage}
-              className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors duration-200"
+              className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors duration-200"
               title={language === 'en' ? 'தமிழுக்கு மாற்று' : 'Switch to English'}
               suppressHydrationWarning
             >
               <LanguageIcon className="h-5 w-5" />
-              <span className="hidden sm:block" suppressHydrationWarning>
+              <span className="hidden sm:inline-block" suppressHydrationWarning>
                 {language === 'en' ? 'தமிழ்' : 'English'}
               </span>
               <span className="sm:hidden" suppressHydrationWarning>

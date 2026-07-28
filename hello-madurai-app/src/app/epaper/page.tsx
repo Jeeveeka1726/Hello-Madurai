@@ -59,7 +59,7 @@ function EpaperPageContent() {
   const [loading, setLoading] = useState(true)
   const [likedMagazines, setLikedMagazines] = useState<Set<string>>(new Set())
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set())
-
+  const [imageLoading, setImageLoading] = useState<Set<string>>(new Set())
   // Load liked magazines from localStorage on mount
   useEffect(() => {
     const savedLikes = localStorage.getItem('hello-madurai-liked-magazines')
@@ -447,24 +447,48 @@ function EpaperPageContent() {
                 {/* Show cover image if available and not errored */}
                 {(magazine.coverImage || magazine.featuredImage) && !imageErrors.has(magazine.id) ? (
                   <>
+                    {/* Loading shimmer - shown while image is loading */}
+                    {imageLoading.has(magazine.id) && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse aspect-[3/4]" />
+                    )}
+
                     <img
                       src={magazine.coverImage || magazine.featuredImage}
                       alt={language === 'ta' && magazine.title_ta ? magazine.title_ta : magazine.title}
-                      className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105 aspect-[3/4]"
-                      onLoad={() => console.log('✅ Cover loaded:', magazine.title)}
+                      className={`w-full h-auto object-cover transition-all duration-300 group-hover:scale-105 aspect-[3/4] ${
+                        imageLoading.has(magazine.id) ? 'opacity-0' : 'opacity-100'
+                      }`}
+                      onLoadStart={() => {
+                        setImageLoading(prev => new Set([...prev, magazine.id]))
+                      }}
+                      onLoad={() => {
+                        console.log('✅ Cover loaded:', magazine.title)
+                        setImageLoading(prev => {
+                          const next = new Set(prev)
+                          next.delete(magazine.id)
+                          return next
+                        })
+                      }}
                       onError={() => {
                         console.error('❌ Cover failed:', magazine.title, magazine.coverImage || magazine.featuredImage)
+                        setImageLoading(prev => {
+                          const next = new Set(prev)
+                          next.delete(magazine.id)
+                          return next
+                        })
                         handleImageError(magazine.id)
                       }}
                     />
-                    {/* Hover overlay with eye icon */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200">
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <div className="bg-white rounded-full p-3 shadow-lg">
-                          <Eye className="w-6 h-6 text-blue-600" />
+                    {/* Hover overlay with eye icon - only show when image is loaded */}
+                    {!imageLoading.has(magazine.id) && (
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200">
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <div className="bg-white rounded-full p-3 shadow-lg">
+                            <Eye className="w-6 h-6 text-blue-600" />
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </>
                 ) : (
                   /* Fallback placeholder when no image or image failed */

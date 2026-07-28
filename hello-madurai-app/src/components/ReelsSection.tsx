@@ -145,12 +145,16 @@ export default function ReelsSection() {
       <div className="bg-gray-50 border-t-2 border-blue-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           <div className="text-center mb-6 sm:mb-8">
-            <TranslatedText as="h2" className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4" tamil="சமீபத்திய வீடியோக்கள்">
-              Latest Reels
-            </TranslatedText>
-            <TranslatedText as="p" className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto" tamil="மதுரையின் சமீபத்திய வீடியோக்கள் மற்றும் ரீல்ஸ்களைப் பார்க்கவும்">
-              Watch the latest videos and reels from Madurai
-            </TranslatedText>
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-gray-900 mb-2 sm:mb-3 leading-tight">
+              <span suppressHydrationWarning>
+                {language === 'ta' ? 'சமீபத்திய வீடியோக்கள்' : 'Latest Reels'}
+              </span>
+            </h2>
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 font-semibold mb-4 sm:mb-6 mx-auto leading-tight" style={{ maxWidth: '95%' }}>
+              <span suppressHydrationWarning>
+                {language === 'ta' ? 'சமீபத்திய ரீல்ஸ்களைப் பார்க்கவும்' : 'Watch latest reels from Madurai'}
+              </span>
+            </p>
           </div>
 
         {reels.length > 0 ? (

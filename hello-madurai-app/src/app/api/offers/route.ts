@@ -1,20 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
+// Cache for 5 minutes
+export const revalidate = 300
+
 // GET all active offers (for public)
 export async function GET(request: NextRequest) {
+  const startTime = Date.now()
+
   try {
     const { searchParams } = new URL(request.url)
     const includeInactive = searchParams.get('includeInactive') === 'true'
 
+    console.log('📦 Fetching offers from database...')
+
     const offers = await prisma.offer.findMany({
       where: includeInactive ? {} : { active: true },
-      orderBy: { orderNumber: 'asc' }
+      orderBy: { orderNumber: 'asc' },
+      take: 500 // Maximum 500 offers
     })
 
-    return NextResponse.json(offers)
+    const duration = Date.now() - startTime
+    console.log(`✅ Offers API completed in ${duration}ms (${offers.length} offers, ${includeInactive ? 'all' : 'active only'})`)
+
+    return NextResponse.json(offers || [], {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'X-Response-Time': `${duration}ms`,
+        'X-Offer-Count': offers.length.toString()
+      }
+    })
   } catch (error) {
-    console.error('Error fetching offers:', error)
+    console.error('❌ Error fetching offers:', error)
     return NextResponse.json(
       { error: 'Failed to fetch offers' },
       { status: 500 }

@@ -12,7 +12,7 @@ export async function GET() {
       orderBy: {
         startDate: 'desc'
       },
-      take: 100 // Limit to 100 events
+      take: 500 // Limit to 500 events
     })
 
     return NextResponse.json(events || [], {

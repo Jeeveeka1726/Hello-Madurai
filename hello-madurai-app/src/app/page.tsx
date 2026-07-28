@@ -225,14 +225,18 @@ export default function RootPage() {
         <NoticeScroller />
 
         {/* Features Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
-          <div className="text-center mb-12">
-            <TranslatedText as="h2" className="text-3xl font-bold text-gray-900 mb-4" tamil="மதுரையை கண்டறியுங்கள்">
-              Discover Madurai
-            </TranslatedText>
-            <TranslatedText as="p" className="text-lg text-gray-600 max-w-2xl mx-auto" tamil="உங்கள் நகரத்துடன் இணைந்திருக்க தேவையான அனைத்தும்">
-              Everything you need to stay connected with your city
-            </TranslatedText>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-gray-50">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-gray-900 mb-2 sm:mb-3 leading-tight">
+              <span suppressHydrationWarning>
+                {language === 'ta' ? 'மதுரையை கண்டறியுங்கள்' : 'Discover Madurai'}
+              </span>
+            </h2>
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 font-semibold mx-auto leading-tight" style={{ maxWidth: '95%' }}>
+              <span suppressHydrationWarning>
+                {language === 'ta' ? 'மதுரையுடன் இணைந்திருக்க தேவையான அனைத்தும்' : 'Stay connected with Madurai'}
+              </span>
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -286,7 +290,8 @@ export default function RootPage() {
                         style={{
                           display: 'block',
                           margin: 0,
-                          padding: 0
+                          padding: 0,
+                          imageRendering: 'crisp-edges'
                         }}
                       />
                     )}

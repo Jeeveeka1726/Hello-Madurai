@@ -55,13 +55,23 @@ export default function OffersPage() {
 
   const fetchOffers = async () => {
     try {
+      console.log('🔍 Fetching offers...')
       const response = await fetch('/api/offers')
+
       if (response.ok) {
         const data = await response.json()
+        console.log('✅ Offers fetched:', data.length, 'offers')
+        console.log('📊 Offers data:', data)
         setOffers(data)
+      } else {
+        console.error('❌ Failed to fetch offers:', response.status, response.statusText)
+        const errorData = await response.text()
+        console.error('Error details:', errorData)
+        toast.error('Failed to load offers')
       }
     } catch (error) {
-      console.error('Error fetching offers:', error)
+      console.error('❌ Error fetching offers:', error)
+      toast.error('Failed to load offers')
     } finally {
       setLoading(false)
     }

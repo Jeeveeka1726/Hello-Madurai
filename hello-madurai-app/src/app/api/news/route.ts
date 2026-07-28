@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const limitParam = searchParams.get('limit')
     const searchQuery = searchParams.get('search')
-    const limit = limitParam ? parseInt(limitParam, 10) : 50 // Reduced default from 100 to 50
+    const limit = limitParam ? parseInt(limitParam, 10) : 100 // Default to 100 articles
 
     // Build where clause for search
     const where = searchQuery ? {
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: 'desc'
       },
-      take: Math.min(limit, 50) // Maximum 50 articles for better performance
+      take: Math.min(limit, 200) // Maximum 200 articles
     })
 
     const duration = Date.now() - startTime

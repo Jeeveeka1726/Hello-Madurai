@@ -627,9 +627,11 @@ function VideosPageContent() {
                           className="absolute inset-0 w-full h-full border-0 bg-black"
                           allow="fullscreen"
                           allowFullScreen
-                          loading="lazy"
                           style={{
                             border: 'none',
+                          }}
+                          onError={(e) => {
+                            console.error('Archive.org embed failed for:', videoTitle)
                           }}
                           onLoad={() => {
                             if (!playingVideoId || playingVideoId !== video.id) {
