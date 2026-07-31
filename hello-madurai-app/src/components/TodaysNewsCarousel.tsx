@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ChevronLeftIcon, ChevronRightIcon, CalendarIcon, EyeIcon, ClockIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '@/contexts/LanguageContext'
 import TranslatedText from '@/components/TranslatedText'
@@ -236,12 +237,14 @@ export default function TodaysNewsCarousel() {
                                 {/* Image */}
                                 {news.featuredImage ? (
                                   <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden">
-                              <img
+                              <Image
                                 src={news.featuredImage}
                                 alt={language === 'ta' && news.title_ta ? news.title_ta : news.title}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                fill
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                className="object-cover group-hover:scale-110 transition-transform duration-500"
                                 loading="lazy"
-                                decoding="async"
+                                quality={85}
                               />
                               {/* Gradient overlay */}
                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>

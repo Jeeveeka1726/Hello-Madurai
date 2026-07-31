@@ -142,11 +142,11 @@ export default function ReporterDetailPage() {
               {(author.description || author.description_ta) && (
                 <div className="border-t border-gray-200 pt-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    {language === 'ta' ? 'பற்றி' : 'About'}
+                    {language === 'ta' ? 'இவரைப் பற்றி' : 'About'}
                   </h2>
                   <div className="prose prose-lg max-w-none text-gray-700 whitespace-pre-wrap">
-                    {language === 'ta' && author.description_ta 
-                      ? author.description_ta 
+                    {language === 'ta' && author.description_ta
+                      ? author.description_ta
                       : author.description
                     }
                   </div>

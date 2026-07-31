@@ -53,7 +53,12 @@ const nextConfig: NextConfig = {
         hostname: '*.archive.org',
       },
     ],
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 86400, // Cache images for 24 hours
   },
+  compress: true, // Enable gzip compression
   experimental: {
     serverActions: {
       allowedOrigins: ['localhost:3000'],
@@ -72,6 +77,16 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      // Feature images - aggressive caching
+      {
+        source: '/feature-images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       // Favicon cache control
       {
         source: '/favicon.ico',

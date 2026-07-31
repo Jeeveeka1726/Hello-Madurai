@@ -10,6 +10,8 @@ import GlobalRadioPlayer from '@/components/GlobalRadioPlayer'
 import ConditionalFooter from '@/components/layout/ConditionalFooter'
 import WeatherWidget from '@/components/WeatherWidget'
 
+export { reportWebVitals } from './_performance'
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -69,9 +71,18 @@ export default function RootLayout({
 
         {/* Resource hints for faster loading */}
         <link rel="dns-prefetch" href={typeof window !== 'undefined' ? window.location.origin : 'https://hellomadurai.com'} />
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://hello-madurai-c5xr.vercel.app" crossOrigin="anonymous" />
         <link rel="prefetch" href="/api/notice-banners" as="fetch" crossOrigin="anonymous" />
+        <link rel="prefetch" href="/api/home-features" as="fetch" crossOrigin="anonymous" />
+        <link rel="prefetch" href="/api/news/latest" as="fetch" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
         <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
+
+        {/* Preload critical feature images for homepage */}
+        <link rel="preload" href="/feature-images/news.png" as="image" type="image/png" />
+        <link rel="preload" href="/feature-images/FM.png" as="image" type="image/png" />
+        <link rel="preload" href="/feature-images/Video.png" as="image" type="image/png" />
 
         {/* Pre-load language setting BEFORE React hydrates to prevent flash */}
         <script

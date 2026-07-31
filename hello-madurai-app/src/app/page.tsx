@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/contexts/LanguageContext'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import {
   NewspaperIcon,
@@ -225,9 +226,9 @@ export default function RootPage() {
         <NoticeScroller />
 
         {/* Features Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-gray-50">
-          <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-gray-900 mb-2 sm:mb-3 leading-tight">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 bg-gray-50">
+          <div className="text-center mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-gray-900 mb-2 leading-tight">
               <span suppressHydrationWarning>
                 {language === 'ta' ? 'மதுரையை கண்டறியுங்கள்' : 'Discover Madurai'}
               </span>
@@ -241,9 +242,14 @@ export default function RootPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {loading ? (
-              <div className="col-span-3 text-center py-12">
-                <p className="text-gray-500">Loading...</p>
-              </div>
+              // Skeleton loader for better UX
+              <>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+                  <div key={i} className="animate-pulse">
+                    <div className="aspect-[4/3] bg-gray-200 rounded-xl"></div>
+                  </div>
+                ))}
+              </>
             ) : (
               displayFeatures.map((feature: any, index: number) => {
                 const Icon = feature.icon || getIconForHref(feature.href)
@@ -287,6 +293,9 @@ export default function RootPage() {
                         src={decorativeImage}
                         alt={language === 'ta' && feature.nameTa ? feature.nameTa : feature.nameEn}
                         className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300 rounded-xl"
+                        loading={index < 3 ? "eager" : "lazy"}
+                        decoding="async"
+                        fetchPriority={index < 3 ? "high" : "auto"}
                         style={{
                           display: 'block',
                           margin: 0,

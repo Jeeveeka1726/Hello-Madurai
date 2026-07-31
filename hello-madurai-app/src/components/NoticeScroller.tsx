@@ -126,13 +126,13 @@ export default function NoticeScroller() {
     }
   }, [])
 
-  // Auto-scroll every 5 seconds
+  // Auto-scroll every 6 seconds (increased from 5 for smoother transitions)
   useEffect(() => {
-    if (notices.length === 0) return
+    if (notices.length === 0 || notices.length === 1) return
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % notices.length)
-    }, 5000)
+    }, 6000) // Increased to 6 seconds for better UX
 
     return () => clearInterval(interval)
   }, [notices.length])
@@ -146,7 +146,16 @@ export default function NoticeScroller() {
   }
 
   if (loading) {
-    return null // Don't show anything while loading
+    // Show skeleton loader to prevent layout shift
+    return (
+      <div className="w-full py-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl shadow-xl overflow-hidden bg-gray-200 animate-pulse">
+            <div className="w-full h-48 sm:h-64 md:h-80"></div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (notices.length === 0) {
@@ -166,32 +175,44 @@ export default function NoticeScroller() {
     return (
       <>
         {hasImages ? (
-          <div className="w-full overflow-hidden rounded-2xl">
-            <picture>
-              {/* Desktop Image - shown on screens >= 768px */}
-              {currentNotice.imageUrl && (
-                <source
-                  media="(min-width: 768px)"
-                  srcSet={currentNotice.imageUrl}
-                />
-              )}
+          <div className="w-full overflow-hidden rounded-2xl relative">
+            {/* Render all images but only show the current one - prevents blinking */}
+            {notices.map((notice, idx) => {
+              const noticeDesktopImage = notice.imageUrl || notice.mobileImageUrl
+              const noticeMobileImage = notice.mobileImageUrl || notice.imageUrl
 
-              {/* Mobile Image - fallback and shown on screens < 768px */}
-              <img
-                key={currentNotice.id}
-                src={mobileImage}
-                alt={language === 'ta' && currentNotice.titleTa ? currentNotice.titleTa : currentNotice.titleEn}
-                className="w-full h-auto"
-                loading="eager"
-                decoding="sync"
-                style={{
-                  imageRendering: '-webkit-optimize-contrast',
-                  backfaceVisibility: 'hidden',
-                  transform: 'translateZ(0)',
-                  WebkitTransform: 'translateZ(0)'
-                }}
-              />
-            </picture>
+              return (
+                <picture
+                  key={notice.id}
+                  className={`${idx === currentIndex ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'} transition-opacity duration-700 ease-in-out`}
+                >
+                  {/* Desktop Image - shown on screens >= 768px */}
+                  {notice.imageUrl && (
+                    <source
+                      media="(min-width: 768px)"
+                      srcSet={notice.imageUrl}
+                    />
+                  )}
+
+                  {/* Mobile Image - fallback and shown on screens < 768px */}
+                  <img
+                    src={noticeMobileImage}
+                    alt={language === 'ta' && notice.titleTa ? notice.titleTa : notice.titleEn}
+                    className="w-full h-auto block"
+                    loading="eager"
+                    fetchPriority={idx === 0 ? "high" : "low"}
+                    decoding="async"
+                    style={{
+                      imageRendering: '-webkit-optimize-contrast',
+                      backfaceVisibility: 'hidden',
+                      transform: 'translateZ(0)',
+                      WebkitTransform: 'translateZ(0)',
+                      willChange: 'opacity'
+                    }}
+                  />
+                </picture>
+              )
+            })}
           </div>
         ) : (
           <div className="transition-all duration-500 ease-in-out py-4 px-4">
