@@ -19,19 +19,18 @@ interface ContentWithAdsProps {
 
 export default function ContentWithAds({ content, newsId }: ContentWithAdsProps) {
   const [ads, setAds] = useState<Ad[]>([])
-  const [contentWithAds, setContentWithAds] = useState<string>('')
+  const [contentWithAds, setContentWithAds] = useState<string>(content) // Show content immediately
+  const [isLoadingAds, setIsLoadingAds] = useState(true)
 
   useEffect(() => {
     fetchAds()
   }, [])
 
   useEffect(() => {
-    if (ads.length > 0) {
+    if (!isLoadingAds && ads.length > 0) {
       injectAds()
-    } else {
-      setContentWithAds(content)
     }
-  }, [ads, content])
+  }, [ads, content, isLoadingAds])
 
   // Fix YouTube iframes - Instagram iframes work automatically with /embed endpoint
   useEffect(() => {
@@ -72,7 +71,11 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
   const fetchAds = async () => {
     try {
       console.log('📢 Fetching ads for news article...')
-      const response = await fetch('/api/ads/active?category=news')
+      const response = await fetch('/api/ads/active?category=news', {
+        // Use cache-first strategy for faster loads
+        cache: 'force-cache',
+        next: { revalidate: 180 } // 3 minutes
+      })
       console.log('📢 Ads API response status:', response.status)
       if (response.ok) {
         const data = await response.json()
@@ -80,15 +83,19 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
         console.log('📢 Ads data:', data)
         setAds(data)
 
-        // Track impressions for each ad
-        data.forEach((ad: Ad) => {
-          fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
-        })
+        // Track impressions in background (non-blocking)
+        setTimeout(() => {
+          data.forEach((ad: Ad) => {
+            fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
+          })
+        }, 1000) // Delay by 1 second to not block ad rendering
       } else {
         console.error('📢 Failed to fetch ads, status:', response.status)
       }
     } catch (error) {
       console.error('📢 Error fetching ads:', error)
+    } finally {
+      setIsLoadingAds(false)
     }
   }
 
@@ -265,8 +272,17 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
         return '' // Skip this ad
       }
 
-      // Image ad with optional link
-      const img = `<img src="${imageUrl}" alt="${ad.title}" class="ad-image w-full h-auto" onerror="this.parentElement.style.display='none'" />`
+      // Image ad with optional link - optimized with lazy loading and fade-in
+      const img = `<img
+        src="${imageUrl}"
+        alt="${ad.title}"
+        class="ad-image w-full h-auto"
+        loading="lazy"
+        decoding="async"
+        style="background: #f3f4f6; min-height: 200px; opacity: 0; transition: opacity 0.3s ease-in-out;"
+        onload="this.style.opacity='1'"
+        onerror="this.parentElement.style.display='none'"
+      />`
       const clickHandler = ad.link ? `onclick="handleAdClick('${ad.id}', '${ad.link}')"` : ''
 
       return `
