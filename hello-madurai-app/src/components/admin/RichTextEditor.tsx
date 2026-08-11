@@ -359,7 +359,6 @@ export default function RichTextEditor({
       toast.error('Please select an image first')
     }
   }
-  }
 
   const addYouTubeVideo = () => {
     const url = prompt('Enter YouTube URL (supports regular videos, Shorts, and Instagram Reels):\n\nExamples:\n• https://www.youtube.com/watch?v=VIDEO_ID\n• https://youtube.com/shorts/VIDEO_ID\n• https://www.instagram.com/reel/REEL_ID/')
