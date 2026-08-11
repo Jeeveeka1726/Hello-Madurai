@@ -52,22 +52,36 @@ export async function generateMetadata({
 
     // Generate absolute URL for featured image
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hello-madurai-c5xr.vercel.app'
-    const imageUrl = news.featuredImage
-      ? (news.featuredImage.startsWith('http')
-        ? news.featuredImage
-        : `${baseUrl}${news.featuredImage}`)
-      : `${baseUrl}/logo.jpg`
+
+    // Build absolute image URL for Open Graph
+    let imageUrl = `${baseUrl}/logo.jpg` // Default fallback
+
+    if (news.featuredImage) {
+      if (news.featuredImage.startsWith('http')) {
+        // External URLs - use proxy for better social media compatibility
+        imageUrl = `${baseUrl}/api/og-image-proxy?url=${encodeURIComponent(news.featuredImage)}`
+      } else {
+        // Local images (including /api/images/) - make absolute with base URL
+        imageUrl = news.featuredImage.startsWith('/')
+          ? `${baseUrl}${news.featuredImage}`
+          : `${baseUrl}/${news.featuredImage}`
+      }
+    }
 
     // Use slug for SEO-friendly URL if available, otherwise use ID
     const urlPath = news.slug || idOrSlug
 
-    console.log('Metadata - Title:', title)
-    console.log('Metadata - Image URL:', imageUrl)
-    console.log('Metadata - URL Path:', urlPath)
+    console.log('🖼️ News Share Metadata:', {
+      slug: urlPath,
+      title,
+      originalImage: news.featuredImage,
+      finalImageUrl: imageUrl,
+    })
 
     return {
       title: `${title} - Hello Madurai`,
       description,
+      metadataBase: new URL(baseUrl),
       openGraph: {
         title,
         description,
@@ -82,12 +96,21 @@ export async function generateMetadata({
         type: 'article',
         siteName: 'Hello Madurai',
         url: `${baseUrl}/news/${urlPath}`,
+        locale: 'en_US',
       },
       twitter: {
         card: 'summary_large_image',
         title,
         description,
         images: [imageUrl],
+        creator: '@hellomadurai',
+      },
+      other: {
+        'og:image': imageUrl,
+        'og:image:width': '1280',
+        'og:image:height': '720',
+        'og:image:alt': title,
+        'og:image:secure_url': imageUrl,
       },
     }
   } catch (error) {

@@ -674,7 +674,7 @@ export default function RichTextEditor({
       </div>
 
       {/* TipTap Styles - Mobile Optimized */}
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{__html: `
         .ProseMirror {
           min-height: 200px;
           font-size: 16px;
@@ -858,7 +858,7 @@ export default function RichTextEditor({
         .dark .ProseMirror {
           color: #F9FAFB;
         }
-      `}</style>
+      `}} />
     </div>
   )
 }
