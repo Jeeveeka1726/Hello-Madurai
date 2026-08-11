@@ -300,6 +300,30 @@ export default function EventDetailClient({ event }: Props) {
                       height: auto !important;
                       object-fit: contain !important;
                     }
+                    .event-description-content img.float-left,
+                    .event-description-content img[style*="float: left"] {
+                      float: left !important;
+                      display: inline !important;
+                      margin: 0.5rem 1.5rem 1rem 0 !important;
+                      max-width: 350px !important;
+                    }
+                    .event-description-content img.float-right,
+                    .event-description-content img[style*="float: right"] {
+                      float: right !important;
+                      display: inline !important;
+                      margin: 0.5rem 0 1rem 1.5rem !important;
+                      max-width: 350px !important;
+                    }
+                    @media (max-width: 767px) {
+                      .event-description-content img.float-left,
+                      .event-description-content img.float-right,
+                      .event-description-content img[style*="float"] {
+                        float: none !important;
+                        display: block !important;
+                        margin: 1rem auto !important;
+                        max-width: 100% !important;
+                      }
+                    }
                     .event-description-content p {
                       margin: 0.75rem 0 !important;
                       line-height: 1.7 !important;

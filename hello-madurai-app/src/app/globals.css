@@ -1457,6 +1457,57 @@ h6 {
   border: 3px solid #3b82f6 !important; /* Blue border to make images obvious */
 }
 
+/* Support for vertical/portrait images with text wrapping in event descriptions */
+.event-description img[style*="float"],
+.event-description img.float-left,
+.event-description img.float-right {
+  display: inline !important;
+  margin: 0.5rem !important;
+}
+
+.event-description img.float-left,
+.event-description img[style*="float: left"] {
+  float: left !important;
+  margin-right: 1.5rem !important;
+  margin-bottom: 1rem !important;
+  max-width: 45% !important;
+}
+
+.event-description img.float-right,
+.event-description img[style*="float: right"] {
+  float: right !important;
+  margin-left: 1.5rem !important;
+  margin-bottom: 1rem !important;
+  max-width: 45% !important;
+}
+
+/* Vertical/portrait image detection - auto-float for better layout */
+@media (min-width: 768px) {
+  .event-description img[src] {
+    /* This will be enhanced with aspect ratio detection via JS if needed */
+  }
+
+  .event-description img.portrait {
+    float: left !important;
+    display: inline !important;
+    max-width: 350px !important;
+    margin: 0.5rem 1.5rem 1rem 0 !important;
+  }
+}
+
+/* Mobile: vertical images should be full width */
+@media (max-width: 767px) {
+  .event-description img.float-left,
+  .event-description img.float-right,
+  .event-description img[style*="float"],
+  .event-description img.portrait {
+    float: none !important;
+    display: block !important;
+    max-width: 100% !important;
+    margin: 1rem auto !important;
+  }
+}
+
 /* Ensure images are visible in news content */
 .news-content img {
   display: block !important;
@@ -1467,6 +1518,96 @@ h6 {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
   opacity: 1 !important;
   visibility: visible !important;
+}
+
+/* Support for vertical/portrait images with text wrapping in news content */
+.news-content img[style*="float"],
+.news-content img.float-left,
+.news-content img.float-right {
+  display: inline !important;
+  margin: 0.5rem !important;
+}
+
+.news-content img.float-left,
+.news-content img[style*="float: left"] {
+  float: left !important;
+  margin-right: 1.5rem !important;
+  margin-bottom: 1rem !important;
+  max-width: 45% !important;
+}
+
+.news-content img.float-right,
+.news-content img[style*="float: right"] {
+  float: right !important;
+  margin-left: 1.5rem !important;
+  margin-bottom: 1rem !important;
+  max-width: 45% !important;
+}
+
+/* Vertical/portrait image detection - auto-float for better layout */
+@media (min-width: 768px) {
+  .news-content img.portrait {
+    float: left !important;
+    display: inline !important;
+    max-width: 350px !important;
+    margin: 0.5rem 1.5rem 1rem 0 !important;
+  }
+}
+
+/* Mobile: vertical images should be full width */
+@media (max-width: 767px) {
+  .news-content img.float-left,
+  .news-content img.float-right,
+  .news-content img[style*="float"],
+  .news-content img.portrait {
+    float: none !important;
+    display: block !important;
+    max-width: 100% !important;
+    margin: 1rem auto !important;
+  }
+}
+
+/* Clear floats after paragraphs with floated images */
+.news-content p:has(img[style*="float"]),
+.event-description p:has(img[style*="float"]),
+.prose p:has(img[style*="float"]) {
+  overflow: hidden;
+}
+
+.news-content::after,
+.event-description::after,
+.prose::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Business profile content - support for floated images */
+.prose img.float-left,
+.prose img[style*="float: left"] {
+  float: left !important;
+  display: inline !important;
+  margin: 0.5rem 1.5rem 1rem 0 !important;
+  max-width: 350px !important;
+}
+
+.prose img.float-right,
+.prose img[style*="float: right"] {
+  float: right !important;
+  display: inline !important;
+  margin: 0.5rem 0 1rem 1.5rem !important;
+  max-width: 350px !important;
+}
+
+@media (max-width: 767px) {
+  .prose img.float-left,
+  .prose img.float-right,
+  .prose img[style*="float"] {
+    float: none !important;
+    display: block !important;
+    margin: 1rem auto !important;
+    max-width: 100% !important;
+  }
 }
 
 /* Force white text on primary and danger buttons */

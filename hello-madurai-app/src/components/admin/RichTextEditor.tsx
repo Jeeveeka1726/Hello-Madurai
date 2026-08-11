@@ -11,7 +11,9 @@ import {
   ItalicIcon,
   PhotoIcon,
   LinkIcon,
-  ListBulletIcon
+  ListBulletIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon
 } from '@heroicons/react/24/outline'
 import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-hot-toast'
@@ -160,11 +162,11 @@ export default function RichTextEditor({
         }
       }),
       Image.configure({
-        inline: false,
+        inline: true,
         allowBase64: true,
         HTMLAttributes: {
           class: 'editor-image',
-          style: 'display: block !important; max-width: 100% !important; height: auto !important; margin: 1rem auto !important; opacity: 1 !important; visibility: visible !important;',
+          style: 'max-width: 100% !important; height: auto !important; opacity: 1 !important; visibility: visible !important;',
         },
       }),
       Link.configure({
@@ -308,6 +310,55 @@ export default function RichTextEditor({
       editor.chain().focus().setImage({ src: url }).run()
       toast.success('✅ Image inserted!')
     }
+  }
+
+  const floatImageLeft = () => {
+    const { state } = editor
+    const { from } = state.selection
+    const node = state.doc.nodeAt(from)
+
+    if (node && node.type.name === 'image') {
+      editor.commands.updateAttributes('image', {
+        style: 'float: left; margin: 0.5rem 1.5rem 1rem 0; max-width: 350px; display: inline;',
+        class: 'float-left'
+      })
+      toast.success('✅ Image floated left!')
+    } else {
+      toast.error('Please select an image first')
+    }
+  }
+
+  const floatImageRight = () => {
+    const { state } = editor
+    const { from } = state.selection
+    const node = state.doc.nodeAt(from)
+
+    if (node && node.type.name === 'image') {
+      editor.commands.updateAttributes('image', {
+        style: 'float: right; margin: 0.5rem 0 1rem 1.5rem; max-width: 350px; display: inline;',
+        class: 'float-right'
+      })
+      toast.success('✅ Image floated right!')
+    } else {
+      toast.error('Please select an image first')
+    }
+  }
+
+  const clearImageFloat = () => {
+    const { state } = editor
+    const { from } = state.selection
+    const node = state.doc.nodeAt(from)
+
+    if (node && node.type.name === 'image') {
+      editor.commands.updateAttributes('image', {
+        style: 'display: block; margin: 1.5rem auto; max-width: 100%;',
+        class: ''
+      })
+      toast.success('✅ Float cleared!')
+    } else {
+      toast.error('Please select an image first')
+    }
+  }
   }
 
   const addYouTubeVideo = () => {
@@ -544,6 +595,36 @@ export default function RichTextEditor({
           🖼️ URL
         </button>
 
+        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+
+        {/* Image Float Controls */}
+        <button
+          type="button"
+          onClick={floatImageLeft}
+          className="p-2 hover:bg-blue-100 rounded transition-colors"
+          title="Float Image Left (Select image first)"
+        >
+          <ArrowLeftIcon className="h-4 w-4 text-gray-700" />
+        </button>
+        <button
+          type="button"
+          onClick={floatImageRight}
+          className="p-2 hover:bg-blue-100 rounded transition-colors"
+          title="Float Image Right (Select image first)"
+        >
+          <ArrowRightIcon className="h-4 w-4 text-gray-700" />
+        </button>
+        <button
+          type="button"
+          onClick={clearImageFloat}
+          className="px-2 py-1 text-xs font-medium hover:bg-blue-100 rounded transition-colors text-gray-700"
+          title="Clear Float (Center image)"
+        >
+          ⊟
+        </button>
+
+        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+
         {/* YouTube Video / Instagram Reel */}
         <button
           type="button"
@@ -573,7 +654,13 @@ export default function RichTextEditor({
         <p className="font-medium mb-1">💡 TipTap Pro Editor:</p>
         <ul className="space-y-1 ml-4">
           <li>• <strong>Type freely</strong> - ALL content saves! No truncation!</li>
-          <li>• <strong>Images:</strong> Click 📷 to upload or 🖼️ URL for links</li>
+          <li>• <strong>Images:</strong> Click 📷 to upload or 🖼️ URL for links
+            <ul className="ml-4 mt-1">
+              <li>- Click an image then use ← or → to float it left/right (perfect for vertical images!)</li>
+              <li>- Use ⊟ to center the image again</li>
+              <li>- Text will wrap around floated images automatically</li>
+            </ul>
+          </li>
           <li>• <strong>Videos:</strong> Click ▶️ Video and paste:
             <ul className="ml-4 mt-1">
               <li>- YouTube videos (embeds at 1280×720 px)</li>
@@ -690,6 +777,35 @@ export default function RichTextEditor({
           background-color: transparent !important;
           border: 2px solid #e5e7eb !important;
           padding: 4px !important;
+        }
+
+        /* Floated images for text wrapping */
+        .ProseMirror img.float-left,
+        .ProseMirror img[style*="float: left"] {
+          float: left !important;
+          display: inline !important;
+          margin: 0.5rem 1.5rem 1rem 0 !important;
+          max-width: 350px !important;
+        }
+
+        .ProseMirror img.float-right,
+        .ProseMirror img[style*="float: right"] {
+          float: right !important;
+          display: inline !important;
+          margin: 0.5rem 0 1rem 1.5rem !important;
+          max-width: 350px !important;
+        }
+
+        /* Mobile: disable float for better readability */
+        @media (max-width: 767px) {
+          .ProseMirror img.float-left,
+          .ProseMirror img.float-right,
+          .ProseMirror img[style*="float"] {
+            float: none !important;
+            display: block !important;
+            margin: 1rem auto !important;
+            max-width: 100% !important;
+          }
         }
         .ProseMirror a {
           color: #3B82F6;

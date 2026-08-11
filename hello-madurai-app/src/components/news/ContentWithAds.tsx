@@ -228,21 +228,21 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
   const createAdElement = (ad: Ad): string => {
     // Stats HTML for bottom - single line
     const statsHtml = `
-      <div class="flex items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-blue-600 mt-4 pt-3 border-t border-blue-200">
+      <div class="flex items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-600 mt-4">
         <div class="flex items-center gap-1.5">
           <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
           </svg>
           <span class="font-medium">${ad.impressions.toLocaleString()}</span>
-          <span class="text-blue-500">views</span>
+          <span class="text-gray-500">views</span>
         </div>
         <div class="flex items-center gap-1.5">
           <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
           </svg>
           <span class="font-medium">${ad.clicks.toLocaleString()}</span>
-          <span class="text-blue-500">clicks</span>
+          <span class="text-gray-500">clicks</span>
         </div>
       </div>
     `
@@ -250,10 +250,7 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
     if (ad.htmlCode) {
       // HTML/AdSense code
       return `
-        <div class="ad-container my-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
-          <div class="mb-4">
-            <p class="text-xs sm:text-sm text-blue-700 font-bold">📢 Advertisement</p>
-          </div>
+        <div class="ad-container my-8">
           ${ad.htmlCode}
           ${statsHtml}
         </div>
@@ -269,14 +266,11 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
       }
 
       // Image ad with optional link
-      const img = `<img src="${imageUrl}" alt="${ad.title}" class="ad-image w-full h-auto rounded-lg shadow-md" onerror="this.parentElement.style.display='none'" />`
+      const img = `<img src="${imageUrl}" alt="${ad.title}" class="ad-image w-full h-auto" onerror="this.parentElement.style.display='none'" />`
       const clickHandler = ad.link ? `onclick="handleAdClick('${ad.id}', '${ad.link}')"` : ''
 
       return `
-        <div class="ad-container my-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400 shadow-lg">
-          <div class="mb-4">
-            <p class="text-xs sm:text-sm text-blue-700 font-bold">📢 Advertisement</p>
-          </div>
+        <div class="ad-container my-8">
           ${ad.link
             ? `<a href="${ad.link}" target="_blank" rel="noopener noreferrer" ${clickHandler} class="block hover:opacity-90 transition-opacity cursor-pointer">${img}</a>`
             : img
@@ -437,6 +431,30 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
           max-width: 100% !important;
           height: auto !important;
           object-fit: contain !important;
+        }
+        .news-content img.float-left,
+        .news-content img[style*="float: left"] {
+          float: left !important;
+          display: inline !important;
+          margin: 0.5rem 1.5rem 1rem 0 !important;
+          max-width: 350px !important;
+        }
+        .news-content img.float-right,
+        .news-content img[style*="float: right"] {
+          float: right !important;
+          display: inline !important;
+          margin: 0.5rem 0 1rem 1.5rem !important;
+          max-width: 350px !important;
+        }
+        @media (max-width: 767px) {
+          .news-content img.float-left,
+          .news-content img.float-right,
+          .news-content img[style*="float"] {
+            float: none !important;
+            display: block !important;
+            margin: 1rem auto !important;
+            max-width: 100% !important;
+          }
         }
         /* Base styles for all iframes */
         .news-content iframe {
