@@ -69,8 +69,8 @@ function NewsPageContent() {
       try {
         // Fetch both in parallel for maximum speed
         const [categoriesRes, newsRes] = await Promise.all([
-          fetch('/api/news-categories', { next: { revalidate: 300 } }), // Cache for 5 minutes
-          fetch('/api/news', { next: { revalidate: 60 } }) // Cache for 1 minute, fetch all news
+          fetch('/api/news-categories', { next: { revalidate: 300 }, cache: 'force-cache' }), // Cache for 5 minutes
+          fetch('/api/news?limit=50', { next: { revalidate: 60 }, cache: 'force-cache' }) // Cache for 1 minute, limit to 50 news for faster load
         ])
 
         if (categoriesRes.ok) {
@@ -220,12 +220,18 @@ function NewsPageContent() {
                   <div className="h-full news-card bg-white rounded-xl shadow-lg border-2 border-blue-400 hover:border-blue-600 hover:shadow-xl transition-all duration-200 overflow-hidden">
                     {/* Image Section - Full Width */}
                     {article.featuredImage && (
-                      <div className="w-full">
+                      <div className="w-full relative bg-gray-100">
                         <img
                           src={article.featuredImage}
                           alt={language === 'ta' && article.title_ta ? article.title_ta : article.title}
                           className="w-full h-56 sm:h-64 md:h-72 lg:h-80 object-cover"
                           loading="lazy"
+                          decoding="async"
+                          onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                          style={{ opacity: 0, transition: 'opacity 0.3s ease-in-out' }}
+                          onLoadCapture={(e) => {
+                            (e.target as HTMLImageElement).style.opacity = '1'
+                          }}
                         />
                       </div>
                     )}
