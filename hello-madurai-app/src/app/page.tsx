@@ -296,11 +296,17 @@ export default function RootPage() {
                         loading={index < 3 ? "eager" : "lazy"}
                         decoding="async"
                         fetchPriority={index < 3 ? "high" : "auto"}
+                        onLoad={(e) => {
+                          (e.target as HTMLImageElement).style.opacity = '1'
+                        }}
                         style={{
                           display: 'block',
                           margin: 0,
                           padding: 0,
-                          imageRendering: 'crisp-edges'
+                          imageRendering: 'crisp-edges',
+                          opacity: 0,
+                          transition: 'opacity 0.3s ease-in-out',
+                          background: '#f3f4f6'
                         }}
                       />
                     )}

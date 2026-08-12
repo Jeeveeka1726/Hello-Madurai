@@ -196,10 +196,20 @@ export default function ReelsSection() {
                       src={getThumbnailUrl(reel) || '/placeholder-video.jpg'}
                       alt={language === 'ta' && reel.title_ta ? reel.title_ta : reel.title}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                      onLoad={(e) => {
+                        (e.target as HTMLImageElement).style.opacity = '1'
+                      }}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement
                         // Fallback to placeholder SVG
                         target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDE2MCAyODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNjAiIGhlaWdodD0iMjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik02MCAyMDBMMTAwIDE4MEwxMDAgMjIwTDYwIDIwMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHR4dCB4PSI4MCIgeT0iMjUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNkI3MjgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiPk5vIFRodW1ibmFpbDwvdGV4dD4KPC9zdmc+'
+                        target.style.opacity = '1'
+                      }}
+                      style={{
+                        opacity: 0,
+                        transition: 'opacity 0.3s ease-in-out'
                       }}
                     />
 

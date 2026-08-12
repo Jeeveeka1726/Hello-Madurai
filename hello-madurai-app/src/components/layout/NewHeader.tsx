@@ -146,6 +146,16 @@ export default function NewHeader({ showSearch = false, onSearch }: NewHeaderPro
                 src="/hello-madurai-logo.jpeg"
                 alt="Hello Madurai Logo"
                 className="h-10 w-10 rounded-full object-cover"
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
+                onLoad={(e) => {
+                  (e.target as HTMLImageElement).style.opacity = '1'
+                }}
+                style={{
+                  opacity: 0,
+                  transition: 'opacity 0.2s ease-in-out'
+                }}
               />
             </Link>
           </div>

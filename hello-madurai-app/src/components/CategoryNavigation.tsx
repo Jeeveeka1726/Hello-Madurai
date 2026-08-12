@@ -94,54 +94,96 @@ export default function CategoryNavigation({ className = '' }: CategoryNavigatio
   const { language } = useLanguage()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  // Continuous auto-scroll effect
+  // Continuous auto-scroll effect with touch/drag support
   useEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
 
-    let scrollPosition = 0
+    let scrollPosition = container.scrollLeft
     const scrollSpeed = 0.5 // pixels per frame - adjust for speed
     let animationFrameId: number
+    let isPaused = false
+    let isTouching = false
+    let startX = 0
+    let startScrollLeft = 0
 
     const scroll = () => {
-      scrollPosition += scrollSpeed
+      if (!isPaused && !isTouching) {
+        scrollPosition += scrollSpeed
 
-      // Get the actual scrollable width
-      const maxScroll = container.scrollWidth - container.clientWidth
+        // Get the actual scrollable width
+        const maxScroll = container.scrollWidth - container.clientWidth
 
-      // Reset to beginning when reaching the end
-      if (scrollPosition >= maxScroll) {
-        scrollPosition = 0
+        // Reset to beginning when reaching the end
+        if (scrollPosition >= maxScroll) {
+          scrollPosition = 0
+        }
+
+        container.scrollLeft = scrollPosition
       }
-
-      container.scrollLeft = scrollPosition
       animationFrameId = requestAnimationFrame(scroll)
     }
 
     // Start the animation
     animationFrameId = requestAnimationFrame(scroll)
 
-    // Pause scrolling on hover/touch
+    // Touch/Mouse handlers
+    const handleTouchStart = (e: TouchEvent | MouseEvent) => {
+      isTouching = true
+      isPaused = true
+      startX = 'touches' in e ? e.touches[0].pageX : e.pageX
+      startScrollLeft = container.scrollLeft
+      scrollPosition = container.scrollLeft
+    }
+
+    const handleTouchMove = (e: TouchEvent | MouseEvent) => {
+      if (!isTouching) return
+      const x = 'touches' in e ? e.touches[0].pageX : e.pageX
+      const walk = (startX - x) * 2 // Multiply for faster scrolling
+      container.scrollLeft = startScrollLeft + walk
+      scrollPosition = container.scrollLeft
+    }
+
+    const handleTouchEnd = () => {
+      isTouching = false
+      // Resume auto-scroll from current position after a short delay
+      setTimeout(() => {
+        isPaused = false
+        scrollPosition = container.scrollLeft
+      }, 500) // Resume after 0.5 seconds
+    }
+
+    // Pause scrolling on hover (desktop)
     const handleMouseEnter = () => {
-      cancelAnimationFrame(animationFrameId)
+      isPaused = true
     }
 
     const handleMouseLeave = () => {
-      animationFrameId = requestAnimationFrame(scroll)
+      isPaused = false
     }
 
+    // Add event listeners
     container.addEventListener('mouseenter', handleMouseEnter)
     container.addEventListener('mouseleave', handleMouseLeave)
-    container.addEventListener('touchstart', handleMouseEnter)
-    container.addEventListener('touchend', handleMouseLeave)
+    container.addEventListener('touchstart', handleTouchStart as EventListener)
+    container.addEventListener('touchmove', handleTouchMove as EventListener)
+    container.addEventListener('touchend', handleTouchEnd)
+    container.addEventListener('mousedown', handleTouchStart as EventListener)
+    container.addEventListener('mousemove', handleTouchMove as EventListener)
+    container.addEventListener('mouseup', handleTouchEnd)
+    container.addEventListener('mouseleave', handleTouchEnd) // Also end on mouse leave
 
     // Cleanup
     return () => {
       cancelAnimationFrame(animationFrameId)
       container.removeEventListener('mouseenter', handleMouseEnter)
       container.removeEventListener('mouseleave', handleMouseLeave)
-      container.removeEventListener('touchstart', handleMouseEnter)
-      container.removeEventListener('touchend', handleMouseLeave)
+      container.removeEventListener('touchstart', handleTouchStart as EventListener)
+      container.removeEventListener('touchmove', handleTouchMove as EventListener)
+      container.removeEventListener('touchend', handleTouchEnd)
+      container.removeEventListener('mousedown', handleTouchStart as EventListener)
+      container.removeEventListener('mousemove', handleTouchMove as EventListener)
+      container.removeEventListener('mouseup', handleTouchEnd)
     }
   }, [])
 
@@ -150,8 +192,12 @@ export default function CategoryNavigation({ className = '' }: CategoryNavigatio
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           ref={scrollContainerRef}
-          className="flex gap-3 overflow-x-auto scrollbar-hide py-4"
-          style={{ scrollBehavior: 'auto' }}
+          className="flex gap-3 overflow-x-auto scrollbar-hide py-4 cursor-grab active:cursor-grabbing"
+          style={{
+            scrollBehavior: 'auto',
+            userSelect: 'none',
+            WebkitUserSelect: 'none'
+          }}
         >
           {/* Render categories twice for seamless loop */}
           {[...categories, ...categories].map((category, index) => {
