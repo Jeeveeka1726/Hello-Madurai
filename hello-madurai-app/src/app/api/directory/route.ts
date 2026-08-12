@@ -4,8 +4,11 @@ import prisma from '@/lib/prisma'
 // Cache for 3 minutes
 export const revalidate = 180
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const limit = searchParams.get('limit')
+
     // Fetch all businesses from Hostinger MySQL
     const businesses = await prisma.business.findMany({
       orderBy: {
@@ -16,14 +19,16 @@ export async function GET() {
           select: {
             id: true,
             name: true,
-            name_ta: true
+            name_ta: true,
+            icon: true
           }
         },
         subcategory: {
           select: {
             id: true,
             name: true,
-            name_ta: true
+            name_ta: true,
+            icon: true
           }
         },
         comments: {
@@ -40,8 +45,12 @@ export async function GET() {
           take: 5 // Only fetch latest 5 comments per business
         }
       },
-      take: 200 // Limit to 200 businesses for better performance
+      // Remove the hard limit - fetch ALL businesses
+      // Only apply limit if explicitly requested (for admin/testing)
+      ...(limit ? { take: parseInt(limit) } : {})
     })
+
+    console.log(`📊 Directory API: Fetched ${businesses.length} businesses`)
 
     return NextResponse.json(businesses || [], {
       headers: {

@@ -304,12 +304,23 @@ export default function BusinessProfilePage({ business }: BusinessProfilePagePro
                   Facebook
                 </a>
               )}
-              {business.bookingUrl && (
-                <a href={business.bookingUrl} target="_blank" rel="noopener noreferrer" className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:shadow-lg transition-all">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  <TranslatedText>Book Now</TranslatedText>
-                </a>
-              )}
+              {business.bookingUrl && (() => {
+                const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
+                const isPhone = phoneRegex.test(business.bookingUrl.replace(/\s/g, ''))
+                const href = isPhone ? `tel:${business.bookingUrl}` : (business.bookingUrl.startsWith('http') ? business.bookingUrl : `https://${business.bookingUrl}`)
+
+                return (
+                  <a
+                    href={href}
+                    target={isPhone ? '_self' : '_blank'}
+                    rel={isPhone ? undefined : 'noopener noreferrer'}
+                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:shadow-lg transition-all"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    <TranslatedText>Book Now</TranslatedText>
+                  </a>
+                )
+              })()}
             </div>
 
             {/* Profile Content */}

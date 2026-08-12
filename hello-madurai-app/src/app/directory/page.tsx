@@ -575,9 +575,10 @@ function DirectoryPageContent() {
         // Handle the selected option
         const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
         if (phoneRegex.test(selectedOption.replace(/\s/g, ''))) {
-          window.open(`tel:${selectedOption}`, '_self')
+          // Use window.location.href for phone numbers (more reliable than window.open)
+          window.location.href = `tel:${selectedOption}`
         } else {
-          window.open(selectedOption.startsWith('http') ? selectedOption : `https://${selectedOption}`, '_blank')
+          window.open(selectedOption.startsWith('http') ? selectedOption : `https://${selectedOption}`, '_blank', 'noopener,noreferrer')
         }
       } else {
         // Single booking option - auto-detect type
@@ -585,11 +586,11 @@ function DirectoryPageContent() {
         const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
 
         if (phoneRegex.test(singleOption.replace(/\s/g, ''))) {
-          // It's a phone number
-          window.open(`tel:${singleOption}`, '_self')
+          // It's a phone number - use window.location.href for better compatibility
+          window.location.href = `tel:${singleOption}`
         } else {
           // It's a URL
-          window.open(singleOption.startsWith('http') ? singleOption : `https://${singleOption}`, '_blank')
+          window.open(singleOption.startsWith('http') ? singleOption : `https://${singleOption}`, '_blank', 'noopener,noreferrer')
         }
       }
     }

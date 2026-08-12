@@ -59,11 +59,22 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 86400, // Cache images for 24 hours
   },
   compress: true, // Enable gzip compression
+  // Production optimizations
+  productionBrowserSourceMaps: false, // Disable source maps in production for smaller bundle size
+  poweredByHeader: false, // Remove X-Powered-By header for security
+  reactStrictMode: true, // Enable strict mode for better error detection
+  swcMinify: true, // Use SWC for faster minification
   experimental: {
     serverActions: {
       allowedOrigins: ['localhost:3000'],
       bodySizeLimit: '500mb', // Allow large PDF uploads to Hostinger
     },
+    // Optimize package imports
+    optimizePackageImports: ['@heroicons/react', 'lucide-react', 'framer-motion'],
+  },
+  // Compiler optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
   async redirects() {
     return [

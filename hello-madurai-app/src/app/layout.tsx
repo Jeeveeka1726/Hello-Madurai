@@ -73,11 +73,20 @@ export default function RootLayout({
         <link rel="dns-prefetch" href={typeof window !== 'undefined' ? window.location.origin : 'https://hellomadurai.com'} />
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://hello-madurai-c5xr.vercel.app" crossOrigin="anonymous" />
+
+        {/* Prefetch critical API endpoints */}
         <link rel="prefetch" href="/api/notice-banners" as="fetch" crossOrigin="anonymous" />
         <link rel="prefetch" href="/api/home-features" as="fetch" crossOrigin="anonymous" />
         <link rel="prefetch" href="/api/news/latest" as="fetch" crossOrigin="anonymous" />
+        <link rel="prefetch" href="/api/ads/active?category=news" as="fetch" crossOrigin="anonymous" />
+
+        {/* Preconnect to ad networks */}
         <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
         <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
+
+        {/* Preconnect to image sources */}
+        <link rel="preconnect" href="https://img.youtube.com" />
+        <link rel="preconnect" href="https://drive.google.com" />
 
         {/* Preload critical feature images for homepage */}
         <link rel="preload" href="/feature-images/news.png" as="image" type="image/png" />

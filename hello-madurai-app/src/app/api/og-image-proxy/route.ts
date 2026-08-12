@@ -75,8 +75,9 @@ export async function GET(request: NextRequest) {
     return new NextResponse(arrayBuffer, {
       headers: {
         'Content-Type': response.headers.get('content-type') || 'image/jpeg',
-        'Cache-Control': 'public, max-age=86400, s-maxage=86400', // Cache for 24 hours
+        'Cache-Control': 'public, max-age=604800, s-maxage=604800, immutable', // Cache for 7 days
         'Access-Control-Allow-Origin': '*',
+        'CDN-Cache-Control': 'public, max-age=604800',
       },
     })
 

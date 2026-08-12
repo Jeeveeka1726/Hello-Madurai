@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface Ad {
   id: string
@@ -15,19 +16,28 @@ interface Ad {
 interface ContentWithAdsProps {
   content: string
   newsId: string
+  initialAds?: Ad[] // Pre-fetched ads from server
 }
 
-export default function ContentWithAds({ content, newsId }: ContentWithAdsProps) {
-  const [ads, setAds] = useState<Ad[]>([])
+export default function ContentWithAds({ content, newsId, initialAds = [] }: ContentWithAdsProps) {
+  const { language } = useLanguage()
+  const [ads, setAds] = useState<Ad[]>(initialAds) // Start with pre-fetched ads
   const [contentWithAds, setContentWithAds] = useState<string>(content) // Show content immediately
-  const [isLoadingAds, setIsLoadingAds] = useState(true)
+  const [isLoadingAds, setIsLoadingAds] = useState(initialAds.length === 0)
 
   useEffect(() => {
-    fetchAds()
+    // Only fetch if we don't have initial ads
+    if (initialAds.length === 0) {
+      fetchAds()
+    } else {
+      // We have initial ads, inject them immediately
+      console.log('📢 Using pre-fetched ads:', initialAds.length)
+      injectAds()
+    }
   }, [])
 
   useEffect(() => {
-    if (!isLoadingAds && ads.length > 0) {
+    if (!isLoadingAds && ads.length > 0 && initialAds.length === 0) {
       injectAds()
     }
   }, [ads, content, isLoadingAds])
@@ -82,13 +92,6 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
         console.log('📢 Fetched ads:', data.length, 'ads found')
         console.log('📢 Ads data:', data)
         setAds(data)
-
-        // Track impressions in background (non-blocking)
-        setTimeout(() => {
-          data.forEach((ad: Ad) => {
-            fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
-          })
-        }, 1000) // Delay by 1 second to not block ad rendering
       } else {
         console.error('📢 Failed to fetch ads, status:', response.status)
       }
@@ -98,6 +101,18 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
       setIsLoadingAds(false)
     }
   }
+
+  // Track impressions when ads are displayed (separate effect)
+  useEffect(() => {
+    if (ads.length > 0 && contentWithAds !== content) {
+      // Ads have been injected, track impressions
+      setTimeout(() => {
+        ads.forEach((ad: Ad) => {
+          fetch(`/api/ads/${ad.id}/impression`, { method: 'POST' }).catch(() => {})
+        })
+      }, 500) // Reduced delay for faster tracking
+    }
+  }, [contentWithAds])
 
   const validateImageSrc = (src: string): string => {
     // Check if it's a valid base64 image
@@ -272,23 +287,27 @@ export default function ContentWithAds({ content, newsId }: ContentWithAdsProps)
         return '' // Skip this ad
       }
 
-      // Image ad with optional link - optimized with lazy loading and fade-in
+      // Image ad with optional link - optimized with eager loading and fade-in
       const img = `<img
         src="${imageUrl}"
         alt="${ad.title}"
         class="ad-image w-full h-auto"
-        loading="lazy"
+        loading="eager"
         decoding="async"
-        style="background: #f3f4f6; min-height: 200px; opacity: 0; transition: opacity 0.3s ease-in-out;"
+        fetchpriority="high"
+        style="background: #f3f4f6; min-height: 200px; max-height: 600px; object-fit: contain; opacity: 0; transition: opacity 0.2s ease-in;"
         onload="this.style.opacity='1'"
         onerror="this.parentElement.style.display='none'"
       />`
       const clickHandler = ad.link ? `onclick="handleAdClick('${ad.id}', '${ad.link}')"` : ''
 
       return `
-        <div class="ad-container my-8">
+        <div class="ad-container my-6 rounded-lg overflow-hidden shadow-md">
+          <div class="text-xs text-gray-500 text-center py-1 bg-gray-50 border-b border-gray-200">
+            ${language === 'ta' ? 'விளம்பரம்' : 'Advertisement'}
+          </div>
           ${ad.link
-            ? `<a href="${ad.link}" target="_blank" rel="noopener noreferrer" ${clickHandler} class="block hover:opacity-90 transition-opacity cursor-pointer">${img}</a>`
+            ? `<a href="${ad.link}" target="_blank" rel="noopener noreferrer" ${clickHandler} class="block hover:opacity-95 transition-opacity cursor-pointer">${img}</a>`
             : img
           }
           ${statsHtml}

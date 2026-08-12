@@ -61,10 +61,11 @@ function NewsDetailPageContent() {
   const idOrSlug = params.id as string
   const [article, setArticle] = useState<NewsArticle | null>(null)
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([])
+  const [ads, setAds] = useState<any[]>([]) // Pre-fetched ads
   const [loading, setLoading] = useState(true)
   // Using featured images only
 
-  // Fetch article and related articles from database - OPTIMIZED
+  // Fetch article, related articles, and ads in parallel - OPTIMIZED
   // Now supports both ID and slug-based URLs for SEO
   useEffect(() => {
     const fetchArticle = async () => {
@@ -73,10 +74,11 @@ function NewsDetailPageContent() {
         const isSlug = idOrSlug.includes('-')
         const apiUrl = isSlug ? `/api/news/slug/${idOrSlug}` : `/api/news/${idOrSlug}`
 
-        // Fetch article and related articles in parallel (much faster!)
-        const [articleResponse, relatedResponse] = await Promise.all([
+        // Fetch article, related articles, AND ads in parallel (much faster!)
+        const [articleResponse, relatedResponse, adsResponse] = await Promise.all([
           fetch(apiUrl, { next: { revalidate: 60 } }), // Cache for 1 minute
-          fetch(`/api/news?limit=20`, { next: { revalidate: 60 } }) // Fetch limited news for related
+          fetch(`/api/news?limit=20`, { next: { revalidate: 60 } }), // Fetch limited news for related
+          fetch('/api/ads/active?category=news', { cache: 'force-cache', next: { revalidate: 180 } }) // Pre-fetch ads
         ])
 
         if (articleResponse.ok) {
@@ -98,6 +100,13 @@ function NewsDetailPageContent() {
               )
               .slice(0, 4)
             setRelatedArticles(related)
+          }
+
+          // Get ads from the parallel fetch
+          if (adsResponse.ok) {
+            const adsData = await adsResponse.json()
+            console.log('📢 Pre-fetched ads on page load:', adsData.length)
+            setAds(adsData)
           }
         }
       } catch (error) {
@@ -305,9 +314,10 @@ function NewsDetailPageContent() {
 
                 {/* Article Content with Auto-Inserted Ads */}
                 <div className="mb-8">
-                  <ContentWithAds 
+                  <ContentWithAds
                     content={t(`news.${article.id}.content`, article.content, article.content_ta)}
                     newsId={article.id}
+                    initialAds={ads}
                   />
                 </div>
 

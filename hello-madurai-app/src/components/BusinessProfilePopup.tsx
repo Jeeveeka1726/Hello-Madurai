@@ -417,19 +417,25 @@ export default function BusinessProfilePopup({ business, isOpen, onClose }: Busi
           )}
 
           {/* Booking Button */}
-          {business.bookingUrl && (
-            <div className="text-center">
-              <a
-                href={business.bookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
-              >
-                <TranslatedText>Book Now</TranslatedText>
-                <ExternalLink className="w-4 h-4 ml-2" />
-              </a>
-            </div>
-          )}
+          {business.bookingUrl && (() => {
+            const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/
+            const isPhone = phoneRegex.test(business.bookingUrl.replace(/\s/g, ''))
+            const href = isPhone ? `tel:${business.bookingUrl}` : (business.bookingUrl.startsWith('http') ? business.bookingUrl : `https://${business.bookingUrl}`)
+
+            return (
+              <div className="text-center">
+                <a
+                  href={href}
+                  target={isPhone ? '_self' : '_blank'}
+                  rel={isPhone ? undefined : 'noopener noreferrer'}
+                  className="inline-flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  <TranslatedText>Book Now</TranslatedText>
+                  <ExternalLink className="w-4 h-4 ml-2" />
+                </a>
+              </div>
+            )
+          })()}
         </div>
       </div>
     </div>
