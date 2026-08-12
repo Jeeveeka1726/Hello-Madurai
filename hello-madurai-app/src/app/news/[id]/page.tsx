@@ -253,14 +253,14 @@ function NewsDetailPageContent() {
                   </div>
 
                   {/* Title - H3 size */}
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">
-                    {t(`news.${article.id}.title`, article.title, article.title_ta)}
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight" suppressHydrationWarning>
+                    {language === 'ta' && article.title_ta ? article.title_ta : article.title}
                   </h1>
 
                   {/* Excerpt - Only show if exists */}
                   {article.excerpt && (
-                    <p className="text-base sm:text-lg text-gray-600 mb-4 leading-relaxed">
-                      {t(`news.${article.id}.excerpt`, article.excerpt, article.excerpt_ta)}
+                    <p className="text-base sm:text-lg text-gray-600 mb-4 leading-relaxed" suppressHydrationWarning>
+                      {language === 'ta' && article.excerpt_ta ? article.excerpt_ta : article.excerpt}
                     </p>
                   )}
                 </div>
@@ -270,7 +270,7 @@ function NewsDetailPageContent() {
                   <div className="overflow-hidden rounded-lg mb-4">
                     <img
                       src={article.featuredImage}
-                      alt={t(`news.${article.id}.title`, article.title, article.title_ta)}
+                      alt={language === 'ta' && article.title_ta ? article.title_ta : article.title}
                       className="w-full h-auto object-cover rounded-lg news-featured-image"
                       loading="eager"
                       decoding="async"
@@ -280,8 +280,8 @@ function NewsDetailPageContent() {
                 ) : (
                   <div className="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg mb-4">
                     <div className="flex items-center justify-center">
-                      <span className="text-gray-400">
-                        {t('news.imageComingSoon', 'Featured Image Coming Soon', 'சிறப்பு படம் விரைவில்')}
+                      <span className="text-gray-400" suppressHydrationWarning>
+                        {language === 'ta' ? 'சிறப்பு படம் விரைவில்' : 'Featured Image Coming Soon'}
                       </span>
                     </div>
                   </div>
@@ -315,9 +315,10 @@ function NewsDetailPageContent() {
                 {/* Article Content with Auto-Inserted Ads */}
                 <div className="mb-8">
                   <ContentWithAds
-                    content={t(`news.${article.id}.content`, article.content, article.content_ta)}
+                    content={language === 'ta' && article.content_ta ? article.content_ta : article.content}
                     newsId={article.id}
                     initialAds={ads}
+                    language={language}
                   />
                 </div>
 

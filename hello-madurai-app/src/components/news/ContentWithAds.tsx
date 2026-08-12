@@ -17,10 +17,12 @@ interface ContentWithAdsProps {
   content: string
   newsId: string
   initialAds?: Ad[] // Pre-fetched ads from server
+  language?: string // Language prop to re-inject ads on language change
 }
 
-export default function ContentWithAds({ content, newsId, initialAds = [] }: ContentWithAdsProps) {
-  const { language } = useLanguage()
+export default function ContentWithAds({ content, newsId, initialAds = [], language }: ContentWithAdsProps) {
+  const { language: contextLanguage } = useLanguage()
+  const currentLanguage = language || contextLanguage
   const [ads, setAds] = useState<Ad[]>(initialAds) // Start with pre-fetched ads
   const [contentWithAds, setContentWithAds] = useState<string>(content) // Show content immediately
   const [isLoadingAds, setIsLoadingAds] = useState(initialAds.length === 0)
@@ -36,11 +38,24 @@ export default function ContentWithAds({ content, newsId, initialAds = [] }: Con
     }
   }, [])
 
+  // Re-inject ads when content or language changes
   useEffect(() => {
-    if (!isLoadingAds && ads.length > 0 && initialAds.length === 0) {
+    console.log('📢 Content changed, updating...')
+    if (ads.length > 0) {
+      console.log('📢 Re-injecting ads due to content/language change')
+      injectAds()
+    } else {
+      // No ads, just update content
+      setContentWithAds(content)
+    }
+  }, [content, currentLanguage])
+
+  // Initial ad injection
+  useEffect(() => {
+    if (!isLoadingAds && ads.length > 0 && contentWithAds === content && initialAds.length === 0) {
       injectAds()
     }
-  }, [ads, content, isLoadingAds])
+  }, [ads, isLoadingAds])
 
   // Fix YouTube iframes - Instagram iframes work automatically with /embed endpoint
   useEffect(() => {
