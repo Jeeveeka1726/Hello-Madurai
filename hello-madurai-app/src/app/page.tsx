@@ -324,10 +324,10 @@ export default function RootPage() {
         <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center bg-white rounded-3xl shadow-xl p-10 md:p-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">
                 <TranslatedText tamil="எங்களைப் பின்தொடருங்கள்">Follow Us</TranslatedText>
               </h2>
-              <p className="text-gray-600 text-base md:text-lg mb-10">
+              <p className="text-gray-600 text-sm sm:text-base mb-8">
                 <TranslatedText tamil="எங்கள் சமீபத்திய உள்ளடக்கம் மற்றும் செய்திகளுடன் புதுப்பித்து வைத்திருங்கள்">
                   Stay updated with our latest content and news
                 </TranslatedText>

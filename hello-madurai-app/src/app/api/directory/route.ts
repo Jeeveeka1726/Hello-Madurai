@@ -19,8 +19,7 @@ export async function GET(request: Request) {
           select: {
             id: true,
             name: true,
-            name_ta: true,
-            icon: true
+            name_ta: true
           }
         },
         subcategory: {
