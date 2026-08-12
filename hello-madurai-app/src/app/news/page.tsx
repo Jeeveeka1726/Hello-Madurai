@@ -70,7 +70,7 @@ function NewsPageContent() {
         // Fetch both in parallel for maximum speed
         const [categoriesRes, newsRes] = await Promise.all([
           fetch('/api/news-categories', { next: { revalidate: 300 }, cache: 'force-cache' }), // Cache for 5 minutes
-          fetch('/api/news?limit=50', { next: { revalidate: 60 }, cache: 'force-cache' }) // Cache for 1 minute, limit to 50 news for faster load
+          fetch('/api/news', { next: { revalidate: 60 }, cache: 'force-cache' }) // Cache for 1 minute, fetch ALL news
         ])
 
         if (categoriesRes.ok) {
@@ -201,13 +201,31 @@ function NewsPageContent() {
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pb-6 sm:pb-8">
 
-        {/* Loading State */}
+        {/* Loading State - Better Skeleton Loader */}
         {loading && (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600" suppressHydrationWarning>
-              {t('news.loading', 'Loading news...', 'செய்திகள் ஏற்றப்படுகின்றன...')}
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="animate-pulse bg-white rounded-xl shadow-lg border-2 border-gray-200 overflow-hidden">
+                {/* Image Skeleton */}
+                <div className="w-full h-56 sm:h-64 md:h-72 lg:h-80 bg-gray-200"></div>
+                {/* Content Skeleton */}
+                <div className="p-4 sm:p-5 md:p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="h-6 w-24 bg-gray-200 rounded-full"></div>
+                    <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                  </div>
+                  <div className="mt-4 flex items-center gap-4">
+                    <div className="h-4 w-20 bg-gray-200 rounded"></div>
+                    <div className="h-4 w-20 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 

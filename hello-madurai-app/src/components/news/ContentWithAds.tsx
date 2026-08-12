@@ -248,33 +248,36 @@ export default function ContentWithAds({ content, newsId, initialAds = [] }: Con
   }
 
   const createAdElement = (ad: Ad): string => {
-    // Stats HTML for bottom - single line
+    // Minimal stats HTML - integrated at top
     const statsHtml = `
-      <div class="flex items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-600 mt-4">
-        <div class="flex items-center gap-1.5">
-          <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="flex items-center gap-4 text-xs text-gray-500">
+        <div class="flex items-center gap-1">
+          <svg class="h-3.5 w-3.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
           </svg>
-          <span class="font-medium">${ad.impressions.toLocaleString()}</span>
-          <span class="text-gray-500">views</span>
+          <span>${ad.impressions.toLocaleString()}</span>
         </div>
-        <div class="flex items-center gap-1.5">
-          <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-1">
+          <svg class="h-3.5 w-3.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
           </svg>
-          <span class="font-medium">${ad.clicks.toLocaleString()}</span>
-          <span class="text-gray-500">clicks</span>
+          <span>${ad.clicks.toLocaleString()}</span>
         </div>
       </div>
     `
 
     if (ad.htmlCode) {
-      // HTML/AdSense code
+      // HTML/AdSense code - minimal container
       return `
         <div class="ad-container my-8">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">
+              ${language === 'ta' ? 'விளம்பரம்' : 'Sponsored'}
+            </span>
+            ${statsHtml}
+          </div>
           ${ad.htmlCode}
-          ${statsHtml}
         </div>
       `
     } else if (ad.imageUrl) {
@@ -287,7 +290,7 @@ export default function ContentWithAds({ content, newsId, initialAds = [] }: Con
         return '' // Skip this ad
       }
 
-      // Image ad with optional link - optimized with eager loading and fade-in
+      // Image ad - NO BOX, full width, clean integration
       const img = `<img
         src="${imageUrl}"
         alt="${ad.title}"
@@ -295,22 +298,24 @@ export default function ContentWithAds({ content, newsId, initialAds = [] }: Con
         loading="eager"
         decoding="async"
         fetchpriority="high"
-        style="background: #f3f4f6; min-height: 200px; max-height: 600px; object-fit: contain; opacity: 0; transition: opacity 0.2s ease-in;"
+        style="background: #f9fafb; min-height: 200px; max-height: 600px; object-fit: cover; opacity: 0; transition: opacity 0.3s ease-in; display: block;"
         onload="this.style.opacity='1'"
         onerror="this.parentElement.style.display='none'"
       />`
       const clickHandler = ad.link ? `onclick="handleAdClick('${ad.id}', '${ad.link}')"` : ''
 
       return `
-        <div class="ad-container my-6 rounded-lg overflow-hidden shadow-md">
-          <div class="text-xs text-gray-500 text-center py-1 bg-gray-50 border-b border-gray-200">
-            ${language === 'ta' ? 'விளம்பரம்' : 'Advertisement'}
+        <div class="ad-container my-8">
+          <div class="flex items-center justify-between mb-2 px-1">
+            <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">
+              ${language === 'ta' ? 'விளம்பரம்' : 'Sponsored'}
+            </span>
+            ${statsHtml}
           </div>
           ${ad.link
-            ? `<a href="${ad.link}" target="_blank" rel="noopener noreferrer" ${clickHandler} class="block hover:opacity-95 transition-opacity cursor-pointer">${img}</a>`
-            : img
+            ? `<a href="${ad.link}" target="_blank" rel="noopener noreferrer" ${clickHandler} class="block overflow-hidden transition-opacity duration-200 hover:opacity-95">${img}</a>`
+            : `<div class="overflow-hidden">${img}</div>`
           }
-          ${statsHtml}
         </div>
       `
     }

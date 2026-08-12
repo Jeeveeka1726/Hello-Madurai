@@ -13,7 +13,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const limitParam = searchParams.get('limit')
     const searchQuery = searchParams.get('search')
-    const limit = limitParam ? parseInt(limitParam, 10) : 100 // Default to 100 articles
+    // Remove default limit - fetch ALL articles unless explicitly limited
+    const limit = limitParam ? parseInt(limitParam, 10) : null
 
     // Build where clause for search
     const where = searchQuery ? {
@@ -47,11 +48,12 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: 'desc'
       },
-      take: Math.min(limit, 200) // Maximum 200 articles
+      // Remove hard limit - fetch ALL articles unless explicitly limited
+      ...(limit ? { take: limit } : {})
     })
 
     const duration = Date.now() - startTime
-    console.log(`✅ News API completed in ${duration}ms (${news.length} articles)`)
+    console.log(`📰 News API completed in ${duration}ms (${news.length} articles)`)
 
     return NextResponse.json(news || [], {
       headers: {
