@@ -23,7 +23,6 @@ export default function NoticeScroller() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [notices, setNotices] = useState<Notice[]>([])
   const [loading, setLoading] = useState(true)
-  const [permanentlyPaused, setPermanentlyPaused] = useState(false)
 
   // Default sample notices
   const defaultNotices: Notice[] = [
@@ -127,58 +126,27 @@ export default function NoticeScroller() {
     }
   }, [])
 
-  // Auto-scroll every 6 seconds - stop completely when user interacts
+  // Auto-scroll every 6 seconds
   useEffect(() => {
     if (notices.length === 0 || notices.length === 1) return
 
-    if (permanentlyPaused) {
-      console.log('⏸️ Auto-scroll is paused - not starting interval')
-      return
-    }
-
-    console.log('▶️ Starting auto-scroll interval')
     const interval = setInterval(() => {
-      console.log('⏭️ Auto-scrolling to next banner')
       setCurrentIndex((prevIndex) => (prevIndex + 1) % notices.length)
-    }, 6000) // Increased to 6 seconds for better UX
+    }, 6000) // Auto-scroll every 6 seconds
 
-    return () => {
-      console.log('🧹 Clearing auto-scroll interval')
-      clearInterval(interval)
-    }
-  }, [notices.length, permanentlyPaused])
+    return () => clearInterval(interval)
+  }, [notices.length])
 
   const goToPrevious = () => {
-    console.log('⬅️ Previous button clicked')
     setCurrentIndex((prevIndex) => (prevIndex - 1 + notices.length) % notices.length)
-    // Stop auto-scroll permanently when user manually navigates
-    setPermanentlyPaused(true)
   }
 
   const goToNext = () => {
-    console.log('➡️ Next button clicked')
     setCurrentIndex((prevIndex) => (prevIndex + 1) % notices.length)
-    // Stop auto-scroll permanently when user manually navigates
-    setPermanentlyPaused(true)
-  }
-
-  const handleUserInteraction = (event: React.MouseEvent | React.TouchEvent) => {
-    // Stop auto-scroll permanently when user touches/hovers
-    console.log('🛑 User interaction detected:', event.type)
-    setPermanentlyPaused(true)
   }
 
   if (loading) {
-    // Show skeleton loader to prevent layout shift
-    return (
-      <div className="w-full py-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl shadow-xl overflow-hidden bg-gray-200 animate-pulse">
-            <div className="w-full h-48 sm:h-64 md:h-80"></div>
-          </div>
-        </div>
-      </div>
-    )
+    return null // Don't show while loading
   }
 
   if (notices.length === 0) {
@@ -207,7 +175,11 @@ export default function NoticeScroller() {
               return (
                 <picture
                   key={notice.id}
-                  className={`${idx === currentIndex ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'} transition-opacity duration-700 ease-in-out`}
+                  className={`${
+                    idx === currentIndex
+                      ? 'opacity-100 relative z-[1]'
+                      : 'opacity-0 absolute inset-0 z-0 pointer-events-none'
+                  } transition-opacity duration-700 ease-in-out`}
                 >
                   {/* Desktop Image - shown on screens >= 768px */}
                   {notice.imageUrl && (
@@ -253,10 +225,6 @@ export default function NoticeScroller() {
 
   return (
     <div className="w-full py-2">
-      {/* Debug info */}
-      <div className="text-center text-xs text-gray-500 mb-2">
-        Auto-scroll: {permanentlyPaused ? '❌ STOPPED' : '✅ RUNNING'} | Notices: {notices.length}
-      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className={`rounded-2xl shadow-xl relative overflow-hidden ${
@@ -264,42 +232,18 @@ export default function NoticeScroller() {
               ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800'
               : ''
           }`}
-          onMouseDown={handleUserInteraction}
-          onMouseEnter={handleUserInteraction}
-          onTouchStart={handleUserInteraction}
-          onTouchMove={handleUserInteraction}
-          onClick={handleUserInteraction}
         >
-          {/* Pause indicator */}
-          {permanentlyPaused && (
-            <div className="absolute top-4 right-4 z-20 bg-black/70 text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-2 backdrop-blur-sm shadow-lg">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              <span>Auto-scroll stopped</span>
-            </div>
-          )}
 
           {(currentNotice.imageUrl || currentNotice.mobileImageUrl) ? (
             // Image Banner Layout - Full Width (No blue background)
             <>
-              <div
-                className="relative w-full"
-                onTouchStart={(e) => {
-                  console.log('👆 Touch on image area')
-                  handleUserInteraction(e)
-                }}
-                onMouseDown={(e) => {
-                  console.log('🖱️ Click on image area')
-                  handleUserInteraction(e)
-                }}
-              >
+              <div className="relative w-full">
                 <NoticeContent />
 
-                {/* Navigation Buttons Overlaid on Image */}
+                {/* Navigation Buttons Overlaid on Image - higher z-index to be above overlay */}
                 <button
                   onClick={goToPrevious}
-                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/30 hover:bg-black/50 transition-colors duration-200 backdrop-blur-sm z-10"
+                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/30 hover:bg-black/50 transition-colors duration-200 backdrop-blur-sm z-20"
                   aria-label="Previous notice"
                 >
                   <ChevronLeftIcon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
@@ -307,7 +251,7 @@ export default function NoticeScroller() {
 
                 <button
                   onClick={goToNext}
-                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/30 hover:bg-black/50 transition-colors duration-200 backdrop-blur-sm z-10"
+                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/30 hover:bg-black/50 transition-colors duration-200 backdrop-blur-sm z-20"
                   aria-label="Next notice"
                 >
                   <ChevronRightIcon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
