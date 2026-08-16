@@ -234,8 +234,8 @@ function NewsPageContent() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
               {filteredArticles.map((article) => (
-                <Link key={article.id} href={`/news/${article.slug || article.id}`}>
-                  <div className="h-full news-card bg-white rounded-xl shadow-lg border-2 border-blue-400 hover:border-blue-600 hover:shadow-xl transition-all duration-200 overflow-hidden">
+                <Link key={article.id} href={`/news/${article.slug || article.id}`} className="focus:outline-none outline-none" style={{ outline: 'none' }}>
+                  <div className="h-full news-card bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden border border-gray-200" style={{ outline: 'none' }}>
                     {/* Image Section - Full Width */}
                     {article.featuredImage && (
                       <div className="w-full relative bg-gray-100">
@@ -268,7 +268,7 @@ function NewsPageContent() {
                       </div>
 
                       {/* Title */}
-                      <h3 className="line-clamp-2 text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight" suppressHydrationWarning>
+                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight" suppressHydrationWarning>
                         {language === 'ta' && article.title_ta ? article.title_ta : article.title}
                       </h3>
 

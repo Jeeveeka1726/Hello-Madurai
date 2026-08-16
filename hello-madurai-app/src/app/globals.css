@@ -325,17 +325,15 @@ header button:hover {
 /* Removed global text-gray overrides - let Tailwind classes work naturally */
 /* This was forcing navigation links to black even when they had text-blue-600 */
 
-/* Add blue borders to cards for better look */
+/* Cards styling - removed blue borders */
 .news-card,
 .event-card {
-  border: 2px solid #3b82f6 !important;
   border-radius: 0.75rem !important;
 }
 
 .news-card:hover,
 .event-card:hover {
-  border-color: #2563eb !important;
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Hide scrollbar for better mobile UX */
