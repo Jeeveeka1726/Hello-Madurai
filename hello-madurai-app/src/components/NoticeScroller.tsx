@@ -23,6 +23,7 @@ export default function NoticeScroller() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [notices, setNotices] = useState<Notice[]>([])
   const [loading, setLoading] = useState(true)
+  const [permanentlyPaused, setPermanentlyPaused] = useState(false)
 
   // Default sample notices
   const defaultNotices: Notice[] = [
@@ -126,23 +127,45 @@ export default function NoticeScroller() {
     }
   }, [])
 
-  // Auto-scroll every 6 seconds (increased from 5 for smoother transitions)
+  // Auto-scroll every 6 seconds - stop completely when user interacts
   useEffect(() => {
     if (notices.length === 0 || notices.length === 1) return
 
+    if (permanentlyPaused) {
+      console.log('⏸️ Auto-scroll is paused - not starting interval')
+      return
+    }
+
+    console.log('▶️ Starting auto-scroll interval')
     const interval = setInterval(() => {
+      console.log('⏭️ Auto-scrolling to next banner')
       setCurrentIndex((prevIndex) => (prevIndex + 1) % notices.length)
     }, 6000) // Increased to 6 seconds for better UX
 
-    return () => clearInterval(interval)
-  }, [notices.length])
+    return () => {
+      console.log('🧹 Clearing auto-scroll interval')
+      clearInterval(interval)
+    }
+  }, [notices.length, permanentlyPaused])
 
   const goToPrevious = () => {
+    console.log('⬅️ Previous button clicked')
     setCurrentIndex((prevIndex) => (prevIndex - 1 + notices.length) % notices.length)
+    // Stop auto-scroll permanently when user manually navigates
+    setPermanentlyPaused(true)
   }
 
   const goToNext = () => {
+    console.log('➡️ Next button clicked')
     setCurrentIndex((prevIndex) => (prevIndex + 1) % notices.length)
+    // Stop auto-scroll permanently when user manually navigates
+    setPermanentlyPaused(true)
+  }
+
+  const handleUserInteraction = (event: React.MouseEvent | React.TouchEvent) => {
+    // Stop auto-scroll permanently when user touches/hovers
+    console.log('🛑 User interaction detected:', event.type)
+    setPermanentlyPaused(true)
   }
 
   if (loading) {
@@ -230,16 +253,47 @@ export default function NoticeScroller() {
 
   return (
     <div className="w-full py-2">
+      {/* Debug info */}
+      <div className="text-center text-xs text-gray-500 mb-2">
+        Auto-scroll: {permanentlyPaused ? '❌ STOPPED' : '✅ RUNNING'} | Notices: {notices.length}
+      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`rounded-2xl shadow-xl relative overflow-hidden ${
-          !(currentNotice.imageUrl || currentNotice.mobileImageUrl)
-            ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800'
-            : ''
-        }`}>
+        <div
+          className={`rounded-2xl shadow-xl relative overflow-hidden ${
+            !(currentNotice.imageUrl || currentNotice.mobileImageUrl)
+              ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800'
+              : ''
+          }`}
+          onMouseDown={handleUserInteraction}
+          onMouseEnter={handleUserInteraction}
+          onTouchStart={handleUserInteraction}
+          onTouchMove={handleUserInteraction}
+          onClick={handleUserInteraction}
+        >
+          {/* Pause indicator */}
+          {permanentlyPaused && (
+            <div className="absolute top-4 right-4 z-20 bg-black/70 text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-2 backdrop-blur-sm shadow-lg">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <span>Auto-scroll stopped</span>
+            </div>
+          )}
+
           {(currentNotice.imageUrl || currentNotice.mobileImageUrl) ? (
             // Image Banner Layout - Full Width (No blue background)
             <>
-              <div className="relative w-full">
+              <div
+                className="relative w-full"
+                onTouchStart={(e) => {
+                  console.log('👆 Touch on image area')
+                  handleUserInteraction(e)
+                }}
+                onMouseDown={(e) => {
+                  console.log('🖱️ Click on image area')
+                  handleUserInteraction(e)
+                }}
+              >
                 <NoticeContent />
 
                 {/* Navigation Buttons Overlaid on Image */}
