@@ -71,11 +71,17 @@ const nextConfig: NextConfig = {
     },
     // Optimize package imports
     optimizePackageImports: ['@heroicons/react', 'lucide-react', 'framer-motion'],
+    // Enable automatic font optimization
+    optimizeCss: true,
+    // Enable turbo mode for faster builds
+    turbo: {},
   },
   // Compiler optimizations
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
+  // Output configuration for better browser compatibility
+  output: 'standalone',
   async redirects() {
     return [
       // Permanent redirect from old /radio route to new /fm route

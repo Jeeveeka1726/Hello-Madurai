@@ -6,7 +6,18 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ta",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "categories": ["news", "entertainment", "business"],
   "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
     {
       "src": "/favicon-32x32.png",
       "sizes": "32x32",
@@ -28,6 +39,29 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Latest News",
+      "short_name": "News",
+      "description": "View latest news from Madurai",
+      "url": "/news",
+      "icons": [{ "src": "/feature-images/news.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "FM Radio",
+      "short_name": "Radio",
+      "description": "Listen to Hello Madurai FM",
+      "url": "/fm",
+      "icons": [{ "src": "/feature-images/FM.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Business Directory",
+      "short_name": "Directory",
+      "description": "Find local businesses",
+      "url": "/directory",
+      "icons": [{ "src": "/favicon-32x32.png", "sizes": "32x32" }]
     }
   ]
 }

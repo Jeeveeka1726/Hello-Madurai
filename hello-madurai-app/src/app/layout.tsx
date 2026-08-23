@@ -9,10 +9,16 @@ import PopupAds from '@/components/PopupAds'
 import GlobalRadioPlayer from '@/components/GlobalRadioPlayer'
 import ConditionalFooter from '@/components/layout/ConditionalFooter'
 import WeatherWidget from '@/components/WeatherWidget'
+import BrowserOptimizationWrapper from '@/components/BrowserOptimizationWrapper'
 
 export { reportWebVitals } from './_performance'
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: 'swap', // Optimize font loading for all browsers
+  preload: true,
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif']
+});
 
 export const metadata: Metadata = {
   title: "ஹலோ மதுரை - உங்கள் உள்ளூர் செய்தி மற்றும் தகவல் மையம்",
@@ -69,6 +75,25 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/favicon.ico" />
         <meta name="theme-color" content="#2563eb" />
 
+        {/* PWA Manifest for all browsers */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Hello Madurai" />
+
+        {/* Preload critical fonts for faster rendering */}
+        <link
+          rel="preload"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          as="style"
+        />
+        <link
+          rel="preload"
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap"
+          as="style"
+        />
+
         {/* Resource hints for faster loading */}
         <link rel="dns-prefetch" href={typeof window !== 'undefined' ? window.location.origin : 'https://hellomadurai.com'} />
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
@@ -100,6 +125,32 @@ export default function RootLayout({
             __html: `(function(){try{var savedLang=localStorage.getItem('hello-madurai-language');console.log('🔧 Pre-load script - savedLang:',savedLang);if(savedLang==='ta'||savedLang==='en'){window.__HELLO_MADURAI_LANG__=savedLang;console.log('🔧 Pre-load script - set window.__HELLO_MADURAI_LANG__ to:',savedLang);}else{console.log('🔧 Pre-load script - defaulting to Tamil');window.__HELLO_MADURAI_LANG__='ta';localStorage.setItem('hello-madurai-language','ta');}}catch(e){console.error('Error loading language:',e);}})();`,
           }}
         />
+
+        {/* Browser-specific optimizations for cross-browser compatibility */}
+        <script
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var ua = navigator.userAgent.toLowerCase();
+                var isFirefox = ua.indexOf('firefox') > -1;
+                var isSafari = ua.indexOf('safari') > -1 && ua.indexOf('chrome') === -1;
+                var isEdge = ua.indexOf('edg') > -1;
+
+                if (isFirefox) {
+                  document.documentElement.style.scrollBehavior = 'smooth';
+                }
+                if (isSafari) {
+                  document.documentElement.style.webkitFontSmoothing = 'antialiased';
+                }
+                if (isEdge) {
+                  document.documentElement.style.scrollBehavior = 'smooth';
+                }
+              })();
+            `,
+          }}
+        />
+
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6813067212539087"
@@ -136,6 +187,7 @@ export default function RootLayout({
                 <PopupAds />
                 <GlobalRadioPlayer />
                 <WeatherWidget />
+                <BrowserOptimizationWrapper />
               </RadioPlayerProvider>
             </AdminProvider>
           </LanguageProvider>

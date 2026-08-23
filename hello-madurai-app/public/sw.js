@@ -1,13 +1,20 @@
 // Service Worker for Background Audio Playback + Image Caching
 // Hello Madurai Radio - Background Play Support
 
-const CACHE_NAME = 'hello-madurai-v3'
-const IMAGE_CACHE_NAME = 'hello-madurai-images-v3'
+const CACHE_NAME = 'hello-madurai-v4'
+const IMAGE_CACHE_NAME = 'hello-madurai-images-v4'
+const RUNTIME_CACHE = 'hello-madurai-runtime-v4'
 const urlsToCache = [
   '/',
   '/radio',
   '/fm-logo.jpg',
-  '/offline.html'
+  '/offline.html',
+  '/favicon.ico',
+  '/favicon-32x32.png',
+  '/favicon-16x16.png',
+  '/feature-images/news.png',
+  '/feature-images/FM.png',
+  '/feature-images/Video.png',
 ]
 
 // Install event - cache resources
@@ -28,7 +35,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME && cacheName !== IMAGE_CACHE_NAME) {
+          if (cacheName !== CACHE_NAME && cacheName !== IMAGE_CACHE_NAME && cacheName !== RUNTIME_CACHE) {
             return caches.delete(cacheName)
           }
         })
@@ -89,6 +96,32 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
+  // Static assets - cache first for better cross-browser performance
+  if (
+    event.request.destination === 'style' ||
+    event.request.destination === 'script' ||
+    event.request.destination === 'font' ||
+    event.request.destination === 'image'
+  ) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse
+        }
+        return fetch(event.request).then((response) => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone()
+            caches.open(RUNTIME_CACHE).then((cache) => {
+              cache.put(event.request, responseToCache)
+            })
+          }
+          return response
+        })
+      })
+    )
+    return
+  }
+
   // Default: network first, fallback to cache
   event.respondWith(
     fetch(event.request)
@@ -96,7 +129,7 @@ self.addEventListener('fetch', (event) => {
         // Cache successful responses
         if (response && response.status === 200) {
           const responseClone = response.clone()
-          caches.open(CACHE_NAME).then((cache) => {
+          caches.open(RUNTIME_CACHE).then((cache) => {
             cache.put(event.request, responseClone)
           })
         }

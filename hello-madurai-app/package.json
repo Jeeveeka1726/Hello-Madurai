@@ -9,7 +9,8 @@
     "start": "node server.js",
     "lint": "eslint",
     "update-favicon": "node force-favicon-update.js",
-    "seed:banners": "node scripts/add-sample-banners.js"
+    "seed:banners": "node scripts/add-sample-banners.js",
+    "test:browser-compat": "node scripts/test-browser-compatibility.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

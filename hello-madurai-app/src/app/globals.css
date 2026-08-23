@@ -37,6 +37,11 @@ html {
   scroll-behavior: smooth;
   color-scheme: light;
   overflow-x: hidden; /* Prevent horizontal scroll */
+  /* Cross-browser font smoothing */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Text rendering optimization for all browsers */
+  text-rendering: optimizeLegibility;
 }
 
 /* Hide scrollbar for reels section */
@@ -352,8 +357,18 @@ img[loading="lazy"] {
 }
 
 img {
+  /* Cross-browser image rendering */
+  -webkit-image-rendering: -webkit-optimize-contrast;
+  -moz-image-rendering: crisp-edges;
+  -ms-image-rendering: crisp-edges;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+  /* Prevent dragging on all browsers */
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
 }
 
 /* Smooth image fade-in on load */
@@ -784,8 +799,12 @@ p {
   }
 }
 
-/* Smooth transitions and animations */
+/* Smooth transitions and animations - cross-browser compatible */
 * {
+  -webkit-transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, -webkit-transform 0.2s ease;
+  -moz-transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, -moz-transform 0.2s ease;
+  -ms-transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, -ms-transform 0.2s ease;
+  -o-transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, -o-transform 0.2s ease;
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
 }
 
@@ -801,9 +820,10 @@ p {
   background-clip: text;
 }
 
-/* Glass morphism effect - Light theme only */
+/* Glass morphism effect - Light theme only - cross-browser */
 .glass {
   background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
