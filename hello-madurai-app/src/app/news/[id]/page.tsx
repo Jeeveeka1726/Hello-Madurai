@@ -76,9 +76,9 @@ function NewsDetailPageContent() {
 
         // Fetch article, related articles, AND ads in parallel (much faster!)
         const [articleResponse, relatedResponse, adsResponse] = await Promise.all([
-          fetch(apiUrl, { next: { revalidate: 60 } }), // Cache for 1 minute
-          fetch(`/api/news?limit=20`, { next: { revalidate: 60 } }), // Fetch limited news for related
-          fetch('/api/ads/active?category=news', { cache: 'force-cache', next: { revalidate: 180 } }) // Pre-fetch ads
+          fetch(apiUrl, { cache: 'no-store' }), // Always fresh article - fixes Firefox caching
+          fetch(`/api/news?limit=20`, { cache: 'no-store' }), // Always fresh related news
+          fetch('/api/ads/active?category=news', { cache: 'no-store' }) // Fresh ads
         ])
 
         if (articleResponse.ok) {

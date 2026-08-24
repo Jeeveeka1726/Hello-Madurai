@@ -29,7 +29,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ categories }, {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+        'Cache-Control': 'public, max-age=60, s-maxage=300, must-revalidate',
+        'Vary': 'Accept-Encoding',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
     })
   } catch (error) {

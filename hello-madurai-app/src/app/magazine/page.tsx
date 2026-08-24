@@ -54,7 +54,7 @@ function MagazinePageContent() {
     const fetchCollections = async () => {
       try {
         console.log('Fetching magazine collections from API...')
-        const response = await fetch('/api/magazines')
+        const response = await fetch('/api/magazines', { cache: 'no-store' }) // Always fresh - fixes Firefox caching
         console.log('Response status:', response.status)
         if (response.ok) {
           const data = await response.json()

@@ -393,8 +393,8 @@ function DigitalFMPageContent() {
       try {
         // Only fetch categories and ads - skip all songs for faster initial load
         const [categoriesRes, adsRes] = await Promise.all([
-          fetch('/api/radio-categories', { next: { revalidate: 300 } }), // Cache for 5 minutes
-          fetch('/api/ads/active?category=radio', { next: { revalidate: 180 } }) // Cache for 3 minutes
+          fetch('/api/radio-categories', { cache: 'no-store' }), // Always fresh - fixes Firefox caching
+          fetch('/api/ads/active?category=radio', { cache: 'no-store' }) // Always fresh - fixes Firefox caching
         ])
 
         // Check for errors

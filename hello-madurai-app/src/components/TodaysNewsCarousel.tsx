@@ -75,7 +75,7 @@ export default function TodaysNewsCarousel() {
     const fetchTodaysNews = async () => {
       try {
         // Fetch latest 10 news articles (optimized for speed)
-        const response = await fetch('/api/news/latest', { next: { revalidate: 60 } }) // Use optimized endpoint
+        const response = await fetch('/api/news/latest', { cache: 'no-store' }) // Always fresh - fixes Firefox caching
         if (response.ok) {
           const data = await response.json()
 

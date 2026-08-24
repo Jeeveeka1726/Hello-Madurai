@@ -69,8 +69,8 @@ function NewsPageContent() {
       try {
         // Fetch both in parallel for maximum speed
         const [categoriesRes, newsRes] = await Promise.all([
-          fetch('/api/news-categories', { next: { revalidate: 300 }, cache: 'force-cache' }), // Cache for 5 minutes
-          fetch('/api/news', { next: { revalidate: 60 }, cache: 'force-cache' }) // Cache for 1 minute, fetch ALL news
+          fetch('/api/news-categories', { cache: 'no-store' }), // Always fresh categories
+          fetch('/api/news', { cache: 'no-store' }) // Always fresh news - fixes Firefox caching issue
         ])
 
         if (categoriesRes.ok) {

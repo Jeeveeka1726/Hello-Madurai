@@ -57,8 +57,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(news || [], {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
-        'X-Response-Time': `${duration}ms`
+        'Cache-Control': 'public, max-age=30, s-maxage=60, must-revalidate',
+        'X-Response-Time': `${duration}ms`,
+        'Vary': 'Accept-Encoding',
+        'ETag': `"news-${Date.now()}"`,
+        // Firefox-specific: prevent stale cache
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
     })
   } catch (error) {

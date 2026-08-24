@@ -249,8 +249,8 @@ function DirectoryPageContent() {
     const fetchData = async () => {
       try {
         const [categoriesRes, businessesRes] = await Promise.all([
-          fetch('/api/directory-categories', { next: { revalidate: 180 } }), // Cache for 3 minutes
-          fetch('/api/directory', { next: { revalidate: 180 } }) // Cache for 3 minutes
+          fetch('/api/directory-categories', { cache: 'no-store' }), // Always fresh - fixes Firefox caching
+          fetch('/api/directory', { cache: 'no-store' }) // Always fresh - fixes Firefox caching
         ])
 
         if (categoriesRes.ok) {

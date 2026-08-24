@@ -24,7 +24,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(radioShows, {
       headers: {
-        'Cache-Control': 'public, s-maxage=180, stale-while-revalidate=360'
+        'Cache-Control': 'public, max-age=60, s-maxage=180, must-revalidate',
+        'Vary': 'Accept-Encoding',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
     })
   } catch (error) {

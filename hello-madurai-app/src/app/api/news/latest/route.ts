@@ -32,7 +32,12 @@ export async function GET() {
 
     return NextResponse.json(news || [], {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'
+        'Cache-Control': 'public, max-age=30, s-maxage=60, must-revalidate',
+        'Vary': 'Accept-Encoding',
+        'ETag': `"latest-news-${Date.now()}"`,
+        // Firefox-specific: prevent stale cache
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
     })
   } catch (error) {

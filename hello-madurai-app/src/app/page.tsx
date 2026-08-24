@@ -152,8 +152,8 @@ export default function RootPage() {
       try {
         // Fetch all data in parallel for faster loading
         const [featuresResponse, newsResponse] = await Promise.all([
-          fetch('/api/home-features', { next: { revalidate: 300 }, cache: 'force-cache' }), // Cache for 5 minutes
-          fetch('/api/news/latest', { next: { revalidate: 60 }, cache: 'force-cache' }) // Optimized endpoint, cache for 1 minute
+          fetch('/api/home-features', { cache: 'no-store' }), // Always fresh features
+          fetch('/api/news/latest', { cache: 'no-store' }) // Always fresh news - fixes Firefox caching
         ])
 
         if (featuresResponse.ok) {
