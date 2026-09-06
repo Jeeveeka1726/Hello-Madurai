@@ -99,7 +99,20 @@ export async function POST(request: NextRequest) {
         stack: dbError instanceof Error ? dbError.stack : undefined
       })
 
-      // Fallback to local file system (development only)
+      // Fallback to local file system (development only).
+      // In production (e.g. Hostinger), the filesystem is wiped on every
+      // redeploy, so a file saved here would 404 later and show as a
+      // broken image. Only use this fallback outside production.
+      if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json(
+          {
+            error: 'Failed to save image to database. Please try again.',
+            details: dbError instanceof Error ? dbError.message : 'Unknown error'
+          },
+          { status: 500 }
+        )
+      }
+
       try {
         console.log('📁 Attempting fallback to local file system...')
         const uploadsDir = join(process.cwd(), 'public', 'uploads', 'image')

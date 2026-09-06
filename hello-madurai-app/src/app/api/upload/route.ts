@@ -118,8 +118,21 @@ export async function POST(request: NextRequest) {
       console.log('✅ Image saved to Hostinger database:', imageRecord.id)
     } catch (dbError) {
       console.error('Database save error:', dbError)
-      
-      // Fallback to local file system (development only)
+
+      // Fallback to local file system (development only).
+      // In production (e.g. Hostinger), the filesystem is wiped on every
+      // redeploy, so a file saved here would 404 later and show as a
+      // broken image. Only use this fallback outside production.
+      if (isProduction) {
+        return NextResponse.json(
+          {
+            error: 'Failed to save image to database. Please try again.',
+            details: dbError instanceof Error ? dbError.message : 'Unknown error'
+          },
+          { status: 500 }
+        )
+      }
+
       try {
         if (!existsSync(uploadsDir)) {
           mkdirSync(uploadsDir, { recursive: true })
