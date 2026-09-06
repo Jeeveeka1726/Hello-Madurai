@@ -56,9 +56,10 @@ export default function BusinessStructuredData({ business }: BusinessStructuredD
       "@type": "City",
       "name": "Madurai"
     },
-    "hasMap": business.latitude && business.longitude 
+    "hasMap": business.latitude && business.longitude
       ? `https://www.google.com/maps?q=${business.latitude},${business.longitude}`
-      : undefined
+      : undefined,
+    "sameAs": [business.website, business.facebookUrl, business.instagramUrl].filter(Boolean)
   }
 
   // Breadcrumb schema
