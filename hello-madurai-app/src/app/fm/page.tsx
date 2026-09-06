@@ -727,6 +727,14 @@ function DigitalFMPageContent() {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  // Guard against corrupted/legacy values like "Infinity:NaN" from live streams
+  const displayDuration = (duration?: string | null) => {
+    if (!duration || duration.includes('Infinity') || duration.includes('NaN')) {
+      return '0:00'
+    }
+    return duration
+  }
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString(language === 'ta' ? 'ta-IN' : 'en-IN', {
@@ -942,7 +950,7 @@ function DigitalFMPageContent() {
                               {language === 'ta' && song.title_ta ? song.title_ta : song.title}
                             </h4>
                             <p className="text-sm text-gray-500">
-                              {song.singer?.name} • {song.duration || '0:00'} • {song.plays} {language === 'ta' ? 'பார்வைகள்' : 'plays'}
+                              {song.singer?.name} • {displayDuration(song.duration)} • {song.plays} {language === 'ta' ? 'பார்வைகள்' : 'plays'}
                             </p>
                           </div>
                           <div className="flex-shrink-0">
@@ -1198,7 +1206,7 @@ function DigitalFMPageContent() {
                           {language === 'ta' && song.title_ta ? song.title_ta : song.title}
                         </h4>
                         <p className="text-sm text-gray-500">
-                          {formatDate(song.createdAt)} • {song.duration || '0:00'} • {song.plays} {language === 'ta' ? 'பார்வைகள்' : 'plays'}
+                          {formatDate(song.createdAt)} • {displayDuration(song.duration)} • {song.plays} {language === 'ta' ? 'பார்வைகள்' : 'plays'}
                         </p>
                       </div>
 

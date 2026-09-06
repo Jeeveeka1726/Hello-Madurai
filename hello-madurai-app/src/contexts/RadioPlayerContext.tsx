@@ -146,19 +146,42 @@ export function RadioPlayerProvider({
     const savedSong = localStorage.getItem('radio_current_song')
     const savedTime = localStorage.getItem('radio_current_time')
     const savedIsPlaying = localStorage.getItem('radio_is_playing')
+    const savedPlaylist = localStorage.getItem('radio_current_playlist')
+    const savedIndex = localStorage.getItem('radio_current_index')
+
+    if (savedPlaylist) {
+      try {
+        const playlist = JSON.parse(savedPlaylist)
+        if (Array.isArray(playlist) && playlist.length > 0) {
+          setCurrentPlaylist(playlist)
+          if (savedIndex) {
+            setCurrentIndex(parseInt(savedIndex, 10))
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to restore saved playlist:', err)
+      }
+    }
 
     if (savedSong) {
       const song = JSON.parse(savedSong)
       setCurrentSong(song)
-      
+
       if (audioRef.current) {
         audioRef.current.src = song.audioUrl
         if (savedTime) {
           audioRef.current.currentTime = parseFloat(savedTime)
         }
         if (savedIsPlaying === 'true') {
-          audioRef.current.play().catch(err => console.log('Auto-play prevented:', err))
-          setIsPlaying(true)
+          audioRef.current.play()
+            .then(() => setIsPlaying(true))
+            .catch(err => {
+              // Browsers block autoplay without a fresh user gesture after refresh.
+              // Keep isPlaying false so the UI accurately shows "paused" and the
+              // user can resume with a single click instead of it looking stuck.
+              console.log('Auto-play prevented:', err)
+              setIsPlaying(false)
+            })
         }
       }
     }
@@ -171,6 +194,14 @@ export function RadioPlayerProvider({
       localStorage.setItem('radio_is_playing', isPlaying.toString())
     }
   }, [currentSong, isPlaying])
+
+  // Save playlist/queue position so auto-play-next keeps working after a refresh
+  useEffect(() => {
+    if (currentPlaylist.length > 0) {
+      localStorage.setItem('radio_current_playlist', JSON.stringify(currentPlaylist))
+      localStorage.setItem('radio_current_index', currentIndex.toString())
+    }
+  }, [currentPlaylist, currentIndex])
 
   // Save current time periodically
   useEffect(() => {
@@ -205,23 +236,10 @@ export function RadioPlayerProvider({
           if (nextSong) {
             console.log('⏭️ Auto-playing next song:', nextSong.title, 'at index:', nextIndex)
             setCurrentIndex(nextIndex)
-            setCurrentSong(nextSong)
-
-            // Start playing the next song
-            const audio = audioRef.current
-            if (audio) {
-              const validatedUrl = validateAndFixAudioUrl(nextSong.audioUrl)
-              console.log('🔗 Loading next song URL:', validatedUrl)
-              audio.src = validatedUrl
-              audio.load()
-              audio.play().then(() => {
-                console.log('✅ Next song started playing successfully')
-                setIsPlaying(true)
-              }).catch(error => {
-                console.error('❌ Error auto-playing next song:', error)
-                setIsPlaying(false)
-              })
-            }
+            // Delegate to playSong so embedded/live stream songs are correctly
+            // extracted via /api/radio-stream instead of being loaded as a
+            // direct audio src (which fails for embed-type stations).
+            playSong(nextSong, currentPlaylist)
           }
         }, 500) // Small delay to ensure clean transition
       } else {
@@ -453,7 +471,8 @@ export function RadioPlayerProvider({
           setDuration(audioDuration)
 
           // Update the song duration in the database if it's not set or if it's different
-          if (!isNaN(audioDuration) && audioDuration > 0) {
+          // Skip Infinity/NaN durations (common for live streams with unknown length)
+          if (isFinite(audioDuration) && audioDuration > 0) {
             const formattedDuration = `${Math.floor(audioDuration / 60)}:${String(Math.floor(audioDuration % 60)).padStart(2, '0')}`
 
             // Update if no duration exists, is invalid, or is different

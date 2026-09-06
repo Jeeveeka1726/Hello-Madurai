@@ -60,6 +60,8 @@ export default function GlobalRadioPlayer() {
     localStorage.removeItem('radio_current_song')
     localStorage.removeItem('radio_current_time')
     localStorage.removeItem('radio_is_playing')
+    localStorage.removeItem('radio_current_playlist')
+    localStorage.removeItem('radio_current_index')
   }
 
   const handleOpenRadio = () => {

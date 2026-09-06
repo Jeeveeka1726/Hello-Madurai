@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   PhotoIcon,
   DocumentIcon,
@@ -85,6 +85,13 @@ export default function FileUpload({
   const [urlInput, setUrlInput] = useState(currentUrl || '')
   const [testingUrl, setTestingUrl] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Keep the local input in sync whenever the underlying value changes,
+  // e.g. when switching between editing different items (song/singer/etc.)
+  // without this component being unmounted/remounted.
+  useEffect(() => {
+    setUrlInput(currentUrl || '')
+  }, [currentUrl])
 
   const config = fileTypeConfig[fileType]
   const IconComponent = config.icon
@@ -505,7 +512,14 @@ export default function FileUpload({
             <input
               type="url"
               value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value
+                setUrlInput(value)
+                // Keep the parent form's value in sync as the user types so a
+                // forgotten "Set URL" click can never leave a stale/previous
+                // URL saved for a different item.
+                onUrlChange(value)
+              }}
               placeholder={`Enter ${config.label.toLowerCase()} URL...`}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />

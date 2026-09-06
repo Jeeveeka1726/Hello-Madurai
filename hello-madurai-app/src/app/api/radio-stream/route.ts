@@ -39,7 +39,21 @@ export async function POST(request: NextRequest) {
 
     // Extract audio stream URLs from the HTML
     const streamUrls: string[] = []
-    
+
+    // tamilradios.com (and similar Next.js-powered sites) embed the page's
+    // own station data as a JSON blob (React Server Components payload)
+    // containing a "web_stream_url" field. The page also embeds a list of
+    // "suggested stations" further down with their own web_stream_url
+    // values, so the FIRST occurrence in the HTML is always the station
+    // that this specific page/URL actually represents. Without this,
+    // fallback generic regexes below tend to match a shared/featured
+    // widget URL that is IDENTICAL across every station page, causing all
+    // "embed" type radio stations to incorrectly play the same stream.
+    const webStreamUrlMatch = html.match(/web_stream_url\\?"\s*:\s*\\?"(https?:[^"\\]+)/)
+    if (webStreamUrlMatch && webStreamUrlMatch[1]) {
+      streamUrls.push(webStreamUrlMatch[1])
+    }
+
     // Look for common audio stream patterns
     const patterns = [
       // Direct MP3/AAC stream URLs

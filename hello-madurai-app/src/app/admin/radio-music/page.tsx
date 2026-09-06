@@ -519,6 +519,11 @@ export default function RadioMusicAdminPage() {
           audio.load()
         })
 
+        // Skip Infinity/NaN durations (common for live streams with unknown length)
+        if (!isFinite(duration) || duration <= 0) {
+          throw new Error('Duration not available (stream has no fixed length)')
+        }
+
         // Format duration as MM:SS
         const minutes = Math.floor(duration / 60)
         const seconds = Math.floor(duration % 60)
@@ -1060,7 +1065,7 @@ export default function RadioMusicAdminPage() {
                                   <h4 className="font-semibold text-gray-900">{song.title}</h4>
                                   {song.title_ta && <p className="text-sm text-gray-600">{song.title_ta}</p>}
                                   <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
-                                    <span>⏱️ {song.duration || 'N/A'}</span>
+                                    <span>⏱️ {song.duration && !song.duration.includes('Infinity') && !song.duration.includes('NaN') ? song.duration : 'N/A'}</span>
                                     <span>▶️ {song.plays} plays</span>
                                   </div>
                                 </div>
