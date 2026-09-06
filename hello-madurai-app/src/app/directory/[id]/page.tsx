@@ -7,6 +7,7 @@ interface Business {
   id: string
   name: string
   name_ta: string
+  category?: string
   address: string
   address_ta: string
   phone?: string
@@ -50,6 +51,7 @@ async function getBusiness(idOrSlug: string): Promise<Business | null> {
             id: true,
             name: true,
             name_ta: true,
+            category: true,
             slug: true,
             address: true,
             address_ta: true,
@@ -76,6 +78,7 @@ async function getBusiness(idOrSlug: string): Promise<Business | null> {
             id: true,
             name: true,
             name_ta: true,
+            category: true,
             slug: true,
             address: true,
             address_ta: true,
@@ -197,9 +200,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   console.log('🖼️ Final Image URL:', absoluteImageUrl)
   console.log('🔗 Business URL:', businessUrl)
 
+  const keywords = [
+    businessName,
+    business.name_ta,
+    business.category,
+    'Madurai',
+    'மதுரை',
+    'Hello Madurai'
+  ].filter(Boolean).join(', ')
+
   return {
     title: `${businessName} - Hello Madurai`,
     description,
+    keywords,
     openGraph: {
       title: businessName,
       description: `${businessName} - ${businessAddress}`,
