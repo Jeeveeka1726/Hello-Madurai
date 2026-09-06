@@ -255,7 +255,7 @@ function EventsPageContent() {
         {/* All Events */}
         {!loading && events.length > 0 && (
         <div>
-          <div className="flex flex-col gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-6xl mx-auto items-start">
             {events
               .filter(event => selectedCategory === 'all' || event.category === selectedCategory)
               .map((event) => {
@@ -264,26 +264,25 @@ function EventsPageContent() {
 
               return (
                 <Card key={event.id} className="event-card overflow-hidden hover:shadow-lg transition-shadow bg-white border-gray-200">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-6">
                     {/* Title First - Centered */}
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center" suppressHydrationWarning>
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 text-center" suppressHydrationWarning>
                       {eventTitle}
                     </h3>
-                    
+
                     {/* Featured Image */}
                     {event.featuredImage && (
-                      <div className="w-full rounded-lg mb-4 bg-gray-100">
+                      <div className="-mx-[2rem] sm:-mx-[3rem] mb-4 bg-gray-100 overflow-hidden leading-none">
                         <img
                           src={event.featuredImage}
                           alt={eventTitle}
-                          className="w-full h-auto object-contain rounded-lg"
-                          style={{ maxHeight: '500px' }}
+                          className="block w-full h-auto object-cover aspect-[3/4]"
                         />
                       </div>
                     )}
                     
                     {/* Date/Time Details Above Description - Highlighted */}
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-4 border-l-4 border-blue-500">
+                    <div className="-mx-[2rem] sm:-mx-[3rem] bg-gradient-to-r from-blue-50 to-indigo-50 p-4 mb-4 border-l-4 border-blue-500">
                       <div className="space-y-3">
                         <div className="flex items-center">
                           <CalendarIcon className="h-5 w-5 mr-3 text-blue-600 flex-shrink-0" />
