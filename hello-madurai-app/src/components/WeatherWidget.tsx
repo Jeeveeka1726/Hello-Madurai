@@ -214,7 +214,7 @@ export default function WeatherWidget() {
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
         style={{
-          top: position.y > 0 ? `${position.y}px` : '8px',
+          top: position.y > 0 ? `${position.y}px` : (isMobile ? '76px' : '8px'),
           right: position.x > 0 ? 'auto' : '8px',
           left: position.x > 0 ? `${position.x}px` : 'auto',
           userSelect: 'none',
