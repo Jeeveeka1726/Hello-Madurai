@@ -35,6 +35,8 @@ export default function WeatherWidget() {
   const [isMobile, setIsMobile] = useState(false)
   const widgetRef = useRef<HTMLDivElement>(null)
   const hasDraggedRef = useRef(false)
+  const rafIdRef = useRef<number | null>(null)
+  const pendingPositionRef = useRef<Position | null>(null)
 
   // Detect mobile on mount
   useEffect(() => {
@@ -116,20 +118,7 @@ export default function WeatherWidget() {
   }
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return
-      e.preventDefault()
-      updatePosition(e.clientX, e.clientY)
-    }
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!isDragging) return
-      e.preventDefault()
-      const touch = e.touches[0]
-      updatePosition(touch.clientX, touch.clientY)
-    }
-
-    const updatePosition = (clientX: number, clientY: number) => {
+    const scheduleUpdate = (clientX: number, clientY: number) => {
       hasDraggedRef.current = true
       const newX = clientX - dragOffset.x
       const newY = clientY - dragOffset.y
@@ -137,14 +126,55 @@ export default function WeatherWidget() {
       const maxX = window.innerWidth - (widgetRef.current?.offsetWidth || 320)
       const maxY = window.innerHeight - (widgetRef.current?.offsetHeight || 100)
 
-      setPosition({
+      const clamped = {
         x: Math.max(0, Math.min(newX, maxX)),
         y: Math.max(0, Math.min(newY, maxY))
-      })
+      }
+
+      pendingPositionRef.current = clamped
+
+      // Reflect the move immediately on the DOM for smooth 60fps dragging,
+      // then commit to React state once per animation frame (avoids
+      // re-render-per-touch-event jank on mobile).
+      if (widgetRef.current) {
+        widgetRef.current.style.left = `${clamped.x}px`
+        widgetRef.current.style.top = `${clamped.y}px`
+        widgetRef.current.style.right = 'auto'
+      }
+
+      if (rafIdRef.current === null) {
+        rafIdRef.current = requestAnimationFrame(() => {
+          rafIdRef.current = null
+          if (pendingPositionRef.current) {
+            setPosition(pendingPositionRef.current)
+          }
+        })
+      }
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return
+      e.preventDefault()
+      scheduleUpdate(e.clientX, e.clientY)
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDragging) return
+      e.preventDefault()
+      const touch = e.touches[0]
+      scheduleUpdate(touch.clientX, touch.clientY)
     }
 
     const handleEnd = () => {
       setIsDragging(false)
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current)
+        rafIdRef.current = null
+      }
+      if (pendingPositionRef.current) {
+        setPosition(pendingPositionRef.current)
+        pendingPositionRef.current = null
+      }
     }
 
     if (isDragging) {
@@ -152,11 +182,13 @@ export default function WeatherWidget() {
       document.addEventListener('mouseup', handleEnd)
       document.addEventListener('touchmove', handleTouchMove, { passive: false })
       document.addEventListener('touchend', handleEnd)
+      document.addEventListener('touchcancel', handleEnd)
       return () => {
         document.removeEventListener('mousemove', handleMouseMove)
         document.removeEventListener('mouseup', handleEnd)
         document.removeEventListener('touchmove', handleTouchMove)
         document.removeEventListener('touchend', handleEnd)
+        document.removeEventListener('touchcancel', handleEnd)
       }
     }
   }, [isDragging, dragOffset])
@@ -185,7 +217,7 @@ export default function WeatherWidget() {
       96: { en: 'Thunderstorm', ta: 'இடி மின்னல்' },
       99: { en: 'Severe thunderstorm', ta: 'கடும் இடி மின்னல்' }
     }
-    return descriptions[code]?.[lang] || (lang === 'ta' ? 'தெரியவில்லை' : 'Unknown')
+    return descriptions[code]?.[lang as 'en' | 'ta'] || (lang === 'ta' ? 'தெரியவில்லை' : 'Unknown')
   }
 
   const getWeatherIcon = (code: number): string => {
@@ -231,7 +263,7 @@ export default function WeatherWidget() {
       ref={widgetRef}
       className={`fixed z-[9999] backdrop-blur-md bg-white/60 rounded-xl shadow-2xl border border-white/50 overflow-hidden transition-shadow ${isDragging ? 'cursor-grabbing shadow-3xl' : 'cursor-grab hover:shadow-3xl'}`}
       style={{
-        top: position.y > 0 ? `${position.y}px` : '8px',
+        top: position.y > 0 ? `${position.y}px` : (isMobile ? '76px' : '8px'),
         right: position.x > 0 ? 'auto' : '8px',
         left: position.x > 0 ? `${position.x}px` : 'auto',
         width: isMobile ? '260px' : '320px',
