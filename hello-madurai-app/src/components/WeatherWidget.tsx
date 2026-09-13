@@ -34,6 +34,7 @@ export default function WeatherWidget() {
   const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 })
   const [isMobile, setIsMobile] = useState(false)
   const widgetRef = useRef<HTMLDivElement>(null)
+  const hasDraggedRef = useRef(false)
 
   // Detect mobile on mount
   useEffect(() => {
@@ -89,6 +90,7 @@ export default function WeatherWidget() {
 
   // Drag functionality - Mouse and Touch
   const handleStart = (clientX: number, clientY: number) => {
+    hasDraggedRef.current = false
     setIsDragging(true)
     if (widgetRef.current) {
       const rect = widgetRef.current.getBoundingClientRect()
@@ -128,6 +130,7 @@ export default function WeatherWidget() {
     }
 
     const updatePosition = (clientX: number, clientY: number) => {
+      hasDraggedRef.current = true
       const newX = clientX - dragOffset.x
       const newY = clientY - dragOffset.y
 
@@ -202,12 +205,20 @@ export default function WeatherWidget() {
   if (isMinimized) {
     return (
       <div
-        className="fixed z-[9999] backdrop-blur-md bg-blue-500/30 text-white rounded-full shadow-lg cursor-pointer hover:shadow-xl hover:bg-blue-500/40 transition-all p-2 sm:p-2.5 border border-white/30"
-        onClick={() => setIsMinimized(false)}
+        ref={widgetRef}
+        className={`fixed z-[9999] backdrop-blur-md bg-blue-500/30 text-white rounded-full shadow-lg hover:shadow-xl hover:bg-blue-500/40 transition-all p-2 sm:p-2.5 border border-white/30 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        onClick={() => {
+          // Only treat as a click (open widget) if the user didn't actually drag
+          if (!hasDraggedRef.current) setIsMinimized(false)
+        }}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         style={{
           top: position.y > 0 ? `${position.y}px` : '8px',
           right: position.x > 0 ? 'auto' : '8px',
-          left: position.x > 0 ? `${position.x}px` : 'auto'
+          left: position.x > 0 ? `${position.x}px` : 'auto',
+          userSelect: 'none',
+          touchAction: 'none'
         }}
       >
         <CloudIcon className="h-4 w-4 sm:h-5 sm:w-5" />
