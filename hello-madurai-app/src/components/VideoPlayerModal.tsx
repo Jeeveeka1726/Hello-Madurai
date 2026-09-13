@@ -111,23 +111,65 @@ export default function VideoPlayerModal({
       onClick={handleBackdropClick}
       className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-0 sm:p-8"
     >
+      {/* Outer wrapper: on mobile this stacks a solid header bar (never
+          overlapping the video's rectangle) on top of the video area.
+          Android WebViews render embedded video (YouTube iframe) on its own
+          hardware compositing surface that always paints above regular HTML
+          content, ignoring CSS z-index - so any button placed ON TOP of the
+          video can get hidden behind it. Keeping the close/nav/title controls
+          in a strip that sits OUTSIDE the video's box avoids that entirely. */}
+      <div className="relative w-full h-full sm:w-[500px] sm:h-auto flex flex-col sm:block">
+        {/* Header bar - mobile only; on desktop these controls overlay the video */}
+        <div
+          className="flex sm:hidden items-center justify-between gap-2 bg-black px-2 pb-2 z-50 relative"
+          style={{ paddingTop: 'calc(0.5rem + env(safe-area-inset-top, 0px))' }}
+        >
+          <div className="flex-1 min-w-0 text-white">
+            <h2 className="text-sm font-semibold line-clamp-1">{title}</h2>
+          </div>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {hasPrevious && onPrevious && (
+              <button
+                type="button"
+                onClick={onPrevious}
+                className="bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-full p-2 text-white transition-colors touch-manipulation"
+                aria-label="Previous video"
+              >
+                <ChevronLeftIcon className="w-5 h-5" />
+              </button>
+            )}
+            {hasNext && onNext && (
+              <button
+                type="button"
+                onClick={onNext}
+                className="bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-full p-2 text-white transition-colors touch-manipulation"
+                aria-label="Next video"
+              >
+                <ChevronRightIcon className="w-5 h-5" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-full p-2.5 text-white transition-colors touch-manipulation"
+              aria-label="Close video"
+            >
+              <XMarkIcon className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+
       {/* Video container - Responsive: fullscreen on mobile, contained on desktop */}
-      <div className="relative w-full h-full sm:w-[500px] sm:h-[calc(500px*16/9)] sm:max-h-[85vh] bg-black sm:rounded-lg overflow-hidden shadow-2xl">
-        {/* Close button - always visible top-right; safe-area insets are added
-            on top of a guaranteed base offset so it's never hidden under a
-            notch, punch-hole camera or the status bar on any phone, even on
-            older Android WebViews that don't support env()/max() in CSS */}
+      <div className="relative w-full flex-1 sm:h-[calc(500px*16/9)] sm:max-h-[85vh] bg-black sm:rounded-lg overflow-hidden shadow-2xl">
+        {/* Close button - desktop/tablet overlay only; on mobile the button
+            lives in the header bar above instead of over the video. */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 bg-black/60 hover:bg-black/70 active:bg-black/80 rounded-full p-2.5 sm:p-2 text-white transition-colors touch-manipulation"
-          style={{
-            top: 'calc(0.5rem + env(safe-area-inset-top, 0px))',
-            right: 'calc(0.5rem + env(safe-area-inset-right, 0px))'
-          }}
+          className="hidden sm:flex absolute top-4 right-4 z-50 bg-black/60 hover:bg-black/70 active:bg-black/80 rounded-full p-2 text-white transition-colors touch-manipulation"
           aria-label="Close video"
         >
-          <XMarkIcon className="w-6 h-6 sm:w-6 sm:h-6" />
+          <XMarkIcon className="w-6 h-6" />
         </button>
 
         {/* Previous button */}
@@ -135,11 +177,10 @@ export default function VideoPlayerModal({
           <button
             type="button"
             onClick={onPrevious}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/70 rounded-full p-2 sm:p-3 text-white transition-colors touch-manipulation"
-            style={{ left: 'calc(0.5rem + env(safe-area-inset-left, 0px))' }}
+            className="hidden sm:flex absolute left-2 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/70 rounded-full p-3 text-white transition-colors touch-manipulation"
             aria-label="Previous video"
           >
-            <ChevronLeftIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+            <ChevronLeftIcon className="w-6 h-6" />
           </button>
         )}
 
@@ -148,20 +189,16 @@ export default function VideoPlayerModal({
           <button
             type="button"
             onClick={onNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/70 rounded-full p-2 sm:p-3 text-white transition-colors touch-manipulation"
-            style={{ right: 'calc(0.5rem + env(safe-area-inset-right, 0px))' }}
+            className="hidden sm:flex absolute right-2 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/70 rounded-full p-3 text-white transition-colors touch-manipulation"
             aria-label="Next video"
           >
-            <ChevronRightIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+            <ChevronRightIcon className="w-6 h-6" />
           </button>
         )}
 
-        {/* Title */}
-        <div
-          className="absolute top-2 left-2 right-16 sm:top-4 sm:left-4 sm:right-20 z-40 text-white pointer-events-none"
-          style={{ top: 'calc(0.5rem + env(safe-area-inset-top, 0px))' }}
-        >
-          <h2 className="text-sm sm:text-base font-semibold line-clamp-1 drop-shadow-lg">{title}</h2>
+        {/* Title - desktop/tablet overlay only */}
+        <div className="hidden sm:block absolute top-4 left-4 right-20 z-40 text-white pointer-events-none">
+          <h2 className="text-base font-semibold line-clamp-1 drop-shadow-lg">{title}</h2>
         </div>
 
         {/* Video iframe/element */}
@@ -226,6 +263,7 @@ export default function VideoPlayerModal({
             Your browser does not support the video tag.
           </video>
         )}
+      </div>
       </div>
     </div>
   )
