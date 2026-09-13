@@ -109,14 +109,17 @@ export default function VideoPlayerModal({
     >
       {/* Video container - Responsive: fullscreen on mobile, contained on desktop */}
       <div className="relative w-full h-full sm:w-[500px] sm:h-[calc(500px*16/9)] sm:max-h-[85vh] bg-black sm:rounded-lg overflow-hidden shadow-2xl">
-        {/* Close button - offset by safe-area insets so it's never hidden under a
-            notch, punch-hole camera or the status bar on any phone */}
+        {/* Close button - always visible top-right; safe-area insets are added
+            on top of a guaranteed base offset so it's never hidden under a
+            notch, punch-hole camera or the status bar on any phone, even on
+            older Android WebViews that don't support env()/max() in CSS */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute z-30 sm:top-4 sm:right-4 bg-black/50 hover:bg-black/70 active:bg-black/80 rounded-full p-2.5 sm:p-2 text-white transition-colors"
+          className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 bg-black/60 hover:bg-black/70 active:bg-black/80 rounded-full p-2.5 sm:p-2 text-white transition-colors touch-manipulation"
           style={{
-            top: 'max(0.5rem, env(safe-area-inset-top))',
-            right: 'max(0.5rem, env(safe-area-inset-right))'
+            top: 'calc(0.5rem + env(safe-area-inset-top, 0px))',
+            right: 'calc(0.5rem + env(safe-area-inset-right, 0px))'
           }}
           aria-label="Close video"
         >
@@ -126,9 +129,10 @@ export default function VideoPlayerModal({
         {/* Previous button */}
         {hasPrevious && onPrevious && (
           <button
+            type="button"
             onClick={onPrevious}
-            className="absolute top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 rounded-full p-2 sm:p-3 text-white transition-colors"
-            style={{ left: 'max(0.5rem, env(safe-area-inset-left))' }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/70 rounded-full p-2 sm:p-3 text-white transition-colors touch-manipulation"
+            style={{ left: 'calc(0.5rem + env(safe-area-inset-left, 0px))' }}
             aria-label="Previous video"
           >
             <ChevronLeftIcon className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -138,9 +142,10 @@ export default function VideoPlayerModal({
         {/* Next button */}
         {hasNext && onNext && (
           <button
+            type="button"
             onClick={onNext}
-            className="absolute top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 rounded-full p-2 sm:p-3 text-white transition-colors"
-            style={{ right: 'max(0.5rem, env(safe-area-inset-right))' }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-black/70 rounded-full p-2 sm:p-3 text-white transition-colors touch-manipulation"
+            style={{ right: 'calc(0.5rem + env(safe-area-inset-right, 0px))' }}
             aria-label="Next video"
           >
             <ChevronRightIcon className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -149,8 +154,8 @@ export default function VideoPlayerModal({
 
         {/* Title */}
         <div
-          className="absolute left-2 right-16 sm:top-4 sm:left-4 sm:right-20 z-20 text-white"
-          style={{ top: 'max(0.5rem, env(safe-area-inset-top))' }}
+          className="absolute top-2 left-2 right-16 sm:top-4 sm:left-4 sm:right-20 z-40 text-white pointer-events-none"
+          style={{ top: 'calc(0.5rem + env(safe-area-inset-top, 0px))' }}
         >
           <h2 className="text-sm sm:text-base font-semibold line-clamp-1 drop-shadow-lg">{title}</h2>
         </div>
@@ -161,7 +166,7 @@ export default function VideoPlayerModal({
             const embedUrl = getEmbedUrl()
             console.log('YouTube embed URL:', embedUrl)
             return (
-              <div className="absolute inset-0 overflow-hidden flex items-center justify-center bg-black">
+              <div className="absolute inset-0 z-0 overflow-hidden flex items-center justify-center bg-black">
                 <iframe
                   src={embedUrl}
                   className="absolute inset-0 w-full h-full sm:relative"
@@ -180,7 +185,7 @@ export default function VideoPlayerModal({
             )
           })()
         ) : videoType === 'instagram' ? (
-          <div className="absolute inset-0 overflow-hidden flex items-center justify-center">
+          <div className="absolute inset-0 z-0 overflow-hidden flex items-center justify-center">
             {/* Instagram gradient background - shows while loading and as fallback */}
             <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 flex items-center justify-center">
               <div className="text-center text-white">
@@ -210,7 +215,7 @@ export default function VideoPlayerModal({
         ) : (
           <video
             src={videoUrl}
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 z-0 w-full h-full"
             style={{ objectFit: 'contain' }}
             controls
             autoPlay
