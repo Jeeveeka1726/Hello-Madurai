@@ -79,7 +79,11 @@ export default function VideoPlayerModal({
         // Add parameters for iPhone autoplay support
         // mute=1 is required for autoplay on iOS (browsers block unmuted autoplay)
         // playsinline=1 allows inline playback on iOS instead of fullscreen
-        return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&rel=0&controls=1`
+        // fs=0 hides YouTube's own fullscreen button so the player can never
+        // take over the whole screen via the browser Fullscreen API - that
+        // would render above our modal's DOM (including the close button)
+        // and there would be no way to get back to our UI.
+        return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&rel=0&controls=1&fs=0`
       } else {
         console.error('VideoPlayerModal - Failed to extract video ID from:', videoUrl)
       }
@@ -178,7 +182,6 @@ export default function VideoPlayerModal({
                     minHeight: '100%'
                   }}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
                   title={title}
                 />
               </div>
