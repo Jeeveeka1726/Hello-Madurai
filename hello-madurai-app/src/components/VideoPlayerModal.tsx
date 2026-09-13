@@ -109,20 +109,26 @@ export default function VideoPlayerModal({
     >
       {/* Video container - Responsive: fullscreen on mobile, contained on desktop */}
       <div className="relative w-full h-full sm:w-[500px] sm:h-[calc(500px*16/9)] sm:max-h-[85vh] bg-black sm:rounded-lg overflow-hidden shadow-2xl">
-        {/* Close button */}
+        {/* Close button - offset by safe-area insets so it's never hidden under a
+            notch, punch-hole camera or the status bar on any phone */}
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 bg-black/50 hover:bg-black/70 rounded-full p-2 text-white transition-colors"
+          className="absolute z-30 sm:top-4 sm:right-4 bg-black/50 hover:bg-black/70 active:bg-black/80 rounded-full p-2.5 sm:p-2 text-white transition-colors"
+          style={{
+            top: 'max(0.5rem, env(safe-area-inset-top))',
+            right: 'max(0.5rem, env(safe-area-inset-right))'
+          }}
           aria-label="Close video"
         >
-          <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+          <XMarkIcon className="w-6 h-6 sm:w-6 sm:h-6" />
         </button>
 
         {/* Previous button */}
         {hasPrevious && onPrevious && (
           <button
             onClick={onPrevious}
-            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 rounded-full p-2 sm:p-3 text-white transition-colors"
+            className="absolute top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 rounded-full p-2 sm:p-3 text-white transition-colors"
+            style={{ left: 'max(0.5rem, env(safe-area-inset-left))' }}
             aria-label="Previous video"
           >
             <ChevronLeftIcon className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -133,7 +139,8 @@ export default function VideoPlayerModal({
         {hasNext && onNext && (
           <button
             onClick={onNext}
-            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 rounded-full p-2 sm:p-3 text-white transition-colors"
+            className="absolute top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 rounded-full p-2 sm:p-3 text-white transition-colors"
+            style={{ right: 'max(0.5rem, env(safe-area-inset-right))' }}
             aria-label="Next video"
           >
             <ChevronRightIcon className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -141,7 +148,10 @@ export default function VideoPlayerModal({
         )}
 
         {/* Title */}
-        <div className="absolute top-2 left-2 right-16 sm:top-4 sm:left-4 sm:right-20 z-20 text-white">
+        <div
+          className="absolute left-2 right-16 sm:top-4 sm:left-4 sm:right-20 z-20 text-white"
+          style={{ top: 'max(0.5rem, env(safe-area-inset-top))' }}
+        >
           <h2 className="text-sm sm:text-base font-semibold line-clamp-1 drop-shadow-lg">{title}</h2>
         </div>
 
