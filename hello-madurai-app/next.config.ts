@@ -94,13 +94,16 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      // Feature images - aggressive caching
+      // Feature images - always revalidate so updated images show immediately
+      // (files are replaced in place with the same filename, so we can't
+      // cache them as immutable; browsers will still cache locally but must
+      // check with the server on every load via a fast conditional request)
       {
         source: '/feature-images/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=0, must-revalidate',
           },
         ],
       },

@@ -62,7 +62,7 @@ export default function NoticeScroller() {
     const fetchNotices = async () => {
       try {
         const response = await fetch('/api/notice-banners', {
-          cache: 'force-cache',
+          cache: 'no-store',
         })
 
         if (!isMounted) return
