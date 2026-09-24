@@ -94,6 +94,16 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      // Service worker - always revalidate so updates roll out promptly
+      {
+        source: '/sw.js',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache',
+          },
+        ],
+      },
       // Feature images - always revalidate so updated images show immediately
       // (files are replaced in place with the same filename, so we can't
       // cache them as immutable; browsers will still cache locally but must

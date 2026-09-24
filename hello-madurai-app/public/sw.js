@@ -1,9 +1,9 @@
 // Service Worker for Background Audio Playback + Image Caching
 // Hello Madurai Radio - Background Play Support
 
-const CACHE_NAME = 'hello-madurai-v4'
-const IMAGE_CACHE_NAME = 'hello-madurai-images-v4'
-const RUNTIME_CACHE = 'hello-madurai-runtime-v4'
+const CACHE_NAME = 'hello-madurai-v5'
+const IMAGE_CACHE_NAME = 'hello-madurai-images-v5'
+const RUNTIME_CACHE = 'hello-madurai-runtime-v5'
 const urlsToCache = [
   '/',
   '/radio',
@@ -76,22 +76,52 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Cache-first for notice banners API
+  // Network-first for notice banners API - always fetch fresh banner list
+  // so admin updates show up on a normal refresh; cache is only a fallback
+  // for when the user is offline
   if (url.pathname === '/api/notice-banners') {
     event.respondWith(
-      caches.open(CACHE_NAME).then((cache) => {
-        return cache.match(event.request).then((cachedResponse) => {
-          const fetchPromise = fetch(event.request).then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              cache.put(event.request, networkResponse.clone())
-            }
-            return networkResponse
-          })
-
-          // Return cached response immediately if available
-          return cachedResponse || fetchPromise
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone()
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache)
+            })
+          }
+          return networkResponse
         })
-      })
+        .catch(() =>
+          caches.match(event.request).then(
+            (cachedResponse) =>
+              cachedResponse ||
+              new Response('[]', {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              })
+          )
+        )
+    )
+    return
+  }
+
+  // Feature images - network-first so images replaced in place (same
+  // filename) show up immediately on a normal refresh. The server sends
+  // must-revalidate so unchanged files are a cheap 304; cache fallback
+  // keeps them available offline.
+  if (url.pathname.startsWith('/feature-images/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone()
+            caches.open(IMAGE_CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache)
+            })
+          }
+          return networkResponse
+        })
+        .catch(() => caches.match(event.request))
     )
     return
   }
