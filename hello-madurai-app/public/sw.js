@@ -102,23 +102,27 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Feature images - network-first so images replaced in place (same
-  // filename) show up immediately on a normal refresh. The server sends
-  // must-revalidate so unchanged files are a cheap 304; cache fallback
-  // keeps them available offline.
+  // Feature images - stale-while-revalidate: serve the cached copy
+  // instantly (0ms) and refresh the cache from the network in the
+  // background so the NEXT view is current. Because the HTML references
+  // versioned URLs (/feature-images/news.png?v=N, see
+  // src/lib/featureImages.ts), any *replaced* image gets a brand-new URL
+  // that no cache holds - so freshness is guaranteed by the URL, and this
+  // strategy only adds speed.
   if (url.pathname.startsWith('/feature-images/')) {
     event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseToCache = networkResponse.clone()
-            caches.open(IMAGE_CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache)
-            })
-          }
-          return networkResponse
-        })
-        .catch(() => caches.match(event.request))
+      caches.open(IMAGE_CACHE_NAME).then(async (cache) => {
+        const cached = await cache.match(event.request)
+        const networkFetch = fetch(event.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone())
+            }
+            return networkResponse
+          })
+          .catch(() => cached)
+        return cached || networkFetch
+      })
     )
     return
   }
@@ -151,22 +155,25 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Other images (news thumbnails, directory/offer/event images, etc.) -
-  // network-first so images replaced or updated on the server show up on
-  // the next load; cache is only an offline fallback. (The specific cases
-  // of /feature-images/* and /api/images/* are handled further up.)
+  // stale-while-revalidate: serve cached instantly, refresh in background.
+  // Safe for two reasons: (1) uploaded images live under /api/images/{id}
+  // with a unique id per upload, so a URL's content never changes; (2) any
+  // same-name replacement goes through a versioned URL that no cache has
+  // seen. If there's no cached copy, wait for the network.
   if (event.request.destination === 'image') {
     event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          if (response && response.status === 200) {
-            const responseToCache = response.clone()
-            caches.open(RUNTIME_CACHE).then((cache) => {
-              cache.put(event.request, responseToCache)
-            })
-          }
-          return response
-        })
-        .catch(() => caches.match(event.request))
+      caches.open(RUNTIME_CACHE).then(async (cache) => {
+        const cached = await cache.match(event.request)
+        const networkFetch = fetch(event.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone())
+            }
+            return networkResponse
+          })
+          .catch(() => cached)
+        return cached || networkFetch
+      })
     )
     return
   }

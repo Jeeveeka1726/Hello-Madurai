@@ -104,16 +104,17 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Feature images - always revalidate so updated images show immediately
-      // (files are replaced in place with the same filename, so we can't
-      // cache them as immutable; browsers will still cache locally but must
-      // check with the server on every load via a fast conditional request)
+      // Feature images - stale-while-revalidate: browsers/CDNs may serve
+      // their cached copy instantly (up to 1 day) while revalidating in
+      // the background. Freshness is guaranteed by the versioned URLs
+      // (?v=N, see src/lib/featureImages.ts) - a replaced image gets a
+      // new URL, so no cache can ever hold a stale copy of it.
       {
         source: '/feature-images/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=0, must-revalidate',
+            value: 'public, max-age=86400, stale-while-revalidate=86400',
           },
         ],
       },
