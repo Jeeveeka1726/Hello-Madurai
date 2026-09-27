@@ -10,6 +10,7 @@ import GlobalRadioPlayer from '@/components/GlobalRadioPlayer'
 import ConditionalFooter from '@/components/layout/ConditionalFooter'
 import WeatherWidget from '@/components/WeatherWidget'
 import BrowserOptimizationWrapper from '@/components/BrowserOptimizationWrapper'
+import { FEATURE_IMAGES_VERSION } from '@/lib/featureImages'
 
 export { reportWebVitals } from './_performance'
 
@@ -113,10 +114,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://img.youtube.com" />
         <link rel="preconnect" href="https://drive.google.com" />
 
-        {/* Preload critical feature images for homepage */}
-        <link rel="preload" href="/feature-images/news.png" as="image" type="image/png" />
-        <link rel="preload" href="/feature-images/FM.png" as="image" type="image/png" />
-        <link rel="preload" href="/feature-images/Video.png" as="image" type="image/png" />
+        {/* Preload critical feature images for homepage - versioned to match src/lib/featureImages.ts */}
+        <link rel="preload" href={`/feature-images/news.png?v=${FEATURE_IMAGES_VERSION}`} as="image" type="image/png" />
+        <link rel="preload" href={`/feature-images/FM.png?v=${FEATURE_IMAGES_VERSION}`} as="image" type="image/png" />
+        <link rel="preload" href={`/feature-images/Video.png?v=${FEATURE_IMAGES_VERSION}`} as="image" type="image/png" />
 
         {/* Pre-load language setting BEFORE React hydrates to prevent flash */}
         <script

@@ -12,9 +12,6 @@ const urlsToCache = [
   '/favicon.ico',
   '/favicon-32x32.png',
   '/favicon-16x16.png',
-  '/feature-images/news.png',
-  '/feature-images/FM.png',
-  '/feature-images/Video.png',
 ]
 
 // Install event - cache resources

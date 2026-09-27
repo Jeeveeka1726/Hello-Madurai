@@ -21,6 +21,7 @@ import SubscriptionButton from '@/components/SubscriptionButton'
 import TranslatedText from '@/components/TranslatedText'
 import ReelsSection from '@/components/ReelsSection'
 import NoticeScroller from '@/components/NoticeScroller'
+import { featureImageUrl } from '@/lib/featureImages'
 
 interface HomeFeature {
   id: string
@@ -270,15 +271,15 @@ export default function RootPage() {
 
                 // Get decorative image based on href - use uploaded images or fallback to feature.backgroundImage
                 const getDecorativeImage = (href: string) => {
-                  if (href.includes('/news')) return '/feature-images/news.png'
-                  if (href.includes('/radio') || href.includes('/fm')) return '/feature-images/FM.png'
-                  if (href.includes('/videos')) return '/feature-images/Video.png'
-                  if (href.includes('/tourism') || href.includes('/directory')) return '/feature-images/Directory.png'
-                  if (href.includes('/events')) return '/feature-images/events.png'
-                  if (href.includes('/epaper') || href.includes('/magazines')) return '/feature-images/epaper.png'
-                  if (href.includes('/helpline')) return '/feature-images/helpline.png'
-                  if (href.includes('/contact')) return '/feature-images/contact.png'
-                  if (href.includes('/discount') || href.includes('/offers')) return '/feature-images/discounts.png'
+                  if (href.includes('/news')) return featureImageUrl('news.png')
+                  if (href.includes('/radio') || href.includes('/fm')) return featureImageUrl('FM.png')
+                  if (href.includes('/videos')) return featureImageUrl('Video.png')
+                  if (href.includes('/tourism') || href.includes('/directory')) return featureImageUrl('Directory.png')
+                  if (href.includes('/events')) return featureImageUrl('events.png')
+                  if (href.includes('/epaper') || href.includes('/magazines')) return featureImageUrl('epaper.png')
+                  if (href.includes('/helpline')) return featureImageUrl('helpline.png')
+                  if (href.includes('/contact')) return featureImageUrl('contact.png')
+                  if (href.includes('/discount') || href.includes('/offers')) return featureImageUrl('discounts.png')
                   return feature.backgroundImage || null
                 }
 
