@@ -38,7 +38,7 @@ export default function ReelsSection() {
   const fetchReels = async () => {
     try {
       const response = await fetch('/api/reels?active=true', {
-        next: { revalidate: 300 } // Cache for 5 minutes
+        cache: 'no-store' // client components ignore next.revalidate; fetch live
       })
       if (response.ok) {
         const data = await response.json()

@@ -123,12 +123,13 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Static assets - cache first for better cross-browser performance
+  // Styles/scripts/fonts - cache-first is safe: Next.js build assets are
+  // content-hashed (name changes when content changes), so a cached copy
+  // can never be stale.
   if (
     event.request.destination === 'style' ||
     event.request.destination === 'script' ||
-    event.request.destination === 'font' ||
-    event.request.destination === 'image'
+    event.request.destination === 'font'
   ) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
@@ -145,6 +146,27 @@ self.addEventListener('fetch', (event) => {
           return response
         })
       })
+    )
+    return
+  }
+
+  // Other images (news thumbnails, directory/offer/event images, etc.) -
+  // network-first so images replaced or updated on the server show up on
+  // the next load; cache is only an offline fallback. (The specific cases
+  // of /feature-images/* and /api/images/* are handled further up.)
+  if (event.request.destination === 'image') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone()
+            caches.open(RUNTIME_CACHE).then((cache) => {
+              cache.put(event.request, responseToCache)
+            })
+          }
+          return response
+        })
+        .catch(() => caches.match(event.request))
     )
     return
   }

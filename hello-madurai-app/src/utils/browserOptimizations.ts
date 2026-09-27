@@ -130,7 +130,8 @@ export function prefetchCriticalResources() {
   if (typeof window === 'undefined') return
   
   const criticalAPIs = [
-    '/api/notice-banners',
+    // '/api/notice-banners' removed - prefetching seeds the HTTP cache with
+    // a stale banner list; NoticeScroller fetches it fresh (no-store)
     '/api/home-features',
     '/api/news/latest',
   ]

@@ -97,9 +97,10 @@ export default function ContentWithAds({ content, newsId, initialAds = [], langu
     try {
       console.log('📢 Fetching ads for news article...')
       const response = await fetch('/api/ads/active?category=news', {
-        // Use cache-first strategy for faster loads
-        cache: 'force-cache',
-        next: { revalidate: 180 } // 3 minutes
+        // Always revalidate - admin ad changes must show up promptly.
+        // (force-cache here served stale ads indefinitely from the
+        // browser's HTTP cache without ever contacting the server)
+        cache: 'no-store'
       })
       console.log('📢 Ads API response status:', response.status)
       if (response.ok) {

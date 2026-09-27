@@ -514,7 +514,7 @@ function DigitalFMPageContent() {
 
     try {
       // Fetch songs with caching
-      const songsRes = await fetch(`/api/radio-songs/singer/${singer.id}`, { next: { revalidate: 180 } }) // Cache for 3 minutes
+      const songsRes = await fetch(`/api/radio-songs/singer/${singer.id}`, { cache: 'no-store' }) // Always fresh
       const data = await songsRes.json()
 
       if (data && data.length > 0) {

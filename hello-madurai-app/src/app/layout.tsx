@@ -100,8 +100,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://hello-madurai-c5xr.vercel.app" crossOrigin="anonymous" />
 
-        {/* Prefetch critical API endpoints */}
-        <link rel="prefetch" href="/api/notice-banners" as="fetch" crossOrigin="anonymous" />
+        {/* Prefetch critical API endpoints
+            NOTE: /api/notice-banners intentionally NOT prefetched - prefetch
+            seeds the HTTP cache with a copy of the banner list, which then
+            goes stale when admins update banners. NoticeScroller fetches it
+            directly (no-store) instead. */}
         <link rel="prefetch" href="/api/home-features" as="fetch" crossOrigin="anonymous" />
         <link rel="prefetch" href="/api/news/latest" as="fetch" crossOrigin="anonymous" />
         <link rel="prefetch" href="/api/ads/active?category=news" as="fetch" crossOrigin="anonymous" />

@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-// Cache for 30 seconds (reduce from 5 minutes)
-export const revalidate = 30
+// Always serve the live banner list - no Next.js route caching, no CDN
+// caching, no browser caching. Admin banner changes must be visible on the
+// very next page load on every device (phone / tablet / laptop).
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
@@ -15,7 +17,8 @@ export async function GET() {
 
     return NextResponse.json(banners || [], {
       headers: {
-        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60'
+        'Cache-Control': 'no-store, must-revalidate',
+        'Pragma': 'no-cache'
       }
     })
   } catch (error) {
