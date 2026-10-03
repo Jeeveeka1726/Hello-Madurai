@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 // Cache for 5 minutes
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 // GET all radio categories (public)
 export async function GET() {

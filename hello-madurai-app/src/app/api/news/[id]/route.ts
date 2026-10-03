@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
 // Cache for 1 minute
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 export async function GET(
   request: Request,
@@ -38,7 +38,7 @@ export async function GET(
 
     return NextResponse.json(article, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+        'Cache-Control': 'no-store, must-revalidate',
         'X-Response-Time': `${duration}ms`
       }
     })

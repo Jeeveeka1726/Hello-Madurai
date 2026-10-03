@@ -129,14 +129,14 @@ export default function ContactPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-8">
               {t('contact.followUs', 'Follow Us', 'எங்களைப் பின்தொடருங்கள்')}
             </h2>
-            <div className="flex justify-center items-center space-x-6">
+            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-5 md:gap-6">
               {socialLinks.map((social, index) => (
                 <a
                   key={index}
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 group"
+                  className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 group"
                   title={`Follow us on ${social.name}`}
                 >
                   <div className="text-white group-hover:scale-110 transition-transform">

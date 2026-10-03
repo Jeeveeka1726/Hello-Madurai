@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-// Cache for 60 seconds, revalidate in background
-export const revalidate = 60
-// Force dynamic to use connection pooling
+// Always serve live news - admin changes must appear on the next page load.
+// revalidate=0 disables ISR; force-dynamic makes every request hit the DB.
+export const revalidate = 0
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(news || [], {
       headers: {
-        'Cache-Control': 'public, max-age=30, s-maxage=60, must-revalidate',
+        'Cache-Control': 'no-store, must-revalidate',
         'X-Response-Time': `${duration}ms`,
         'Vary': 'Accept-Encoding',
         'ETag': `"news-${Date.now()}"`,

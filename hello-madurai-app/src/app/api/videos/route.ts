@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
 // Cache for 2 minutes
-export const revalidate = 120
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,7 +20,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(videos || [], {
       headers: {
-        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=240'
+        'Cache-Control': 'no-store, must-revalidate',
+        'Pragma': 'no-cache'
       }
     })
   } catch (error) {

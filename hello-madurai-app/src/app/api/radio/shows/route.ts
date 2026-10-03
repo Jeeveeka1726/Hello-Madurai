@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
 // Cache for 3 minutes
-export const revalidate = 180
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,7 +24,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(radioShows, {
       headers: {
-        'Cache-Control': 'public, max-age=60, s-maxage=180, must-revalidate',
+        'Cache-Control': 'no-store, must-revalidate',
+        'Pragma': 'no-cache',
         'Vary': 'Accept-Encoding',
         'Pragma': 'no-cache',
         'Expires': '0'

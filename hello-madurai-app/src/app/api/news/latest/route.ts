@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
 // Cache for 1 minute
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 // GET /api/news/latest - Get latest 6 news for homepage (optimized)
 export async function GET() {
@@ -32,7 +32,7 @@ export async function GET() {
 
     return NextResponse.json(news || [], {
       headers: {
-        'Cache-Control': 'public, max-age=30, s-maxage=60, must-revalidate',
+        'Cache-Control': 'no-store, must-revalidate',
         'Vary': 'Accept-Encoding',
         'ETag': `"latest-news-${Date.now()}"`,
         // Firefox-specific: prevent stale cache

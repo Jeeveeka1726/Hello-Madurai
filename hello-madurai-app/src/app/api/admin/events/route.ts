@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-// Cache for 5 minutes
-export const revalidate = 300
+// Always serve live data - admin changes must appear on the next page load
+export const dynamic = 'force-dynamic'
 
 // GET /api/admin/events - Get all events
 export async function GET() {
@@ -17,7 +17,8 @@ export async function GET() {
 
     return NextResponse.json(events || [], {
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+        'Cache-Control': 'no-store, must-revalidate',
+        'Pragma': 'no-cache'
       }
     })
   } catch (error: any) {

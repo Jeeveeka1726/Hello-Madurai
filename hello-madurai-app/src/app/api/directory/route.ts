@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
 // Cache for 3 minutes
-export const revalidate = 180
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   try {
@@ -53,7 +53,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(businesses || [], {
       headers: {
-        'Cache-Control': 'public, max-age=60, s-maxage=180, must-revalidate',
+        'Cache-Control': 'no-store, must-revalidate',
         'Vary': 'Accept-Encoding',
         'Pragma': 'no-cache',
         'Expires': '0'

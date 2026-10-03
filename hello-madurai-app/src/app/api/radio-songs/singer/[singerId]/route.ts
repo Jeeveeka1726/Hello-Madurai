@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 // Cache for 3 minutes
-export const revalidate = 180
+export const dynamic = 'force-dynamic'
 
 /**
  * GET /api/radio-songs/singer/[singerId]
@@ -42,7 +42,8 @@ export async function GET(
 
     return NextResponse.json(songs, {
       headers: {
-        'Cache-Control': 'public, s-maxage=180, stale-while-revalidate=360'
+        'Cache-Control': 'no-store, must-revalidate',
+        'Pragma': 'no-cache'
       }
     })
   } catch (error) {

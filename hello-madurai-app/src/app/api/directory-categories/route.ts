@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
 // Cache for 5 minutes
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 // GET: Fetch all directory categories for public use
 export async function GET(request: NextRequest) {
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ categories }, {
       headers: {
-        'Cache-Control': 'public, max-age=60, s-maxage=300, must-revalidate',
+        'Cache-Control': 'no-store, must-revalidate',
         'Vary': 'Accept-Encoding',
         'Pragma': 'no-cache',
         'Expires': '0'

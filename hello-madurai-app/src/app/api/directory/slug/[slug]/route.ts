@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
 // Cache for 3 minutes
-export const revalidate = 180
+export const dynamic = 'force-dynamic'
 
 // GET /api/directory/slug/[slug] - Get business by slug
 export async function GET(
@@ -57,7 +57,8 @@ export async function GET(
 
     return NextResponse.json(business, {
       headers: {
-        'Cache-Control': 'public, s-maxage=180, stale-while-revalidate=360',
+        'Cache-Control': 'no-store, must-revalidate',
+        'Pragma': 'no-cache',
         'X-Response-Time': `${duration}ms`
       }
     })
